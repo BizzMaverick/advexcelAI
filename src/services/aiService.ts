@@ -99,9 +99,9 @@ Please perform the requested operation and return the result.`;
     }
   }
 
-  private static _formatDataForAI(_data: any[][]): string {
-    return 'Empty spreadsheet';
-  }
+  // private static _formatDataForAI(_data: any[][]): string {
+  //   return 'Empty spreadsheet';
+  // }
 
   private static handleCommonOperations(prompt: string, data: any[][]): ExcelResult {
     const lowerPrompt = prompt.toLowerCase();
@@ -136,9 +136,9 @@ Please perform the requested operation and return the result.`;
     }
     
     // Handle specific column operations
-    if (lowerPrompt.includes('column') || lowerPrompt.includes('col')) {
-      return this.handleColumnSpecificOperation(prompt, data);
-    }
+    // if (lowerPrompt.includes('column') || lowerPrompt.includes('col')) {
+    //   return this.handleColumnSpecificOperation(prompt, data);
+    // }
     
     // Handle row operations
     if (lowerPrompt.includes('row')) {
@@ -473,33 +473,33 @@ Please perform the requested operation and return the result.`;
     };
   }
 
-  private static handleColumnSpecificOperation(prompt: string, data: any[][]): ExcelResult {
-    // Extract column information
-    const columnMatch = prompt.match(/column\s+([A-Za-z])/i) || prompt.match(/col\s+([A-Za-z])/i);
-    
-    if (columnMatch) {
-      const columnLetter = columnMatch[1].toUpperCase();
-      const columnIndex = this.letterToIndex(columnLetter);
-      
-      // Determine what operation to perform on the column
-      if (prompt.includes('sum') || prompt.includes('total')) {
-        return this.handleSumOperation(prompt, data);
-      } else if (prompt.includes('average') || prompt.includes('avg')) {
-        return this.handleAverageOperation(prompt, data);
-      } else if (prompt.includes('sort')) {
-        return this.handleSortOperation(prompt, data);
-      }
-    }
-    
-    // Default column operation
-    return {
-      operation: {
-        type: 'custom',
-        description: `Processed column operation: ${prompt}`
-      },
-      newData: data
-    };
-  }
+  // private static handleColumnSpecificOperation(prompt: string, data: any[][]): ExcelResult {
+  //   // Extract column information
+  //   const columnMatch = prompt.match(/column\s+([A-Za-z])/i) || prompt.match(/col\s+([A-Za-z])/i);
+  //   
+  //   if (columnMatch) {
+  //     const columnLetter = columnMatch[1].toUpperCase();
+  //     const columnIndex = this.letterToIndex(columnLetter);
+  //     
+  //     // Determine what operation to perform on the column
+  //     if (prompt.includes('sum') || prompt.includes('total')) {
+  //       return this.handleSumOperation(prompt, data);
+  //     } else if (prompt.includes('average') || prompt.includes('avg')) {
+  //       return this.handleAverageOperation(prompt, data);
+  //     } else if (prompt.includes('sort')) {
+  //       return this.handleSortOperation(prompt, data);
+  //     }
+  //   }
+  //   
+  //   // Default column operation
+  //   return {
+  //     operation: {
+  //       type: 'custom',
+  //       description: `Processed column operation: ${prompt}`
+  //     },
+  //     newData: data
+  //   };
+  // }
 
   private static handleRowOperation(prompt: string, data: any[][]): ExcelResult {
     // Extract row information
