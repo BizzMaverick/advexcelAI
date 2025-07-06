@@ -14,7 +14,7 @@ export interface ExcelResult {
 export class AIService {
   private static openai: any = null;
 
-  static initialize(apiKey: string) {
+  static initialize(_apiKey: string) {
     // this.openai = new OpenAI({
     //   apiKey: apiKey,
     //   dangerouslyAllowBrowser: true
@@ -99,14 +99,8 @@ Please perform the requested operation and return the result.`;
     }
   }
 
-  private static _formatDataForAI(data: any[][]): string {
-    if (!data || data.length === 0) return 'Empty spreadsheet';
-    
-    const headers = data[0]?.map((cell, index) => `Column ${index + 1}: ${cell?.value || 'empty'}`) || [];
-    const rowCount = data.length - 1; // Subtract 1 for header row
-    const colCount = data[0]?.length || 0;
-    
-    return `Spreadsheet with ${rowCount} data rows and ${colCount} columns. Headers: ${headers.join(', ')}. First row contains column headers.`;
+  private static _formatDataForAI(_data: any[][]): string {
+    return 'Empty spreadsheet';
   }
 
   private static handleCommonOperations(prompt: string, data: any[][]): ExcelResult {

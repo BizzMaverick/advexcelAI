@@ -15,23 +15,23 @@ export interface ChartData {
 }
 
 export class ExcelService {
-  static async loadExcelFile(file: File): Promise<any[][]> {
+  static async loadExcelFile(_file: File): Promise<any[][]> {
     return [];
   }
 
-  static async saveExcelFile(data: any[][], filename: string): Promise<void> {
+  static async saveExcelFile(_data: any[][], _filename: string): Promise<void> {
     // Stub implementation
   }
 
-  static applyFormulas(data: any[][], formulas: ExcelFormula[]): any[][] {
+  static applyFormulas(data: any[][], _formulas: ExcelFormula[]): any[][] {
     return data;
   }
 
-  static applyConditionalFormatting(data: any[][], formats: ConditionalFormat[]): any[][] {
+  static applyConditionalFormatting(data: any[][], _formats: ConditionalFormat[]): any[][] {
     return data;
   }
 
-  static createChartData(data: any[][]): ChartData {
+  static createChartData(_data: any[][]): ChartData {
     return {
       labels: [],
       datasets: []
