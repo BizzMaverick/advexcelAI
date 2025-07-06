@@ -3,27 +3,33 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
+  min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
   overflow-y: auto;
-  padding: 20px;
+  overflow-x: hidden;
+  padding: 10px;
+  box-sizing: border-box;
 }
 
 .coming-soon-content {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   border-radius: 20px;
-  padding: 40px;
+  padding: 30px 20px;
   text-align: center;
   max-width: 600px;
   width: 100%;
+  min-height: fit-content;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   color: #333;
+  margin: auto;
+  box-sizing: border-box;
 }
 
 .logo-section {
@@ -150,57 +156,224 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .coming-soon-overlay {
+    padding: 5px;
+  }
+  
   .coming-soon-content {
-    padding: 30px 20px;
-    margin: 10px;
+    padding: 25px 15px;
+    margin: 5px;
+    border-radius: 15px;
   }
   
   .logo-section h1 {
-    font-size: 2em;
-  }
-  
-  .launch-info h2 {
     font-size: 1.8em;
   }
   
-  .countdown {
-    gap: 15px;
+  .launch-info h2 {
+    font-size: 1.6em;
   }
   
-  .countdown-item {
-    min-width: 70px;
-    padding: 15px 10px;
-  }
-  
-  .countdown-item .number {
-    font-size: 1.5em;
-  }
-  
-  .countdown-item .label {
-    font-size: 0.8em;
-  }
-}
-
-@media (max-width: 480px) {
-  .coming-soon-content {
-    padding: 20px 15px;
+  .launch-info p {
+    font-size: 1em;
   }
   
   .countdown {
-    gap: 10px;
+    gap: 12px;
   }
   
   .countdown-item {
-    min-width: 60px;
+    min-width: 65px;
     padding: 12px 8px;
   }
   
   .countdown-item .number {
+    font-size: 1.4em;
+  }
+  
+  .countdown-item .label {
+    font-size: 0.75em;
+  }
+  
+  .features-preview h3 {
+    font-size: 1.2em;
+  }
+  
+  .features-preview li {
+    font-size: 0.9em;
+  }
+}
+
+@media (max-width: 480px) {
+  .coming-soon-overlay {
+    padding: 2px;
+  }
+  
+  .coming-soon-content {
+    padding: 20px 12px;
+    margin: 2px;
+    border-radius: 12px;
+  }
+  
+  .logo-section h1 {
+    font-size: 1.5em;
+  }
+  
+  .launch-info h2 {
+    font-size: 1.4em;
+  }
+  
+  .launch-info p {
+    font-size: 0.9em;
+  }
+  
+  .countdown {
+    gap: 8px;
+  }
+  
+  .countdown-item {
+    min-width: 55px;
+    padding: 10px 6px;
+  }
+  
+  .countdown-item .number {
+    font-size: 1.2em;
+  }
+  
+  .countdown-item .label {
+    font-size: 0.65em;
+  }
+  
+  .features-preview h3 {
+    font-size: 1.1em;
+  }
+  
+  .features-preview li {
+    font-size: 0.85em;
+  }
+  
+  .contact-info p {
+    font-size: 0.9em;
+  }
+}
+
+@media (max-width: 360px) {
+  .coming-soon-overlay {
+    padding: 1px;
+  }
+  
+  .coming-soon-content {
+    padding: 15px 10px;
+    margin: 1px;
+    border-radius: 10px;
+  }
+  
+  .logo-section h1 {
     font-size: 1.3em;
+  }
+  
+  .launch-info h2 {
+    font-size: 1.2em;
+  }
+  
+  .launch-info p {
+    font-size: 0.85em;
+  }
+  
+  .countdown {
+    gap: 6px;
+  }
+  
+  .countdown-item {
+    min-width: 50px;
+    padding: 8px 5px;
+  }
+  
+  .countdown-item .number {
+    font-size: 1.1em;
+  }
+  
+  .countdown-item .label {
+    font-size: 0.6em;
+  }
+  
+  .features-preview h3 {
+    font-size: 1em;
+  }
+  
+  .features-preview li {
+    font-size: 0.8em;
+  }
+  
+  .contact-info p {
+    font-size: 0.85em;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (max-height: 600px) and (orientation: landscape) {
+  .coming-soon-overlay {
+    padding: 5px;
+  }
+  
+  .coming-soon-content {
+    padding: 15px 20px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  .logo-section {
+    margin-bottom: 15px;
+  }
+  
+  .logo-section h1 {
+    font-size: 1.5em;
+  }
+  
+  .launch-info h2 {
+    font-size: 1.3em;
+  }
+  
+  .launch-info p {
+    font-size: 0.9em;
+    margin-bottom: 15px;
+  }
+  
+  .countdown {
+    gap: 10px;
+    margin: 15px 0;
+  }
+  
+  .countdown-item {
+    min-width: 60px;
+    padding: 10px 8px;
+  }
+  
+  .countdown-item .number {
+    font-size: 1.2em;
   }
   
   .countdown-item .label {
     font-size: 0.7em;
+  }
+  
+  .features-preview {
+    margin: 15px 0;
+  }
+  
+  .features-preview h3 {
+    font-size: 1.1em;
+    margin-bottom: 10px;
+  }
+  
+  .features-preview li {
+    font-size: 0.85em;
+    padding: 5px 0;
+  }
+  
+  .contact-info {
+    margin-top: 15px;
+    padding-top: 15px;
   }
 }
 
