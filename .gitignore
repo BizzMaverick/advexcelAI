@@ -15,7 +15,10 @@ pnpm-debug.log*
 # Build outputs
 dist/
 build/
+<<<<<<< HEAD
 *.tsbuildinfo
+=======
+>>>>>>> 21ae1af82d09521b87df252822dab1fb1422f456
 
 # IDE and editor files
 .vscode/
@@ -84,16 +87,20 @@ jspm_packages/
 # Nuxt.js build / generate output
 .nuxt
 
+<<<<<<< HEAD
 # Gatsby files
 .cache/
 public
 
+=======
+>>>>>>> 21ae1af82d09521b87df252822dab1fb1422f456
 # Storybook build outputs
 .out
 .storybook-out
 
 # Temporary folders
 tmp/
+<<<<<<< HEAD
 temp/
 
 # API keys and secrets
@@ -110,3 +117,6 @@ test-data/
 # Backup files
 *.bak
 *.backup 
+=======
+temp/ 
+>>>>>>> 21ae1af82d09521b87df252822dab1fb1422f456

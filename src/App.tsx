@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
@@ -84,3 +85,12 @@ function App() {
 }
 
 export default App; 
+=======
+import LandingPage from './LandingPage';
+
+const App = () => {
+  return <LandingPage />;
+};
+
+export default App;
+>>>>>>> 21ae1af82d09521b87df252822dab1fb1422f456

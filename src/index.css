@@ -1,5 +1,12 @@
+<<<<<<< HEAD
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+=======
+/* Luckysheet CSS imports removed; now loaded via CDN in index.html */
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+>>>>>>> 21ae1af82d09521b87df252822dab1fb1422f456
   line-height: 1.5;
   font-weight: 400;
 
@@ -11,7 +18,10 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+<<<<<<< HEAD
   -webkit-text-size-adjust: 100%;
+=======
+>>>>>>> 21ae1af82d09521b87df252822dab1fb1422f456
 }
 
 a {
@@ -31,6 +41,19 @@ body {
   min-height: 100vh;
 }
 
+<<<<<<< HEAD
+=======
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+>>>>>>> 21ae1af82d09521b87df252822dab1fb1422f456
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
@@ -44,7 +67,10 @@ button {
   font-weight: 500;
   font-family: inherit;
   background-color: #1a1a1a;
+<<<<<<< HEAD
   color: white;
+=======
+>>>>>>> 21ae1af82d09521b87df252822dab1fb1422f456
   cursor: pointer;
   transition: border-color 0.25s;
 }
@@ -66,6 +92,7 @@ button:focus-visible {
   }
   button {
     background-color: #f9f9f9;
+<<<<<<< HEAD
     color: #213547;
   }
 }
@@ -84,3 +111,7 @@ button:focus-visible {
 .read-the-docs {
   color: #888;
 } 
+=======
+  }
+}
+>>>>>>> 21ae1af82d09521b87df252822dab1fb1422f456
