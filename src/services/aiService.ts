@@ -1,4 +1,4 @@
-import OpenAI from 'openai';
+// import OpenAI from 'openai';
 
 export interface ExcelOperation {
   type: 'sum' | 'average' | 'filter' | 'sort' | 'formula' | 'format' | 'custom';
@@ -12,18 +12,18 @@ export interface ExcelResult {
 }
 
 export class AIService {
-  private static openai: OpenAI | null = null;
+  private static openai: any = null;
 
   static initialize(apiKey: string) {
-    this.openai = new OpenAI({
-      apiKey: apiKey,
-      dangerouslyAllowBrowser: true
-    });
+    // this.openai = new OpenAI({
+    //   apiKey: apiKey,
+    //   dangerouslyAllowBrowser: true
+    // });
   }
 
   static async processExcelPrompt(
     prompt: string, 
-    spreadsheetData: any[][], 
+    _spreadsheetData: any[][], 
     currentData: any[][]
   ): Promise<ExcelResult> {
     if (!this.openai) {
@@ -99,7 +99,7 @@ Please perform the requested operation and return the result.`;
     }
   }
 
-  private static formatDataForAI(data: any[][]): string {
+  private static _formatDataForAI(data: any[][]): string {
     if (!data || data.length === 0) return 'Empty spreadsheet';
     
     const headers = data[0]?.map((cell, index) => `Column ${index + 1}: ${cell?.value || 'empty'}`) || [];
