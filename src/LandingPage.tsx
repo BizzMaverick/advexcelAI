@@ -72,18 +72,18 @@ const LandingPage: React.FC = () => {
           <span style={sparkleStyle}>✨</span>
           ADVANCED EXCEL AI
           <span style={sparkleStyle}>🚀</span>
-        </div>
+              </div>
         <div style={{ fontSize: '2rem', marginBottom: '18px', fontWeight: 700 }}>
           Something <span style={{ color: '#ffcc33' }}>amazing</span> is coming!
-        </div>
+          </div>
         <div style={{ fontSize: '1.3rem', marginBottom: '30px', color: '#fff', opacity: 0.9 }}>
           We are working hard to bring you the next generation of Excel superpowers.<br/>
           <span style={{ color: '#ffcc33', fontWeight: 700 }}>Launching on {LAUNCH_DATE}</span>
-        </div>
+            </div>
         <button style={buttonStyle} onClick={handleAnyClick}>
           Notify Me &rarr;
-        </button>
-      </div>
+              </button>
+            </div>
       {showModal && (
         <div style={{ ...modalStyle, position: 'absolute', top: '30%', left: '50%', transform: 'translate(-50%, -30%)' }} onClick={handleCloseModal}>
           <div style={{ fontSize: '2.2rem', marginBottom: '10px' }}>🎉</div>
@@ -115,4 +115,4 @@ const LandingPage: React.FC = () => {
   );
 };
 
-export default LandingPage; 
+export default LandingPage;

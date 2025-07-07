@@ -1,5 +1,3 @@
-// import OpenAI from 'openai';
-
 export interface ExcelOperation {
   type: 'sum' | 'average' | 'filter' | 'sort' | 'formula' | 'format' | 'custom';
   description: string;
@@ -9,94 +7,27 @@ export interface ExcelOperation {
 export interface ExcelResult {
   operation: ExcelOperation;
   newData: any[][];
+  instructions?: string;
 }
 
 export class AIService {
-  private static openai: any = null;
-
-  static initialize(_apiKey: string) {
-    // this.openai = new OpenAI({
-    //   apiKey: apiKey,
-    //   dangerouslyAllowBrowser: true
-    // });
-  }
-
-  static async processExcelPrompt(
-    prompt: string, 
-    _spreadsheetData: any[][], 
-    currentData: any[][]
-  ): Promise<ExcelResult> {
-    if (!this.openai) {
-      throw new Error('AI Service not initialized. Please set your OpenAI API key.');
+  static async processExcelPrompt(prompt: string, spreadsheetData: any[][], currentData: any[][]): Promise<ExcelResult> {
+    // Call backend proxy
+    const response = await fetch('http://localhost:5001/api/ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, spreadsheetData })
+    });
+    if (!response.ok) {
+      throw new Error('AI backend error');
     }
-
-    try {
-      const systemPrompt = `You are an Excel AI assistant. Process the user's request and modify the spreadsheet data accordingly.
-
-Available operations:
-- sum: Calculate sum of numeric columns
-- average: Calculate average of numeric columns  
-- filter: Filter rows based on conditions
-- sort: Sort data by columns
-- formula: Apply Excel formulas
-- format: Apply formatting
-- custom: Handle other operations
-
-Guidelines:
-- If they mention a specific column (A, B, C, or 1, 2, 3), focus on that column
-- If they want to sum/average specific columns, only process those columns
-- If they want to sort, identify the column to sort by
-- If they want to filter, identify the condition
-
-Respond with a JSON object containing:
-{
-  "operation": {
-    "type": "sum|average|filter|sort|formula|format|custom",
-    "description": "What operation was performed"
-  },
-  "instructions": "Step-by-step instructions for the user",
-  "newData": [array of arrays representing the modified spreadsheet data]
-}
-
-Only return valid JSON.`;
-
-      const userPrompt = `User request: "${prompt}"
-
-Current spreadsheet data:
-${JSON.stringify(currentData, null, 2)}
-
-Please perform the requested operation and return the result.`;
-
-      const completion = await this.openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
-        ],
-        temperature: 0.1,
-        max_tokens: 2000
-      });
-
-      const response = completion.choices[0]?.message?.content;
-      
-      if (!response) {
-        throw new Error('No response from AI');
-      }
-
-      // Parse the AI response
-      const result = JSON.parse(response);
-      
-      return {
-        operation: result.operation,
-        newData: result.newData || currentData
-      };
-
-    } catch (error) {
-      console.error('AI processing error:', error);
-      
-      // Fallback: Try to handle common operations manually
-      return this.handleCommonOperations(prompt, currentData);
-    }
+    const data = await response.json();
+    // For now, just return the instructions and keep the data unchanged
+    return {
+      operation: { type: 'custom', description: prompt },
+      newData: currentData,
+      instructions: data.result
+    };
   }
 
   // private static _formatDataForAI(_data: any[][]): string {
@@ -203,18 +134,18 @@ Please perform the requested operation and return the result.`;
     
     const newData = [...data];
     const sumRow = new Array(data[0].length).fill({ value: '' });
-    
+        
     numericColumns.forEach(colIndex => {
       const columnLetter = this.indexToLetter(colIndex);
       const sum = data.slice(1).reduce((acc, row) => {
         const cellValue = row[colIndex]?.value || row[colIndex];
         return acc + (Number(cellValue) || 0);
-      }, 0);
-      
+        }, 0);
+        
       sumRow[colIndex] = { value: sum, formula: `=SUM(${columnLetter}:${columnLetter})` };
-    });
-    
-    newData.push(sumRow);
+      });
+      
+      newData.push(sumRow);
     
     return {
       operation: {
@@ -232,7 +163,7 @@ Please perform the requested operation and return the result.`;
     if (columnMatch) {
       const columnLetter = columnMatch[1].toUpperCase();
       const columnIndex = this.letterToIndex(columnLetter);
-      
+        
       // Calculate average
       const numericValues = data.slice(1)
         .map(row => {
@@ -240,7 +171,7 @@ Please perform the requested operation and return the result.`;
           return Number(cellValue);
         })
         .filter(val => !isNaN(val));
-      
+        
       const average = numericValues.length > 0 
         ? numericValues.reduce((acc, val) => acc + val, 0) / numericValues.length 
         : 0;
@@ -325,15 +256,15 @@ Please perform the requested operation and return the result.`;
           const cellValue = row[columnIndex]?.value || row[columnIndex];
           return Number(cellValue) > threshold;
         });
-        
-        return {
-          operation: {
-            type: 'filter',
-            description: `Filtered rows with values greater than ${threshold}`
-          },
-          newData: filteredData
-        };
-      }
+      
+      return {
+        operation: {
+          type: 'filter',
+          description: `Filtered rows with values greater than ${threshold}`
+        },
+        newData: filteredData
+      };
+    }
     }
     
     if (lessMatch) {
@@ -347,15 +278,15 @@ Please perform the requested operation and return the result.`;
           const cellValue = row[columnIndex]?.value || row[columnIndex];
           return Number(cellValue) < threshold;
         });
-        
-        return {
-          operation: {
-            type: 'filter',
-            description: `Filtered rows with values less than ${threshold}`
-          },
-          newData: filteredData
-        };
-      }
+      
+      return {
+        operation: {
+          type: 'filter',
+          description: `Filtered rows with values less than ${threshold}`
+        },
+        newData: filteredData
+      };
+    }
     }
     
     if (containsMatch) {
@@ -420,14 +351,14 @@ Please perform the requested operation and return the result.`;
           return bStr.localeCompare(aStr);
         } else {
           return aStr.localeCompare(bStr);
-        }
+    }
       });
-      
+    
       const newData = [header, ...sortedDataRows];
       
-      return {
-        operation: {
-          type: 'sort',
+    return {
+      operation: {
+        type: 'sort',
           description: `Sorted data by column ${columnLetter} ${isDescending ? 'descending' : 'ascending'}`
         },
         newData: newData
@@ -442,7 +373,7 @@ Please perform the requested operation and return the result.`;
     const sortedDataRows = dataRows.sort((a, b) => {
       const aValue = a[0]?.value || a[0];
       const bValue = b[0]?.value || b[0];
-      
+        
       // Try numeric comparison first
       const aNum = Number(aValue);
       const bNum = Number(bValue);
@@ -454,7 +385,7 @@ Please perform the requested operation and return the result.`;
       // Fall back to string comparison
       const aStr = String(aValue).toLowerCase();
       const bStr = String(bValue).toLowerCase();
-      
+        
       if (isDescending) {
         return bStr.localeCompare(aStr);
       } else {

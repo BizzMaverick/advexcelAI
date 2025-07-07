@@ -565,6 +565,71 @@
   border-left: 4px solid #363;
 }
 
+/* Spreadsheet Styles */
+.spreadsheet-container {
+  margin-top: 30px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background: white;
+}
+
+.spreadsheet-header {
+  background: #f8f9fa;
+  padding: 15px 20px;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.spreadsheet-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.2em;
+}
+
+.data-info {
+  color: #666;
+  font-size: 0.9em;
+  font-weight: 500;
+}
+
+.spreadsheet-table-container {
+  overflow-x: auto;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.spreadsheet-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9em;
+}
+
+.spreadsheet-table th,
+.spreadsheet-table td {
+  color: #222 !important;
+  background: #fff;
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spreadsheet-table tr:hover {
+  background-color: #f5f5f5;
+}
+
+.spreadsheet-table tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .header {
@@ -591,4 +656,59 @@
   .ai-controls {
     justify-content: center;
   }
+  
+  .spreadsheet-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .spreadsheet-table {
+    font-size: 0.8em;
+  }
+  
+  .spreadsheet-table th,
+  .spreadsheet-table td {
+    padding: 6px 4px;
+  }
 }
+
+.ai-prompt-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 32px 0 24px 0;
+  width: 100%;
+}
+
+.ai-prompt-input {
+  width: 60%;
+  min-width: 280px;
+  max-width: 700px;
+  font-size: 1.5em;
+  padding: 22px 32px;
+  border-radius: 40px;
+  border: 1.5px solid #e0e0e0;
+  box-shadow: 0 4px 24px rgba(102, 126, 234, 0.10);
+  outline: none;
+  background: #fff;
+  transition: box-shadow 0.2s, border-color 0.2s;
+  margin: 0 auto;
+  color: #222;
+}
+
+.ai-prompt-input:focus {
+  border-color: #667eea;
+  box-shadow: 0 6px 32px rgba(102, 126, 234, 0.18);
+}
+
+@media (max-width: 768px) {
+  .ai-prompt-input {
+    width: 95%;
+    font-size: 1.1em;
+    padding: 16px 16px;
+  }
+  .ai-prompt-bar {
+    margin: 18px 0 12px 0;
+  }
+}
+ 
