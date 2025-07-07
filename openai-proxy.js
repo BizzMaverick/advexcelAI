@@ -3,15 +3,37 @@ import express from 'express';
 import cors from 'cors';
 import OpenAI from 'openai';
 import dotenv from 'dotenv';
+import multer from 'multer';
+import fs from 'fs';
 
 dotenv.config();
 
 const app = express();
 app.use(cors());
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+const upload = multer({ dest: 'uploads/' });
 
 // Temporarily comment out OpenAI for testing
 // const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+// File upload endpoint
+app.post('/api/upload', upload.single('file'), async (req, res) => {
+  const prompt = req.body.prompt;
+  const filePath = req.file.path;
+  try {
+    // Read the uploaded file (CSV or XLSX)
+    const fileBuffer = fs.readFileSync(filePath);
+    // You can parse the fileBuffer here if needed (e.g., with xlsx or csv-parse)
+    // For now, just return a mock response
+    res.json({ result: `Received file ${req.file.originalname} (${req.file.mimetype}, ${req.file.size} bytes) with prompt: ${prompt}` });
+    // Clean up the uploaded file
+    fs.unlinkSync(filePath);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 app.post('/api/ai', async (req, res) => {
   const { prompt, spreadsheetData } = req.body;

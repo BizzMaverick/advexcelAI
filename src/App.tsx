@@ -103,16 +103,16 @@ function App() {
   
   // AI prompt handler
   const handleRunAI = async () => {
-    if (!prompt.trim() || spreadsheetData.length === 0) return;
+    if (!prompt.trim() || !selectedFile) return;
     setAiLoading(true);
     setAiError(null);
     setAiInstructions(null);
     setAiResultData(null);
     try {
-      // Use the current spreadsheet data (excluding header row)
-      const result = await AIService.processExcelPrompt(prompt, spreadsheetData, spreadsheetData);
-      setAiInstructions(result.instructions || '');
-      setAiResultData(result.newData || []);
+      // Use the new upload method for large files
+      const result = await AIService.uploadSpreadsheetWithPrompt(selectedFile, prompt);
+      setAiInstructions(result.result || '');
+      // Optionally, update aiResultData if your backend returns processed data
     } catch (err: any) {
       setAiError(err.message || 'AI processing failed');
     } finally {
