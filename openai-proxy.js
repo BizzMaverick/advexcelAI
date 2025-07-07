@@ -24,6 +24,7 @@ function rewritePrompt(userPrompt, spreadsheetData) {
 
 // File upload endpoint with robust AI processing
 app.post('/api/upload', upload.single('file'), async (req, res) => {
+  console.log('OPENAI_API_KEY present:', !!process.env.OPENAI_API_KEY);
   const prompt = req.body.prompt;
   const filePath = req.file.path;
   try {
@@ -36,8 +37,9 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
     fs.unlinkSync(filePath);
 
     if (process.env.OPENAI_API_KEY) {
+      console.log('About to call OpenAI...');
       const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-      const systemPrompt = `You are an Excel AI assistant. When the user asks for a change, you MUST return ONLY a valid JSON object with two keys: 'data' (the updated spreadsheet as an array of arrays) and 'formatting' (an array of arrays of formatting objects, matching the data structure, with keys like 'color', 'background', 'bold', 'italic'). Do not return any explanation, markdown, or extra text. If the request is ambiguous or impossible, return the original spreadsheet as 'data' and an empty array for 'formatting'. Example: {"data": [["A", "B"], [1, 2]], "formatting": [[{"bold":true,"color":"red"},{"bold":false}], [{},{}]]}`;
+      const systemPrompt = `You are an Excel AI assistant. When the user asks for a change, you MUST return ONLY a valid JSON object with two keys: 'data' (the updated spreadsheet as an array of arrays) and 'formatting' (an array of arrays of formatting objects, matching the data structure, with keys like 'color', 'background', 'bold', 'italic'). Do not return any explanation, markdown, or extra text. If the request is ambiguous or impossible, return the original spreadsheet as 'data' and an empty array for 'formatting'. Example: {"data": [["A", "B"], [1, 2]], "formatting": [[{"bold":true,"color":"red"},{"bold":false}], [{},{}]]]}`;
       // Use the new prompt rewriting function
       const rewrittenPrompt = rewritePrompt(prompt, spreadsheetData);
       const completion = await openai.chat.completions.create({
@@ -71,18 +73,9 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
       }
       return res.json({ result: response, data: aiResult.data, formatting: aiResult.formatting });
     } else {
+      console.log('Returning mock response!');
       return res.json({ result: `Mock AI Response: I understand you want to "${prompt}". Here's what I would do with your spreadsheet data: ${JSON.stringify(spreadsheetData).substring(0, 100)}...`, newData: spreadsheetData });
     }
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.post('/api/ai', async (req, res) => {
-  const { prompt, spreadsheetData } = req.body;
-  try {
-    const mockResponse = `Mock AI Response: I understand you want to "${prompt}". Here's what I would do with your spreadsheet data: ${JSON.stringify(spreadsheetData).substring(0, 100)}...`;
-    res.json({ result: mockResponse });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
