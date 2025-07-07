@@ -231,13 +231,6 @@ function App() {
                'Ready to upload files'}
             </div>
             <div className="ai-controls">
-              <button
-                className="ai-button"
-                disabled={!selectedFile || isProcessing || aiLoading}
-                onClick={handleRunAI}
-              >
-                {isProcessing ? <span className="loading"></span> : ''}AI Processing
-              </button>
               <button className="ai-button" disabled={!selectedFile || isProcessing}>Download Excel</button>
               <button className="ai-button" disabled={!selectedFile || isProcessing}>Download CSV</button>
             </div>
