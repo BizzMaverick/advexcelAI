@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import './App.css';
 import * as XLSX from 'xlsx';
 import { AIService } from './services/aiService';
+import LandingPage from './LandingPage';
 
 // Supported file types
 const SUPPORTED_EXTENSIONS = [
@@ -77,6 +78,7 @@ function App() {
   const [aiResultData, setAiResultData] = useState<any[][] | null>(null);
   const [aiFormatting, setAiFormatting] = useState<any[][] | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showLanding, setShowLanding] = useState(true);
   
   // File validation function
   const validateFile = (file: File): { isValid: boolean; error?: string } => {
@@ -140,6 +142,10 @@ function App() {
       return () => clearTimeout(timer);
     }
   }, [showSuccess]);
+
+  if (showLanding) {
+    return <LandingPage onBegin={() => setShowLanding(false)} />;
+  }
 
   // Always show the actual application
   return (

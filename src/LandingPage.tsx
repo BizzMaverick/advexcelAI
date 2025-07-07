@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 
-const LAUNCH_DATE = 'August 15th, 2025';
+type LandingPageProps = {
+  onBegin: () => void;
+};
 
 const overlayStyle: React.CSSProperties = {
   position: 'fixed',
@@ -18,93 +20,117 @@ const overlayStyle: React.CSSProperties = {
   textAlign: 'center',
   fontFamily: 'Poppins, Arial, sans-serif',
   overflow: 'hidden',
+  transition: 'background 0.7s',
 };
 
-const modalStyle: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.95)',
-  color: '#764ba2',
-  borderRadius: '16px',
-  padding: '32px 40px',
+const minionGifStyle: React.CSSProperties = {
+  width: 220,
+  height: 220,
+  borderRadius: '50%',
   boxShadow: '0 8px 32px rgba(76, 0, 255, 0.15)',
-  fontSize: '1.5rem',
-  fontWeight: 600,
-  marginTop: '24px',
-  animation: 'pop 0.4s cubic-bezier(.68,-0.55,.27,1.55)',
+  cursor: 'pointer',
+  marginBottom: 32,
+  border: '6px solid #fff',
+  background: '#fff',
+  objectFit: 'cover',
+  transition: 'opacity 0.7s',
 };
 
-const sparkleStyle: React.CSSProperties = {
-  fontSize: '2.5rem',
-  margin: '0 0.5rem',
-  animation: 'sparkle 1.5s infinite alternate',
+const logoStyle: React.CSSProperties = {
+  width: 180,
+  height: 180,
+  borderRadius: '24px',
+  boxShadow: '0 8px 32px rgba(76, 0, 255, 0.15)',
+  margin: '0 auto 32px',
+  background: '#fff',
+  objectFit: 'contain',
+  transition: 'opacity 0.7s',
+};
+
+const introStyle: React.CSSProperties = {
+  fontSize: '2rem',
+  fontWeight: 700,
+  color: '#fff',
+  marginBottom: 18,
+  textShadow: '0 2px 8px #764ba2',
+  letterSpacing: 1.2,
+};
+
+const subIntroStyle: React.CSSProperties = {
+  fontSize: '1.2rem',
+  color: '#ffcc33',
+  marginBottom: 30,
+  fontWeight: 600,
+  textShadow: '0 1px 4px #764ba2',
 };
 
 const buttonStyle: React.CSSProperties = {
-  marginTop: '32px',
+  marginTop: 24,
   background: 'linear-gradient(90deg, #ffb347 0%, #ffcc33 100%)',
   color: '#764ba2',
   border: 'none',
   borderRadius: '8px',
-  padding: '14px 32px',
-  fontSize: '1.2rem',
-  fontWeight: 700,
+  padding: '16px 40px',
+  fontSize: '1.3rem',
+  fontWeight: 800,
   cursor: 'pointer',
   boxShadow: '0 2px 8px rgba(255, 204, 51, 0.15)',
   transition: 'transform 0.1s',
+  outline: 'none',
 };
 
-const LandingPage: React.FC = () => {
-  const [showModal, setShowModal] = useState(false);
+const LandingPage: React.FC<LandingPageProps> = ({ onBegin }) => {
+  const [step, setStep] = useState<'minion' | 'intro'>('minion');
+  const [fade, setFade] = useState(false);
 
-  const handleAnyClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setShowModal(true);
-  };
-
-  const handleCloseModal = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setShowModal(false);
+  const handleMinionClick = () => {
+    setFade(true);
+    setTimeout(() => {
+      setStep('intro');
+      setFade(false);
+    }, 600);
   };
 
   return (
-    <div style={overlayStyle} onClick={handleAnyClick}>
-      <div>
-        <div style={{ fontSize: '3.5rem', fontWeight: 900, letterSpacing: '2px', marginBottom: '12px' }}>
-          <span style={sparkleStyle}>✨</span>
-          ADVANCED EXCEL AI
-          <span style={sparkleStyle}>🚀</span>
-              </div>
-        <div style={{ fontSize: '2rem', marginBottom: '18px', fontWeight: 700 }}>
-          Something <span style={{ color: '#ffcc33' }}>amazing</span> is coming!
+    <div style={{ ...overlayStyle, background: step === 'intro' ? 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)' : overlayStyle.background }}>
+      {step === 'minion' && (
+        <>
+          <img
+            src="/minion.gif"
+            alt="Blue Minion Welcome"
+            style={{ ...minionGifStyle, opacity: fade ? 0 : 1 }}
+            onClick={handleMinionClick}
+            draggable={false}
+          />
+          <div style={{ fontSize: '2.2rem', fontWeight: 900, marginBottom: 12, letterSpacing: 2 }}>
+            Welcome to Advanced Excel AI!
           </div>
-        <div style={{ fontSize: '1.3rem', marginBottom: '30px', color: '#fff', opacity: 0.9 }}>
-          We are working hard to bring you the next generation of Excel superpowers.<br/>
-          <span style={{ color: '#ffcc33', fontWeight: 700 }}>Launching on {LAUNCH_DATE}</span>
-            </div>
-        <button style={buttonStyle} onClick={handleAnyClick}>
-          Notify Me &rarr;
-              </button>
-            </div>
-      {showModal && (
-        <div style={{ ...modalStyle, position: 'absolute', top: '30%', left: '50%', transform: 'translate(-50%, -30%)' }} onClick={handleCloseModal}>
-          <div style={{ fontSize: '2.2rem', marginBottom: '10px' }}>🎉</div>
-          <div style={{ fontWeight: 700, fontSize: '1.3rem', marginBottom: '8px' }}>
-            We're launching on <span style={{ color: '#ffb347' }}>{LAUNCH_DATE}</span>!
+          <div style={{ fontSize: '1.1rem', color: '#ffcc33', fontWeight: 600, marginBottom: 10 }}>
+            Click the minion to get started
           </div>
-          <div style={{ fontSize: '1rem', color: '#764ba2', marginBottom: '10px' }}>
-            Stay tuned for the most powerful AI Excel assistant ever.<br/>
-            Follow us for updates and be the first to know!
-          </div>
-          <button style={{ ...buttonStyle, background: 'linear-gradient(90deg, #764ba2 0%, #667eea 100%)', color: 'white', marginTop: 0 }} onClick={handleCloseModal}>
-            Close
-          </button>
-        </div>
+        </>
       )}
-      {/* Keyframes for animation */}
+      {step === 'intro' && (
+        <>
+          <img
+            src="/logo.png"
+            alt="App Logo"
+            style={{ ...logoStyle, opacity: fade ? 0 : 1 }}
+            draggable={false}
+          />
+          <div style={introStyle}>
+            Unleash the Power of AI in Your Spreadsheets
+          </div>
+          <div style={subIntroStyle}>
+            Meet your new Excel superpower: automate, analyze, and format like never before.<br/>
+            <span style={{ color: '#fff', fontWeight: 400 }}>Your productivity, reimagined.</span>
+          </div>
+          <button style={buttonStyle} onClick={onBegin}>
+            Let's Begin
+          </button>
+        </>
+      )}
       <style>{`
-        @keyframes sparkle {
-          0% { filter: brightness(1.2) drop-shadow(0 0 8px #ffcc33); }
-          100% { filter: brightness(1.5) drop-shadow(0 0 16px #ffb347); }
-        }
         @keyframes pop {
           0% { transform: scale(0.7); opacity: 0; }
           80% { transform: scale(1.05); opacity: 1; }
