@@ -51,19 +51,25 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
       });
       const response = completion.choices[0]?.message?.content;
       console.log('Raw OpenAI response:', response);
-      // Try to extract JSON from the response
-      let newData = null;
+      // Try to extract JSON object with data and formatting
+      let aiResult = null;
       let parseError = null;
       try {
-        const match = response.match(/\[.*\]/s);
+        // Try to find the first JSON object in the response
+        const match = response.match(/\{[\s\S]*\}/);
         if (match) {
-          newData = JSON.parse(match[0]);
+          aiResult = JSON.parse(match[0]);
         }
       } catch (e) { parseError = e; }
-      if (!Array.isArray(newData) || !Array.isArray(newData[0])) {
-        return res.json({ result: response, newData: spreadsheetData, aiError: 'AI did not return a valid spreadsheet. Here is the raw response.', raw: response });
+      // Validate structure
+      if (!aiResult || !Array.isArray(aiResult.data) || !Array.isArray(aiResult.data[0])) {
+        return res.json({ result: response, data: spreadsheetData, formatting: [], aiError: 'AI did not return a valid spreadsheet object. Here is the raw response.', raw: response });
       }
-      return res.json({ result: response, newData });
+      // If formatting is missing, provide empty formatting array
+      if (!Array.isArray(aiResult.formatting)) {
+        aiResult.formatting = [];
+      }
+      return res.json({ result: response, data: aiResult.data, formatting: aiResult.formatting });
     } else {
       return res.json({ result: `Mock AI Response: I understand you want to "${prompt}". Here's what I would do with your spreadsheet data: ${JSON.stringify(spreadsheetData).substring(0, 100)}...`, newData: spreadsheetData });
     }

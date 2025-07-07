@@ -75,6 +75,7 @@ function App() {
   const [aiError, setAiError] = useState<string | null>(null);
   const [aiInstructions, setAiInstructions] = useState<string | null>(null);
   const [aiResultData, setAiResultData] = useState<any[][] | null>(null);
+  const [aiFormatting, setAiFormatting] = useState<any[][] | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   
   // File validation function
@@ -108,6 +109,7 @@ function App() {
     setAiError(null);
     setAiInstructions(null);
     setAiResultData(null);
+    setAiFormatting(null);
     try {
       const result = await AIService.uploadSpreadsheetWithPrompt(selectedFile, prompt);
       console.log('AI result:', result);
@@ -115,10 +117,15 @@ function App() {
       if (result.aiError) {
         setAiError(result.aiError);
       }
-      if (Array.isArray(result.newData) && result.newData.length > 0 && Array.isArray(result.newData[0])) {
+      if (Array.isArray(result.data) && result.data.length > 0 && Array.isArray(result.data[0])) {
+        setAiResultData(result.data);
+        setAiFormatting(Array.isArray(result.formatting) ? result.formatting : null);
+      } else if (Array.isArray(result.newData) && result.newData.length > 0 && Array.isArray(result.newData[0])) {
         setAiResultData(result.newData);
+        setAiFormatting(null);
       } else {
         setAiResultData(null);
+        setAiFormatting(null);
       }
     } catch (err: any) {
       setAiError(err.message || 'AI processing failed');
@@ -301,9 +308,18 @@ function App() {
                   <tbody>
                     {aiResultData.map((row, rowIndex) => (
                       <tr key={rowIndex}>
-                        {row.map((cell, cellIndex) => (
-                          <td key={cellIndex}>{cell === null || cell === undefined ? '' : String(cell)}</td>
-                        ))}
+                        {row.map((cell, cellIndex) => {
+                          const fmt = aiFormatting && aiFormatting[rowIndex] && aiFormatting[rowIndex][cellIndex] ? aiFormatting[rowIndex][cellIndex] : {};
+                          const style: React.CSSProperties = {
+                            color: fmt.color || undefined,
+                            background: fmt.background || undefined,
+                            fontWeight: fmt.bold ? 'bold' : undefined,
+                            fontStyle: fmt.italic ? 'italic' : undefined,
+                          };
+                          return (
+                            <td key={cellIndex} style={style}>{cell === null || cell === undefined ? '' : String(cell)}</td>
+                          );
+                        })}
                       </tr>
                     ))}
                   </tbody>
