@@ -34,63 +34,6 @@ export class AIService {
   //   return 'Empty spreadsheet';
   // }
 
-  private static handleCommonOperations(prompt: string, data: any[][]): ExcelResult {
-    const lowerPrompt = prompt.toLowerCase();
-    
-    console.log('Processing prompt:', prompt);
-    console.log('Data structure:', {
-      totalRows: data.length,
-      headers: data[0]?.map(cell => cell?.value),
-      firstDataRow: data[1]?.map(cell => cell?.value)
-    });
-    
-    // Handle sum operations with more specific matching
-    if (lowerPrompt.includes('sum') || lowerPrompt.includes('total') || lowerPrompt.includes('add up')) {
-      console.log('Detected sum operation');
-      return this.handleSumOperation(prompt, data);
-    }
-    
-    // Handle average operations with more specific matching
-    if (lowerPrompt.includes('average') || lowerPrompt.includes('mean') || lowerPrompt.includes('avg')) {
-      return this.handleAverageOperation(prompt, data);
-    }
-    
-    // Handle filter operations with more specific matching
-    if (lowerPrompt.includes('filter') || lowerPrompt.includes('show only') || lowerPrompt.includes('where') || lowerPrompt.includes('find')) {
-      return this.handleFilterOperation(prompt, data);
-    }
-    
-    // Handle sort operations with more specific matching
-    if (lowerPrompt.includes('sort') || lowerPrompt.includes('order') || lowerPrompt.includes('arrange') || lowerPrompt.includes('alphabetical')) {
-      console.log('Detected sort operation');
-      return this.handleSortOperation(prompt, data);
-    }
-    
-    // Handle specific column operations
-    // if (lowerPrompt.includes('column') || lowerPrompt.includes('col')) {
-    //   return this.handleColumnSpecificOperation(prompt, data);
-    // }
-    
-    // Handle row operations
-    if (lowerPrompt.includes('row')) {
-      return this.handleRowOperation(prompt, data);
-    }
-    
-    // Handle formula operations
-    if (lowerPrompt.includes('formula') || lowerPrompt.includes('calculate') || lowerPrompt.includes('compute')) {
-      return this.handleFormulaOperation(prompt, data);
-    }
-    
-    // Default: return original data with custom operation
-    return {
-      operation: {
-        type: 'custom',
-        description: `Processed: ${prompt}`
-      },
-      newData: data
-    };
-  }
-
   private static handleSumOperation(prompt: string, data: any[][]): ExcelResult {
     // Extract column information from prompt
     const columnMatch = prompt.match(/column\s+([A-Za-z])/i) || prompt.match(/col\s+([A-Za-z])/i);
