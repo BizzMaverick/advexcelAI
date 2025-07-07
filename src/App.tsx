@@ -109,10 +109,16 @@ function App() {
     setAiInstructions(null);
     setAiResultData(null);
     try {
-      // Use the new upload method for large files
       const result = await AIService.uploadSpreadsheetWithPrompt(selectedFile, prompt);
       setAiInstructions(result.result || '');
-      // Optionally, update aiResultData if your backend returns processed data
+      if (result.aiError) {
+        setAiError(result.aiError);
+      }
+      if (Array.isArray(result.newData) && result.newData.length > 0 && Array.isArray(result.newData[0])) {
+        setAiResultData(result.newData);
+      } else {
+        setAiResultData(null);
+      }
     } catch (err: any) {
       setAiError(err.message || 'AI processing failed');
     } finally {

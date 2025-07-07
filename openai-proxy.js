@@ -16,7 +16,7 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 const upload = multer({ dest: 'uploads/' });
 
-// File upload endpoint with real AI processing
+// File upload endpoint with robust AI processing
 app.post('/api/upload', upload.single('file'), async (req, res) => {
   const prompt = req.body.prompt;
   const filePath = req.file.path;
@@ -27,14 +27,11 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
     const spreadsheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-
-    // Clean up the uploaded file
     fs.unlinkSync(filePath);
 
-    // Use OpenAI if API key is present
     if (process.env.OPENAI_API_KEY) {
       const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-      const systemPrompt = `You are an Excel AI assistant. Process the user's request and modify the spreadsheet data accordingly. Return the new spreadsheet as a JSON array of arrays.`;
+      const systemPrompt = `You are an Excel AI assistant. When the user asks for a change, you MUST return ONLY the new spreadsheet as a valid JSON array of arrays, with no extra text, explanation, or formatting. If you cannot perform the operation, return the original spreadsheet as a JSON array of arrays. DO NOT return any explanation, markdown, or text—ONLY the JSON array.`;
       const userPrompt = `User request: "${prompt}"
 \nCurrent spreadsheet data:\n${JSON.stringify(spreadsheetData, null, 2)}\n\nPlease perform the requested operation and return the new spreadsheet as a JSON array of arrays.`;
       const completion = await openai.chat.completions.create({
@@ -47,17 +44,21 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
         max_tokens: 2000
       });
       const response = completion.choices[0]?.message?.content;
+      console.log('Raw OpenAI response:', response);
       // Try to extract JSON from the response
       let newData = null;
+      let parseError = null;
       try {
         const match = response.match(/\[.*\]/s);
         if (match) {
           newData = JSON.parse(match[0]);
         }
-      } catch (e) {}
+      } catch (e) { parseError = e; }
+      if (!Array.isArray(newData) || !Array.isArray(newData[0])) {
+        return res.json({ result: response, newData: spreadsheetData, aiError: 'AI did not return a valid spreadsheet. Here is the raw response.', raw: response });
+      }
       return res.json({ result: response, newData });
     } else {
-      // Fallback mock response
       return res.json({ result: `Mock AI Response: I understand you want to "${prompt}". Here's what I would do with your spreadsheet data: ${JSON.stringify(spreadsheetData).substring(0, 100)}...`, newData: spreadsheetData });
     }
   } catch (err) {
