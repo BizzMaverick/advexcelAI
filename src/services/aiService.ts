@@ -33,12 +33,4 @@ export class AIService {
   // private static _formatDataForAI(_data: any[][]): string {
   //   return 'Empty spreadsheet';
   // }
-
-  private static letterToIndex(letter: string): number {
-    return letter.toUpperCase().charCodeAt(0) - 65; // A=0, B=1, etc.
-  }
-
-  private static indexToLetter(index: number): string {
-    return String.fromCharCode(65 + index); // 0=A, 1=B, etc.
-  }
 } 
