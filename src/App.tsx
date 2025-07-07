@@ -110,6 +110,7 @@ function App() {
     setAiResultData(null);
     try {
       const result = await AIService.uploadSpreadsheetWithPrompt(selectedFile, prompt);
+      console.log('AI result:', result);
       setAiInstructions(result.result || '');
       if (result.aiError) {
         setAiError(result.aiError);
@@ -223,7 +224,11 @@ function App() {
                'Ready to upload files'}
             </div>
             <div className="ai-controls">
-              <button className="ai-button" disabled={!selectedFile || isProcessing}>
+              <button
+                className="ai-button"
+                disabled={!selectedFile || isProcessing || aiLoading}
+                onClick={handleRunAI}
+              >
                 {isProcessing ? <span className="loading"></span> : ''}AI Processing
               </button>
               <button className="ai-button" disabled={!selectedFile || isProcessing}>Download Excel</button>
