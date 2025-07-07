@@ -16,6 +16,12 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 const upload = multer({ dest: 'uploads/' });
 
+// --- Prompt Rewriting Function ---
+function rewritePrompt(userPrompt, spreadsheetData) {
+  // Basic rule-based template for now; can be expanded for more complex logic
+  return `You are an AI assistant for Excel. The user has uploaded a spreadsheet and made the following request: "${userPrompt}"\n\nSpreadsheet data (as JSON array of arrays):\n${JSON.stringify(spreadsheetData, null, 2)}\n\nYour task:\n- Perform the user's requested operation on the spreadsheet.\n- Output ONLY the updated spreadsheet as a valid JSON array of arrays.\n- Do NOT include any explanation, markdown, or extra text.\n- If the request is ambiguous or impossible, return the original spreadsheet as a JSON array of arrays.\n- Never return anything except the JSON array of arrays.`;
+}
+
 // File upload endpoint with robust AI processing
 app.post('/api/upload', upload.single('file'), async (req, res) => {
   const prompt = req.body.prompt;
@@ -32,13 +38,13 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
     if (process.env.OPENAI_API_KEY) {
       const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
       const systemPrompt = `You are an Excel AI assistant. When the user asks for a change, you MUST return ONLY the new spreadsheet as a valid JSON array of arrays, with no extra text, explanation, or formatting. If you cannot perform the operation, return the original spreadsheet as a JSON array of arrays. DO NOT return any explanation, markdown, or text—ONLY the JSON array.`;
-      const userPrompt = `User request: "${prompt}"
-\nCurrent spreadsheet data:\n${JSON.stringify(spreadsheetData, null, 2)}\n\nPlease perform the requested operation and return the new spreadsheet as a JSON array of arrays.`;
+      // Use the new prompt rewriting function
+      const rewrittenPrompt = rewritePrompt(prompt, spreadsheetData);
       const completion = await openai.chat.completions.create({
         model: "gpt-3.5-turbo",
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
+          { role: "user", content: rewrittenPrompt }
         ],
         temperature: 0.1,
         max_tokens: 2000
