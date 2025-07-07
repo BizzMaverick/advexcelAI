@@ -37,7 +37,7 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
 
     if (process.env.OPENAI_API_KEY) {
       const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-      const systemPrompt = `You are an Excel AI assistant. When the user asks for a change, you MUST return ONLY the new spreadsheet as a valid JSON array of arrays, with no extra text, explanation, or formatting. If you cannot perform the operation, return the original spreadsheet as a JSON array of arrays. DO NOT return any explanation, markdown, or text—ONLY the JSON array.`;
+      const systemPrompt = `You are an Excel AI assistant. When the user asks for a change, you MUST return ONLY a valid JSON object with two keys: 'data' (the updated spreadsheet as an array of arrays) and 'formatting' (an array of arrays of formatting objects, matching the data structure, with keys like 'color', 'background', 'bold', 'italic'). Do not return any explanation, markdown, or extra text. If the request is ambiguous or impossible, return the original spreadsheet as 'data' and an empty array for 'formatting'. Example: {"data": [["A", "B"], [1, 2]], "formatting": [[{"bold":true,"color":"red"},{"bold":false}], [{},{}]]}`;
       // Use the new prompt rewriting function
       const rewrittenPrompt = rewritePrompt(prompt, spreadsheetData);
       const completion = await openai.chat.completions.create({
