@@ -16,7 +16,7 @@ const overlayStyle: React.CSSProperties = {
   justifyContent: 'center',
   color: 'white',
   textAlign: 'center',
-  fontFamily: 'Poppins, Arial, sans-serif',
+  fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
   overflow: 'hidden',
   transition: 'background 0.7s',
 };
@@ -53,43 +53,49 @@ const coinFaceStyle: React.CSSProperties = {
 
 const introStyle: React.CSSProperties = {
   fontSize: '2rem',
-  fontWeight: 700,
-  color: '#ffffff',
+  fontWeight: 600,
+  color: '#e0f2fe',
   marginBottom: 18,
   textShadow: '0 2px 8px rgba(30, 58, 138, 0.5)',
-  letterSpacing: 1.2,
+  letterSpacing: 0.5,
+  fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
 };
 
 const subIntroStyle: React.CSSProperties = {
   fontSize: '1.2rem',
-  color: '#fbbf24',
+  color: '#bfdbfe',
   marginBottom: 30,
-  fontWeight: 600,
+  fontWeight: 400,
   textShadow: '0 1px 4px rgba(30, 58, 138, 0.5)',
+  fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
+  lineHeight: 1.6,
 };
 
 const buttonStyle: React.CSSProperties = {
   marginTop: 24,
-  background: 'linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%)',
-  color: '#1e3a8a',
-  border: 'none',
-  borderRadius: '8px',
+  background: 'linear-gradient(90deg, #3b82f6 0%, #1e40af 100%)',
+  color: '#ffffff',
+  border: '2px solid #60a5fa',
+  borderRadius: '12px',
   padding: '16px 40px',
-  fontSize: '1.3rem',
-  fontWeight: 800,
+  fontSize: '1.2rem',
+  fontWeight: 600,
   cursor: 'pointer',
-  boxShadow: '0 4px 12px rgba(251, 191, 36, 0.3)',
+  boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
   transition: 'all 0.2s ease',
   outline: 'none',
+  fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
+  letterSpacing: 0.5,
 };
 
 const welcomeStyle: React.CSSProperties = {
-  fontSize: '2.2rem',
-  fontWeight: 900,
+  fontSize: '2.4rem',
+  fontWeight: 700,
   marginBottom: 12,
-  letterSpacing: 2,
+  letterSpacing: 1,
   color: '#ffffff',
   textShadow: '0 2px 8px rgba(30, 58, 138, 0.5)',
+  fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
 };
 
 const LandingPage: React.FC<{ onBegin: () => void }> = ({ onBegin }) => {
@@ -137,18 +143,20 @@ const LandingPage: React.FC<{ onBegin: () => void }> = ({ onBegin }) => {
       <div style={introStyle}>Unleash the Power of AI in Your Spreadsheets</div>
       <div style={subIntroStyle}>
         Meet your new Excel superpower: automate, analyze, and format like never before.<br />
-        <span style={{ color: '#ffffff', fontWeight: 400 }}>Your productivity, reimagined.</span>
+        <span style={{ color: '#ffffff', fontWeight: 500 }}>Your productivity, reimagined.</span>
       </div>
       <button 
         style={buttonStyle} 
         onClick={onBegin}
         onMouseEnter={(e) => {
           e.currentTarget.style.transform = 'translateY(-2px)';
-          e.currentTarget.style.boxShadow = '0 6px 16px rgba(251, 191, 36, 0.4)';
+          e.currentTarget.style.boxShadow = '0 6px 16px rgba(59, 130, 246, 0.4)';
+          e.currentTarget.style.background = 'linear-gradient(90deg, #1e40af 0%, #1e3a8a 100%)';
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.transform = 'translateY(0)';
-          e.currentTarget.style.boxShadow = '0 4px 12px rgba(251, 191, 36, 0.3)';
+          e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.3)';
+          e.currentTarget.style.background = 'linear-gradient(90deg, #3b82f6 0%, #1e40af 100%)';
         }}
       >
         Let's Begin
