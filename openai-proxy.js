@@ -44,23 +44,26 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
       const rewrittenPrompt = rewritePrompt(prompt, spreadsheetData);
       try {
         console.log('Calling OpenAI API with prompt:', rewrittenPrompt.slice(0, 500));
-        const controller = new AbortController();
-        const timeout = setTimeout(() => {
-          controller.abort();
-          console.error('OpenAI API call aborted due to timeout (15s)');
-        }, 15000); // 15 seconds
+        // Helper function for timeout
+        function withTimeout(promise, ms) {
+          const timeout = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('OpenAI API call timed out')), ms)
+          );
+          return Promise.race([promise, timeout]);
+        }
         try {
-          const completion = await openai.chat.completions.create({
-            model: "gpt-3.5-turbo",
-            messages: [
-              { role: "system", content: systemPrompt },
-              { role: "user", content: rewrittenPrompt }
-            ],
-            temperature: 0.1,
-            max_tokens: 2000,
-            signal: controller.signal
-          });
-          clearTimeout(timeout);
+          const completion = await withTimeout(
+            openai.chat.completions.create({
+              model: "gpt-3.5-turbo",
+              messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: rewrittenPrompt }
+              ],
+              temperature: 0.1,
+              max_tokens: 2000
+            }),
+            15000 // 15 seconds
+          );
           console.log('OpenAI API call succeeded.');
           const response = completion.choices[0]?.message?.content;
           console.log('Raw OpenAI response:', response);
@@ -88,7 +91,6 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
           }
           return res.json({ result: response, data: aiResult.data, formatting: aiResult.formatting });
         } catch (openaiErr) {
-          clearTimeout(timeout);
           console.error('Error during OpenAI API call:', openaiErr);
           return res.status(500).json({ error: 'OpenAI API call failed', details: openaiErr.message });
         }
