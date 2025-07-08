@@ -1,25 +1,4 @@
-export type SpreadsheetData = (string | number | boolean | null | undefined)[][];
-export type SpreadsheetFormatting = ({ color?: string; background?: string; bold?: boolean; italic?: boolean } | undefined)[][];
-
-export interface ExcelOperation {
-  type: 'sum' | 'average' | 'filter' | 'sort' | 'formula' | 'format' | 'custom';
-  description: string;
-  result?: unknown;
-}
-
-export interface ExcelResult {
-  operation: ExcelOperation;
-  newData: SpreadsheetData;
-  instructions?: string;
-}
-
-export type AIResult = {
-  result?: string;
-  aiError?: string;
-  data?: SpreadsheetData;
-  newData?: SpreadsheetData;
-  formatting?: SpreadsheetFormatting;
-};
+const API_URL = import.meta.env.VITE_API_URL || '/api/upload';
 
 export class AIService {
   static async uploadSpreadsheetWithPrompt(file: File, prompt: string): Promise<AIResult> {
@@ -27,7 +6,7 @@ export class AIService {
     formData.append('file', file);
     formData.append('prompt', prompt);
 
-    const response = await fetch('http://localhost:5001/api/upload', {
+    const response = await fetch(API_URL, {
       method: 'POST',
       body: formData,
     });
@@ -36,8 +15,4 @@ export class AIService {
     }
     return await response.json();
   }
-
-  // private static _formatDataForAI(_data: any[][]): string {
-  //   return 'Empty spreadsheet';
-  // }
-} 
+}
