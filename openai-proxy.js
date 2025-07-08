@@ -69,6 +69,87 @@ function highlightFirstRowFormatting(data) {
   return formatting;
 }
 
+// --- Generalized Prompt Parser ---
+function parseFormattingPrompt(prompt) {
+  // Lowercase for easier matching
+  const p = prompt.toLowerCase();
+  // Patterns for row/column/cell
+  const rowMatch = p.match(/(row|line)\s*(\d+|first|second|third|fourth|fifth|last)/);
+  const colMatch = p.match(/(column|col)\s*(\d+|first|second|third|fourth|fifth|last|[a-z]+)/);
+  const cellMatch = p.match(/cell\s*([a-z]+)(\d+)/);
+  // Patterns for properties
+  const colorMatch = p.match(/(red|green|blue|yellow|orange|purple|pink|gray|grey|black|white|cyan|magenta)/);
+  const bold = /bold/.test(p);
+  const italic = /italic/.test(p);
+  const underline = /underline/.test(p);
+  const fontSizeMatch = p.match(/font size\s*(\d+)/);
+  const widthMatch = p.match(/width\s*(\d+)/);
+  const alignMatch = p.match(/align(?:ment)?\s*(left|center|right|justify)/);
+
+  // Helper to convert words to numbers
+  function wordToNumber(word) {
+    const map = { first: 1, second: 2, third: 3, fourth: 4, fifth: 5, last: -1 };
+    return map[word] || parseInt(word);
+  }
+
+  let target = null, index = null, property = {}, type = null;
+
+  if (rowMatch) {
+    type = 'row';
+    index = wordToNumber(rowMatch[2]);
+  } else if (colMatch) {
+    type = 'column';
+    index = isNaN(colMatch[2]) ? (colMatch[2].charCodeAt(0) - 96) : wordToNumber(colMatch[2]);
+  } else if (cellMatch) {
+    type = 'cell';
+    // Convert column letter to index (A=1)
+    index = [cellMatch[1].charCodeAt(0) - 97 + 1, parseInt(cellMatch[2])];
+  }
+
+  if (colorMatch) property.background = colorMatch[1];
+  if (bold) property.bold = true;
+  if (italic) property.italic = true;
+  if (underline) property.underline = true;
+  if (fontSizeMatch) property.fontSize = fontSizeMatch[1] + 'px';
+  if (widthMatch) property.width = widthMatch[1] + 'px';
+  if (alignMatch) property.align = alignMatch[1];
+
+  if (type && Object.keys(property).length > 0) {
+    return { type, index, property };
+  }
+  return null;
+}
+
+function applyFormatting(data, formatting, parsed) {
+  if (!parsed) return formatting;
+  const { type, index, property } = parsed;
+  if (!Array.isArray(data) || data.length === 0) return formatting;
+  // Clone formatting
+  const fmt = formatting.map(row => row.map(cell => ({ ...cell })));
+  if (type === 'row') {
+    let rowIdx = index === -1 ? data.length - 1 : index - 1;
+    if (rowIdx >= 0 && rowIdx < data.length) {
+      for (let j = 0; j < data[rowIdx].length; j++) {
+        fmt[rowIdx][j] = { ...fmt[rowIdx][j], ...property };
+      }
+    }
+  } else if (type === 'column') {
+    let colIdx = index === -1 ? data[0].length - 1 : index - 1;
+    if (colIdx >= 0 && colIdx < data[0].length) {
+      for (let i = 0; i < data.length; i++) {
+        fmt[i][colIdx] = { ...fmt[i][colIdx], ...property };
+      }
+    }
+  } else if (type === 'cell') {
+    let colIdx = parsed.index[0] - 1;
+    let rowIdx = parsed.index[1] - 1;
+    if (rowIdx >= 0 && rowIdx < data.length && colIdx >= 0 && colIdx < data[0].length) {
+      fmt[rowIdx][colIdx] = { ...fmt[rowIdx][colIdx], ...property };
+    }
+  }
+  return fmt;
+}
+
 // File upload endpoint with robust AI processing
 app.post('/api/upload', upload.single('file'), async (req, res) => {
   console.log('OPENAI_API_KEY present:', !!process.env.OPENAI_API_KEY);
@@ -166,6 +247,14 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
       }
     }
     if (!usedOpenAI) {
+      // Initialize empty formatting array
+      let formatting = spreadsheetData.map(row => row.map(() => ({})));
+      // Try to parse formatting prompt
+      const parsed = parseFormattingPrompt(prompt);
+      if (parsed) {
+        formatting = applyFormatting(spreadsheetData, formatting, parsed);
+        return res.json({ result: 'Formatting applied (backend)', data: spreadsheetData, formatting });
+      }
       // Return processed data for classic operations
       return res.json({ result: 'Processed in backend', data: processedData, formatting: [] });
     }
