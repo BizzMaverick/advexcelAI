@@ -2,10 +2,6 @@ import React, { useState } from 'react';
 import minionGif from './assets/minion.gif';
 import logoImg from './assets/logo.png';
 
-type LandingPageProps = {
-  onBegin: () => void;
-};
-
 const overlayStyle: React.CSSProperties = {
   position: 'fixed',
   top: 0,
@@ -25,28 +21,32 @@ const overlayStyle: React.CSSProperties = {
   transition: 'background 0.7s',
 };
 
-const minionGifStyle: React.CSSProperties = {
+const coinContainerStyle: React.CSSProperties = {
+  perspective: '1200px',
+  width: 220,
+  height: 220,
+  margin: '0 auto 32px',
+};
+
+const coinStyle: React.CSSProperties = {
+  width: 220,
+  height: 220,
+  position: 'relative',
+  transformStyle: 'preserve-3d',
+  transition: 'transform 1s cubic-bezier(.4,2,.6,1)',
+  cursor: 'pointer',
+};
+
+const coinFaceStyle: React.CSSProperties = {
+  position: 'absolute',
   width: 220,
   height: 220,
   borderRadius: '50%',
   boxShadow: '0 8px 32px rgba(76, 0, 255, 0.15)',
-  cursor: 'pointer',
-  marginBottom: 32,
   border: '6px solid #fff',
   background: '#fff',
   objectFit: 'cover',
-  transition: 'opacity 0.7s',
-};
-
-const logoStyle: React.CSSProperties = {
-  width: 180,
-  height: 180,
-  borderRadius: '24px',
-  boxShadow: '0 8px 32px rgba(76, 0, 255, 0.15)',
-  margin: '0 auto 32px',
-  background: '#fff',
-  objectFit: 'contain',
-  transition: 'opacity 0.7s',
+  backfaceVisibility: 'hidden',
 };
 
 const introStyle: React.CSSProperties = {
@@ -81,57 +81,59 @@ const buttonStyle: React.CSSProperties = {
   outline: 'none',
 };
 
-const LandingPage: React.FC<LandingPageProps> = ({ onBegin }) => {
-  const [step, setStep] = useState<'minion' | 'intro'>('minion');
-  const [fade, setFade] = useState(false);
+const welcomeStyle: React.CSSProperties = {
+  fontSize: '2.2rem',
+  fontWeight: 900,
+  marginBottom: 12,
+  letterSpacing: 2,
+};
 
-  const handleMinionClick = () => {
-    setFade(true);
-    setTimeout(() => {
-      setStep('intro');
-      setFade(false);
-    }, 600);
-  };
+const LandingPage: React.FC<{ onBegin: () => void }> = ({ onBegin }) => {
+  const [spun, setSpun] = useState(false);
+
+  const handleSpin = () => setSpun(s => !s);
 
   return (
-    <div style={{ ...overlayStyle, background: step === 'intro' ? 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)' : overlayStyle.background }}>
-      {step === 'minion' && (
-        <>
+    <div style={overlayStyle}>
+      <div style={coinContainerStyle}>
+        <div
+          style={{
+            ...coinStyle,
+            transform: spun ? 'rotateY(180deg)' : 'rotateY(0deg)',
+          }}
+          onClick={handleSpin}
+          title="Click to spin"
+        >
           <img
             src={minionGif}
-            alt="Blue Minion Welcome"
-            style={{ ...minionGifStyle, opacity: fade ? 0 : 1 }}
-            onClick={handleMinionClick}
+            alt="Minion Side"
+            style={{
+              ...coinFaceStyle,
+              zIndex: 2,
+              transform: 'rotateY(0deg)',
+            }}
             draggable={false}
           />
-          <div style={{ fontSize: '2.2rem', fontWeight: 900, marginBottom: 12, letterSpacing: 2 }}>
-            Welcome to Advanced Excel AI!
-          </div>
-          <div style={{ fontSize: '1.1rem', color: '#ffcc33', fontWeight: 600, marginBottom: 10 }}>
-            Click the minion to get started
-          </div>
-        </>
-      )}
-      {step === 'intro' && (
-        <>
           <img
             src={logoImg}
-            alt="App Logo"
-            style={{ ...logoStyle, opacity: fade ? 0 : 1 }}
+            alt="Logo Side"
+            style={{
+              ...coinFaceStyle,
+              transform: 'rotateY(180deg)',
+            }}
             draggable={false}
           />
-          <div style={introStyle}>
-            Unleash the Power of AI in Your Spreadsheets
-          </div>
-          <div style={subIntroStyle}>
-            Meet your new Excel superpower: automate, analyze, and format like never before.<br/>
-            <span style={{ color: '#fff', fontWeight: 400 }}>Your productivity, reimagined.</span>
-          </div>
-          <button style={buttonStyle} onClick={onBegin}>
-            Let's Begin
-          </button>
-        </>
-      )}
+        </div>
+      </div>
+      <div style={welcomeStyle}>Welcome to Advanced Excel AI!</div>
+      <div style={introStyle}>Unleash the Power of AI in Your Spreadsheets</div>
+      <div style={subIntroStyle}>
+        Meet your new Excel superpower: automate, analyze, and format like never before.<br />
+        <span style={{ color: '#fff', fontWeight: 400 }}>Your productivity, reimagined.</span>
+      </div>
+      <button style={buttonStyle} onClick={onBegin}>
+        Let's Begin
+      </button>
       <style>{`
         @keyframes pop {
           0% { transform: scale(0.7); opacity: 0; }
