@@ -119,6 +119,19 @@ const welcomeStyle: React.CSSProperties = {
   fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
 };
 
+const welcomeAnim = {
+  animation: 'fadeSlideIn 0.8s cubic-bezier(.4,2,.6,1) 0.1s both'
+};
+const introAnim = {
+  animation: 'fadeSlideIn 0.8s cubic-bezier(.4,2,.6,1) 0.3s both'
+};
+const subIntroAnim = {
+  animation: 'fadeSlideIn 0.8s cubic-bezier(.4,2,.6,1) 0.5s both'
+};
+const buttonAnim = {
+  animation: 'fadeSlideIn 0.8s cubic-bezier(.4,2,.6,1) 0.7s both'
+};
+
 const LandingPage: React.FC<{ onBegin: () => void }> = ({ onBegin }) => {
   const [rotation, setRotation] = useState(0);
 
@@ -160,14 +173,14 @@ const LandingPage: React.FC<{ onBegin: () => void }> = ({ onBegin }) => {
           />
         </div>
       </div>
-      <div style={welcomeStyle}>Welcome to Advanced Excel AI!</div>
-      <div style={introStyle}>Unleash the Power of AI in Your Spreadsheets</div>
-      <div style={subIntroStyle}>
+      <div style={{ ...welcomeStyle, ...welcomeAnim }}>Welcome to Advanced Excel AI!</div>
+      <div style={{ ...introStyle, ...introAnim }}>Unleash the Power of AI in Your Spreadsheets</div>
+      <div style={{ ...subIntroStyle, ...subIntroAnim }}>
         Meet your new Excel superpower: automate, analyze, and format like never before.<br />
         <span style={{ color: '#ffffff', fontWeight: 500 }}>Your productivity, reimagined.</span>
       </div>
       <button 
-        style={buttonStyle} 
+        style={{ ...buttonStyle, ...buttonAnim }} 
         onClick={onBegin}
         onMouseEnter={(e) => {
           e.currentTarget.style.transform = 'translateY(-2px)';
@@ -187,6 +200,11 @@ const LandingPage: React.FC<{ onBegin: () => void }> = ({ onBegin }) => {
           0% { transform: scale(0.7); opacity: 0; }
           80% { transform: scale(1.05); opacity: 1; }
           100% { transform: scale(1); }
+        }
+        @keyframes fadeSlideIn {
+          0% { opacity: 0; transform: translateY(40px) scale(0.98); }
+          80% { opacity: 1; transform: translateY(-4px) scale(1.03); }
+          100% { opacity: 1; transform: translateY(0) scale(1); }
         }
       `}</style>
     </div>
