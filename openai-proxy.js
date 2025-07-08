@@ -77,6 +77,14 @@ function parseFormattingPrompt(prompt) {
   const rowMatch = p.match(/(row|line)\s*(\d+|first|second|third|fourth|fifth|last)/);
   const colMatch = p.match(/(column|col)\s*(\d+|first|second|third|fourth|fifth|last|[a-z]+)/);
   const cellMatch = p.match(/cell\s*([a-z]+)(\d+)/);
+  // Patterns for value-based and conditional highlights
+  const valueHighlightMatch = p.match(/highlight\s+([\w\s'"-]+)\s+in\s+(red|green|blue|yellow|orange|purple|pink|gray|grey|black|white|cyan|magenta)/);
+  const valueBoldMatch = p.match(/make all ['"]?([\w\s]+)['"]? cells bold/);
+  const valueUnderlineMatch = p.match(/underline all ['"]?([\w\s]+)['"]? cells/);
+  const valueItalicMatch = p.match(/italic all ['"]?([\w\s]+)['"]? cells/);
+  const greaterThanMatch = p.match(/highlight all cells (greater than|>|above) (\d+) in (\w+)/);
+  const lessThanMatch = p.match(/highlight all cells (less than|<|below) (\d+) in (\w+)/);
+  const containsMatch = p.match(/highlight all cells containing ['"]?([\w\s]+)['"]? in (\w+)/);
   // Patterns for properties
   const colorMatch = p.match(/(red|green|blue|yellow|orange|purple|pink|gray|grey|black|white|cyan|magenta)/);
   const bold = /bold/.test(p);
@@ -94,7 +102,7 @@ function parseFormattingPrompt(prompt) {
     return map[word] || parseInt(word);
   }
 
-  let target = null, index = null, property = {}, type = null;
+  let target = null, index = null, property = {}, type = null, value = null, condition = null;
 
   if (rowMatch) {
     type = 'row';
@@ -106,6 +114,32 @@ function parseFormattingPrompt(prompt) {
     type = 'cell';
     // Convert column letter to index (A=1)
     index = [cellMatch[1].charCodeAt(0) - 97 + 1, parseInt(cellMatch[2])];
+  } else if (valueHighlightMatch) {
+    type = 'value';
+    value = valueHighlightMatch[1].replace(/['"]/g, '').trim();
+    property.background = valueHighlightMatch[2];
+  } else if (valueBoldMatch) {
+    type = 'value';
+    value = valueBoldMatch[1].replace(/['"]/g, '').trim();
+    property.bold = true;
+  } else if (valueUnderlineMatch) {
+    type = 'value';
+    value = valueUnderlineMatch[1].replace(/['"]/g, '').trim();
+    property.underline = true;
+  } else if (valueItalicMatch) {
+    type = 'value';
+    value = valueItalicMatch[1].replace(/['"]/g, '').trim();
+    property.italic = true;
+  } else if (greaterThanMatch) {
+    type = 'condition';
+    condition = { op: '>', val: Number(greaterThanMatch[2]), color: greaterThanMatch[3] };
+  } else if (lessThanMatch) {
+    type = 'condition';
+    condition = { op: '<', val: Number(lessThanMatch[2]), color: lessThanMatch[3] };
+  } else if (containsMatch) {
+    type = 'contains';
+    value = containsMatch[1].replace(/['"]/g, '').trim();
+    property.background = containsMatch[2];
   }
 
   if (colorMatch) property.background = colorMatch[1];
@@ -118,7 +152,7 @@ function parseFormattingPrompt(prompt) {
   if (rowHeightMatch) property.height = rowHeightMatch[1] ? rowHeightMatch[1] + 'px' : (p.includes('reduce') ? '16px' : '32px');
   if (colWidthMatch) property.width = colWidthMatch[1] ? colWidthMatch[1] + 'px' : (p.includes('reduce') ? '60px' : '200px');
 
-  if ((type || rowHeightMatch || colWidthMatch) && Object.keys(property).length > 0) {
+  if ((type || rowHeightMatch || colWidthMatch) && (Object.keys(property).length > 0 || value || condition)) {
     // If row/col height/width is requested but no specific row/col, apply to all
     if (!type && rowHeightMatch) {
       type = 'allRows';
@@ -126,14 +160,14 @@ function parseFormattingPrompt(prompt) {
     if (!type && colWidthMatch) {
       type = 'allCols';
     }
-    return { type, index, property };
+    return { type, index, property, value, condition };
   }
   return null;
 }
 
 function applyFormatting(data, formatting, parsed) {
   if (!parsed) return formatting;
-  const { type, index, property } = parsed;
+  const { type, index, property, value, condition } = parsed;
   if (!Array.isArray(data) || data.length === 0) return formatting;
   // Clone formatting
   const fmt = formatting.map(row => row.map(cell => ({ ...cell })));
@@ -167,6 +201,33 @@ function applyFormatting(data, formatting, parsed) {
     for (let j = 0; j < data[0].length; j++) {
       for (let i = 0; i < data.length; i++) {
         fmt[i][j] = { ...fmt[i][j], ...property };
+      }
+    }
+  } else if (type === 'value' && value) {
+    for (let i = 0; i < data.length; i++) {
+      for (let j = 0; j < data[i].length; j++) {
+        if (String(data[i][j]).trim().toLowerCase() === value.toLowerCase()) {
+          fmt[i][j] = { ...fmt[i][j], ...property };
+        }
+      }
+    }
+  } else if (type === 'condition' && condition) {
+    for (let i = 0; i < data.length; i++) {
+      for (let j = 0; j < data[i].length; j++) {
+        const cellVal = Number(data[i][j]);
+        if (condition.op === '>' && cellVal > condition.val) {
+          fmt[i][j] = { ...fmt[i][j], background: condition.color };
+        } else if (condition.op === '<' && cellVal < condition.val) {
+          fmt[i][j] = { ...fmt[i][j], background: condition.color };
+        }
+      }
+    }
+  } else if (type === 'contains' && value) {
+    for (let i = 0; i < data.length; i++) {
+      for (let j = 0; j < data[i].length; j++) {
+        if (String(data[i][j]).toLowerCase().includes(value.toLowerCase())) {
+          fmt[i][j] = { ...fmt[i][j], ...property };
+        }
       }
     }
   }
