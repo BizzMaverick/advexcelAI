@@ -2,6 +2,14 @@ import React, { useState, useEffect } from 'react';
 import minionGif from './assets/minion.gif';
 import logoImg from './assets/logo.png';
 
+// Add Google Fonts import for Luckiest Guy
+const fontLink = document.createElement('link');
+fontLink.href = 'https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap';
+fontLink.rel = 'stylesheet';
+if (!document.head.querySelector('link[href*="Luckiest+Guy"]')) {
+  document.head.appendChild(fontLink);
+}
+
 const overlayStyle: React.CSSProperties = {
   position: 'fixed',
   top: 0,
@@ -51,13 +59,14 @@ const coinFaceStyle: React.CSSProperties = {
   backfaceVisibility: 'hidden',
 };
 
+// Remove yellow edge, use transparent or blue gradient
 const coinEdgeStyle: React.CSSProperties = {
   position: 'absolute',
   top: 0,
   left: '50%',
   width: 16,
   height: 220,
-  background: 'linear-gradient(90deg, #facc15 60%, #fff 100%)',
+  background: 'linear-gradient(90deg, #1e3a8a 60%, #3b82f6 100%)',
   transform: 'translateX(-50%) rotateY(90deg)',
   borderRadius: '50%',
   zIndex: 1,
@@ -70,7 +79,7 @@ const introStyle: React.CSSProperties = {
   marginBottom: 18,
   textShadow: '0 2px 8px rgba(30, 58, 138, 0.5)',
   letterSpacing: 0.5,
-  fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
+  fontFamily: 'Luckiest Guy, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
 };
 
 const subIntroStyle: React.CSSProperties = {
@@ -96,7 +105,7 @@ const buttonStyle: React.CSSProperties = {
   boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
   transition: 'all 0.2s ease',
   outline: 'none',
-  fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
+  fontFamily: 'Luckiest Guy, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
   letterSpacing: 0.5,
 };
 
@@ -107,7 +116,7 @@ const welcomeStyle: React.CSSProperties = {
   letterSpacing: 1,
   color: '#ffffff',
   textShadow: '0 2px 8px rgba(30, 58, 138, 0.5)',
-  fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
+  fontFamily: 'Luckiest Guy, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
 };
 
 const LandingPage: React.FC<{ onBegin: () => void }> = ({ onBegin }) => {
