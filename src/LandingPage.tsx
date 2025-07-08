@@ -36,7 +36,7 @@ const coinStyle: React.CSSProperties = {
   height: 220,
   position: 'relative',
   transformStyle: 'preserve-3d',
-  transition: 'transform 1s cubic-bezier(.4,2,.6,1)',
+  transition: 'transform 1.2s cubic-bezier(.4,2,.6,1)',
 };
 
 const coinFaceStyle: React.CSSProperties = {
@@ -49,6 +49,18 @@ const coinFaceStyle: React.CSSProperties = {
   background: 'linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)',
   objectFit: 'cover',
   backfaceVisibility: 'hidden',
+};
+
+const coinEdgeStyle: React.CSSProperties = {
+  position: 'absolute',
+  top: 0,
+  left: '50%',
+  width: 16,
+  height: 220,
+  background: 'linear-gradient(90deg, #facc15 60%, #fff 100%)',
+  transform: 'translateX(-50%) rotateY(90deg)',
+  borderRadius: '50%',
+  zIndex: 1,
 };
 
 const introStyle: React.CSSProperties = {
@@ -103,9 +115,8 @@ const LandingPage: React.FC<{ onBegin: () => void }> = ({ onBegin }) => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setRotation(prev => prev + 360);
-    }, 3000); // Rotate every 3 seconds
-
+      setRotation(prev => prev + 180);
+    }, 1200); // 3D spin every 1.2s
     return () => clearInterval(interval);
   }, []);
 
@@ -115,7 +126,7 @@ const LandingPage: React.FC<{ onBegin: () => void }> = ({ onBegin }) => {
         <div
           style={{
             ...coinStyle,
-            transform: `rotateZ(${rotation}deg)`,
+            transform: `rotateY(${rotation}deg)`
           }}
         >
           <img
@@ -128,6 +139,7 @@ const LandingPage: React.FC<{ onBegin: () => void }> = ({ onBegin }) => {
             }}
             draggable={false}
           />
+          <div style={coinEdgeStyle}></div>
           <img
             src={logoImg}
             alt="Logo Side"
