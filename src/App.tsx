@@ -605,6 +605,23 @@ function App() {
                   fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
                   fontSize: '0.9rem'
                 }}>
+                  <thead>
+                    <tr style={{
+                      background: 'rgba(59, 130, 246, 0.2)',
+                      borderBottom: '2px solid rgba(59, 130, 246, 0.3)'
+                    }}>
+                      {aiResultData[0].map((_, index) => (
+                        <th key={index} style={{
+                          padding: '12px 8px',
+                          textAlign: 'left',
+                          color: '#ffffff',
+                          fontWeight: 600,
+                          borderRight: '1px solid rgba(255, 255, 255, 0.1)',
+                          fontSize: '0.85rem'
+                        }}>{headers[index] || `Column ${index + 1}`}</th>
+                      ))}
+                    </tr>
+                  </thead>
                   <tbody>
                     {aiResultData.map((row, rowIndex) => (
                       <tr key={rowIndex} style={{
