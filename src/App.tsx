@@ -171,7 +171,7 @@ function App() {
       width: '100vw',
       height: '100vh',
       background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #1e40af 100%)',
-      fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
+      fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
       color: 'white',
       overflow: 'auto'
     }}>
@@ -181,12 +181,14 @@ function App() {
         padding: '20px',
         minHeight: '100vh',
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif'
       }}>
         <div style={{
           textAlign: 'center',
           marginBottom: '30px',
-          padding: '20px 0'
+          padding: '20px 0',
+          fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif'
         }}>
           <h1 style={{
             fontSize: '2.4rem',
@@ -194,14 +196,16 @@ function App() {
             color: '#ffffff',
             textShadow: '0 2px 8px rgba(30, 58, 138, 0.5)',
             marginBottom: '10px',
-            letterSpacing: 1
+            letterSpacing: 1,
+            fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif'
           }}>Advanced Excel AI Assistant</h1>
           <p style={{
             fontSize: '1.2rem',
             color: '#bfdbfe',
             fontWeight: 400,
             textShadow: '0 1px 4px rgba(30, 58, 138, 0.5)',
-            lineHeight: 1.6
+            lineHeight: 1.6,
+            fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif'
           }}>Upload your Excel files and use AI to perform advanced operations</p>
         </div>
         
@@ -224,7 +228,7 @@ function App() {
                   background: 'rgba(255, 255, 255, 0.1)',
                   color: '#ffffff',
                   fontSize: '1rem',
-                  fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
+                  fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
                   outline: 'none',
                   backdropFilter: 'blur(10px)'
                 }}
@@ -254,7 +258,7 @@ function App() {
                   boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
                   transition: 'all 0.2s ease',
                   outline: 'none',
-                  fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
+                  fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
                   letterSpacing: 0.5,
                   opacity: aiLoading || !prompt.trim() ? 0.6 : 1
                 }}
@@ -385,7 +389,7 @@ function App() {
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
                   outline: 'none',
-                  fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
+                  fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
                   opacity: !selectedFile || isProcessing ? 0.5 : 1
                 }}
                 disabled={!selectedFile || isProcessing}
@@ -404,7 +408,7 @@ function App() {
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
                   outline: 'none',
-                  fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
+                  fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
                   opacity: !selectedFile || isProcessing ? 0.5 : 1
                 }}
                 disabled={!selectedFile || isProcessing}
@@ -423,7 +427,7 @@ function App() {
               margin: '20px 0',
               color: '#fca5a5',
               fontSize: '0.9rem',
-              fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif'
+              fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif'
             }}>
               <strong>Error:</strong> {fileError}
             </div>
@@ -438,7 +442,7 @@ function App() {
               margin: '20px 0',
               color: '#86efac',
               fontSize: '0.9rem',
-              fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif'
+              fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif'
             }}>
               <strong>Success!</strong> File "{selectedFile.name}" has been loaded successfully with {spreadsheetData.length} rows of data.
             </div>
@@ -484,7 +488,7 @@ function App() {
                 <table style={{
                   width: '100%',
                   borderCollapse: 'collapse',
-                  fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
+                  fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
                   fontSize: '0.9rem'
                 }}>
                   <thead>
@@ -538,7 +542,7 @@ function App() {
               margin: '20px 0',
               color: '#fca5a5',
               fontSize: '0.9rem',
-              fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif'
+              fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif'
             }}>
               <strong>AI Error:</strong> {aiError}
             </div>
@@ -552,7 +556,7 @@ function App() {
               margin: '20px 0',
               color: '#bfdbfe',
               fontSize: '0.9rem',
-              fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
+              fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
               lineHeight: 1.6
             }}>
               <strong>AI Instructions:</strong>
@@ -598,7 +602,7 @@ function App() {
                 <table style={{
                   width: '100%',
                   borderCollapse: 'collapse',
-                  fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
+                  fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
                   fontSize: '0.9rem'
                 }}>
                   <tbody>

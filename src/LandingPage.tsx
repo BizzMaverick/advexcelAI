@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import minionGif from './assets/minion.gif';
 import logoImg from './assets/logo.png';
 
-// Add Google Fonts import for Luckiest Guy
+// Add Google Fonts import for Hammersmith One
 const fontLink = document.createElement('link');
-fontLink.href = 'https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap';
+fontLink.href = 'https://fonts.googleapis.com/css2?family=Hammersmith+One&display=swap';
 fontLink.rel = 'stylesheet';
-if (!document.head.querySelector('link[href*="Luckiest+Guy"]')) {
+if (!document.head.querySelector('link[href*="Hammersmith+One"]')) {
   document.head.appendChild(fontLink);
 }
 
@@ -24,7 +24,7 @@ const overlayStyle: React.CSSProperties = {
   justifyContent: 'center',
   color: 'white',
   textAlign: 'center',
-  fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
+  fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
   overflow: 'hidden',
   transition: 'background 0.7s',
 };
@@ -79,7 +79,7 @@ const introStyle: React.CSSProperties = {
   marginBottom: 18,
   textShadow: '0 2px 8px rgba(30, 58, 138, 0.5)',
   letterSpacing: 0.5,
-  fontFamily: 'Luckiest Guy, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
+  fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
 };
 
 const subIntroStyle: React.CSSProperties = {
@@ -88,7 +88,7 @@ const subIntroStyle: React.CSSProperties = {
   marginBottom: 30,
   fontWeight: 400,
   textShadow: '0 1px 4px rgba(30, 58, 138, 0.5)',
-  fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
+  fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
   lineHeight: 1.6,
 };
 
@@ -105,7 +105,7 @@ const buttonStyle: React.CSSProperties = {
   boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
   transition: 'all 0.2s ease',
   outline: 'none',
-  fontFamily: 'Luckiest Guy, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
+  fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
   letterSpacing: 0.5,
 };
 
@@ -116,7 +116,7 @@ const welcomeStyle: React.CSSProperties = {
   letterSpacing: 1,
   color: '#ffffff',
   textShadow: '0 2px 8px rgba(30, 58, 138, 0.5)',
-  fontFamily: 'Luckiest Guy, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
+  fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
 };
 
 const LandingPage: React.FC<{ onBegin: () => void }> = ({ onBegin }) => {
