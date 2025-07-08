@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import minionGif from './assets/minion.gif';
+import logoImg from './assets/logo.png';
 
 type LandingPageProps = {
   onBegin: () => void;
@@ -96,7 +98,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onBegin }) => {
       {step === 'minion' && (
         <>
           <img
-            src="/minion.gif"
+            src={minionGif}
             alt="Blue Minion Welcome"
             style={{ ...minionGifStyle, opacity: fade ? 0 : 1 }}
             onClick={handleMinionClick}
@@ -113,7 +115,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onBegin }) => {
       {step === 'intro' && (
         <>
           <img
-            src="/logo.png"
+            src={logoImg}
             alt="App Logo"
             style={{ ...logoStyle, opacity: fade ? 0 : 1 }}
             draggable={false}
