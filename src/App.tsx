@@ -178,7 +178,7 @@ function App() {
       <div style={{
         maxWidth: '1200px',
         margin: '0 auto',
-        padding: '20px',
+        padding: 'clamp(10px, 4vw, 40px)',
         minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
@@ -186,12 +186,12 @@ function App() {
       }}>
         <div style={{
           textAlign: 'center',
-          marginBottom: '30px',
-          padding: '20px 0',
+          marginBottom: 'clamp(16px, 4vw, 30px)',
+          padding: 'clamp(10px, 2vw, 20px) 0',
           fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif'
         }}>
           <h1 style={{
-            fontSize: '2.4rem',
+            fontSize: 'clamp(1.3rem, 4vw, 2.4rem)',
             fontWeight: 700,
             color: '#ffffff',
             textShadow: '0 2px 8px rgba(30, 58, 138, 0.5)',
@@ -200,7 +200,7 @@ function App() {
             fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif'
           }}>Advanced Excel AI Assistant</h1>
           <p style={{
-            fontSize: '1.2rem',
+            fontSize: 'clamp(0.9rem, 2vw, 1.2rem)',
             color: '#bfdbfe',
             fontWeight: 400,
             textShadow: '0 1px 4px rgba(30, 58, 138, 0.5)',
@@ -635,6 +635,31 @@ function App() {
           )}
         </div>
       </div>
+      <style>{`
+        @media (max-width: 800px) {
+          .spreadsheet-table th, .spreadsheet-table td {
+            font-size: 0.8rem !important;
+            padding: 6px 4px !important;
+          }
+        }
+        @media (max-width: 600px) {
+          .spreadsheet-table th, .spreadsheet-table td {
+            font-size: 0.7rem !important;
+            padding: 4px 2px !important;
+          }
+          .spreadsheet-table {
+            font-size: 0.7rem !important;
+          }
+          input[type="text"] {
+            font-size: 1rem !important;
+            padding: 10px 8px !important;
+          }
+          button {
+            font-size: 1rem !important;
+            padding: 10px 16px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

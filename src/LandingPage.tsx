@@ -31,17 +31,19 @@ const overlayStyle: React.CSSProperties = {
 
 const coinContainerStyle: React.CSSProperties = {
   perspective: '1200px',
-  width: 220,
-  height: 220,
-  margin: '0 auto 32px',
+  width: 'min(60vw, 220px)',
+  height: 'min(60vw, 220px)',
+  margin: '0 auto 6vw',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
+  maxWidth: 220,
+  maxHeight: 220,
 };
 
 const coinStyle: React.CSSProperties = {
-  width: 220,
-  height: 220,
+  width: '100%',
+  height: '100%',
   position: 'relative',
   transformStyle: 'preserve-3d',
   transition: 'transform 1.2s cubic-bezier(.4,2,.6,1)',
@@ -49,11 +51,11 @@ const coinStyle: React.CSSProperties = {
 
 const coinFaceStyle: React.CSSProperties = {
   position: 'absolute',
-  width: 220,
-  height: 220,
+  width: '100%',
+  height: '100%',
   borderRadius: '50%',
   boxShadow: '0 8px 32px rgba(59, 130, 246, 0.3)',
-  border: '6px solid #3b82f6',
+  border: '0.27em solid #3b82f6',
   background: 'linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)',
   objectFit: 'cover',
   backfaceVisibility: 'hidden',
@@ -64,8 +66,8 @@ const coinEdgeStyle: React.CSSProperties = {
   position: 'absolute',
   top: 0,
   left: '50%',
-  width: 16,
-  height: 220,
+  width: '7%',
+  height: '100%',
   background: 'linear-gradient(90deg, #1e3a8a 60%, #3b82f6 100%)',
   transform: 'translateX(-50%) rotateY(90deg)',
   borderRadius: '50%',
@@ -73,19 +75,19 @@ const coinEdgeStyle: React.CSSProperties = {
 };
 
 const introStyle: React.CSSProperties = {
-  fontSize: '2rem',
+  fontSize: 'clamp(1rem, 2.5vw, 2rem)',
   fontWeight: 600,
   color: '#e0f2fe',
-  marginBottom: 18,
+  marginBottom: '0.7em',
   textShadow: '0 2px 8px rgba(30, 58, 138, 0.5)',
   letterSpacing: 0.5,
   fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
 };
 
 const subIntroStyle: React.CSSProperties = {
-  fontSize: '1.2rem',
+  fontSize: 'clamp(0.9rem, 2vw, 1.2rem)',
   color: '#bfdbfe',
-  marginBottom: 30,
+  marginBottom: '2vw',
   fontWeight: 400,
   textShadow: '0 1px 4px rgba(30, 58, 138, 0.5)',
   fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
@@ -93,13 +95,13 @@ const subIntroStyle: React.CSSProperties = {
 };
 
 const buttonStyle: React.CSSProperties = {
-  marginTop: 24,
+  marginTop: '2vw',
   background: 'linear-gradient(90deg, #3b82f6 0%, #1e40af 100%)',
   color: '#ffffff',
   border: '2px solid #60a5fa',
   borderRadius: '12px',
-  padding: '16px 40px',
-  fontSize: '1.2rem',
+  padding: 'clamp(10px, 3vw, 16px) clamp(30px, 8vw, 40px)',
+  fontSize: 'clamp(1rem, 2vw, 1.2rem)',
   fontWeight: 600,
   cursor: 'pointer',
   boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
@@ -110,9 +112,9 @@ const buttonStyle: React.CSSProperties = {
 };
 
 const welcomeStyle: React.CSSProperties = {
-  fontSize: '2.4rem',
+  fontSize: 'clamp(1.3rem, 4vw, 2.4rem)',
   fontWeight: 700,
-  marginBottom: 12,
+  marginBottom: '0.5em',
   letterSpacing: 1,
   color: '#ffffff',
   textShadow: '0 2px 8px rgba(30, 58, 138, 0.5)',
@@ -205,6 +207,14 @@ const LandingPage: React.FC<{ onBegin: () => void }> = ({ onBegin }) => {
           0% { opacity: 0; transform: translateY(40px) scale(0.98); }
           80% { opacity: 1; transform: translateY(-4px) scale(1.03); }
           100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @media (max-width: 600px) {
+          .coin-container, .coin-style {
+            width: 90vw !important;
+            height: 90vw !important;
+            max-width: 95vw !important;
+            max-height: 95vw !important;
+          }
         }
       `}</style>
     </div>
