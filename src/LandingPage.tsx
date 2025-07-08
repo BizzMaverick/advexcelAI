@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import minionGif from './assets/minion.gif';
 import logoImg from './assets/logo.png';
 
@@ -26,6 +26,9 @@ const coinContainerStyle: React.CSSProperties = {
   width: 220,
   height: 220,
   margin: '0 auto 32px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
 };
 
 const coinStyle: React.CSSProperties = {
@@ -34,7 +37,6 @@ const coinStyle: React.CSSProperties = {
   position: 'relative',
   transformStyle: 'preserve-3d',
   transition: 'transform 1s cubic-bezier(.4,2,.6,1)',
-  cursor: 'pointer',
 };
 
 const coinFaceStyle: React.CSSProperties = {
@@ -89,9 +91,15 @@ const welcomeStyle: React.CSSProperties = {
 };
 
 const LandingPage: React.FC<{ onBegin: () => void }> = ({ onBegin }) => {
-  const [spun, setSpun] = useState(false);
+  const [rotation, setRotation] = useState(0);
 
-  const handleSpin = () => setSpun(s => !s);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRotation(prev => prev + 180);
+    }, 2000); // Spin every 2 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div style={overlayStyle}>
@@ -99,10 +107,8 @@ const LandingPage: React.FC<{ onBegin: () => void }> = ({ onBegin }) => {
         <div
           style={{
             ...coinStyle,
-            transform: spun ? 'rotateY(180deg)' : 'rotateY(0deg)',
+            transform: `rotateY(${rotation}deg)`,
           }}
-          onClick={handleSpin}
-          title="Click to spin"
         >
           <img
             src={minionGif}
