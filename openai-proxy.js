@@ -85,6 +85,8 @@ function parseFormattingPrompt(prompt) {
   const fontSizeMatch = p.match(/font size\s*(\d+)/);
   const widthMatch = p.match(/width\s*(\d+)/);
   const alignMatch = p.match(/align(?:ment)?\s*(left|center|right|justify)/);
+  const rowHeightMatch = p.match(/row height\s*(\d+)|reduce row height|increase row height/);
+  const colWidthMatch = p.match(/column width\s*(\d+)|reduce column width|increase column width/);
 
   // Helper to convert words to numbers
   function wordToNumber(word) {
@@ -113,8 +115,17 @@ function parseFormattingPrompt(prompt) {
   if (fontSizeMatch) property.fontSize = fontSizeMatch[1] + 'px';
   if (widthMatch) property.width = widthMatch[1] + 'px';
   if (alignMatch) property.align = alignMatch[1];
+  if (rowHeightMatch) property.height = rowHeightMatch[1] ? rowHeightMatch[1] + 'px' : (p.includes('reduce') ? '16px' : '32px');
+  if (colWidthMatch) property.width = colWidthMatch[1] ? colWidthMatch[1] + 'px' : (p.includes('reduce') ? '60px' : '200px');
 
-  if (type && Object.keys(property).length > 0) {
+  if ((type || rowHeightMatch || colWidthMatch) && Object.keys(property).length > 0) {
+    // If row/col height/width is requested but no specific row/col, apply to all
+    if (!type && rowHeightMatch) {
+      type = 'allRows';
+    }
+    if (!type && colWidthMatch) {
+      type = 'allCols';
+    }
     return { type, index, property };
   }
   return null;
@@ -145,6 +156,18 @@ function applyFormatting(data, formatting, parsed) {
     let rowIdx = parsed.index[1] - 1;
     if (rowIdx >= 0 && rowIdx < data.length && colIdx >= 0 && colIdx < data[0].length) {
       fmt[rowIdx][colIdx] = { ...fmt[rowIdx][colIdx], ...property };
+    }
+  } else if (type === 'allRows') {
+    for (let i = 0; i < data.length; i++) {
+      for (let j = 0; j < data[i].length; j++) {
+        fmt[i][j] = { ...fmt[i][j], ...property };
+      }
+    }
+  } else if (type === 'allCols') {
+    for (let j = 0; j < data[0].length; j++) {
+      for (let i = 0; i < data.length; i++) {
+        fmt[i][j] = { ...fmt[i][j], ...property };
+      }
     }
   }
   return fmt;
@@ -255,8 +278,70 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
         formatting = applyFormatting(spreadsheetData, formatting, parsed);
         return res.json({ result: 'Formatting applied (backend)', data: spreadsheetData, formatting });
       }
-      // Return processed data for classic operations
-      return res.json({ result: 'Processed in backend', data: processedData, formatting: [] });
+      // Fallback to OpenAI: only send a sample of the data
+      const sampleData = spreadsheetData.slice(0, 10);
+      const rewrittenPrompt = rewritePrompt(prompt, sampleData);
+      if (process.env.OPENAI_API_KEY) {
+        console.log('About to call OpenAI...');
+        const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+        const systemPrompt = `You are an Excel AI assistant. When the user asks for a change, you MUST return ONLY a valid JSON object with two keys: 'data' (the updated spreadsheet as an array of arrays) and 'formatting' (an array of arrays of formatting objects, matching the data structure, with keys like 'color', 'background', 'bold', 'italic'). Do not return any explanation, markdown, or extra text. If the request is ambiguous or impossible, return the original spreadsheet as 'data' and an empty array for 'formatting'. Example: {"data": [["A", "B"], [1, 2]], "formatting": [[{"bold":true,"color":"red"},{"bold":false}], [{},{}]]]}`;
+        try {
+          console.log('Calling OpenAI API with prompt:', rewrittenPrompt.slice(0, 500));
+          // Helper function for timeout
+          function withTimeout(promise, ms) {
+            const timeout = new Promise((_, reject) =>
+              setTimeout(() => reject(new Error('OpenAI API call timed out')), ms)
+            );
+            return Promise.race([promise, timeout]);
+          }
+          try {
+            const completion = await withTimeout(
+              openai.chat.completions.create({
+                model: "gpt-3.5-turbo",
+                messages: [
+                  { role: "system", content: systemPrompt },
+                  { role: "user", content: rewrittenPrompt }
+                ],
+                temperature: 0.1,
+                max_tokens: 2000
+              }),
+              15000 // 15 seconds
+            );
+            console.log('OpenAI API call succeeded.');
+            const response = completion.choices[0]?.message?.content;
+            console.log('Raw OpenAI response:', response);
+            // Try to extract JSON object with data and formatting
+            let aiResult = null;
+            let parseError = null;
+            try {
+              // Try to find the first JSON object in the response
+              const match = response.match(/\{[\s\S]*\}/);
+              if (match) {
+                aiResult = JSON.parse(match[0]);
+              }
+            } catch (e) {
+              parseError = e;
+              console.error('Error parsing AI response JSON:', e);
+            }
+            // Validate structure
+            if (!aiResult || !Array.isArray(aiResult.data) || !Array.isArray(aiResult.data[0])) {
+              console.warn('AI did not return a valid spreadsheet object. Returning fallback.');
+              return res.json({ result: response, data: spreadsheetData, formatting: [], aiError: 'AI did not return a valid spreadsheet object. Here is the raw response.', raw: response });
+            }
+            // If formatting is missing, provide empty formatting array
+            if (!Array.isArray(aiResult.formatting)) {
+              aiResult.formatting = [];
+            }
+            return res.json({ result: response, data: aiResult.data, formatting: aiResult.formatting });
+          } catch (openaiErr) {
+            console.error('Error during OpenAI API call:', openaiErr);
+            return res.status(500).json({ error: 'OpenAI API call failed', details: openaiErr.message });
+          }
+        } catch (openaiErr) {
+          console.error('Error during OpenAI API call:', openaiErr);
+          return res.status(500).json({ error: 'OpenAI API call failed', details: openaiErr.message });
+        }
+      }
     }
   } catch (err) {
     console.error('Error in /api/upload handler:', err);
