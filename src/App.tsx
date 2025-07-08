@@ -164,19 +164,70 @@ function App() {
 
   // Always show the actual application
   return (
-    <div className="app">
-      <div className="container">
-        <div className="header">
-          <h1>Advanced Excel AI Assistant</h1>
-          <p>Upload your Excel files and use AI to perform advanced operations</p>
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100vw',
+      height: '100vh',
+      background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #1e40af 100%)',
+      fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
+      color: 'white',
+      overflow: 'auto'
+    }}>
+      <div style={{
+        maxWidth: '1200px',
+        margin: '0 auto',
+        padding: '20px',
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column'
+      }}>
+        <div style={{
+          textAlign: 'center',
+          marginBottom: '30px',
+          padding: '20px 0'
+        }}>
+          <h1 style={{
+            fontSize: '2.4rem',
+            fontWeight: 700,
+            color: '#ffffff',
+            textShadow: '0 2px 8px rgba(30, 58, 138, 0.5)',
+            marginBottom: '10px',
+            letterSpacing: 1
+          }}>Advanced Excel AI Assistant</h1>
+          <p style={{
+            fontSize: '1.2rem',
+            color: '#bfdbfe',
+            fontWeight: 400,
+            textShadow: '0 1px 4px rgba(30, 58, 138, 0.5)',
+            lineHeight: 1.6
+          }}>Upload your Excel files and use AI to perform advanced operations</p>
         </div>
         
-        <div className="content">
+        <div style={{ flex: 1 }}>
           {spreadsheetData.length > 0 && (
-            <div className="ai-prompt-bar">
+            <div style={{
+              marginBottom: '20px',
+              display: 'flex',
+              gap: '10px',
+              justifyContent: 'center'
+            }}>
               <input
                 type="text"
-                className="ai-prompt-input"
+                style={{
+                  flex: 1,
+                  maxWidth: '500px',
+                  padding: '12px 16px',
+                  borderRadius: '8px',
+                  border: '2px solid #60a5fa',
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  color: '#ffffff',
+                  fontSize: '1rem',
+                  fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
+                  outline: 'none',
+                  backdropFilter: 'blur(10px)'
+                }}
                 placeholder="Add prompt here"
                 value={prompt}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => setPrompt(e.target.value)}
@@ -188,18 +239,77 @@ function App() {
                 disabled={aiLoading}
                 autoFocus
               />
+              <button
+                onClick={handleRunAI}
+                disabled={aiLoading || !prompt.trim()}
+                style={{
+                  padding: '12px 24px',
+                  background: 'linear-gradient(90deg, #3b82f6 0%, #1e40af 100%)',
+                  color: '#ffffff',
+                  border: '2px solid #60a5fa',
+                  borderRadius: '8px',
+                  fontSize: '1rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
+                  transition: 'all 0.2s ease',
+                  outline: 'none',
+                  fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
+                  letterSpacing: 0.5,
+                  opacity: aiLoading || !prompt.trim() ? 0.6 : 1
+                }}
+              >
+                {aiLoading ? 'Processing...' : 'Run AI'}
+              </button>
             </div>
           )}
           {spreadsheetData.length === 0 && (
-            <div className="upload-section">
-              <div className="upload-area" onClick={() => document.getElementById('file-input')?.click()}>
-                <div className="upload-icon">📁</div>
-                <div className="upload-text">Upload Excel/CSV File</div>
-                <div className="upload-hint">Supports Excel (.xlsx, .xls, .xlsm, .xltx, .xltm, .xlsb), CSV (.csv), TSV (.tsv), OpenDocument (.ods), and text files (.txt)</div>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              minHeight: '400px'
+            }}>
+              <div 
+                style={{
+                  border: '3px dashed #60a5fa',
+                  borderRadius: '16px',
+                  padding: '60px 40px',
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  backdropFilter: 'blur(10px)',
+                  transition: 'all 0.3s ease',
+                  maxWidth: '500px',
+                  width: '100%'
+                }}
+                onClick={() => document.getElementById('file-input')?.click()}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                  e.currentTarget.style.borderColor = '#3b82f6';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                  e.currentTarget.style.borderColor = '#60a5fa';
+                }}
+              >
+                <div style={{ fontSize: '3rem', marginBottom: '20px' }}>📁</div>
+                <div style={{
+                  fontSize: '1.5rem',
+                  fontWeight: 600,
+                  color: '#ffffff',
+                  marginBottom: '10px',
+                  textShadow: '0 2px 8px rgba(30, 58, 138, 0.5)'
+                }}>Upload Excel/CSV File</div>
+                <div style={{
+                  fontSize: '1rem',
+                  color: '#bfdbfe',
+                  lineHeight: 1.6
+                }}>Supports Excel (.xlsx, .xls, .xlsm, .xltx, .xltm, .xlsb), CSV (.csv), TSV (.tsv), OpenDocument (.ods), and text files (.txt)</div>
                 <input
                   id="file-input"
                   type="file"
-                  className="file-input"
+                  style={{ display: 'none' }}
                   accept=".xlsx,.xls,.csv,.xlsm,.xltx,.xltm,.xlsb,.ods,.tsv,.txt"
                   onChange={async (e: ChangeEvent<HTMLInputElement>) => {
                     const file = e.target.files?.[0];
@@ -245,43 +355,152 @@ function App() {
             </div>
           )}
           
-          <div className="status-bar">
-            <div className="status-text">
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '15px 0',
+            borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+            marginTop: '20px'
+          }}>
+            <div style={{
+              color: '#bfdbfe',
+              fontSize: '0.9rem',
+              fontWeight: 400
+            }}>
               {isProcessing ? 'Processing file...' : 
                selectedFile ? `File loaded: ${selectedFile.name} (${spreadsheetData.length} rows)` : 
                'Ready to upload files'}
             </div>
-            <div className="ai-controls">
-              <button className="ai-button" disabled={!selectedFile || isProcessing}>Download Excel</button>
-              <button className="ai-button" disabled={!selectedFile || isProcessing}>Download CSV</button>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button 
+                style={{
+                  padding: '8px 16px',
+                  background: 'linear-gradient(90deg, #3b82f6 0%, #1e40af 100%)',
+                  color: '#ffffff',
+                  border: '1px solid #60a5fa',
+                  borderRadius: '6px',
+                  fontSize: '0.9rem',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  outline: 'none',
+                  fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
+                  opacity: !selectedFile || isProcessing ? 0.5 : 1
+                }}
+                disabled={!selectedFile || isProcessing}
+              >
+                Download Excel
+              </button>
+              <button 
+                style={{
+                  padding: '8px 16px',
+                  background: 'linear-gradient(90deg, #3b82f6 0%, #1e40af 100%)',
+                  color: '#ffffff',
+                  border: '1px solid #60a5fa',
+                  borderRadius: '6px',
+                  fontSize: '0.9rem',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  outline: 'none',
+                  fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
+                  opacity: !selectedFile || isProcessing ? 0.5 : 1
+                }}
+                disabled={!selectedFile || isProcessing}
+              >
+                Download CSV
+              </button>
             </div>
           </div>
           
           {fileError && (
-            <div className="error-message">
+            <div style={{
+              background: 'rgba(239, 68, 68, 0.1)',
+              border: '1px solid #ef4444',
+              borderRadius: '8px',
+              padding: '15px',
+              margin: '20px 0',
+              color: '#fca5a5',
+              fontSize: '0.9rem',
+              fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif'
+            }}>
               <strong>Error:</strong> {fileError}
             </div>
           )}
           
           {selectedFile && !isProcessing && spreadsheetData.length > 0 && showSuccess && (
-            <div className="success-message">
+            <div style={{
+              background: 'rgba(34, 197, 94, 0.1)',
+              border: '1px solid #22c55e',
+              borderRadius: '8px',
+              padding: '15px',
+              margin: '20px 0',
+              color: '#86efac',
+              fontSize: '0.9rem',
+              fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif'
+            }}>
               <strong>Success!</strong> File "{selectedFile.name}" has been loaded successfully with {spreadsheetData.length} rows of data.
             </div>
           )}
           
           {/* Spreadsheet Display */}
           {spreadsheetData.length > 0 && (
-            <div className="spreadsheet-container">
-              <div className="spreadsheet-header">
-                <h3>Spreadsheet Data</h3>
-                <span className="data-info">Rows: {spreadsheetData.length} | Columns: {headers.length}</span>
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.05)',
+              borderRadius: '12px',
+              padding: '20px',
+              margin: '20px 0',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.1)'
+            }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '20px',
+                paddingBottom: '15px',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+              }}>
+                <h3 style={{
+                  fontSize: '1.5rem',
+                  fontWeight: 600,
+                  color: '#ffffff',
+                  margin: 0,
+                  textShadow: '0 2px 8px rgba(30, 58, 138, 0.5)'
+                }}>Spreadsheet Data</h3>
+                <span style={{
+                  color: '#bfdbfe',
+                  fontSize: '0.9rem',
+                  fontWeight: 400
+                }}>Rows: {spreadsheetData.length} | Columns: {headers.length}</span>
               </div>
-              <div className="spreadsheet-table-container">
-                <table className="spreadsheet-table">
+              <div style={{
+                overflow: 'auto',
+                maxHeight: '500px',
+                borderRadius: '8px',
+                border: '1px solid rgba(255, 255, 255, 0.1)'
+              }}>
+                <table style={{
+                  width: '100%',
+                  borderCollapse: 'collapse',
+                  fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
+                  fontSize: '0.9rem'
+                }}>
                   <thead>
-                    <tr>
+                    <tr style={{
+                      background: 'rgba(59, 130, 246, 0.2)',
+                      borderBottom: '2px solid rgba(59, 130, 246, 0.3)'
+                    }}>
                       {headers.map((header, index) => (
-                        <th key={index}>{header || `Column ${index + 1}`}</th>
+                        <th key={index} style={{
+                          padding: '12px 8px',
+                          textAlign: 'left',
+                          color: '#ffffff',
+                          fontWeight: 600,
+                          borderRight: '1px solid rgba(255, 255, 255, 0.1)',
+                          fontSize: '0.85rem'
+                        }}>{header || `Column ${index + 1}`}</th>
                       ))}
                     </tr>
                   </thead>
@@ -289,9 +508,17 @@ function App() {
                     {spreadsheetData.slice(1)
                       .filter(row => row.some(cell => cell !== null && cell !== undefined && cell !== ''))
                       .map((row, rowIndex) => (
-                        <tr key={rowIndex}>
+                        <tr key={rowIndex} style={{
+                          borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                          background: rowIndex % 2 === 0 ? 'rgba(255, 255, 255, 0.02)' : 'transparent'
+                        }}>
                           {row.map((cell, cellIndex) => (
-                            <td key={cellIndex}>{cell === null || cell === undefined ? '' : String(cell)}</td>
+                            <td key={cellIndex} style={{
+                              padding: '8px',
+                              color: '#e0f2fe',
+                              borderRight: '1px solid rgba(255, 255, 255, 0.05)',
+                              fontSize: '0.8rem'
+                            }}>{cell === null || cell === undefined ? '' : String(cell)}</td>
                           ))}
                         </tr>
                       ))}
@@ -303,32 +530,93 @@ function App() {
 
           {/* AI Output */}
           {aiError && (
-            <div className="error-message"><strong>AI Error:</strong> {aiError}</div>
+            <div style={{
+              background: 'rgba(239, 68, 68, 0.1)',
+              border: '1px solid #ef4444',
+              borderRadius: '8px',
+              padding: '15px',
+              margin: '20px 0',
+              color: '#fca5a5',
+              fontSize: '0.9rem',
+              fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif'
+            }}>
+              <strong>AI Error:</strong> {aiError}
+            </div>
           )}
           {aiInstructions && (
-            <div className="ai-instructions">
+            <div style={{
+              background: 'rgba(59, 130, 246, 0.1)',
+              border: '1px solid #3b82f6',
+              borderRadius: '8px',
+              padding: '15px',
+              margin: '20px 0',
+              color: '#bfdbfe',
+              fontSize: '0.9rem',
+              fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
+              lineHeight: 1.6
+            }}>
               <strong>AI Instructions:</strong>
-              <div>{aiInstructions}</div>
+              <div style={{ marginTop: '8px' }}>{aiInstructions}</div>
             </div>
           )}
           {aiResultData && aiResultData.length > 0 && (
-            <div className="spreadsheet-container">
-              <div className="spreadsheet-header">
-                <h3>AI Result Data</h3>
-                <span className="data-info">Rows: {aiResultData.length} | Columns: {aiResultData[0]?.length || 0}</span>
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.05)',
+              borderRadius: '12px',
+              padding: '20px',
+              margin: '20px 0',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.1)'
+            }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '20px',
+                paddingBottom: '15px',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+              }}>
+                <h3 style={{
+                  fontSize: '1.5rem',
+                  fontWeight: 600,
+                  color: '#ffffff',
+                  margin: 0,
+                  textShadow: '0 2px 8px rgba(30, 58, 138, 0.5)'
+                }}>AI Result Data</h3>
+                <span style={{
+                  color: '#bfdbfe',
+                  fontSize: '0.9rem',
+                  fontWeight: 400
+                }}>Rows: {aiResultData.length} | Columns: {aiResultData[0]?.length || 0}</span>
               </div>
-              <div className="spreadsheet-table-container">
-                <table className="spreadsheet-table">
+              <div style={{
+                overflow: 'auto',
+                maxHeight: '500px',
+                borderRadius: '8px',
+                border: '1px solid rgba(255, 255, 255, 0.1)'
+              }}>
+                <table style={{
+                  width: '100%',
+                  borderCollapse: 'collapse',
+                  fontFamily: '"Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
+                  fontSize: '0.9rem'
+                }}>
                   <tbody>
                     {aiResultData.map((row, rowIndex) => (
-                      <tr key={rowIndex}>
+                      <tr key={rowIndex} style={{
+                        borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                        background: rowIndex % 2 === 0 ? 'rgba(255, 255, 255, 0.02)' : 'transparent'
+                      }}>
                         {row.map((cell, cellIndex) => {
                           const fmt = aiFormatting && aiFormatting[rowIndex] && aiFormatting[rowIndex][cellIndex] ? aiFormatting[rowIndex][cellIndex] : {};
                           const style: React.CSSProperties = {
-                            color: fmt.color || undefined,
-                            background: fmt.background || undefined,
-                            fontWeight: fmt.bold ? 'bold' : undefined,
-                            fontStyle: fmt.italic ? 'italic' : undefined,
+                            padding: '8px',
+                            color: fmt.color || '#e0f2fe',
+                            background: fmt.background || 'transparent',
+                            fontWeight: fmt.bold ? 'bold' : 'normal',
+                            fontStyle: fmt.italic ? 'italic' : 'normal',
+                            borderRight: '1px solid rgba(255, 255, 255, 0.05)',
+                            fontSize: '0.8rem'
                           };
                           return (
                             <td key={cellIndex} style={style}>{cell === null || cell === undefined ? '' : String(cell)}</td>

@@ -103,8 +103,8 @@ const LandingPage: React.FC<{ onBegin: () => void }> = ({ onBegin }) => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setRotation(prev => prev + 180);
-    }, 2000); // Spin every 2 seconds
+      setRotation(prev => prev + 360);
+    }, 3000); // Rotate every 3 seconds
 
     return () => clearInterval(interval);
   }, []);
@@ -115,7 +115,7 @@ const LandingPage: React.FC<{ onBegin: () => void }> = ({ onBegin }) => {
         <div
           style={{
             ...coinStyle,
-            transform: `rotateY(${rotation}deg)`,
+            transform: `rotateZ(${rotation}deg)`,
           }}
         >
           <img
