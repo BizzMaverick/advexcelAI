@@ -8,7 +8,7 @@ const overlayStyle: React.CSSProperties = {
   left: 0,
   width: '100vw',
   height: '100vh',
-  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #1e40af 100%)',
   zIndex: 9999,
   display: 'flex',
   flexDirection: 'column',
@@ -44,9 +44,9 @@ const coinFaceStyle: React.CSSProperties = {
   width: 220,
   height: 220,
   borderRadius: '50%',
-  boxShadow: '0 8px 32px rgba(76, 0, 255, 0.15)',
-  border: '6px solid #fff',
-  background: '#fff',
+  boxShadow: '0 8px 32px rgba(59, 130, 246, 0.3)',
+  border: '6px solid #3b82f6',
+  background: 'linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)',
   objectFit: 'cover',
   backfaceVisibility: 'hidden',
 };
@@ -54,32 +54,32 @@ const coinFaceStyle: React.CSSProperties = {
 const introStyle: React.CSSProperties = {
   fontSize: '2rem',
   fontWeight: 700,
-  color: '#fff',
+  color: '#ffffff',
   marginBottom: 18,
-  textShadow: '0 2px 8px #764ba2',
+  textShadow: '0 2px 8px rgba(30, 58, 138, 0.5)',
   letterSpacing: 1.2,
 };
 
 const subIntroStyle: React.CSSProperties = {
   fontSize: '1.2rem',
-  color: '#ffcc33',
+  color: '#fbbf24',
   marginBottom: 30,
   fontWeight: 600,
-  textShadow: '0 1px 4px #764ba2',
+  textShadow: '0 1px 4px rgba(30, 58, 138, 0.5)',
 };
 
 const buttonStyle: React.CSSProperties = {
   marginTop: 24,
-  background: 'linear-gradient(90deg, #ffb347 0%, #ffcc33 100%)',
-  color: '#764ba2',
+  background: 'linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%)',
+  color: '#1e3a8a',
   border: 'none',
   borderRadius: '8px',
   padding: '16px 40px',
   fontSize: '1.3rem',
   fontWeight: 800,
   cursor: 'pointer',
-  boxShadow: '0 2px 8px rgba(255, 204, 51, 0.15)',
-  transition: 'transform 0.1s',
+  boxShadow: '0 4px 12px rgba(251, 191, 36, 0.3)',
+  transition: 'all 0.2s ease',
   outline: 'none',
 };
 
@@ -88,6 +88,8 @@ const welcomeStyle: React.CSSProperties = {
   fontWeight: 900,
   marginBottom: 12,
   letterSpacing: 2,
+  color: '#ffffff',
+  textShadow: '0 2px 8px rgba(30, 58, 138, 0.5)',
 };
 
 const LandingPage: React.FC<{ onBegin: () => void }> = ({ onBegin }) => {
@@ -135,9 +137,20 @@ const LandingPage: React.FC<{ onBegin: () => void }> = ({ onBegin }) => {
       <div style={introStyle}>Unleash the Power of AI in Your Spreadsheets</div>
       <div style={subIntroStyle}>
         Meet your new Excel superpower: automate, analyze, and format like never before.<br />
-        <span style={{ color: '#fff', fontWeight: 400 }}>Your productivity, reimagined.</span>
+        <span style={{ color: '#ffffff', fontWeight: 400 }}>Your productivity, reimagined.</span>
       </div>
-      <button style={buttonStyle} onClick={onBegin}>
+      <button 
+        style={buttonStyle} 
+        onClick={onBegin}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'translateY(-2px)';
+          e.currentTarget.style.boxShadow = '0 6px 16px rgba(251, 191, 36, 0.4)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'translateY(0)';
+          e.currentTarget.style.boxShadow = '0 4px 12px rgba(251, 191, 36, 0.3)';
+        }}
+      >
         Let's Begin
       </button>
       <style>{`
