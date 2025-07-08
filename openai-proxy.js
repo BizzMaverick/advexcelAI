@@ -25,6 +25,7 @@ function rewritePrompt(userPrompt, spreadsheetData) {
 // --- Prompt Classifier Function ---
 function classifyPrompt(prompt) {
   const p = prompt.toLowerCase();
+  if (p.includes('highlight 1st row') || p.includes('highlight first row') || p.includes('color first row')) return 'highlight_first_row';
   if (p.includes('sort by') || p.includes('order by')) return 'sort';
   if (p.includes('filter') || p.includes('where')) return 'filter';
   if (p.includes('pivot')) return 'pivot';
@@ -54,6 +55,20 @@ function pivotData(data, prompt) {
   return data;
 }
 
+function highlightFirstRowFormatting(data) {
+  // Apply red background to the first row
+  if (!Array.isArray(data) || data.length === 0) return [];
+  const formatting = [];
+  for (let i = 0; i < data.length; i++) {
+    if (i === 0) {
+      formatting.push(data[0].map(() => ({ background: 'red' })));
+    } else {
+      formatting.push(data[i].map(() => ({})));
+    }
+  }
+  return formatting;
+}
+
 // File upload endpoint with robust AI processing
 app.post('/api/upload', upload.single('file'), async (req, res) => {
   console.log('OPENAI_API_KEY present:', !!process.env.OPENAI_API_KEY);
@@ -77,6 +92,10 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
       processedData = filterData(spreadsheetData, prompt);
     } else if (operation === 'pivot') {
       processedData = pivotData(spreadsheetData, prompt);
+    } else if (operation === 'highlight_first_row') {
+      // Apply formatting to first row in backend
+      const formatting = highlightFirstRowFormatting(spreadsheetData);
+      return res.json({ result: 'First row highlighted in red (backend)', data: spreadsheetData, formatting });
     } else {
       usedOpenAI = true;
       if (process.env.OPENAI_API_KEY) {
