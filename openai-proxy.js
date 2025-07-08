@@ -22,6 +22,38 @@ function rewritePrompt(userPrompt, spreadsheetData) {
   return `You are an AI assistant for Excel. The user has uploaded a spreadsheet and made the following request: "${userPrompt}"\n\nSpreadsheet data (as JSON array of arrays):\n${JSON.stringify(spreadsheetData, null, 2)}\n\nYour task:\n- Perform the user's requested operation on the spreadsheet.\n- Output ONLY the updated spreadsheet as a valid JSON array of arrays.\n- Do NOT include any explanation, markdown, or extra text.\n- If the request is ambiguous or impossible, return the original spreadsheet as a JSON array of arrays.\n- Never return anything except the JSON array of arrays.`;
 }
 
+// --- Prompt Classifier Function ---
+function classifyPrompt(prompt) {
+  const p = prompt.toLowerCase();
+  if (p.includes('sort by') || p.includes('order by')) return 'sort';
+  if (p.includes('filter') || p.includes('where')) return 'filter';
+  if (p.includes('pivot')) return 'pivot';
+  if (p.match(/sum|average|count|min|max/)) return 'aggregate';
+  if (p.match(/formula|explain|how to/)) return 'openai';
+  // Default: try OpenAI for ambiguous cases
+  return 'openai';
+}
+
+// --- Backend Data Operations (Stubs) ---
+function sortData(data, prompt) {
+  // Example: "sort by sales descending"
+  // For now, just return data unchanged and log
+  console.log('Sorting data (stub):', prompt);
+  return data;
+}
+
+function filterData(data, prompt) {
+  // Example: "filter where region is 'West'"
+  console.log('Filtering data (stub):', prompt);
+  return data;
+}
+
+function pivotData(data, prompt) {
+  // Example: "pivot sales by region"
+  console.log('Pivoting data (stub):', prompt);
+  return data;
+}
+
 // File upload endpoint with robust AI processing
 app.post('/api/upload', upload.single('file'), async (req, res) => {
   console.log('OPENAI_API_KEY present:', !!process.env.OPENAI_API_KEY);
@@ -36,71 +68,87 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
     const spreadsheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
     fs.unlinkSync(filePath);
 
-    if (process.env.OPENAI_API_KEY) {
-      console.log('About to call OpenAI...');
-      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-      const systemPrompt = `You are an Excel AI assistant. When the user asks for a change, you MUST return ONLY a valid JSON object with two keys: 'data' (the updated spreadsheet as an array of arrays) and 'formatting' (an array of arrays of formatting objects, matching the data structure, with keys like 'color', 'background', 'bold', 'italic'). Do not return any explanation, markdown, or extra text. If the request is ambiguous or impossible, return the original spreadsheet as 'data' and an empty array for 'formatting'. Example: {"data": [["A", "B"], [1, 2]], "formatting": [[{"bold":true,"color":"red"},{"bold":false}], [{},{}]]]}`;
-      // Use the new prompt rewriting function
-      const rewrittenPrompt = rewritePrompt(prompt, spreadsheetData);
-      try {
-        console.log('Calling OpenAI API with prompt:', rewrittenPrompt.slice(0, 500));
-        // Helper function for timeout
-        function withTimeout(promise, ms) {
-          const timeout = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('OpenAI API call timed out')), ms)
-          );
-          return Promise.race([promise, timeout]);
-        }
+    const operation = classifyPrompt(prompt);
+    let processedData = spreadsheetData;
+    let usedOpenAI = false;
+    if (operation === 'sort') {
+      processedData = sortData(spreadsheetData, prompt);
+    } else if (operation === 'filter') {
+      processedData = filterData(spreadsheetData, prompt);
+    } else if (operation === 'pivot') {
+      processedData = pivotData(spreadsheetData, prompt);
+    } else {
+      usedOpenAI = true;
+      if (process.env.OPENAI_API_KEY) {
+        console.log('About to call OpenAI...');
+        const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+        const systemPrompt = `You are an Excel AI assistant. When the user asks for a change, you MUST return ONLY a valid JSON object with two keys: 'data' (the updated spreadsheet as an array of arrays) and 'formatting' (an array of arrays of formatting objects, matching the data structure, with keys like 'color', 'background', 'bold', 'italic'). Do not return any explanation, markdown, or extra text. If the request is ambiguous or impossible, return the original spreadsheet as 'data' and an empty array for 'formatting'. Example: {"data": [["A", "B"], [1, 2]], "formatting": [[{"bold":true,"color":"red"},{"bold":false}], [{},{}]]]}`;
+        // Use the new prompt rewriting function
+        const rewrittenPrompt = rewritePrompt(prompt, spreadsheetData);
         try {
-          const completion = await withTimeout(
-            openai.chat.completions.create({
-              model: "gpt-3.5-turbo",
-              messages: [
-                { role: "system", content: systemPrompt },
-                { role: "user", content: rewrittenPrompt }
-              ],
-              temperature: 0.1,
-              max_tokens: 2000
-            }),
-            15000 // 15 seconds
-          );
-          console.log('OpenAI API call succeeded.');
-          const response = completion.choices[0]?.message?.content;
-          console.log('Raw OpenAI response:', response);
-          // Try to extract JSON object with data and formatting
-          let aiResult = null;
-          let parseError = null;
+          console.log('Calling OpenAI API with prompt:', rewrittenPrompt.slice(0, 500));
+          // Helper function for timeout
+          function withTimeout(promise, ms) {
+            const timeout = new Promise((_, reject) =>
+              setTimeout(() => reject(new Error('OpenAI API call timed out')), ms)
+            );
+            return Promise.race([promise, timeout]);
+          }
           try {
-            // Try to find the first JSON object in the response
-            const match = response.match(/\{[\s\S]*\}/);
-            if (match) {
-              aiResult = JSON.parse(match[0]);
+            const completion = await withTimeout(
+              openai.chat.completions.create({
+                model: "gpt-3.5-turbo",
+                messages: [
+                  { role: "system", content: systemPrompt },
+                  { role: "user", content: rewrittenPrompt }
+                ],
+                temperature: 0.1,
+                max_tokens: 2000
+              }),
+              15000 // 15 seconds
+            );
+            console.log('OpenAI API call succeeded.');
+            const response = completion.choices[0]?.message?.content;
+            console.log('Raw OpenAI response:', response);
+            // Try to extract JSON object with data and formatting
+            let aiResult = null;
+            let parseError = null;
+            try {
+              // Try to find the first JSON object in the response
+              const match = response.match(/\{[\s\S]*\}/);
+              if (match) {
+                aiResult = JSON.parse(match[0]);
+              }
+            } catch (e) {
+              parseError = e;
+              console.error('Error parsing AI response JSON:', e);
             }
-          } catch (e) {
-            parseError = e;
-            console.error('Error parsing AI response JSON:', e);
+            // Validate structure
+            if (!aiResult || !Array.isArray(aiResult.data) || !Array.isArray(aiResult.data[0])) {
+              console.warn('AI did not return a valid spreadsheet object. Returning fallback.');
+              return res.json({ result: response, data: spreadsheetData, formatting: [], aiError: 'AI did not return a valid spreadsheet object. Here is the raw response.', raw: response });
+            }
+            // If formatting is missing, provide empty formatting array
+            if (!Array.isArray(aiResult.formatting)) {
+              aiResult.formatting = [];
+            }
+            return res.json({ result: response, data: aiResult.data, formatting: aiResult.formatting });
+          } catch (openaiErr) {
+            console.error('Error during OpenAI API call:', openaiErr);
+            return res.status(500).json({ error: 'OpenAI API call failed', details: openaiErr.message });
           }
-          // Validate structure
-          if (!aiResult || !Array.isArray(aiResult.data) || !Array.isArray(aiResult.data[0])) {
-            console.warn('AI did not return a valid spreadsheet object. Returning fallback.');
-            return res.json({ result: response, data: spreadsheetData, formatting: [], aiError: 'AI did not return a valid spreadsheet object. Here is the raw response.', raw: response });
-          }
-          // If formatting is missing, provide empty formatting array
-          if (!Array.isArray(aiResult.formatting)) {
-            aiResult.formatting = [];
-          }
-          return res.json({ result: response, data: aiResult.data, formatting: aiResult.formatting });
         } catch (openaiErr) {
           console.error('Error during OpenAI API call:', openaiErr);
           return res.status(500).json({ error: 'OpenAI API call failed', details: openaiErr.message });
         }
-      } catch (openaiErr) {
-        console.error('Error during OpenAI API call:', openaiErr);
-        return res.status(500).json({ error: 'OpenAI API call failed', details: openaiErr.message });
+      } else {
+        console.log('Returning mock response!');
+        return res.json({ result: `Mock AI Response: I understand you want to "${prompt}". Here's what I would do with your spreadsheet data: ${JSON.stringify(spreadsheetData).substring(0, 100)}...`, newData: spreadsheetData });
       }
-    } else {
-      console.log('Returning mock response!');
-      return res.json({ result: `Mock AI Response: I understand you want to "${prompt}". Here's what I would do with your spreadsheet data: ${JSON.stringify(spreadsheetData).substring(0, 100)}...`, newData: spreadsheetData });
+    }
+    if (!usedOpenAI) {
+      // Return processed data for classic operations
+      return res.json({ result: 'Processed in backend', data: processedData, formatting: [] });
     }
   } catch (err) {
     console.error('Error in /api/upload handler:', err);
