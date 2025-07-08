@@ -1,17 +1,28 @@
+export type SpreadsheetData = (string | number | boolean | null | undefined)[][];
+export type SpreadsheetFormatting = ({ color?: string; background?: string; bold?: boolean; italic?: boolean } | undefined)[][];
+
 export interface ExcelOperation {
   type: 'sum' | 'average' | 'filter' | 'sort' | 'formula' | 'format' | 'custom';
   description: string;
-  result?: any;
+  result?: unknown;
 }
 
 export interface ExcelResult {
   operation: ExcelOperation;
-  newData: any[][];
+  newData: SpreadsheetData;
   instructions?: string;
 }
 
+export type AIResult = {
+  result?: string;
+  aiError?: string;
+  data?: SpreadsheetData;
+  newData?: SpreadsheetData;
+  formatting?: SpreadsheetFormatting;
+};
+
 export class AIService {
-  static async uploadSpreadsheetWithPrompt(file: File, prompt: string): Promise<any> {
+  static async uploadSpreadsheetWithPrompt(file: File, prompt: string): Promise<AIResult> {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('prompt', prompt);

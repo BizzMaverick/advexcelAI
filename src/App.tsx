@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, ChangeEvent, KeyboardEvent } from 'react';
 import './App.css';
 import * as XLSX from 'xlsx';
 import { AIService } from './services/aiService';
@@ -25,12 +25,23 @@ const SUPPORTED_MIME_TYPES = [
   'text/plain' // .txt
 ];
 
+type SpreadsheetData = (string | number | boolean | null | undefined)[][];
+type SpreadsheetFormatting = ({ color?: string; background?: string; bold?: boolean; italic?: boolean } | undefined)[][];
+
+type AIResult = {
+  result?: string;
+  aiError?: string;
+  data?: SpreadsheetData;
+  newData?: SpreadsheetData;
+  formatting?: SpreadsheetFormatting;
+};
+
 // File processing function
-const processFile = async (file: File): Promise<any[][]> => {
+const processFile = async (file: File): Promise<SpreadsheetData> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     
-    reader.onload = (e) => {
+    reader.onload = (e: ProgressEvent<FileReader>) => {
       try {
         const data = e.target?.result;
         if (!data) {
@@ -51,7 +62,7 @@ const processFile = async (file: File): Promise<any[][]> => {
           return;
         }
         
-        resolve(jsonData as any[][]);
+        resolve(jsonData as SpreadsheetData);
       } catch (error) {
         reject(error);
       }
@@ -69,14 +80,14 @@ function App() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [spreadsheetData, setSpreadsheetData] = useState<any[][]>([]);
+  const [spreadsheetData, setSpreadsheetData] = useState<SpreadsheetData>([]);
   const [headers, setHeaders] = useState<string[]>([]);
   const [prompt, setPrompt] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [aiInstructions, setAiInstructions] = useState<string | null>(null);
-  const [aiResultData, setAiResultData] = useState<any[][] | null>(null);
-  const [aiFormatting, setAiFormatting] = useState<any[][] | null>(null);
+  const [aiResultData, setAiResultData] = useState<SpreadsheetData | null>(null);
+  const [aiFormatting, setAiFormatting] = useState<SpreadsheetFormatting | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showLanding, setShowLanding] = useState(true);
   
@@ -113,7 +124,7 @@ function App() {
     setAiResultData(null);
     setAiFormatting(null);
     try {
-      const result = await AIService.uploadSpreadsheetWithPrompt(selectedFile, prompt);
+      const result: AIResult = await AIService.uploadSpreadsheetWithPrompt(selectedFile, prompt);
       console.log('AI result:', result);
       setAiInstructions(result.result || '');
       if (result.aiError) {
@@ -129,8 +140,12 @@ function App() {
         setAiResultData(null);
         setAiFormatting(null);
       }
-    } catch (err: any) {
-      setAiError(err.message || 'AI processing failed');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setAiError(err.message || 'AI processing failed');
+      } else {
+        setAiError('AI processing failed');
+      }
     } finally {
       setAiLoading(false);
     }
@@ -164,8 +179,8 @@ function App() {
                 className="ai-prompt-input"
                 placeholder="Add prompt here"
                 value={prompt}
-                onChange={e => setPrompt(e.target.value)}
-                onKeyDown={e => {
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setPrompt(e.target.value)}
+                onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
                   if (e.key === 'Enter' && !aiLoading && prompt.trim()) {
                     handleRunAI();
                   }
@@ -186,7 +201,7 @@ function App() {
                   type="file"
                   className="file-input"
                   accept=".xlsx,.xls,.csv,.xlsm,.xltx,.xltm,.xlsb,.ods,.tsv,.txt"
-                  onChange={async (e) => {
+                  onChange={async (e: ChangeEvent<HTMLInputElement>) => {
                     const file = e.target.files?.[0];
                     if (file) {
                       console.log('File selected:', file.name, file.type, file.size);
@@ -205,7 +220,7 @@ function App() {
                           
                           // Extract headers (first row)
                           if (data.length > 0) {
-                            setHeaders(data[0].map((cell: any) => String(cell || '')));
+                            setHeaders(data[0].map((cell: string | number | boolean | null | undefined) => String(cell || '')));
                           }
                           
                           console.log('File processed successfully:', data);
