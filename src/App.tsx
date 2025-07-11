@@ -1241,9 +1241,9 @@ function App() {
           <h3 style={{ color: '#1e293b', marginBottom: 16 }}>Pivot Table</h3>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'Calibri, Segoe UI, Arial, sans-serif', fontSize: 14 }}>
             <tbody>
-              {pivotResult.map((row, i) => (
+              {pivotResult.map((rowArr, i) => (
                 <tr key={i}>
-                  {row.map((cell, j) => (
+                  {rowArr.map((cell, j) => (
                     <td key={j} style={{ border: '1px solid #e5e7eb', padding: 8, fontWeight: i === 0 ? 700 : 400, background: i === 0 ? '#f1f5f9' : 'white' }}>{cell}</td>
                   ))}
                 </tr>
