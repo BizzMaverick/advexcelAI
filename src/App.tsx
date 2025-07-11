@@ -3,6 +3,7 @@ import './App.css';
 import { AIService } from './services/aiService';
 import LandingPage from './LandingPage';
 import ResizableTable from './components/ResizableTable';
+import * as XLSX from 'xlsx';
 
 // Supported file types
 const SUPPORTED_EXTENSIONS = [
@@ -89,7 +90,7 @@ function getClosestUICommands(input: string, maxDistance = 6) {
 function App() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
-  const [spreadsheetData] = useState<SpreadsheetData>([]);
+  const [spreadsheetData, setSpreadsheetData] = useState<SpreadsheetData>([]);
   const [prompt, setPrompt] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
@@ -481,10 +482,37 @@ function App() {
                 type="file"
                 accept={SUPPORTED_EXTENSIONS.join(',')}
                 style={{ display: 'none' }}
-                onChange={e => {
+                onChange={async e => {
                   if (e.target.files && e.target.files[0]) {
                     setSelectedFile(e.target.files[0]);
                     setFileError(null);
+                    try {
+                      const file = e.target.files[0];
+                      const reader = new FileReader();
+                      reader.onload = (evt) => {
+                        try {
+                          const data = evt.target?.result;
+                          if (!data) throw new Error('No data read from file');
+                          const workbook = XLSX.read(data, { type: 'binary' });
+                          const sheetName = workbook.SheetNames[0];
+                          const worksheet = workbook.Sheets[sheetName];
+                          const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                          if (jsonData.length === 0) throw new Error('No data found in the file');
+                          setSpreadsheetData(jsonData as SpreadsheetData);
+                        } catch (err) {
+                          setFileError('Failed to process file: ' + (err instanceof Error ? err.message : 'Unknown error'));
+                          setSpreadsheetData([]);
+                        }
+                      };
+                      reader.onerror = () => {
+                        setFileError('Failed to read file');
+                        setSpreadsheetData([]);
+                      };
+                      reader.readAsBinaryString(file);
+                    } catch (err) {
+                      setFileError('Failed to process file: ' + (err instanceof Error ? err.message : 'Unknown error'));
+                      setSpreadsheetData([]);
+                    }
                   }
                 }}
               />
