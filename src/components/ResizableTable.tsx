@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect, MouseEvent, KeyboardEvent, useImperativeHandle, forwardRef } from 'react';
+import { FixedSizeList as List } from 'react-window';
+import { ListChildComponentProps } from 'react-window';
 
 interface ResizableTableProps {
   data: (string | number | boolean | null | undefined)[][];
@@ -448,87 +450,73 @@ const ResizableTable = forwardRef<any, ResizableTableProps>(({
             </tr>
           </thead>
           <tbody>
-            {filteredData.map((row, rowIndex) => (
-              <tr key={rowIndex} style={{
-                borderBottom: '1px solid #e5e7eb',
-                background: rowIndex % 2 === 0 ? '#ffffff' : '#f9fafb',
-                height: `${getRowHeight(rowIndex)}px`,
-                position: 'relative'
-              }}>
-                {row.map((cell, cellIndex) => (
-                  <td key={cellIndex} style={getCellStyle(rowIndex, cellIndex)}>
-                    {editingCell && editingCell.row === rowIndex && editingCell.col === cellIndex ? (
-                      <input
-                        value={editValue}
-                        autoFocus
-                        onChange={e => setEditValue(e.target.value)}
-                        onBlur={() => {
-                          if (onCellEdit) onCellEdit(rowIndex, cellIndex, editValue);
-                          setEditingCell(null);
-                        }}
-                        onKeyDown={e => {
-                          if (e.key === 'Enter') {
-                            if (onCellEdit) onCellEdit(rowIndex, cellIndex, editValue);
-                            setEditingCell(null);
-                          } else if (e.key === 'Escape') {
-                            setEditingCell(null);
-                          }
-                        }}
-                        style={{ width: '100%' }}
-                      />
-                    ) : (
-                      <span
-                        onClick={() => {
-                          setEditingCell({ row: rowIndex, col: cellIndex });
-                          setEditValue(String(cell ?? ''));
-                          setSelectedCell({ row: rowIndex, col: cellIndex });
-                        }}
-                        style={{
-                          cursor: 'pointer',
-                          display: 'block',
-                          minHeight: 24,
-                          fontWeight: formatting?.[rowIndex]?.[cellIndex]?.bold ? 'bold' : undefined,
-                          fontStyle: formatting?.[rowIndex]?.[cellIndex]?.italic ? 'italic' : undefined,
-                          color: formatting?.[rowIndex]?.[cellIndex]?.color,
-                          background: formatting?.[rowIndex]?.[cellIndex]?.background
-                        }}
-                      >
-                        {typeof cell === 'string' && cell.startsWith('=')
-                          ? evaluateFormula(cell, data)
-                          : cell}
-                      </span>
-                    )}
-                  </td>
-                ))}
-                {/* Row resize handle */}
-                <div
-                  className="resize-handle row"
-                  onMouseDown={(e) => handleMouseDown(e, 'row', rowIndex)}
-                  onDoubleClick={() => {
-                    setShowDimensionInput(true);
-                    setActiveDimension({ type: 'row', index: rowIndex });
-                    setDimensionInput(getRowHeight(rowIndex).toString());
-                  }}
+            <List
+              height={500}
+              itemCount={filteredData.length}
+              itemSize={40}
+              width="100%"
+              style={{ overflowX: 'hidden' }}
+            >
+              {({ index, style }: ListChildComponentProps) => (
+                <tr
+                  key={index}
                   style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    height: '6px',
-                    background: 'transparent',
-                    cursor: 'row-resize',
-                    zIndex: 10,
-                    transition: 'background-color 0.2s ease'
+                    ...style,
+                    display: 'table-row',
+                    borderBottom: '1px solid #e5e7eb',
+                    background: index % 2 === 0 ? '#ffffff' : '#f9fafb',
+                    height: `${getRowHeight(index)}px`,
+                    position: 'relative'
                   }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = '#3b82f6';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'transparent';
-                  }}
-                />
-              </tr>
-            ))}
+                >
+                  {filteredData[index].map((cell, cellIndex) => (
+                    <td key={cellIndex} style={getCellStyle(index, cellIndex)}>
+                      {editingCell && editingCell.row === index && editingCell.col === cellIndex ? (
+                        <input
+                          value={editValue}
+                          autoFocus
+                          onChange={e => setEditValue(e.target.value)}
+                          onBlur={() => {
+                            if (onCellEdit) onCellEdit(index, cellIndex, editValue);
+                            setEditingCell(null);
+                          }}
+                          onKeyDown={e => {
+                            if (e.key === 'Enter') {
+                              if (onCellEdit) onCellEdit(index, cellIndex, editValue);
+                              setEditingCell(null);
+                            } else if (e.key === 'Escape') {
+                              setEditingCell(null);
+                            }
+                          }}
+                          style={{ width: '100%' }}
+                        />
+                      ) : (
+                        <span
+                          onClick={() => {
+                            setEditingCell({ row: index, col: cellIndex });
+                            setEditValue(String(cell ?? ''));
+                            setSelectedCell({ row: index, col: cellIndex });
+                          }}
+                          style={{
+                            cursor: 'pointer',
+                            display: 'block',
+                            minHeight: 24,
+                            fontWeight: formatting?.[index]?.[cellIndex]?.bold ? 'bold' : undefined,
+                            fontStyle: formatting?.[index]?.[cellIndex]?.italic ? 'italic' : undefined,
+                            color: formatting?.[index]?.[cellIndex]?.color,
+                            background: formatting?.[index]?.[cellIndex]?.background
+                          }}
+                        >
+                          {typeof cell === 'string' && cell.startsWith('=')
+                            ? evaluateFormula(cell, data)
+                            : cell}
+                        </span>
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              )}
+            </List>
           </tbody>
         </table>
 
