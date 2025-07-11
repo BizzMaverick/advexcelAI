@@ -12,19 +12,6 @@ const SUPPORTED_EXTENSIONS = [
   '.txt' // Plain text
 ];
 
-const SUPPORTED_MIME_TYPES = [
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
-  'application/vnd.ms-excel', // .xls
-  'application/vnd.ms-excel.sheet.macroEnabled.12', // .xlsm
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.template', // .xltx
-  'application/vnd.ms-excel.template.macroEnabled.12', // .xltm
-  'application/vnd.ms-excel.sheet.binary.macroEnabled.12', // .xlsb
-  'text/csv', // .csv
-  'text/tab-separated-values', // .tsv
-  'application/vnd.oasis.opendocument.spreadsheet', // .ods
-  'text/plain' // .txt
-];
-
 type SpreadsheetData = (string | number | boolean | null | undefined)[][];
 type SpreadsheetFormatting = ({ color?: string; background?: string; bold?: boolean; italic?: boolean } | undefined)[][];
 
