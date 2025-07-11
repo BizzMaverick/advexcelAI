@@ -1122,7 +1122,7 @@ function App() {
               <button
                 onClick={() => {
                   // Prepare chart data
-                  const labels = spreadsheetData.slice(chartRange.startRow, chartRange.endRow + 1).map((row, i) => `Row ${chartRange.startRow + i}`);
+                  const labels = spreadsheetData.slice(chartRange.startRow, chartRange.endRow + 1).map((_, i) => `Row ${chartRange.startRow + i}`);
                   const data = spreadsheetData.slice(chartRange.startRow, chartRange.endRow + 1).map(row => row.slice(chartRange.startCol, chartRange.endCol + 1).map(Number));
                   const flatData = data.map(arr => arr[0]);
                   setChartData({
