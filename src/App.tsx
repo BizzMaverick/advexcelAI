@@ -4,7 +4,6 @@ import * as XLSX from 'xlsx';
 import { AIService } from './services/aiService';
 import LandingPage from './LandingPage';
 import ResizableTable from './components/ResizableTable';
-import type { RefObject } from 'react';
 
 // Supported file types
 const SUPPORTED_EXTENSIONS = [

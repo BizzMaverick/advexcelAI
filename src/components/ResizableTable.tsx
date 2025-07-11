@@ -33,7 +33,6 @@ const ResizableTable = forwardRef<any, ResizableTableProps>(({
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [hiddenColumns, setHiddenColumns] = useState<Set<number>>(new Set());
   const [showGrid, setShowGrid] = useState(true);
-  const [frozenRows, setFrozenRows] = useState<number>(0);
 
   const tableRef = useRef<HTMLTableElement>(null);
   const isResizingRef = useRef(false);
@@ -61,7 +60,7 @@ const ResizableTable = forwardRef<any, ResizableTableProps>(({
       setRowHeights(newHeights);
     },
     freezeFirstRow: () => {
-      setFrozenRows(1);
+      // setFrozenRows(1); // This line was removed as per the edit hint.
     },
     hideColumn: (col: number) => {
       setHiddenColumns(prev => new Set([...prev, col]));
