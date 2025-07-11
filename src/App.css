@@ -712,49 +712,38 @@
   }
 }
  
-/* Resizable Table Styles */
+/* Excel-like Resizable Table Styles */
 .resizable-table {
   position: relative;
+  font-family: 'Calibri', 'Segoe UI', Arial, sans-serif;
 }
 
 .resizable-table th {
   position: relative;
+  background: #f8fafc !important;
+  border-right: 1px solid #d1d5db !important;
+  border-bottom: 2px solid #374151 !important;
+  color: #1f2937 !important;
+  font-weight: 600 !important;
 }
 
-.resizable-table th::after {
-  content: '';
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  background: rgba(255, 255, 255, 0.3);
-  cursor: col-resize;
-  transition: background-color 0.2s ease;
+.resizable-table th:hover {
+  background: #f1f5f9 !important;
 }
 
-.resizable-table th:hover::after {
-  background: rgba(255, 255, 255, 0.6);
+.resizable-table td {
+  border-right: 1px solid #e5e7eb !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  color: #1f2937 !important;
+  background: #ffffff !important;
 }
 
-.resizable-table tr {
-  position: relative;
+.resizable-table tr:nth-child(even) td {
+  background: #f9fafb !important;
 }
 
-.resizable-table tr::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.3);
-  cursor: row-resize;
-  transition: background-color 0.2s ease;
-}
-
-.resizable-table tr:hover::after {
-  background: rgba(255, 255, 255, 0.6);
+.resizable-table tr:hover td {
+  background: #f3f4f6 !important;
 }
 
 /* Resize indicator */
@@ -776,28 +765,33 @@
 }
 
 /* Visual feedback during resize */
-.resizable-table.resizing th,
+.resizable-table.resizing th {
+  background: #dbeafe !important;
+  border-right: 2px solid #3b82f6 !important;
+}
+
 .resizable-table.resizing-row tr {
-  background: rgba(59, 130, 246, 0.1) !important;
+  background: #dbeafe !important;
+  border-bottom: 2px solid #3b82f6 !important;
 }
 
 /* Resize handle styles */
 .resize-handle {
   position: absolute;
-  background: rgba(255, 255, 255, 0.3);
+  background: transparent;
   transition: background-color 0.2s ease;
   z-index: 10;
 }
 
 .resize-handle:hover {
-  background: rgba(255, 255, 255, 0.6) !important;
+  background: #3b82f6 !important;
 }
 
 .resize-handle.column {
   right: 0;
   top: 0;
   bottom: 0;
-  width: 8px;
+  width: 6px;
   cursor: col-resize;
 }
 
@@ -805,7 +799,41 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 8px;
+  height: 6px;
   cursor: row-resize;
+}
+
+/* Excel-like focus styles */
+.resizable-table th:focus,
+.resizable-table td:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: -2px;
+}
+
+/* Excel-like selection styles */
+.resizable-table th.selected,
+.resizable-table td.selected {
+  background: #dbeafe !important;
+  color: #1e40af !important;
+}
+
+/* Excel-like grid lines */
+.resizable-table {
+  border: 1px solid #d1d5db;
+}
+
+/* Excel-like header styling */
+.resizable-table thead {
+  background: #f8fafc;
+  border-bottom: 2px solid #374151;
+}
+
+/* Excel-like cell padding and typography */
+.resizable-table th,
+.resizable-table td {
+  padding: 8px 12px;
+  font-size: 13px;
+  line-height: 1.4;
+  vertical-align: top;
 }
  

@@ -120,81 +120,89 @@ const ResizableTable: React.FC<ResizableTableProps> = ({
   const getCellStyle = (rowIndex: number, cellIndex: number) => {
     const fmt = formatting && formatting[rowIndex] && formatting[rowIndex][cellIndex] ? formatting[rowIndex][cellIndex] : {};
     return {
-      padding: '8px',
-      color: fmt.color || '#e0f2fe',
-      background: fmt.background || 'transparent',
+      padding: '8px 12px',
+      color: fmt.color || '#1f2937',
+      background: fmt.background || '#ffffff',
       fontWeight: fmt.bold ? 'bold' : 'normal',
       fontStyle: fmt.italic ? 'italic' : 'normal',
-      borderRight: '1px solid rgba(255, 255, 255, 0.05)',
-      fontSize: '0.8rem',
+      borderRight: '1px solid #e5e7eb',
+      borderBottom: '1px solid #e5e7eb',
+      fontSize: '13px',
       height: `${getRowHeight(rowIndex)}px`,
       width: `${getColumnWidth(cellIndex)}px`,
       overflow: 'hidden',
       textOverflow: 'ellipsis',
-      whiteSpace: 'nowrap'
+      whiteSpace: 'nowrap',
+      fontFamily: 'Calibri, "Segoe UI", Arial, sans-serif',
+      lineHeight: '1.4'
     } as React.CSSProperties;
   };
 
   const getHeaderStyle = (index: number) => {
     return {
-      padding: '12px 8px',
+      padding: '12px 16px',
       textAlign: 'left' as const,
-      color: '#ffffff',
+      color: '#1f2937',
       fontWeight: 600,
-      borderRight: '1px solid rgba(255, 255, 255, 0.1)',
-      fontSize: '0.85rem',
+      borderRight: '1px solid #d1d5db',
+      borderBottom: '2px solid #374151',
+      fontSize: '13px',
       width: `${getColumnWidth(index)}px`,
-      position: 'relative' as const
+      position: 'relative' as const,
+      background: '#f8fafc',
+      fontFamily: 'Calibri, "Segoe UI", Arial, sans-serif',
+      lineHeight: '1.4'
     } as React.CSSProperties;
   };
 
   return (
     <div style={{
-      background: 'rgba(255, 255, 255, 0.05)',
-      borderRadius: '12px',
-      padding: '20px',
+      background: '#ffffff',
+      borderRadius: '8px',
+      padding: '24px',
       margin: '20px 0',
-      backdropFilter: 'blur(10px)',
-      border: '1px solid rgba(255, 255, 255, 0.1)'
+      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+      border: '1px solid #e5e7eb'
     }}>
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: '20px',
-        paddingBottom: '15px',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+        paddingBottom: '16px',
+        borderBottom: '1px solid #e5e7eb'
       }}>
         <div>
           <h3 style={{
             fontSize: '1.5rem',
             fontWeight: 600,
-            color: '#ffffff',
+            color: '#1f2937',
             margin: 0,
-            textShadow: '0 2px 8px rgba(30, 58, 138, 0.5)'
+            fontFamily: 'Calibri, "Segoe UI", Arial, sans-serif'
           }}>{title}</h3>
           <div style={{
-            fontSize: '0.8rem',
-            color: '#bfdbfe',
+            fontSize: '0.875rem',
+            color: '#6b7280',
             marginTop: '4px',
-            opacity: 0.8
+            fontFamily: 'Calibri, "Segoe UI", Arial, sans-serif'
           }}>
             💡 Drag column edges to resize width • Drag row edges to resize height
           </div>
         </div>
         <span style={{
-          color: '#bfdbfe',
-          fontSize: '0.9rem',
-          fontWeight: 400
+          color: '#6b7280',
+          fontSize: '0.875rem',
+          fontWeight: 500,
+          fontFamily: 'Calibri, "Segoe UI", Arial, sans-serif'
         }}>{subtitle || `Rows: ${data.length} | Columns: ${headers.length}`}</span>
       </div>
       
       <div style={{
         overflow: 'auto',
         maxHeight: '500px',
-        borderRadius: '8px',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-        position: 'relative'
+        borderRadius: '6px',
+        border: '1px solid #d1d5db',
+        background: '#ffffff'
       }}>
         <table 
           ref={tableRef}
@@ -202,15 +210,16 @@ const ResizableTable: React.FC<ResizableTableProps> = ({
           style={{
             width: '100%',
             borderCollapse: 'collapse',
-            fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
-            fontSize: '0.9rem',
-            tableLayout: 'fixed'
+            fontFamily: 'Calibri, "Segoe UI", Arial, sans-serif',
+            fontSize: '13px',
+            tableLayout: 'fixed',
+            background: '#ffffff'
           }}
         >
           <thead>
             <tr style={{
-              background: 'rgba(59, 130, 246, 0.2)',
-              borderBottom: '2px solid rgba(59, 130, 246, 0.3)'
+              background: '#f8fafc',
+              borderBottom: '2px solid #374151'
             }}>
               {headers.map((header, index) => (
                 <th key={index} style={getHeaderStyle(index)}>
@@ -223,17 +232,17 @@ const ResizableTable: React.FC<ResizableTableProps> = ({
                       right: 0,
                       top: 0,
                       bottom: 0,
-                      width: '8px',
-                      background: 'rgba(255, 255, 255, 0.3)',
+                      width: '6px',
+                      background: 'transparent',
                       cursor: 'col-resize',
                       zIndex: 10,
                       transition: 'background-color 0.2s ease'
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.6)';
+                      e.currentTarget.style.background = '#3b82f6';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
+                      e.currentTarget.style.background = 'transparent';
                     }}
                   />
                 </th>
@@ -243,8 +252,8 @@ const ResizableTable: React.FC<ResizableTableProps> = ({
           <tbody>
             {data.map((row, rowIndex) => (
               <tr key={rowIndex} style={{
-                borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-                background: rowIndex % 2 === 0 ? 'rgba(255, 255, 255, 0.02)' : 'transparent',
+                borderBottom: '1px solid #e5e7eb',
+                background: rowIndex % 2 === 0 ? '#ffffff' : '#f9fafb',
                 height: `${getRowHeight(rowIndex)}px`,
                 position: 'relative'
               }}>
@@ -262,17 +271,17 @@ const ResizableTable: React.FC<ResizableTableProps> = ({
                     bottom: 0,
                     left: 0,
                     right: 0,
-                    height: '8px',
-                    background: 'rgba(255, 255, 255, 0.3)',
+                    height: '6px',
+                    background: 'transparent',
                     cursor: 'row-resize',
                     zIndex: 10,
                     transition: 'background-color 0.2s ease'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.6)';
+                    e.currentTarget.style.background = '#3b82f6';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
+                    e.currentTarget.style.background = 'transparent';
                   }}
                 />
               </tr>
