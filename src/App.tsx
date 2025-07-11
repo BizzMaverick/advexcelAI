@@ -1,4 +1,4 @@
-import { useState, useEffect, ChangeEvent, KeyboardEvent, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './App.css';
 import * as XLSX from 'xlsx';
 import { AIService } from './services/aiService';
@@ -99,46 +99,6 @@ function getClosestUICommands(input: string, maxDistance = 6) {
   // Return personalized suggestions
   return distances.filter(d => d.dist <= Math.max(maxDistance, minDist)).map(d => getPersonalizedSuggestion(input, d.cmd));
 }
-
-// File processing function
-const processFile = async (file: File): Promise<SpreadsheetData> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    
-    reader.onload = (e: ProgressEvent<FileReader>) => {
-      try {
-        const data = e.target?.result;
-        if (!data) {
-          reject(new Error('No data read from file'));
-          return;
-        }
-
-        const workbook = XLSX.read(data, { type: 'binary' });
-        const sheetName = workbook.SheetNames[0]; // Get first sheet
-        const worksheet = workbook.Sheets[sheetName];
-        
-        // Convert to JSON array
-        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-        
-        // Ensure we have at least some data
-        if (jsonData.length === 0) {
-          reject(new Error('No data found in the file'));
-          return;
-        }
-        
-        resolve(jsonData as SpreadsheetData);
-      } catch (error) {
-        reject(error);
-      }
-    };
-    
-    reader.onerror = () => {
-      reject(new Error('Failed to read file'));
-    };
-    
-    reader.readAsBinaryString(file);
-  });
-};
 
 function App() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
