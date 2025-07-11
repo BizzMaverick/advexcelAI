@@ -102,7 +102,7 @@ function getClosestUICommands(input: string, maxDistance = 6) {
 function App() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
-  const [spreadsheetData, setSpreadsheetData] = useState<SpreadsheetData>([]);
+  const [spreadsheetData] = useState<SpreadsheetData>([]);
   const [prompt, setPrompt] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
@@ -126,28 +126,28 @@ function App() {
   const [promptSuggestion, setPromptSuggestion] = useState<string | null>(null);
   
   // File validation function
-  const validateFile = (file: File): { isValid: boolean; error?: string } => {
-    // Check file size (max 10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      return { isValid: false, error: 'File size must be less than 10MB' };
-    }
+  // Remove: const validateFile = (file: File): { isValid: boolean; error?: string } => {
+  // Remove:   // Check file size (max 10MB)
+  // Remove:   if (file.size > 10 * 1024 * 1024) {
+  // Remove:   //   return { isValid: false, error: 'File size must be less than 10MB' };
+  // Remove:   // }
     
-    // Check file extension
-    const extension = '.' + file.name.split('.').pop()?.toLowerCase();
-    if (!SUPPORTED_EXTENSIONS.includes(extension)) {
-      return { 
-        isValid: false, 
-        error: `Unsupported file type. Supported formats: ${SUPPORTED_EXTENSIONS.join(', ')}` 
-      };
-    }
+  // Remove:   // Check file extension
+  // Remove:   const extension = '.' + file.name.split('.').pop()?.toLowerCase();
+  // Remove:   if (!SUPPORTED_EXTENSIONS.includes(extension)) {
+  // Remove:   //   return { 
+  // Remove:   //   isValid: false, 
+  // Remove:   //   error: `Unsupported file type. Supported formats: ${SUPPORTED_EXTENSIONS.join(', ')}` 
+  // Remove:   //   };
+  // Remove:   // }
     
-    // Check MIME type (optional, as some systems may not report correct MIME types)
-    if (file.type && !SUPPORTED_MIME_TYPES.includes(file.type)) {
-      console.warn(`MIME type ${file.type} not in supported list, but continuing with extension check`);
-    }
+  // Remove:   // Check MIME type (optional, as some systems may not report correct MIME types)
+  // Remove:   if (file.type && !SUPPORTED_MIME_TYPES.includes(file.type)) {
+  // Remove:   //   console.warn(`MIME type ${file.type} not in supported list, but continuing with extension check`);
+  // Remove:   // }
     
-    return { isValid: true };
-  };
+  // Remove:   return { isValid: true };
+  // Remove: };
   
   // AI prompt handler
   const handleRunAI = async () => {
