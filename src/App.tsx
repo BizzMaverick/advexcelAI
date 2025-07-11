@@ -453,87 +453,35 @@ function App() {
         </div>
         
         <div style={{ flex: 1 }}>
-          {/* Prompt input and suggestion UI */}
-          <div style={{ margin: '20px 0', textAlign: 'center' }}>
-            <input
-              type="text"
-              value={prompt}
-              onChange={e => setPrompt(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') handleUserPrompt(); }}
-              placeholder="Type a command or ask a question..."
-              style={{ width: '60%', padding: '10px', fontSize: '1.1rem', borderRadius: 6, border: '1px solid #ccc', fontFamily: 'Hammersmith One, Segoe UI, Arial, sans-serif' }}
-            />
-            <button
-              onClick={handleUserPrompt}
-              style={{ marginLeft: 12, padding: '10px 18px', fontSize: '1.1rem', borderRadius: 6, border: 'none', background: '#2563eb', color: 'white', fontWeight: 600, cursor: 'pointer' }}
-            >Go</button>
-            {promptSuggestion && (
-              <div style={{ marginTop: 10, color: '#fbbf24', background: '#1e293b', padding: '8px 16px', borderRadius: 6, display: 'inline-block', cursor: 'pointer', fontWeight: 500 }}
-                onClick={handleAcceptSuggestion}
-                title="Click to accept suggestion"
-              >
-                Did you mean: <span style={{ textDecoration: 'underline', color: '#38bdf8' }}>{promptSuggestion}</span>?
-                <span style={{ marginLeft: 8, color: '#38bdf8' }}>[Click to accept]</span>
-              </div>
-            )}
-          </div>
+          {/* Only show prompt input after upload */}
           {spreadsheetData.length > 0 && (
-            <div style={{
-              marginBottom: '20px',
-              display: 'flex',
-              gap: '10px',
-              justifyContent: 'center'
-            }}>
+            <div style={{ margin: '20px 0', textAlign: 'center' }}>
               <input
                 type="text"
-                style={{
-                  flex: 1,
-                  maxWidth: '500px',
-                  padding: '12px 16px',
-                  borderRadius: '8px',
-                  border: '2px solid #60a5fa',
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  color: '#ffffff',
-                  fontSize: '1rem',
-                  fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
-                  outline: 'none',
-                  backdropFilter: 'blur(10px)'
-                }}
-                placeholder="Add prompt here"
                 value={prompt}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setPrompt(e.target.value)}
-                onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
-                  if (e.key === 'Enter' && !aiLoading && prompt.trim()) {
-                    handleUserPrompt();
-                  }
-                }}
-                disabled={aiLoading}
+                onChange={e => setPrompt(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') handleUserPrompt(); }}
+                placeholder="Type a command or ask a question..."
+                style={{ width: '60%', padding: '10px', fontSize: '1.1rem', borderRadius: 6, border: '1px solid #ccc', fontFamily: 'Hammersmith One, Segoe UI, Arial, sans-serif' }}
                 autoFocus
               />
               <button
                 onClick={handleUserPrompt}
-                disabled={aiLoading || !prompt.trim()}
-                style={{
-                  padding: '12px 24px',
-                  background: 'linear-gradient(90deg, #3b82f6 0%, #1e40af 100%)',
-                  color: '#ffffff',
-                  border: '2px solid #60a5fa',
-                  borderRadius: '8px',
-                  fontSize: '1rem',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
-                  transition: 'all 0.2s ease',
-                  outline: 'none',
-                  fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
-                  letterSpacing: 0.5,
-                  opacity: aiLoading || !prompt.trim() ? 0.6 : 1
-                }}
-              >
-                {aiLoading ? 'Processing...' : 'Run AI'}
-              </button>
+                style={{ marginLeft: 12, padding: '10px 18px', fontSize: '1.1rem', borderRadius: 6, border: 'none', background: '#2563eb', color: 'white', fontWeight: 600, cursor: 'pointer' }}
+                disabled={!prompt.trim() || aiLoading}
+              >{aiLoading ? 'Processing...' : 'Go'}</button>
+              {promptSuggestion && (
+                <div style={{ marginTop: 10, color: '#fbbf24', background: '#1e293b', padding: '8px 16px', borderRadius: 6, display: 'inline-block', cursor: 'pointer', fontWeight: 500 }}
+                  onClick={handleAcceptSuggestion}
+                  title="Click to accept suggestion"
+                >
+                  Did you mean: <span style={{ textDecoration: 'underline', color: '#38bdf8' }}>{promptSuggestion}</span>?
+                  <span style={{ marginLeft: 8, color: '#38bdf8' }}>[Click to accept]</span>
+                </div>
+              )}
             </div>
           )}
+          {/* File upload UI remains unchanged */}
           {spreadsheetData.length === 0 && (
             <div style={{
               display: 'flex',
@@ -557,71 +505,30 @@ function App() {
                 onClick={() => document.getElementById('file-input')?.click()}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-                  e.currentTarget.style.borderColor = '#3b82f6';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
-                  e.currentTarget.style.borderColor = '#60a5fa';
                 }}
               >
-                <div style={{ fontSize: '3rem', marginBottom: '20px' }}>📁</div>
-                <div style={{
-                  fontSize: '1.5rem',
-                  fontWeight: 600,
-                  color: '#ffffff',
-                  marginBottom: '10px',
-                  textShadow: '0 2px 8px rgba(30, 58, 138, 0.5)'
-                }}>Upload Excel/CSV File</div>
-                <div style={{
-                  fontSize: '1rem',
-                  color: '#bfdbfe',
-                  lineHeight: 1.6
-                }}>Supports Excel (.xlsx, .xls, .xlsm, .xltx, .xltm, .xlsb), CSV (.csv), TSV (.tsv), OpenDocument (.ods), and text files (.txt)</div>
                 <input
                   id="file-input"
                   type="file"
+                  accept={SUPPORTED_EXTENSIONS.join(',')}
                   style={{ display: 'none' }}
-                  accept=".xlsx,.xls,.csv,.xlsm,.xltx,.xltm,.xlsb,.ods,.tsv,.txt"
-                  onChange={async (e: ChangeEvent<HTMLInputElement>) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      console.log('File selected:', file.name, file.type, file.size);
-                      
-                      // Validate the file
-                      const validation = validateFile(file);
-                      if (validation.isValid) {
-                        setSelectedFile(file);
-                        setFileError(null);
-                        setIsProcessing(true);
-                        
-                        try {
-                          // Process the file
-                          const data = await processFile(file);
-                          setSpreadsheetData(data);
-                          
-                          // Extract headers (first row)
-                          if (data.length > 0) {
-                            setHeaders(data[0].map((cell: string | number | boolean | null | undefined) => String(cell || '')));
-                          }
-                          
-                          console.log('File processed successfully:', data);
-                          setShowSuccess(true);
-                        } catch (error) {
-                          console.error('Error processing file:', error);
-                          setFileError(`Failed to process file: ${error instanceof Error ? error.message : 'Unknown error'}`);
-                          setSelectedFile(null);
-                          setSpreadsheetData([]);
-                          setHeaders([]);
-                        } finally {
-                          setIsProcessing(false);
-                        }
-                      } else {
-                        setFileError(validation.error || 'Invalid file');
-                        setSelectedFile(null);
-                      }
+                  onChange={e => {
+                    if (e.target.files && e.target.files[0]) {
+                      setSelectedFile(e.target.files[0]);
+                      setFileError(null);
                     }
                   }}
                 />
+                <div style={{ fontSize: '1.2rem', color: '#60a5fa', fontWeight: 600, marginBottom: 16 }}>
+                  Click or drag your Excel/CSV file here to upload
+                </div>
+                <div style={{ fontSize: '1rem', color: '#bfdbfe', marginBottom: 8 }}>
+                  Supported formats: {SUPPORTED_EXTENSIONS.join(', ')}
+                </div>
+                {fileError && <div style={{ color: '#f87171', marginTop: 8 }}>{fileError}</div>}
               </div>
             </div>
           )}
