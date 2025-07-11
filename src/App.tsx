@@ -57,6 +57,25 @@ function levenshtein(a: string, b: string): number {
   return matrix[a.length][b.length];
 }
 
+// Add this utility to extract numbers from a string
+function extractNumbers(str: string): number[] {
+  return (str.match(/\d+/g) || []).map(Number);
+}
+
+// Update getClosestUICommands to also substitute numbers from the input into the template
+function getPersonalizedSuggestion(input: string, template: string): string {
+  const inputNumbers = extractNumbers(input);
+  let result = template;
+  // Replace numbers in template with those from input, in order
+  let i = 0;
+  result = result.replace(/\d+/g, () => {
+    const val = inputNumbers[i];
+    i++;
+    return val !== undefined ? String(val) : '';
+  });
+  return result;
+}
+
 // List of supported UI command templates for suggestions
 const uiCommandTemplates = [
   'set column 1 width to 100',
@@ -77,7 +96,8 @@ function getClosestUICommands(input: string, maxDistance = 6) {
     dist: levenshtein(input.toLowerCase(), cmd.toLowerCase())
   }));
   const minDist = Math.min(...distances.map(d => d.dist));
-  return distances.filter(d => d.dist <= Math.max(maxDistance, minDist)).map(d => d.cmd);
+  // Return personalized suggestions
+  return distances.filter(d => d.dist <= Math.max(maxDistance, minDist)).map(d => getPersonalizedSuggestion(input, d.cmd));
 }
 
 // File processing function
