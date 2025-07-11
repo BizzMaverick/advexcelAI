@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, MouseEvent, KeyboardEvent } from 'react';
+import { useState, useRef, useEffect, MouseEvent, KeyboardEvent, useImperativeHandle, forwardRef } from 'react';
 
 interface ResizableTableProps {
   data: (string | number | boolean | null | undefined)[][];
@@ -16,28 +16,66 @@ interface RowHeights {
   [key: number]: number;
 }
 
-const ResizableTable: React.FC<ResizableTableProps> = ({ 
-  data, 
-  headers, 
-  formatting, 
+const ResizableTable = forwardRef<any, ResizableTableProps>(({
+  data,
+  headers,
+  formatting,
   title = "Spreadsheet Data",
-  subtitle 
-}) => {
+  subtitle
+}, ref) => {
   const [columnWidths, setColumnWidths] = useState<ColumnWidths>({});
   const [rowHeights, setRowHeights] = useState<RowHeights>({});
   const [isResizing, setIsResizing] = useState(false);
   const [resizeType, setResizeType] = useState<'column' | 'row' | null>(null);
   const [showDimensionInput, setShowDimensionInput] = useState(false);
   const [dimensionInput, setDimensionInput] = useState('');
-  const [activeDimension, setActiveDimension] = useState<{type: 'column' | 'row', index: number} | null>(null);
+  const [activeDimension, setActiveDimension] = useState<{ type: 'column' | 'row', index: number } | null>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  
+  const [hiddenColumns, setHiddenColumns] = useState<Set<number>>(new Set());
+  const [showGrid, setShowGrid] = useState(true);
+  const [frozenRows, setFrozenRows] = useState<number>(0);
+
   const tableRef = useRef<HTMLTableElement>(null);
   const isResizingRef = useRef(false);
   const startPosRef = useRef(0);
   const startSizeRef = useRef(0);
   const resizeTypeRef = useRef<'column' | 'row' | null>(null);
   const resizeIndexRef = useRef(-1);
+
+  // Expose UI control methods to parent via ref
+  useImperativeHandle(ref, () => ({
+    setColumnWidth: (col: number, width: number) => {
+      setColumnWidths(prev => ({ ...prev, [col]: width }));
+    },
+    setAllColumnsWidth: (width: number) => {
+      const newWidths: ColumnWidths = {};
+      headers.forEach((_, i) => { newWidths[i] = width; });
+      setColumnWidths(newWidths);
+    },
+    setRowHeight: (row: number, height: number) => {
+      setRowHeights(prev => ({ ...prev, [row]: height }));
+    },
+    setAllRowsHeight: (height: number) => {
+      const newHeights: RowHeights = {};
+      data.forEach((_, i) => { newHeights[i] = height; });
+      setRowHeights(newHeights);
+    },
+    freezeFirstRow: () => {
+      setFrozenRows(1);
+    },
+    hideColumn: (col: number) => {
+      setHiddenColumns(prev => new Set([...prev, col]));
+    },
+    showColumn: (col: number) => {
+      setHiddenColumns(prev => {
+        const next = new Set([...prev]);
+        next.delete(col);
+        return next;
+      });
+    },
+    showGridlines: () => setShowGrid(true),
+    hideGridlines: () => setShowGrid(false),
+  }));
 
   // Initialize default column widths
   useEffect(() => {
@@ -217,6 +255,20 @@ const ResizableTable: React.FC<ResizableTableProps> = ({
     } as React.CSSProperties;
   };
 
+  // Helper to filter columns
+  const visibleHeaders = headers.filter((_, i) => !hiddenColumns.has(i));
+  const visibleData = data.map(row => row.filter((_, i) => !hiddenColumns.has(i)));
+
+  // Helper to get visible column index
+  const getVisibleColIndex = (visibleIndex: number) => {
+    let count = -1;
+    for (let i = 0; i < headers.length; ++i) {
+      if (!hiddenColumns.has(i)) count++;
+      if (count === visibleIndex) return i;
+    }
+    return -1;
+  };
+
   return (
     <div style={{
       background: '#ffffff',
@@ -276,7 +328,8 @@ const ResizableTable: React.FC<ResizableTableProps> = ({
             fontFamily: 'Calibri, "Segoe UI", Arial, sans-serif',
             fontSize: '13px',
             tableLayout: 'fixed',
-            background: '#ffffff'
+            background: '#ffffff',
+            border: showGrid ? '1px solid #e5e7eb' : 'none'
           }}
         >
           <thead>
@@ -284,16 +337,16 @@ const ResizableTable: React.FC<ResizableTableProps> = ({
               background: '#f8fafc',
               borderBottom: '2px solid #374151'
             }}>
-              {headers.map((header, index) => (
-                <th key={index} style={getHeaderStyle(index)}>
+              {visibleHeaders.map((header, index) => (
+                <th key={index} style={getHeaderStyle(getVisibleColIndex(index))}>
                   {header || `Column ${index + 1}`}
                   <div
                     className="resize-handle column"
-                    onMouseDown={(e) => handleMouseDown(e, 'column', index)}
+                    onMouseDown={(e) => handleMouseDown(e, 'column', getVisibleColIndex(index))}
                     onDoubleClick={() => {
                       setShowDimensionInput(true);
-                      setActiveDimension({ type: 'column', index });
-                      setDimensionInput(getColumnWidth(index).toString());
+                      setActiveDimension({ type: 'column', index: getVisibleColIndex(index) });
+                      setDimensionInput(getColumnWidth(getVisibleColIndex(index)).toString());
                     }}
                     style={{
                       position: 'absolute',
@@ -318,7 +371,7 @@ const ResizableTable: React.FC<ResizableTableProps> = ({
             </tr>
           </thead>
           <tbody>
-            {data.map((row, rowIndex) => (
+            {visibleData.map((row, rowIndex) => (
               <tr key={rowIndex} style={{
                 borderBottom: '1px solid #e5e7eb',
                 background: rowIndex % 2 === 0 ? '#ffffff' : '#f9fafb',
@@ -430,6 +483,6 @@ const ResizableTable: React.FC<ResizableTableProps> = ({
       </div>
     </div>
   );
-};
+});
 
 export default ResizableTable; 

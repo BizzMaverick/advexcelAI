@@ -1,9 +1,10 @@
-import { useState, useEffect, ChangeEvent, KeyboardEvent } from 'react';
+import { useState, useEffect, ChangeEvent, KeyboardEvent, useRef } from 'react';
 import './App.css';
 import * as XLSX from 'xlsx';
 import { AIService } from './services/aiService';
 import LandingPage from './LandingPage';
 import ResizableTable from './components/ResizableTable';
+import type { RefObject } from 'react';
 
 // Supported file types
 const SUPPORTED_EXTENSIONS = [
@@ -91,6 +92,18 @@ function App() {
   const [aiFormatting, setAiFormatting] = useState<SpreadsheetFormatting | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showLanding, setShowLanding] = useState(true);
+  const resizableTableRef = useRef<null | {
+    setColumnWidth: (col: number, width: number) => void;
+    setAllColumnsWidth: (width: number) => void;
+    setRowHeight: (row: number, height: number) => void;
+    setAllRowsHeight: (height: number) => void;
+    freezeFirstRow: () => void;
+    hideColumn: (col: number) => void;
+    showColumn: (col: number) => void;
+    showGridlines: () => void;
+    hideGridlines: () => void;
+  }>(null);
+  const [userFeedback, setUserFeedback] = useState<string | null>(null);
   
   // File validation function
   const validateFile = (file: File): { isValid: boolean; error?: string } => {
@@ -157,6 +170,147 @@ function App() {
       setAiLoading(false);
     }
   };
+
+  // Regex-based intent parser for common UI commands
+  function parseUICommand(prompt: string) {
+    // Set column width (single column)
+    let match = prompt.match(/set column (\d+) width to (\d+)/i);
+    if (match) {
+      return { type: 'setColumnWidth', col: parseInt(match[1], 10) - 1, width: parseInt(match[2], 10) };
+    }
+    // Set all columns width
+    match = prompt.match(/set all columns width to (\d+)/i);
+    if (match) {
+      return { type: 'setAllColumnsWidth', width: parseInt(match[1], 10) };
+    }
+    // Set row height (single row)
+    match = prompt.match(/set row (\d+) height to (\d+)/i);
+    if (match) {
+      return { type: 'setRowHeight', row: parseInt(match[1], 10) - 1, height: parseInt(match[2], 10) };
+    }
+    // Set all rows height
+    match = prompt.match(/set all rows height to (\d+)/i);
+    if (match) {
+      return { type: 'setAllRowsHeight', height: parseInt(match[1], 10) };
+    }
+    // Freeze first row
+    if (/freeze first row/i.test(prompt)) {
+      return { type: 'freezeFirstRow' };
+    }
+    // Hide column
+    match = prompt.match(/hide column (\d+)/i);
+    if (match) {
+      return { type: 'hideColumn', col: parseInt(match[1], 10) - 1 };
+    }
+    // Show column
+    match = prompt.match(/show column (\d+)/i);
+    if (match) {
+      return { type: 'showColumn', col: parseInt(match[1], 10) - 1 };
+    }
+    // Show gridlines
+    if (/show gridlines/i.test(prompt)) {
+      return { type: 'showGridlines' };
+    }
+    // Hide gridlines
+    if (/hide gridlines/i.test(prompt)) {
+      return { type: 'hideGridlines' };
+    }
+    return null;
+  }
+
+  // OpenAI-powered intent classifier for ambiguous prompts
+  async function classifyPromptWithAI(prompt: string): Promise<'ui' | 'data' | 'unknown'> {
+    // Use OpenAI to classify the prompt
+    try {
+      const systemPrompt = `Classify the following prompt as either 'ui' (if it is about column width, row height, freeze, hide, show, gridlines, etc.) or 'data' (if it is about formulas, values, formatting, calculations, etc.). Only reply with 'ui' or 'data'.`;
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-3.5-turbo',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: prompt }
+          ],
+          max_tokens: 1,
+          temperature: 0
+        })
+      });
+      const data = await response.json();
+      const content = data.choices?.[0]?.message?.content?.trim().toLowerCase();
+      if (content === 'ui') return 'ui';
+      if (content === 'data') return 'data';
+      return 'unknown';
+    } catch (e) {
+      return 'unknown';
+    }
+  }
+
+  // Unified prompt handler
+  async function handleUserPrompt() {
+    if (!prompt.trim() || !selectedFile) return;
+    // 1. Try regex-based UI command parser
+    const uiCommand = parseUICommand(prompt);
+    if (uiCommand) {
+      // Handle UI commands
+      if (uiCommand.type === 'setColumnWidth' && typeof uiCommand.col === 'number' && typeof uiCommand.width === 'number') {
+        resizableTableRef.current?.setColumnWidth(uiCommand.col, uiCommand.width);
+        setUserFeedback(`Set column ${uiCommand.col + 1} width to ${uiCommand.width}px`);
+        return;
+      }
+      if (uiCommand.type === 'setAllColumnsWidth' && typeof uiCommand.width === 'number') {
+        resizableTableRef.current?.setAllColumnsWidth(uiCommand.width);
+        setUserFeedback(`Set all columns width to ${uiCommand.width}px`);
+        return;
+      }
+      if (uiCommand.type === 'setRowHeight' && typeof uiCommand.row === 'number' && typeof uiCommand.height === 'number') {
+        resizableTableRef.current?.setRowHeight(uiCommand.row, uiCommand.height);
+        setUserFeedback(`Set row ${uiCommand.row + 1} height to ${uiCommand.height}px`);
+        return;
+      }
+      if (uiCommand.type === 'setAllRowsHeight' && typeof uiCommand.height === 'number') {
+        resizableTableRef.current?.setAllRowsHeight(uiCommand.height);
+        setUserFeedback(`Set all rows height to ${uiCommand.height}px`);
+        return;
+      }
+      if (uiCommand.type === 'freezeFirstRow') {
+        resizableTableRef.current?.freezeFirstRow();
+        setUserFeedback('Froze the first row');
+        return;
+      }
+      if (uiCommand.type === 'hideColumn' && typeof uiCommand.col === 'number') {
+        resizableTableRef.current?.hideColumn(uiCommand.col);
+        setUserFeedback(`Hid column ${uiCommand.col + 1}`);
+        return;
+      }
+      if (uiCommand.type === 'showColumn' && typeof uiCommand.col === 'number') {
+        resizableTableRef.current?.showColumn(uiCommand.col);
+        setUserFeedback(`Showed column ${uiCommand.col + 1}`);
+        return;
+      }
+      if (uiCommand.type === 'showGridlines') {
+        resizableTableRef.current?.showGridlines();
+        setUserFeedback('Gridlines shown');
+        return;
+      }
+      if (uiCommand.type === 'hideGridlines') {
+        resizableTableRef.current?.hideGridlines();
+        setUserFeedback('Gridlines hidden');
+        return;
+      }
+    }
+    // 2. If not matched, use OpenAI to classify
+    const aiIntent = await classifyPromptWithAI(prompt);
+    if (aiIntent === 'ui') {
+      setUserFeedback('This looks like a UI command, but it is not recognized. Please use a supported format.');
+      return;
+    }
+    // 3. Otherwise, send to backend/AI
+    handleRunAI();
+  }
 
   useEffect(() => {
     if (showSuccess) {
@@ -244,14 +398,14 @@ function App() {
                 onChange={(e: ChangeEvent<HTMLInputElement>) => setPrompt(e.target.value)}
                 onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
                   if (e.key === 'Enter' && !aiLoading && prompt.trim()) {
-                    handleRunAI();
+                    handleUserPrompt();
                   }
                 }}
                 disabled={aiLoading}
                 autoFocus
               />
               <button
-                onClick={handleRunAI}
+                onClick={handleUserPrompt}
                 disabled={aiLoading || !prompt.trim()}
                 style={{
                   padding: '12px 24px',
@@ -458,6 +612,7 @@ function App() {
           {/* Spreadsheet Display */}
           {spreadsheetData.length > 0 && (
             <ResizableTable
+              ref={resizableTableRef}
               data={spreadsheetData.slice(1).filter(row => row.some(cell => cell !== null && cell !== undefined && cell !== ''))}
               headers={headers}
               title="Spreadsheet Data"
@@ -504,6 +659,21 @@ function App() {
               title="AI Result Data"
               subtitle={`Rows: ${aiResultData.length} | Columns: ${aiResultData[0]?.length || 0}`}
             />
+          )}
+          {userFeedback && (
+            <div style={{
+              background: 'rgba(59, 130, 246, 0.1)',
+              border: '1px solid #3b82f6',
+              borderRadius: '8px',
+              padding: '15px',
+              margin: '20px 0',
+              color: '#bfdbfe',
+              fontSize: '0.9rem',
+              fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
+              lineHeight: 1.6
+            }}>
+              <strong>Feedback:</strong> {userFeedback}
+            </div>
           )}
         </div>
       </div>
