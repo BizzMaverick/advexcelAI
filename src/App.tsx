@@ -429,51 +429,82 @@ function App() {
           {spreadsheetData.length === 0 && (
             <div style={{
               display: 'flex',
-              justifyContent: 'center',
+              flexDirection: 'column',
               alignItems: 'center',
-              minHeight: '400px'
+              justifyContent: 'center',
+              minHeight: '400px',
+              width: '100%'
             }}>
-              <div 
-                style={{
-                  border: '3px dashed #60a5fa',
-                  borderRadius: '16px',
-                  padding: '60px 40px',
-                  textAlign: 'center',
-                  cursor: 'pointer',
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  backdropFilter: 'blur(10px)',
-                  transition: 'all 0.3s ease',
-                  maxWidth: '500px',
-                  width: '100%'
-                }}
+              <div
                 onClick={() => document.getElementById('file-input')?.click()}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                style={{
+                  width: 120,
+                  height: 120,
+                  borderRadius: '50%',
+                  background: 'linear-gradient(145deg, #3b82f6 60%, #1e40af 100%)',
+                  boxShadow: '0 8px 32px 0 rgba(30,64,175,0.25), 0 1.5px 4px 0 #2563eb',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  marginBottom: 24,
+                  transition: 'transform 0.2s',
+                  transform: 'scale(1)',
+                  position: 'relative',
+                  border: '4px solid #60a5fa',
+                  animation: 'folder-bounce 1.5s infinite alternate',
                 }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
-                }}
+                onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.08)'}
+                onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                title="Click to upload file"
               >
-                <input
-                  id="file-input"
-                  type="file"
-                  accept={SUPPORTED_EXTENSIONS.join(',')}
-                  style={{ display: 'none' }}
-                  onChange={e => {
-                    if (e.target.files && e.target.files[0]) {
-                      setSelectedFile(e.target.files[0]);
-                      setFileError(null);
-                    }
-                  }}
-                />
-                <div style={{ fontSize: '1.2rem', color: '#60a5fa', fontWeight: 600, marginBottom: 16 }}>
-                  Click or drag your Excel/CSV file here to upload
-                </div>
-                <div style={{ fontSize: '1rem', color: '#bfdbfe', marginBottom: 8 }}>
-                  Supported formats: {SUPPORTED_EXTENSIONS.join(', ')}
-                </div>
-                {fileError && <div style={{ color: '#f87171', marginTop: 8 }}>{fileError}</div>}
+                {/* SVG 3D Folder Icon */}
+                <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <linearGradient id="folderBody" x1="0" y1="0" x2="0" y2="1" gradientTransform="rotate(20)">
+                      <stop offset="0%" stopColor="#fbbf24"/>
+                      <stop offset="100%" stopColor="#f59e42"/>
+                    </linearGradient>
+                    <linearGradient id="folderTop" x1="0" y1="0" x2="0" y2="1" gradientTransform="rotate(20)">
+                      <stop offset="0%" stopColor="#fde68a"/>
+                      <stop offset="100%" stopColor="#fbbf24"/>
+                    </linearGradient>
+                  </defs>
+                  <rect x="8" y="24" width="48" height="28" rx="6" fill="url(#folderBody)"/>
+                  <rect x="12" y="16" width="40" height="16" rx="4" fill="url(#folderTop)"/>
+                  <rect x="20" y="12" width="12" height="8" rx="2" fill="#fde68a"/>
+                  <ellipse cx="32" cy="52" rx="16" ry="4" fill="#fbbf24" fillOpacity="0.18"/>
+                </svg>
               </div>
+              <input
+                id="file-input"
+                type="file"
+                accept={SUPPORTED_EXTENSIONS.join(',')}
+                style={{ display: 'none' }}
+                onChange={e => {
+                  if (e.target.files && e.target.files[0]) {
+                    setSelectedFile(e.target.files[0]);
+                    setFileError(null);
+                  }
+                }}
+              />
+              <div style={{
+                fontSize: '1.3rem',
+                color: '#60a5fa',
+                fontWeight: 700,
+                marginTop: 8,
+                letterSpacing: 1,
+                textShadow: '0 2px 8px rgba(30, 58, 138, 0.15)'
+              }}>
+                upload file
+              </div>
+              {fileError && <div style={{ color: '#f87171', marginTop: 8 }}>{fileError}</div>}
+              <style>{`
+                @keyframes folder-bounce {
+                  0% { box-shadow: 0 8px 32px 0 rgba(30,64,175,0.25), 0 1.5px 4px 0 #2563eb; transform: scale(1); }
+                  100% { box-shadow: 0 16px 48px 0 rgba(30,64,175,0.35), 0 3px 8px 0 #2563eb; transform: scale(1.06); }
+                }
+              `}</style>
             </div>
           )}
           
