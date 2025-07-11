@@ -4,6 +4,21 @@ import { AIService } from './services/aiService';
 import LandingPage from './LandingPage';
 import ResizableTable from './components/ResizableTable';
 import * as XLSX from 'xlsx';
+import { Bar, Line, Pie } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  PointElement,
+  LineElement,
+  ArcElement
+} from 'chart.js';
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement, LineElement, ArcElement);
+import { DragDropContext, Droppable, Draggable, DropResult, DroppableProvided, DraggableProvided, DraggableStateSnapshot } from 'react-beautiful-dnd';
 
 // Supported file types
 const SUPPORTED_EXTENSIONS = [
@@ -87,10 +102,25 @@ function getClosestUICommands(input: string, maxDistance = 6) {
   return distances.filter(d => d.dist <= Math.max(maxDistance, minDist)).map(d => getPersonalizedSuggestion(input, d.cmd));
 }
 
+const presetColors: string[] = ['#e5e7eb', '#fbbf24', '#34d399', '#60a5fa', '#a78bfa', '#f472b6', '#f87171', '#facc15', '#38bdf8', '#6366f1'];
+
+// Add a function to determine readable text color
+function getContrastYIQ(hexcolor: string) {
+  if (!hexcolor) return '#1e293b';
+  hexcolor = hexcolor.replace('#', '');
+  if (hexcolor.length === 3) hexcolor = hexcolor.split('').map(x => x + x).join('');
+  const r = parseInt(hexcolor.substr(0,2),16);
+  const g = parseInt(hexcolor.substr(2,2),16);
+  const b = parseInt(hexcolor.substr(4,2),16);
+  const yiq = ((r*299)+(g*587)+(b*114))/1000;
+  return (yiq >= 128) ? '#1e293b' : '#fff';
+}
+
 function App() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [spreadsheetData, setSpreadsheetData] = useState<SpreadsheetData>([]);
+  const [formatting, setFormatting] = useState<SpreadsheetFormatting>([]);
   const [prompt, setPrompt] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
@@ -112,6 +142,26 @@ function App() {
   }>(null);
   const [userFeedback, setUserFeedback] = useState<string | null>(null);
   const [promptSuggestion, setPromptSuggestion] = useState<string | null>(null);
+  const [showChartModal, setShowChartModal] = useState(false);
+  const [chartType, setChartType] = useState<'bar' | 'line' | 'pie'>('bar');
+  const [chartRange, setChartRange] = useState<{ startRow: number; endRow: number; startCol: number; endCol: number }>({ startRow: 1, endRow: 1, startCol: 0, endCol: 0 });
+  const [chartData, setChartData] = useState<any>(null);
+  // Add state for pivot table
+  const [showPivotModal, setShowPivotModal] = useState(false);
+  const [pivotRows, setPivotRows] = useState<number[]>([]);
+  const [pivotCols, setPivotCols] = useState<number[]>([]);
+  const [pivotValue, setPivotValue] = useState<number | null>(null);
+  const [pivotAgg, setPivotAgg] = useState<'sum' | 'count' | 'avg'>('sum');
+  const [pivotResult, setPivotResult] = useState<any[][] | null>(null);
+  // Add state for multi-sheet support
+  const [sheets, setSheets] = useState<{ name: string; data: SpreadsheetData; color?: string; locked?: boolean }[]>([]);
+  const [selectedSheet, setSelectedSheet] = useState(0);
+  // Add state for renaming
+  const [renamingSheet, setRenamingSheet] = useState<number | null>(null);
+  const [renameValue, setRenameValue] = useState('');
+  const [contextMenuSheet, setContextMenuSheet] = useState<number | null>(null);
+  const [contextMenuAnchor, setContextMenuAnchor] = useState<{ x: number; y: number } | null>(null);
+  const contextMenuRef = useRef<HTMLDivElement | null>(null);
   
   // File validation function
   // Remove: const validateFile = (file: File): { isValid: boolean; error?: string } => {
@@ -339,6 +389,61 @@ function App() {
     }
   }
 
+  const handleCellEdit = (row: number, col: number, value: string) => {
+    if (isCurrentSheetLocked) return;
+    setSpreadsheetData(prev => {
+      const newData = prev.map(r => [...r]);
+      newData[row][col] = value;
+      return newData;
+    });
+  };
+
+  const handleCellFormat = (row: number, col: number, fmt: any) => {
+    setFormatting(prev => {
+      const newFmt = prev.map(r => r ? [...r] : []);
+      if (!newFmt[row]) newFmt[row] = [];
+      newFmt[row][col] = { ...newFmt[row][col], ...fmt };
+      return newFmt;
+    });
+  };
+
+  // Update file upload logic to read all sheets
+  const handleFileUpload = (jsonData: SpreadsheetData, allSheets?: { name: string; data: SpreadsheetData }[]) => {
+    if (allSheets && allSheets.length > 0) {
+      setSheets(allSheets.map(s => ({ ...s, locked: false })));
+      setSelectedSheet(0);
+      setSpreadsheetData(allSheets[0].data);
+      setFormatting(allSheets[0].data.map(row => row.map(() => ({}))));
+    } else {
+      setSheets([{ name: 'Sheet1', data: jsonData, locked: false }]);
+      setSelectedSheet(0);
+      setSpreadsheetData(jsonData);
+      setFormatting(jsonData.map(row => row.map(() => ({}))));
+    }
+  };
+
+  const handleDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+    const reordered = Array.from(sheets);
+    const [removed] = reordered.splice(result.source.index, 1);
+    reordered.splice(result.destination.index, 0, removed);
+    setSheets(reordered);
+    // Adjust selectedSheet index if needed
+    if (result.source.index === selectedSheet) {
+      setSelectedSheet(result.destination.index);
+    } else if (
+      result.source.index < selectedSheet &&
+      result.destination.index >= selectedSheet
+    ) {
+      setSelectedSheet(selectedSheet - 1);
+    } else if (
+      result.source.index > selectedSheet &&
+      result.destination.index <= selectedSheet
+    ) {
+      setSelectedSheet(selectedSheet + 1);
+    }
+  };
+
   useEffect(() => {
     if (showSuccess) {
       const timer = setTimeout(() => setShowSuccess(false), 10000);
@@ -346,11 +451,24 @@ function App() {
     }
   }, [showSuccess]);
 
+  useEffect(() => {
+    if (contextMenuSheet === null) return;
+    function handleClick(e: MouseEvent) {
+      if (contextMenuRef.current && !contextMenuRef.current.contains(e.target as Node)) {
+        setContextMenuSheet(null);
+        setContextMenuAnchor(null);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [contextMenuSheet]);
+
   if (showLanding) {
     return <LandingPage onBegin={() => setShowLanding(false)} />;
   }
 
   // Always show the actual application
+  const isCurrentSheetLocked = sheets[selectedSheet]?.locked;
   return (
     <div style={{
       position: 'fixed',
@@ -494,24 +612,28 @@ function App() {
                           const data = evt.target?.result;
                           if (!data) throw new Error('No data read from file');
                           const workbook = XLSX.read(data, { type: 'binary' });
-                          const sheetName = workbook.SheetNames[0];
-                          const worksheet = workbook.Sheets[sheetName];
-                          const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-                          if (jsonData.length === 0) throw new Error('No data found in the file');
-                          setSpreadsheetData(jsonData as SpreadsheetData);
+                          const allSheets = workbook.SheetNames.map(name => ({
+                            name,
+                            data: XLSX.utils.sheet_to_json(workbook.Sheets[name], { header: 1 }) as SpreadsheetData
+                          }));
+                          if (allSheets.length === 0 || allSheets[0].data.length === 0) throw new Error('No data found in the file');
+                          handleFileUpload(allSheets[0].data as SpreadsheetData, allSheets);
                         } catch (err) {
                           setFileError('Failed to process file: ' + (err instanceof Error ? err.message : 'Unknown error'));
                           setSpreadsheetData([]);
+                          setSheets([]);
                         }
                       };
                       reader.onerror = () => {
                         setFileError('Failed to read file');
                         setSpreadsheetData([]);
+                        setSheets([]);
                       };
                       reader.readAsBinaryString(file);
                     } catch (err) {
                       setFileError('Failed to process file: ' + (err instanceof Error ? err.message : 'Unknown error'));
                       setSpreadsheetData([]);
+                      setSheets([]);
                     }
                   }
                 }}
@@ -536,6 +658,256 @@ function App() {
             </div>
           )}
           
+          {sheets.length > 0 && (
+            <DragDropContext onDragEnd={handleDragEnd}>
+              <Droppable droppableId="sheet-tabs" direction="horizontal">
+                {(provided: DroppableProvided) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                    style={{ display: 'flex', gap: 8, marginBottom: 16, alignItems: 'center', position: 'relative' }}
+                  >
+                    {sheets.map((sheet, i) => (
+                      <Draggable key={sheet.name + i} draggableId={sheet.name + i} index={i}>
+                        {(dragProvided: DraggableProvided, dragSnapshot: DraggableStateSnapshot) => (
+                          <div
+                            ref={dragProvided.innerRef}
+                            {...dragProvided.draggableProps}
+                            style={{
+                              ...dragProvided.draggableProps.style,
+                              opacity: dragSnapshot.isDragging ? 0.7 : 1,
+                              position: 'relative',
+                              display: 'flex',
+                              alignItems: 'center',
+                              boxShadow: dragSnapshot.isDragging ? '0 0 0 3px #2563eb, 0 2px 8px #3b82f6' : undefined
+                            }}
+                          >
+                            <span {...dragProvided.dragHandleProps} style={{ cursor: 'grab', marginRight: 2, userSelect: 'none' }}>☰</span>
+                            {renamingSheet === i ? (
+                              <input
+                                value={renameValue}
+                                autoFocus
+                                onChange={e => setRenameValue(e.target.value)}
+                                onBlur={() => {
+                                  const trimmed = renameValue.trim();
+                                  if (!trimmed || sheets.some((s, idx) => idx !== i && s.name === trimmed)) {
+                                    setRenamingSheet(null);
+                                    return;
+                                  }
+                                  setSheets(prev => prev.map((s, idx) => idx === i ? { ...s, name: trimmed } : s));
+                                  setRenamingSheet(null);
+                                }}
+                                onKeyDown={e => {
+                                  if (e.key === 'Enter') {
+                                    const trimmed = renameValue.trim();
+                                    if (!trimmed || sheets.some((s, idx) => idx !== i && s.name === trimmed)) {
+                                      setRenamingSheet(null);
+                                      return;
+                                    }
+                                    setSheets(prev => prev.map((s, idx) => idx === i ? { ...s, name: trimmed } : s));
+                                    setRenamingSheet(null);
+                                  } else if (e.key === 'Escape') {
+                                    setRenamingSheet(null);
+                                  }
+                                }}
+                                style={{
+                                  padding: '6px 10px',
+                                  borderRadius: 6,
+                                  border: '1px solid #3b82f6',
+                                  fontSize: '1rem',
+                                  minWidth: 70
+                                }}
+                              />
+                            ) : (
+                              <button
+                                onClick={() => {
+                                  setSelectedSheet(i);
+                                  setSpreadsheetData(sheet.data);
+                                  setFormatting(sheet.data.map(row => row.map(() => ({}))));
+                                }}
+                                onDoubleClick={() => {
+                                  setRenamingSheet(i);
+                                  setRenameValue(sheet.name);
+                                }}
+                                style={{
+                                  padding: '8px 18px',
+                                  borderRadius: 6,
+                                  border: i === selectedSheet ? '2px solid #2563eb' : '1px solid #e5e7eb',
+                                  background: sheet.color || (i === selectedSheet ? '#3b82f6' : '#e5e7eb'),
+                                  color: getContrastYIQ(sheet.color || (i === selectedSheet ? '#3b82f6' : '#e5e7eb')),
+                                  fontWeight: 600,
+                                  cursor: 'pointer',
+                                  fontSize: '1rem',
+                                  boxShadow: i === selectedSheet ? '0 2px 8px #3b82f6' : undefined,
+                                  marginRight: 2,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 4
+                                }}
+                              >
+                                {sheet.name}
+                                {sheet.locked && <span style={{ marginLeft: 2, color: '#64748b', fontSize: 15 }} title="Sheet is locked">🔒</span>}
+                              </button>
+                            )}
+                            {/* Context menu button */}
+                            <span
+                              onClick={e => {
+                                e.stopPropagation();
+                                setContextMenuSheet(i);
+                                setContextMenuAnchor({ x: e.clientX, y: e.clientY });
+                              }}
+                              title="Sheet actions"
+                              style={{ cursor: 'pointer', marginLeft: 2, color: '#64748b', fontSize: 18 }}
+                            >
+                              ⋮
+                            </span>
+                            {/* Rename icon */}
+                            {renamingSheet !== i && (
+                              <span
+                                onClick={() => {
+                                  setRenamingSheet(i);
+                                  setRenameValue(sheet.name);
+                                }}
+                                title="Rename sheet"
+                                style={{ cursor: 'pointer', marginLeft: 2, color: '#64748b', fontSize: 16 }}
+                              >
+                                ✏️
+                              </span>
+                            )}
+                            {/* Delete icon */}
+                            {sheets.length > 1 && (
+                              <span
+                                onClick={() => {
+                                  if (sheets.length <= 1) return;
+                                  setSheets(prev => prev.filter((_, idx) => idx !== i));
+                                  if (selectedSheet === i) {
+                                    setTimeout(() => setSelectedSheet(0), 0);
+                                  } else if (selectedSheet > i) {
+                                    setTimeout(() => setSelectedSheet(selectedSheet - 1), 0);
+                                  }
+                                }}
+                                title="Delete sheet"
+                                style={{ cursor: 'pointer', marginLeft: 2, color: '#ef4444', fontSize: 16 }}
+                              >
+                                🗑️
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                    {/* Add sheet button */}
+                    <button
+                      onClick={() => {
+                        const newName = `Sheet${sheets.length + 1}`;
+                        const blankData = Array(spreadsheetData.length > 0 ? spreadsheetData.length : 10).fill(null).map(() => Array(spreadsheetData[0]?.length || 5).fill(''));
+                        setSheets(prev => [...prev, { name: newName, data: blankData, locked: false }]);
+                        setSelectedSheet(sheets.length);
+                        setSpreadsheetData(blankData);
+                        setFormatting(blankData.map(row => row.map(() => ({}))));
+                      }}
+                      style={{
+                        padding: '8px 14px',
+                        borderRadius: '50%',
+                        border: 'none',
+                        background: '#e5e7eb',
+                        color: '#1e293b',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        fontSize: '1.2rem',
+                        marginLeft: 8
+                      }}
+                      title="Add new sheet"
+                    >
+                      +
+                    </button>
+                    {/* Context menu UI */}
+                    {contextMenuSheet !== null && contextMenuAnchor && (
+                      <div
+                        ref={contextMenuRef}
+                        style={{
+                          position: 'fixed',
+                          top: Math.min(contextMenuAnchor.y + 4, window.innerHeight - 220),
+                          left: Math.min(contextMenuAnchor.x + 4, window.innerWidth - 180),
+                          background: '#fff',
+                          border: '1px solid #e5e7eb',
+                          borderRadius: 8,
+                          boxShadow: '0 2px 12px rgba(0,0,0,0.12)',
+                          zIndex: 1000,
+                          minWidth: 160,
+                          fontFamily: 'Hammersmith One, Segoe UI, Arial, sans-serif',
+                          color: '#1e293b',
+                          padding: 0
+                        }}
+                      >
+                        <div style={{ padding: '10px 16px', cursor: 'pointer', transition: 'background 0.15s' }} onMouseOver={e => (e.currentTarget.style.background = '#f3f4f6')} onMouseOut={e => (e.currentTarget.style.background = 'transparent')} onClick={() => {
+  if (contextMenuSheet !== null) {
+    const original = sheets[contextMenuSheet];
+    // Generate a unique name
+    let baseName = original.name + ' Copy';
+    let newName = baseName;
+    let count = 1;
+    while (sheets.some(s => s.name === newName)) {
+      newName = baseName + (count++);
+    }
+    // Deep copy data and formatting if available
+    const newData = original.data.map(row => [...row]);
+    // If you have formatting, copy it as well (optional, if formatting is in sheet object)
+    let newFormatting = undefined;
+    if (formatting && selectedSheet === contextMenuSheet) {
+      newFormatting = formatting.map(row => row.map(cell => ({ ...cell })));
+    }
+    setSheets(prev => [...prev, { ...original, name: newName, data: newData, locked: false }]);
+    setSelectedSheet(sheets.length); // Select the new sheet
+    if (newFormatting) setFormatting(newFormatting);
+  }
+  setContextMenuSheet(null);
+  setContextMenuAnchor(null);
+}}>Duplicate</div>
+                        <div style={{ padding: '10px 16px', cursor: 'pointer', transition: 'background 0.15s' }} onMouseOver={e => (e.currentTarget.style.background = '#f3f4f6')} onMouseOut={e => (e.currentTarget.style.background = 'transparent')} onClick={() => { setRenamingSheet(contextMenuSheet); setRenameValue(sheets[contextMenuSheet!].name); setContextMenuSheet(null); setContextMenuAnchor(null); }}>Rename</div>
+                        <div style={{ padding: '10px 16px', cursor: 'pointer', color: '#ef4444', transition: 'background 0.15s' }} onMouseOver={e => (e.currentTarget.style.background = '#fee2e2')} onMouseOut={e => (e.currentTarget.style.background = 'transparent')} onClick={() => { setSheets(prev => prev.filter((_, idx) => idx !== contextMenuSheet)); if (selectedSheet === contextMenuSheet) { setTimeout(() => setSelectedSheet(0), 0); } else if (selectedSheet > (contextMenuSheet ?? 0)) { setTimeout(() => setSelectedSheet(selectedSheet - 1), 0); } setContextMenuSheet(null); setContextMenuAnchor(null); }}>Delete</div>
+                        <div style={{ padding: '10px 16px', cursor: 'pointer', position: 'relative', transition: 'background 0.15s' }} onMouseOver={e => (e.currentTarget.style.background = '#f3f4f6')} onMouseOut={e => (e.currentTarget.style.background = 'transparent')}>
+                          Set Color
+                          <div style={{ display: 'flex', gap: 4, marginTop: 8 }}>
+                            {presetColors.map((color: string) => (
+                              <span
+                                key={color}
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  setSheets(prev => prev.map((s, idx) => idx === contextMenuSheet ? { ...s, color } : s));
+                                  setContextMenuSheet(null);
+                                  setContextMenuAnchor(null);
+                                }}
+                                style={{
+                                  display: 'inline-block',
+                                  width: 18,
+                                  height: 18,
+                                  borderRadius: '50%',
+                                  background: color,
+                                  border: '2px solid #e5e7eb',
+                                  cursor: 'pointer',
+                                  boxShadow: sheets[contextMenuSheet!]?.color === color ? '0 0 0 2px #3b82f6' : undefined
+                                }}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                        <div style={{ padding: '10px 16px', cursor: 'pointer', transition: 'background 0.15s' }} onMouseOver={e => (e.currentTarget.style.background = '#f3f4f6')} onMouseOut={e => (e.currentTarget.style.background = 'transparent')} onClick={() => {
+  if (contextMenuSheet !== null) {
+    setSheets(prev => prev.map((s, idx) => idx === contextMenuSheet ? { ...s, locked: !s.locked } : s));
+  }
+  setContextMenuSheet(null);
+  setContextMenuAnchor(null);
+}}>{sheets[contextMenuSheet!]?.locked ? 'Unlock' : 'Lock'} Sheet</div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
+          )}
+
           <div style={{
             display: 'flex',
             justifyContent: 'space-between',
@@ -631,8 +1003,11 @@ function App() {
               ref={resizableTableRef}
               data={spreadsheetData.slice(1).filter(row => row.some(cell => cell !== null && cell !== undefined && cell !== ''))}
               headers={Array.isArray(spreadsheetData[0]) ? spreadsheetData[0].map(cell => String(cell ?? '')) : []}
+              formatting={formatting.slice(1)}
               title="Spreadsheet Data"
               subtitle={`Rows: ${spreadsheetData.length} | Columns: ${spreadsheetData[0]?.length || 0}`}
+              onCellEdit={handleCellEdit}
+              onCellFormat={handleCellFormat}
             />
           )}
 
@@ -718,6 +1093,165 @@ function App() {
           }
         }
       `}</style>
+      {/* Chart Modal UI */}
+      {showChartModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(30, 41, 59, 0.4)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ background: 'white', borderRadius: 12, padding: 32, minWidth: 320, boxShadow: '0 8px 32px 0 rgba(30,64,175,0.15)' }}>
+            <h3 style={{ color: '#1e293b', marginBottom: 16 }}>Create Chart</h3>
+            <div style={{ marginBottom: 12 }}>
+              <label>Chart Type: </label>
+              <select value={chartType} onChange={e => setChartType(e.target.value as any)} style={{ fontSize: '1rem', marginLeft: 8 }}>
+                <option value="bar">Bar</option>
+                <option value="line">Line</option>
+                <option value="pie">Pie</option>
+              </select>
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <label>Data Range (row 1 = headers):</label>
+              <div style={{ marginTop: 6 }}>
+                <input type="number" min={1} max={spreadsheetData.length - 1} value={chartRange.startRow} onChange={e => setChartRange(r => ({ ...r, startRow: Number(e.target.value) }))} style={{ width: 50, marginRight: 4 }} />
+                to
+                <input type="number" min={1} max={spreadsheetData.length - 1} value={chartRange.endRow} onChange={e => setChartRange(r => ({ ...r, endRow: Number(e.target.value) }))} style={{ width: 50, marginLeft: 4, marginRight: 12 }} />
+                Col
+                <input type="number" min={0} max={spreadsheetData[0]?.length - 1} value={chartRange.startCol} onChange={e => setChartRange(r => ({ ...r, startCol: Number(e.target.value) }))} style={{ width: 40, marginLeft: 4 }} />
+                to
+                <input type="number" min={0} max={spreadsheetData[0]?.length - 1} value={chartRange.endCol} onChange={e => setChartRange(r => ({ ...r, endCol: Number(e.target.value) }))} style={{ width: 40, marginLeft: 4 }} />
+              </div>
+            </div>
+            <div style={{ marginTop: 18, display: 'flex', gap: 12 }}>
+              <button
+                onClick={() => {
+                  // Prepare chart data
+                  const labels = spreadsheetData.slice(chartRange.startRow, chartRange.endRow + 1).map((row, i) => `Row ${chartRange.startRow + i}`);
+                  const data = spreadsheetData.slice(chartRange.startRow, chartRange.endRow + 1).map(row => row.slice(chartRange.startCol, chartRange.endCol + 1).map(Number));
+                  const flatData = data.map(arr => arr[0]);
+                  setChartData({
+                    labels,
+                    datasets: [
+                      {
+                        label: spreadsheetData[0][chartRange.startCol],
+                        data: chartType === 'pie' ? flatData : data.map(arr => arr[0]),
+                        backgroundColor: chartType === 'pie' ? [
+                          '#3b82f6', '#f59e42', '#fbbf24', '#10b981', '#ef4444', '#6366f1', '#f472b6', '#facc15', '#a3e635', '#38bdf8'
+                        ] : '#3b82f6',
+                        borderColor: '#1e40af',
+                        borderWidth: 1
+                      }
+                    ]
+                  });
+                  setShowChartModal(false);
+                }}
+                style={{ padding: '8px 18px', borderRadius: 6, border: 'none', background: '#3b82f6', color: 'white', fontWeight: 600, cursor: 'pointer', fontSize: '1rem' }}
+              >
+                Create
+              </button>
+              <button
+                onClick={() => setShowChartModal(false)}
+                style={{ padding: '8px 18px', borderRadius: 6, border: 'none', background: '#e5e7eb', color: '#1e293b', fontWeight: 600, cursor: 'pointer', fontSize: '1rem' }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Render chart below the table */}
+      {chartData && (
+        <div style={{ margin: '32px 0', background: 'white', borderRadius: 12, boxShadow: '0 4px 16px rgba(30,64,175,0.08)', padding: 24 }}>
+          <h3 style={{ color: '#1e293b', marginBottom: 16 }}>Chart</h3>
+          {chartType === 'bar' && <Bar data={chartData} />}
+          {chartType === 'line' && <Line data={chartData} />}
+          {chartType === 'pie' && <Pie data={chartData} />}
+        </div>
+      )}
+      {/* Pivot Table Modal UI */}
+      {showPivotModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(30, 41, 59, 0.4)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ background: 'white', borderRadius: 12, padding: 32, minWidth: 340, boxShadow: '0 8px 32px 0 rgba(30,64,175,0.15)' }}>
+            <h3 style={{ color: '#1e293b', marginBottom: 16 }}>Create Pivot Table</h3>
+            <div style={{ marginBottom: 12 }}>
+              <label>Rows: </label>
+              <select multiple value={pivotRows.map(String)} onChange={e => setPivotRows(Array.from(e.target.selectedOptions, o => Number(o.value)))} style={{ fontSize: '1rem', marginLeft: 8, minWidth: 120, height: 60 }}>
+                {spreadsheetData[0]?.map((h, i) => <option key={i} value={i}>{h}</option>)}
+              </select>
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <label>Columns: </label>
+              <select multiple value={pivotCols.map(String)} onChange={e => setPivotCols(Array.from(e.target.selectedOptions, o => Number(o.value)))} style={{ fontSize: '1rem', marginLeft: 8, minWidth: 120, height: 60 }}>
+                {spreadsheetData[0]?.map((h, i) => <option key={i} value={i}>{h}</option>)}
+              </select>
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <label>Values: </label>
+              <select value={pivotValue ?? ''} onChange={e => setPivotValue(Number(e.target.value))} style={{ fontSize: '1rem', marginLeft: 8, minWidth: 120 }}>
+                <option value="">Select...</option>
+                {spreadsheetData[0]?.map((h, i) => <option key={i} value={i}>{h}</option>)}
+              </select>
+              <select value={pivotAgg} onChange={e => setPivotAgg(e.target.value as any)} style={{ fontSize: '1rem', marginLeft: 8 }}>
+                <option value="sum">Sum</option>
+                <option value="count">Count</option>
+                <option value="avg">Average</option>
+              </select>
+            </div>
+            <div style={{ marginTop: 18, display: 'flex', gap: 12 }}>
+              <button
+                onClick={() => {
+                  // Compute pivot table
+                  if (pivotValue == null) return;
+                  const rows = spreadsheetData.slice(1);
+                  const rowKeys = Array.from(new Set(rows.map(r => pivotRows.map(i => r[i]).join('|'))));
+                  const colKeys = Array.from(new Set(rows.map(r => pivotCols.map(i => r[i]).join('|'))));
+                  const result: any[][] = [];
+                  result.push(['', ...colKeys]);
+                  rowKeys.forEach(rk => {
+                    const row: any[] = [rk];
+                    colKeys.forEach(ck => {
+                      const vals = rows.filter(r =>
+                        pivotRows.map(i => r[i]).join('|') === rk &&
+                        pivotCols.map(i => r[i]).join('|') === ck
+                      ).map(r => Number(r[pivotValue]));
+                      let val: any = '';
+                      if (pivotAgg === 'sum') val = vals.reduce((a, b) => a + b, 0);
+                      if (pivotAgg === 'count') val = vals.length;
+                      if (pivotAgg === 'avg') val = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : '';
+                      row.push(val);
+                    });
+                    result.push(row);
+                  });
+                  setPivotResult(result);
+                  setShowPivotModal(false);
+                }}
+                style={{ padding: '8px 18px', borderRadius: 6, border: 'none', background: '#10b981', color: 'white', fontWeight: 600, cursor: 'pointer', fontSize: '1rem' }}
+              >
+                Create
+              </button>
+              <button
+                onClick={() => setShowPivotModal(false)}
+                style={{ padding: '8px 18px', borderRadius: 6, border: 'none', background: '#e5e7eb', color: '#1e293b', fontWeight: 600, cursor: 'pointer', fontSize: '1rem' }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Render pivot table below the main table */}
+      {pivotResult && (
+        <div style={{ margin: '32px 0', background: 'white', borderRadius: 12, boxShadow: '0 4px 16px rgba(30,64,175,0.08)', padding: 24 }}>
+          <h3 style={{ color: '#1e293b', marginBottom: 16 }}>Pivot Table</h3>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'Calibri, Segoe UI, Arial, sans-serif', fontSize: 14 }}>
+            <tbody>
+              {pivotResult.map((row, i) => (
+                <tr key={i}>
+                  {row.map((cell, j) => (
+                    <td key={j} style={{ border: '1px solid #e5e7eb', padding: 8, fontWeight: i === 0 ? 700 : 400, background: i === 0 ? '#f1f5f9' : 'white' }}>{cell}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

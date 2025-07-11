@@ -6,6 +6,8 @@ interface ResizableTableProps {
   formatting?: ({ color?: string; background?: string; bold?: boolean; italic?: boolean } | undefined)[][];
   title?: string;
   subtitle?: string;
+  onCellEdit?: (row: number, col: number, value: string) => void;
+  onCellFormat?: (row: number, col: number, fmt: any) => void;
 }
 
 interface ColumnWidths {
@@ -16,12 +18,73 @@ interface RowHeights {
   [key: number]: number;
 }
 
+// Add formula evaluation utilities at the top of the file
+function cellRefToIndexes(ref: string): [number, number] | null {
+  const match = ref.match(/^([A-Z]+)(\d+)$/i);
+  if (!match) return null;
+  const col = match[1].toUpperCase().split('').reduce((acc, char) => acc * 26 + (char.charCodeAt(0) - 64), 0) - 1;
+  const row = parseInt(match[2], 10) - 1;
+  return [row, col];
+}
+
+function getCellValue(data: any[][], ref: string): number {
+  const idx = cellRefToIndexes(ref);
+  if (!idx) return NaN;
+  const [row, col] = idx;
+  const val = data[row]?.[col];
+  if (typeof val === 'number') return val;
+  if (typeof val === 'string' && val.trim() !== '' && !isNaN(Number(val))) return Number(val);
+  return NaN;
+}
+
+function evaluateFormula(formula: string, data: any[][]): number | string {
+  try {
+    // Remove '='
+    let expr = formula.slice(1).trim();
+    // SUM, AVERAGE, MIN, MAX
+    if (/^(SUM|AVERAGE|MIN|MAX)\(/i.test(expr)) {
+      const fn = expr.match(/^(SUM|AVERAGE|MIN|MAX)/i)?.[0].toUpperCase();
+      const range = expr.match(/\(([^)]+)\)/)?.[1];
+      if (range) {
+        const [start, end] = range.split(':');
+        const startIdx = cellRefToIndexes(start.trim());
+        const endIdx = cellRefToIndexes(end.trim());
+        if (startIdx && endIdx) {
+          const values: number[] = [];
+          for (let r = startIdx[0]; r <= endIdx[0]; r++) {
+            for (let c = startIdx[1]; c <= endIdx[1]; c++) {
+              const v = data[r]?.[c];
+              if (typeof v === 'number') values.push(v);
+              else if (typeof v === 'string' && v.trim() !== '' && !isNaN(Number(v))) values.push(Number(v));
+            }
+          }
+          if (fn === 'SUM') return values.reduce((a, b) => a + b, 0);
+          if (fn === 'AVERAGE') return values.length ? values.reduce((a, b) => a + b, 0) / values.length : 0;
+          if (fn === 'MIN') return values.length ? Math.min(...values) : 0;
+          if (fn === 'MAX') return values.length ? Math.max(...values) : 0;
+        }
+      }
+    }
+    // Simple math with cell refs (e.g., =A1+B2)
+    expr = expr.replace(/([A-Z]+\d+)/gi, (ref) => {
+      const v = getCellValue(data, ref);
+      return isNaN(v) ? '0' : String(v);
+    });
+    // eslint-disable-next-line no-eval
+    return Function('return ' + expr)();
+  } catch {
+    return '#ERR';
+  }
+}
+
 const ResizableTable = forwardRef<any, ResizableTableProps>(({
   data,
   headers,
   formatting,
   title = "Spreadsheet Data",
-  subtitle
+  subtitle,
+  onCellEdit,
+  onCellFormat
 }, ref) => {
   const [columnWidths, setColumnWidths] = useState<ColumnWidths>({});
   const [rowHeights, setRowHeights] = useState<RowHeights>({});
@@ -33,6 +96,13 @@ const ResizableTable = forwardRef<any, ResizableTableProps>(({
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [hiddenColumns, setHiddenColumns] = useState<Set<number>>(new Set());
   const [showGrid, setShowGrid] = useState(true);
+  const [editingCell, setEditingCell] = useState<{ row: number; col: number } | null>(null);
+  const [editValue, setEditValue] = useState<string>('');
+  // Add state for selectedCell
+  const [selectedCell, setSelectedCell] = useState<{ row: number; col: number } | null>(null);
+  // Add state for sorting and filtering
+  const [sortConfig, setSortConfig] = useState<{ col: number; direction: 'asc' | 'desc' } | null>(null);
+  const [filters, setFilters] = useState<{ [col: number]: string }>({});
 
   const tableRef = useRef<HTMLTableElement>(null);
   const isResizingRef = useRef(false);
@@ -258,6 +328,26 @@ const ResizableTable = forwardRef<any, ResizableTableProps>(({
   const visibleHeaders = headers.filter((_, i) => !hiddenColumns.has(i));
   const visibleData = data.map(row => row.filter((_, i) => !hiddenColumns.has(i)));
 
+  // Update visibleData to apply filtering
+  let filteredData = visibleData;
+  Object.entries(filters).forEach(([col, value]) => {
+    if (value) {
+      filteredData = filteredData.filter(row => String(row[Number(col)] ?? '').toLowerCase().includes(value.toLowerCase()));
+    }
+  });
+  // Apply sorting
+  if (sortConfig) {
+    filteredData = [...filteredData].sort((a, b) => {
+      const aVal = a[sortConfig.col];
+      const bVal = b[sortConfig.col];
+      if (aVal === bVal) return 0;
+      if (aVal === undefined || aVal === null) return 1;
+      if (bVal === undefined || bVal === null) return -1;
+      if (sortConfig.direction === 'asc') return String(aVal).localeCompare(String(bVal), undefined, { numeric: true });
+      return String(bVal).localeCompare(String(aVal), undefined, { numeric: true });
+    });
+  }
+
   // Helper to get visible column index
   const getVisibleColIndex = (visibleIndex: number) => {
     let count = -1;
@@ -338,39 +428,27 @@ const ResizableTable = forwardRef<any, ResizableTableProps>(({
             }}>
               {visibleHeaders.map((header, index) => (
                 <th key={index} style={getHeaderStyle(getVisibleColIndex(index))}>
-                  {header || `Column ${index + 1}`}
-                  <div
-                    className="resize-handle column"
-                    onMouseDown={(e) => handleMouseDown(e, 'column', getVisibleColIndex(index))}
-                    onDoubleClick={() => {
-                      setShowDimensionInput(true);
-                      setActiveDimension({ type: 'column', index: getVisibleColIndex(index) });
-                      setDimensionInput(getColumnWidth(getVisibleColIndex(index)).toString());
-                    }}
-                    style={{
-                      position: 'absolute',
-                      right: 0,
-                      top: 0,
-                      bottom: 0,
-                      width: '6px',
-                      background: 'transparent',
-                      cursor: 'col-resize',
-                      zIndex: 10,
-                      transition: 'background-color 0.2s ease'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = '#3b82f6';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = 'transparent';
-                    }}
-                  />
+                  <span style={{ cursor: 'pointer' }} onClick={() => {
+                    setSortConfig(prev => prev && prev.col === getVisibleColIndex(index) ? { col: getVisibleColIndex(index), direction: prev.direction === 'asc' ? 'desc' : 'asc' } : { col: getVisibleColIndex(index), direction: 'asc' });
+                  }}>
+                    {header}
+                    {sortConfig?.col === getVisibleColIndex(index) && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
+                  </span>
+                  <span style={{ marginLeft: 8 }}>
+                    <input
+                      type="text"
+                      value={filters[getVisibleColIndex(index)] || ''}
+                      onChange={e => setFilters(f => ({ ...f, [getVisibleColIndex(index)]: e.target.value }))}
+                      placeholder="Filter"
+                      style={{ width: 60, fontSize: 12, border: '1px solid #d1d5db', borderRadius: 4, padding: '2px 4px' }}
+                    />
+                  </span>
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {visibleData.map((row, rowIndex) => (
+            {filteredData.map((row, rowIndex) => (
               <tr key={rowIndex} style={{
                 borderBottom: '1px solid #e5e7eb',
                 background: rowIndex % 2 === 0 ? '#ffffff' : '#f9fafb',
@@ -379,7 +457,47 @@ const ResizableTable = forwardRef<any, ResizableTableProps>(({
               }}>
                 {row.map((cell, cellIndex) => (
                   <td key={cellIndex} style={getCellStyle(rowIndex, cellIndex)}>
-                    {cell === null || cell === undefined ? '' : String(cell)}
+                    {editingCell && editingCell.row === rowIndex && editingCell.col === cellIndex ? (
+                      <input
+                        value={editValue}
+                        autoFocus
+                        onChange={e => setEditValue(e.target.value)}
+                        onBlur={() => {
+                          if (onCellEdit) onCellEdit(rowIndex, cellIndex, editValue);
+                          setEditingCell(null);
+                        }}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') {
+                            if (onCellEdit) onCellEdit(rowIndex, cellIndex, editValue);
+                            setEditingCell(null);
+                          } else if (e.key === 'Escape') {
+                            setEditingCell(null);
+                          }
+                        }}
+                        style={{ width: '100%' }}
+                      />
+                    ) : (
+                      <span
+                        onClick={() => {
+                          setEditingCell({ row: rowIndex, col: cellIndex });
+                          setEditValue(String(cell ?? ''));
+                          setSelectedCell({ row: rowIndex, col: cellIndex });
+                        }}
+                        style={{
+                          cursor: 'pointer',
+                          display: 'block',
+                          minHeight: 24,
+                          fontWeight: formatting?.[rowIndex]?.[cellIndex]?.bold ? 'bold' : undefined,
+                          fontStyle: formatting?.[rowIndex]?.[cellIndex]?.italic ? 'italic' : undefined,
+                          color: formatting?.[rowIndex]?.[cellIndex]?.color,
+                          background: formatting?.[rowIndex]?.[cellIndex]?.background
+                        }}
+                      >
+                        {typeof cell === 'string' && cell.startsWith('=')
+                          ? evaluateFormula(cell, data)
+                          : cell}
+                      </span>
+                    )}
                   </td>
                 ))}
                 {/* Row resize handle */}
@@ -477,6 +595,99 @@ const ResizableTable = forwardRef<any, ResizableTableProps>(({
                 />
               </div>
             )}
+          </div>
+        )}
+
+        {/* Floating Formatting Toolbar */}
+        {selectedCell && (
+          <div
+            style={{
+              position: 'fixed',
+              left: selectedCell.col * (columnWidths[selectedCell.col] || 150) + 10,
+              top: selectedCell.row * (rowHeights[selectedCell.row] || 40) + 10,
+              background: '#ffffff',
+              border: '1px solid #e5e7eb',
+              borderRadius: '4px',
+              padding: '8px',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+              zIndex: 1000,
+              display: 'flex',
+              gap: '8px',
+              flexDirection: 'column'
+            }}
+          >
+            <button
+              onClick={() => onCellFormat?.(selectedCell.row, selectedCell.col, { bold: true })}
+              style={{
+                padding: '4px 8px',
+                border: '1px solid #d1d5db',
+                borderRadius: '4px',
+                background: formatting?.[selectedCell.row]?.[selectedCell.col]?.bold ? '#3b82f6' : '#ffffff',
+                color: formatting?.[selectedCell.row]?.[selectedCell.col]?.bold ? '#ffffff' : '#1f2937',
+                fontWeight: formatting?.[selectedCell.row]?.[selectedCell.col]?.bold ? 'bold' : 'normal',
+                fontStyle: 'normal',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-bold"><path d="M11 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9" /><path d="M18 11H6" /><path d="M18 18H6" /></svg>
+              Bold
+            </button>
+            <button
+              onClick={() => onCellFormat?.(selectedCell.row, selectedCell.col, { italic: true })}
+              style={{
+                padding: '4px 8px',
+                border: '1px solid #d1d5db',
+                borderRadius: '4px',
+                background: formatting?.[selectedCell.row]?.[selectedCell.col]?.italic ? '#3b82f6' : '#ffffff',
+                color: formatting?.[selectedCell.row]?.[selectedCell.col]?.italic ? '#ffffff' : '#1f2937',
+                fontWeight: 'normal',
+                fontStyle: formatting?.[selectedCell.row]?.[selectedCell.col]?.italic ? 'italic' : 'normal',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-italic"><path d="M11 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9" /><path d="M18 11H6" /><path d="M18 18H6" /></svg>
+              Italic
+            </button>
+            <button
+              onClick={() => onCellFormat?.(selectedCell.row, selectedCell.col, { color: '#3b82f6' })}
+              style={{
+                padding: '4px 8px',
+                border: '1px solid #d1d5db',
+                borderRadius: '4px',
+                background: formatting?.[selectedCell.row]?.[selectedCell.col]?.color === '#3b82f6' ? '#3b82f6' : '#ffffff',
+                color: formatting?.[selectedCell.row]?.[selectedCell.col]?.color === '#3b82f6' ? '#ffffff' : '#1f2937',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-text-color"><path d="M11 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9" /><path d="M18 11H6" /><path d="M18 18H6" /></svg>
+              Text Color
+            </button>
+            <button
+              onClick={() => onCellFormat?.(selectedCell.row, selectedCell.col, { background: '#3b82f6' })}
+              style={{
+                padding: '4px 8px',
+                border: '1px solid #d1d5db',
+                borderRadius: '4px',
+                background: formatting?.[selectedCell.row]?.[selectedCell.col]?.background === '#3b82f6' ? '#3b82f6' : '#ffffff',
+                color: formatting?.[selectedCell.row]?.[selectedCell.col]?.background === '#3b82f6' ? '#ffffff' : '#1f2937',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-background-color"><path d="M11 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9" /><path d="M18 11H6" /><path d="M18 18H6" /></svg>
+              Background Color
+            </button>
           </div>
         )}
       </div>
