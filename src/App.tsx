@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ChangeEvent, KeyboardEvent } from 'react';
+import { useState, useEffect, ChangeEvent, KeyboardEvent } from 'react';
 import './App.css';
 import * as XLSX from 'xlsx';
 import { AIService } from './services/aiService';

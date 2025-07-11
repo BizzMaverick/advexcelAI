@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, MouseEvent } from 'react';
+import { useState, useRef, useEffect, MouseEvent } from 'react';
 
 interface ResizableTableProps {
   data: (string | number | boolean | null | undefined)[][];
