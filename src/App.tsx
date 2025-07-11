@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import './App.css';
-import * as XLSX from 'xlsx';
 import { AIService } from './services/aiService';
 import LandingPage from './LandingPage';
 import ResizableTable from './components/ResizableTable';
@@ -103,9 +102,7 @@ function getClosestUICommands(input: string, maxDistance = 6) {
 function App() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
   const [spreadsheetData, setSpreadsheetData] = useState<SpreadsheetData>([]);
-  const [headers, setHeaders] = useState<string[]>([]);
   const [prompt, setPrompt] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
@@ -506,7 +503,7 @@ function App() {
               fontSize: '0.9rem',
               fontWeight: 400
             }}>
-              {isProcessing ? 'Processing file...' : 
+              {aiLoading ? 'Processing file...' : 
                selectedFile ? `File loaded: ${selectedFile.name} (${spreadsheetData.length} rows)` : 
                'Ready to upload files'}
             </div>
@@ -524,9 +521,9 @@ function App() {
                   transition: 'all 0.2s ease',
                   outline: 'none',
                   fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
-                  opacity: !selectedFile || isProcessing ? 0.5 : 1
+                  opacity: !selectedFile || aiLoading ? 0.5 : 1
                 }}
-                disabled={!selectedFile || isProcessing}
+                disabled={!selectedFile || aiLoading}
               >
                 Download Excel
               </button>
@@ -543,9 +540,9 @@ function App() {
                   transition: 'all 0.2s ease',
                   outline: 'none',
                   fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
-                  opacity: !selectedFile || isProcessing ? 0.5 : 1
+                  opacity: !selectedFile || aiLoading ? 0.5 : 1
                 }}
-                disabled={!selectedFile || isProcessing}
+                disabled={!selectedFile || aiLoading}
               >
                 Download CSV
               </button>
@@ -567,7 +564,7 @@ function App() {
             </div>
           )}
           
-          {selectedFile && !isProcessing && spreadsheetData.length > 0 && showSuccess && (
+          {selectedFile && !aiLoading && spreadsheetData.length > 0 && showSuccess && (
             <div style={{
               background: 'rgba(34, 197, 94, 0.1)',
               border: '1px solid #22c55e',
@@ -587,9 +584,9 @@ function App() {
             <ResizableTable
               ref={resizableTableRef}
               data={spreadsheetData.slice(1).filter(row => row.some(cell => cell !== null && cell !== undefined && cell !== ''))}
-              headers={headers}
+              headers={Array.isArray(spreadsheetData[0]) ? spreadsheetData[0].map(cell => String(cell ?? '')) : []}
               title="Spreadsheet Data"
-              subtitle={`Rows: ${spreadsheetData.length} | Columns: ${headers.length}`}
+              subtitle={`Rows: ${spreadsheetData.length} | Columns: ${spreadsheetData[0]?.length || 0}`}
             />
           )}
 
@@ -627,7 +624,7 @@ function App() {
           {aiResultData && aiResultData.length > 0 && (
             <ResizableTable
               data={aiResultData}
-              headers={headers}
+              headers={Array.isArray(spreadsheetData[0]) ? spreadsheetData[0].map(cell => String(cell ?? '')) : []}
               formatting={aiFormatting || undefined}
               title="AI Result Data"
               subtitle={`Rows: ${aiResultData.length} | Columns: ${aiResultData[0]?.length || 0}`}
