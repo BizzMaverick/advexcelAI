@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, MouseEvent, useCallback } from 'react';
+import { useState, useRef, useEffect, MouseEvent } from 'react';
 
 interface ResizableTableProps {
   data: (string | number | boolean | null | undefined)[][];
@@ -27,11 +27,13 @@ const ResizableTable: React.FC<ResizableTableProps> = ({
   const [rowHeights, setRowHeights] = useState<RowHeights>({});
   const [isResizing, setIsResizing] = useState(false);
   const [resizeType, setResizeType] = useState<'column' | 'row' | null>(null);
-  const [resizeIndex, setResizeIndex] = useState<number>(-1);
-  const [startPos, setStartPos] = useState<number>(0);
-  const [startSize, setStartSize] = useState<number>(0);
   
   const tableRef = useRef<HTMLTableElement>(null);
+  const isResizingRef = useRef(false);
+  const startPosRef = useRef(0);
+  const startSizeRef = useRef(0);
+  const resizeTypeRef = useRef<'column' | 'row' | null>(null);
+  const resizeIndexRef = useRef(-1);
 
   // Initialize default column widths
   useEffect(() => {
@@ -51,54 +53,61 @@ const ResizableTable: React.FC<ResizableTableProps> = ({
     setRowHeights(defaultHeights);
   }, [data]);
 
-  const handleMouseDown = useCallback((e: MouseEvent, type: 'column' | 'row', index: number) => {
+  const handleMouseDown = (e: MouseEvent, type: 'column' | 'row', index: number) => {
     e.preventDefault();
     e.stopPropagation();
     
-    console.log('Mouse down:', type, index); // Debug log
+    console.log('Mouse down:', type, index);
+    
+    isResizingRef.current = true;
+    resizeTypeRef.current = type;
+    resizeIndexRef.current = index;
+    startPosRef.current = type === 'column' ? e.clientX : e.clientY;
+    startSizeRef.current = type === 'column' ? columnWidths[index] || 150 : rowHeights[index] || 40;
     
     setIsResizing(true);
     setResizeType(type);
-    setResizeIndex(index);
-    setStartPos(type === 'column' ? e.clientX : e.clientY);
-    setStartSize(type === 'column' ? columnWidths[index] || 150 : rowHeights[index] || 40);
     
-    // Add event listeners to document
-    const handleMouseMove = (e: globalThis.MouseEvent) => {
-      e.preventDefault();
-      if (!isResizing || resizeType === null || resizeIndex === -1) return;
-
-      const currentPos = resizeType === 'column' ? e.clientX : e.clientY;
-      const delta = currentPos - startPos;
-      const newSize = Math.max(50, startSize + delta); // Minimum size of 50px
-
-      console.log('Mouse move:', currentPos, delta, newSize); // Debug log
-
-      if (resizeType === 'column') {
-        setColumnWidths(prev => ({
-          ...prev,
-          [resizeIndex]: newSize
-        }));
-      } else {
-        setRowHeights(prev => ({
-          ...prev,
-          [resizeIndex]: newSize
-        }));
-      }
-    };
-
-    const handleMouseUp = () => {
-      console.log('Mouse up'); // Debug log
-      setIsResizing(false);
-      setResizeType(null);
-      setResizeIndex(-1);
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
-  }, [isResizing, resizeType, resizeIndex, startPos, startSize, columnWidths, rowHeights]);
+  };
+
+  const handleMouseMove = (e: globalThis.MouseEvent) => {
+    if (!isResizingRef.current || !resizeTypeRef.current || resizeIndexRef.current === -1) return;
+
+    e.preventDefault();
+    
+    const currentPos = resizeTypeRef.current === 'column' ? e.clientX : e.clientY;
+    const delta = currentPos - startPosRef.current;
+    const newSize = Math.max(50, startSizeRef.current + delta);
+
+    console.log('Mouse move:', currentPos, delta, newSize);
+
+    if (resizeTypeRef.current === 'column') {
+      setColumnWidths(prev => ({
+        ...prev,
+        [resizeIndexRef.current]: newSize
+      }));
+    } else {
+      setRowHeights(prev => ({
+        ...prev,
+        [resizeIndexRef.current]: newSize
+      }));
+    }
+  };
+
+  const handleMouseUp = () => {
+    console.log('Mouse up');
+    isResizingRef.current = false;
+    resizeTypeRef.current = null;
+    resizeIndexRef.current = -1;
+    
+    setIsResizing(false);
+    setResizeType(null);
+    
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', handleMouseUp);
+  };
 
   const getColumnWidth = (index: number) => {
     return columnWidths[index] || 150;
@@ -209,6 +218,23 @@ const ResizableTable: React.FC<ResizableTableProps> = ({
                   <div
                     className="resize-handle column"
                     onMouseDown={(e) => handleMouseDown(e, 'column', index)}
+                    style={{
+                      position: 'absolute',
+                      right: 0,
+                      top: 0,
+                      bottom: 0,
+                      width: '8px',
+                      background: 'rgba(255, 255, 255, 0.3)',
+                      cursor: 'col-resize',
+                      zIndex: 10,
+                      transition: 'background-color 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.6)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
+                    }}
                   />
                 </th>
               ))}
@@ -231,6 +257,23 @@ const ResizableTable: React.FC<ResizableTableProps> = ({
                 <div
                   className="resize-handle row"
                   onMouseDown={(e) => handleMouseDown(e, 'row', rowIndex)}
+                  style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    height: '8px',
+                    background: 'rgba(255, 255, 255, 0.3)',
+                    cursor: 'row-resize',
+                    zIndex: 10,
+                    transition: 'background-color 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.6)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
+                  }}
                 />
               </tr>
             ))}
