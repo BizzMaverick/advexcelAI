@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, MouseEvent } from 'react';
+import { useState, useRef, useEffect, MouseEvent, useCallback } from 'react';
 
 interface ResizableTableProps {
   data: (string | number | boolean | null | undefined)[][];
@@ -51,45 +51,54 @@ const ResizableTable: React.FC<ResizableTableProps> = ({
     setRowHeights(defaultHeights);
   }, [data]);
 
-  const handleMouseDown = (e: MouseEvent, type: 'column' | 'row', index: number) => {
+  const handleMouseDown = useCallback((e: MouseEvent, type: 'column' | 'row', index: number) => {
     e.preventDefault();
+    e.stopPropagation();
+    
+    console.log('Mouse down:', type, index); // Debug log
+    
     setIsResizing(true);
     setResizeType(type);
     setResizeIndex(index);
     setStartPos(type === 'column' ? e.clientX : e.clientY);
     setStartSize(type === 'column' ? columnWidths[index] || 150 : rowHeights[index] || 40);
     
+    // Add event listeners to document
+    const handleMouseMove = (e: globalThis.MouseEvent) => {
+      e.preventDefault();
+      if (!isResizing || resizeType === null || resizeIndex === -1) return;
+
+      const currentPos = resizeType === 'column' ? e.clientX : e.clientY;
+      const delta = currentPos - startPos;
+      const newSize = Math.max(50, startSize + delta); // Minimum size of 50px
+
+      console.log('Mouse move:', currentPos, delta, newSize); // Debug log
+
+      if (resizeType === 'column') {
+        setColumnWidths(prev => ({
+          ...prev,
+          [resizeIndex]: newSize
+        }));
+      } else {
+        setRowHeights(prev => ({
+          ...prev,
+          [resizeIndex]: newSize
+        }));
+      }
+    };
+
+    const handleMouseUp = () => {
+      console.log('Mouse up'); // Debug log
+      setIsResizing(false);
+      setResizeType(null);
+      setResizeIndex(-1);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
-  };
-
-  const handleMouseMove = (e: globalThis.MouseEvent) => {
-    if (!isResizing || resizeType === null || resizeIndex === -1) return;
-
-    const currentPos = resizeType === 'column' ? e.clientX : e.clientY;
-    const delta = currentPos - startPos;
-    const newSize = Math.max(50, startSize + delta); // Minimum size of 50px
-
-    if (resizeType === 'column') {
-      setColumnWidths(prev => ({
-        ...prev,
-        [resizeIndex]: newSize
-      }));
-    } else {
-      setRowHeights(prev => ({
-        ...prev,
-        [resizeIndex]: newSize
-      }));
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsResizing(false);
-    setResizeType(null);
-    setResizeIndex(-1);
-    document.removeEventListener('mousemove', handleMouseMove);
-    document.removeEventListener('mouseup', handleMouseUp);
-  };
+  }, [isResizing, resizeType, resizeIndex, startPos, startSize, columnWidths, rowHeights]);
 
   const getColumnWidth = (index: number) => {
     return columnWidths[index] || 150;
@@ -147,23 +156,23 @@ const ResizableTable: React.FC<ResizableTableProps> = ({
         paddingBottom: '15px',
         borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
       }}>
-                 <div>
-           <h3 style={{
-             fontSize: '1.5rem',
-             fontWeight: 600,
-             color: '#ffffff',
-             margin: 0,
-             textShadow: '0 2px 8px rgba(30, 58, 138, 0.5)'
-           }}>{title}</h3>
-           <div style={{
-             fontSize: '0.8rem',
-             color: '#bfdbfe',
-             marginTop: '4px',
-             opacity: 0.8
-           }}>
-             💡 Drag column edges to resize width • Drag row edges to resize height
-           </div>
-         </div>
+        <div>
+          <h3 style={{
+            fontSize: '1.5rem',
+            fontWeight: 600,
+            color: '#ffffff',
+            margin: 0,
+            textShadow: '0 2px 8px rgba(30, 58, 138, 0.5)'
+          }}>{title}</h3>
+          <div style={{
+            fontSize: '0.8rem',
+            color: '#bfdbfe',
+            marginTop: '4px',
+            opacity: 0.8
+          }}>
+            💡 Drag column edges to resize width • Drag row edges to resize height
+          </div>
+        </div>
         <span style={{
           color: '#bfdbfe',
           fontSize: '0.9rem',
@@ -197,26 +206,10 @@ const ResizableTable: React.FC<ResizableTableProps> = ({
               {headers.map((header, index) => (
                 <th key={index} style={getHeaderStyle(index)}>
                   {header || `Column ${index + 1}`}
-                                     <div
-                     style={{
-                       position: 'absolute',
-                       right: 0,
-                       top: 0,
-                       bottom: 0,
-                       width: '6px',
-                       background: 'rgba(255, 255, 255, 0.3)',
-                       cursor: 'col-resize',
-                       zIndex: 10,
-                       transition: 'background-color 0.2s ease'
-                     }}
-                     onMouseDown={(e) => handleMouseDown(e, 'column', index)}
-                     onMouseEnter={(e) => {
-                       e.currentTarget.style.background = 'rgba(255, 255, 255, 0.6)';
-                     }}
-                     onMouseLeave={(e) => {
-                       e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
-                     }}
-                   />
+                  <div
+                    className="resize-handle column"
+                    onMouseDown={(e) => handleMouseDown(e, 'column', index)}
+                  />
                 </th>
               ))}
             </tr>
@@ -234,27 +227,11 @@ const ResizableTable: React.FC<ResizableTableProps> = ({
                     {cell === null || cell === undefined ? '' : String(cell)}
                   </td>
                 ))}
-                                 {/* Row resize handle */}
-                 <div
-                   style={{
-                     position: 'absolute',
-                     bottom: 0,
-                     left: 0,
-                     right: 0,
-                     height: '6px',
-                     background: 'rgba(255, 255, 255, 0.3)',
-                     cursor: 'row-resize',
-                     zIndex: 10,
-                     transition: 'background-color 0.2s ease'
-                   }}
-                   onMouseDown={(e) => handleMouseDown(e, 'row', rowIndex)}
-                   onMouseEnter={(e) => {
-                     e.currentTarget.style.background = 'rgba(255, 255, 255, 0.6)';
-                   }}
-                   onMouseLeave={(e) => {
-                     e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
-                   }}
-                 />
+                {/* Row resize handle */}
+                <div
+                  className="resize-handle row"
+                  onMouseDown={(e) => handleMouseDown(e, 'row', rowIndex)}
+                />
               </tr>
             ))}
           </tbody>

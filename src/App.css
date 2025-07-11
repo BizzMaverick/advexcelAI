@@ -759,18 +759,53 @@
 
 /* Resize indicator */
 .resizable-table.resizing {
-  cursor: col-resize;
+  cursor: col-resize !important;
 }
 
 .resizable-table.resizing-row {
-  cursor: row-resize;
+  cursor: row-resize !important;
 }
 
 /* Prevent text selection during resize */
-.resizable-table.resizing * {
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
+.resizable-table.resizing *,
+.resizable-table.resizing-row * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+}
+
+/* Visual feedback during resize */
+.resizable-table.resizing th,
+.resizable-table.resizing-row tr {
+  background: rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Resize handle styles */
+.resize-handle {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.3);
+  transition: background-color 0.2s ease;
+  z-index: 10;
+}
+
+.resize-handle:hover {
+  background: rgba(255, 255, 255, 0.6) !important;
+}
+
+.resize-handle.column {
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  cursor: col-resize;
+}
+
+.resize-handle.row {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  cursor: row-resize;
 }
  
