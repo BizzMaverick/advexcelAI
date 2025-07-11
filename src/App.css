@@ -712,3 +712,65 @@
   }
 }
  
+/* Resizable Table Styles */
+.resizable-table {
+  position: relative;
+}
+
+.resizable-table th {
+  position: relative;
+}
+
+.resizable-table th::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  cursor: col-resize;
+  transition: background-color 0.2s ease;
+}
+
+.resizable-table th:hover::after {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.resizable-table tr {
+  position: relative;
+}
+
+.resizable-table tr::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  cursor: row-resize;
+  transition: background-color 0.2s ease;
+}
+
+.resizable-table tr:hover::after {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+/* Resize indicator */
+.resizable-table.resizing {
+  cursor: col-resize;
+}
+
+.resizable-table.resizing-row {
+  cursor: row-resize;
+}
+
+/* Prevent text selection during resize */
+.resizable-table.resizing * {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+ 

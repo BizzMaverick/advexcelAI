@@ -3,6 +3,7 @@ import './App.css';
 import * as XLSX from 'xlsx';
 import { AIService } from './services/aiService';
 import LandingPage from './LandingPage';
+import ResizableTable from './components/ResizableTable';
 
 // Supported file types
 const SUPPORTED_EXTENSIONS = [
@@ -450,86 +451,12 @@ function App() {
           
           {/* Spreadsheet Display */}
           {spreadsheetData.length > 0 && (
-            <div style={{
-              background: 'rgba(255, 255, 255, 0.05)',
-              borderRadius: '12px',
-              padding: '20px',
-              margin: '20px 0',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.1)'
-            }}>
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: '20px',
-                paddingBottom: '15px',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
-              }}>
-                <h3 style={{
-                  fontSize: '1.5rem',
-                  fontWeight: 600,
-                  color: '#ffffff',
-                  margin: 0,
-                  textShadow: '0 2px 8px rgba(30, 58, 138, 0.5)'
-                }}>Spreadsheet Data</h3>
-                <span style={{
-                  color: '#bfdbfe',
-                  fontSize: '0.9rem',
-                  fontWeight: 400
-                }}>Rows: {spreadsheetData.length} | Columns: {headers.length}</span>
-              </div>
-              <div style={{
-                overflow: 'auto',
-                maxHeight: '500px',
-                borderRadius: '8px',
-                border: '1px solid rgba(255, 255, 255, 0.1)'
-              }}>
-                <table style={{
-                  width: '100%',
-                  borderCollapse: 'collapse',
-                  fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
-                  fontSize: '0.9rem'
-                }}>
-                  <thead>
-                    <tr style={{
-                      background: 'rgba(59, 130, 246, 0.2)',
-                      borderBottom: '2px solid rgba(59, 130, 246, 0.3)'
-                    }}>
-                      {headers.map((header, index) => (
-                        <th key={index} style={{
-                          padding: '12px 8px',
-                          textAlign: 'left',
-                          color: '#ffffff',
-                          fontWeight: 600,
-                          borderRight: '1px solid rgba(255, 255, 255, 0.1)',
-                          fontSize: '0.85rem'
-                        }}>{header || `Column ${index + 1}`}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {spreadsheetData.slice(1)
-                      .filter(row => row.some(cell => cell !== null && cell !== undefined && cell !== ''))
-                      .map((row, rowIndex) => (
-                        <tr key={rowIndex} style={{
-                          borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-                          background: rowIndex % 2 === 0 ? 'rgba(255, 255, 255, 0.02)' : 'transparent'
-                        }}>
-                          {row.map((cell, cellIndex) => (
-                            <td key={cellIndex} style={{
-                              padding: '8px',
-                              color: '#e0f2fe',
-                              borderRight: '1px solid rgba(255, 255, 255, 0.05)',
-                              fontSize: '0.8rem'
-                            }}>{cell === null || cell === undefined ? '' : String(cell)}</td>
-                          ))}
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+            <ResizableTable
+              data={spreadsheetData.slice(1).filter(row => row.some(cell => cell !== null && cell !== undefined && cell !== ''))}
+              headers={headers}
+              title="Spreadsheet Data"
+              subtitle={`Rows: ${spreadsheetData.length} | Columns: ${headers.length}`}
+            />
           )}
 
           {/* AI Output */}
@@ -564,91 +491,13 @@ function App() {
             </div>
           )}
           {aiResultData && aiResultData.length > 0 && (
-            <div style={{
-              background: 'rgba(255, 255, 255, 0.05)',
-              borderRadius: '12px',
-              padding: '20px',
-              margin: '20px 0',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.1)'
-            }}>
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: '20px',
-                paddingBottom: '15px',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
-              }}>
-                <h3 style={{
-                  fontSize: '1.5rem',
-                  fontWeight: 600,
-                  color: '#ffffff',
-                  margin: 0,
-                  textShadow: '0 2px 8px rgba(30, 58, 138, 0.5)'
-                }}>AI Result Data</h3>
-                <span style={{
-                  color: '#bfdbfe',
-                  fontSize: '0.9rem',
-                  fontWeight: 400
-                }}>Rows: {aiResultData.length} | Columns: {aiResultData[0]?.length || 0}</span>
-              </div>
-              <div style={{
-                overflow: 'auto',
-                maxHeight: '500px',
-                borderRadius: '8px',
-                border: '1px solid rgba(255, 255, 255, 0.1)'
-              }}>
-                <table style={{
-                  width: '100%',
-                  borderCollapse: 'collapse',
-                  fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
-                  fontSize: '0.9rem'
-                }}>
-                  <thead>
-                    <tr style={{
-                      background: 'rgba(59, 130, 246, 0.2)',
-                      borderBottom: '2px solid rgba(59, 130, 246, 0.3)'
-                    }}>
-                      {aiResultData[0].map((_, index) => (
-                        <th key={index} style={{
-                          padding: '12px 8px',
-                          textAlign: 'left',
-                          color: '#ffffff',
-                          fontWeight: 600,
-                          borderRight: '1px solid rgba(255, 255, 255, 0.1)',
-                          fontSize: '0.85rem'
-                        }}>{headers[index] || `Column ${index + 1}`}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {aiResultData.map((row, rowIndex) => (
-                      <tr key={rowIndex} style={{
-                        borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-                        background: rowIndex % 2 === 0 ? 'rgba(255, 255, 255, 0.02)' : 'transparent'
-                      }}>
-                        {row.map((cell, cellIndex) => {
-                          const fmt = aiFormatting && aiFormatting[rowIndex] && aiFormatting[rowIndex][cellIndex] ? aiFormatting[rowIndex][cellIndex] : {};
-                          const style: React.CSSProperties = {
-                            padding: '8px',
-                            color: fmt.color || '#e0f2fe',
-                            background: fmt.background || 'transparent',
-                            fontWeight: fmt.bold ? 'bold' : 'normal',
-                            fontStyle: fmt.italic ? 'italic' : 'normal',
-                            borderRight: '1px solid rgba(255, 255, 255, 0.05)',
-                            fontSize: '0.8rem'
-                          };
-                          return (
-                            <td key={cellIndex} style={style}>{cell === null || cell === undefined ? '' : String(cell)}</td>
-                          );
-                        })}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+            <ResizableTable
+              data={aiResultData}
+              headers={headers}
+              formatting={aiFormatting || undefined}
+              title="AI Result Data"
+              subtitle={`Rows: ${aiResultData.length} | Columns: ${aiResultData[0]?.length || 0}`}
+            />
           )}
         </div>
       </div>
