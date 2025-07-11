@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, MouseEvent } from 'react';
+import { useState, useRef, useEffect, MouseEvent, KeyboardEvent } from 'react';
 
 interface ResizableTableProps {
   data: (string | number | boolean | null | undefined)[][];
@@ -27,6 +27,10 @@ const ResizableTable: React.FC<ResizableTableProps> = ({
   const [rowHeights, setRowHeights] = useState<RowHeights>({});
   const [isResizing, setIsResizing] = useState(false);
   const [resizeType, setResizeType] = useState<'column' | 'row' | null>(null);
+  const [showDimensionInput, setShowDimensionInput] = useState(false);
+  const [dimensionInput, setDimensionInput] = useState('');
+  const [activeDimension, setActiveDimension] = useState<{type: 'column' | 'row', index: number} | null>(null);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   
   const tableRef = useRef<HTMLTableElement>(null);
   const isResizingRef = useRef(false);
@@ -67,6 +71,8 @@ const ResizableTable: React.FC<ResizableTableProps> = ({
     
     setIsResizing(true);
     setResizeType(type);
+    setShowDimensionInput(true);
+    setActiveDimension({ type, index });
     
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
@@ -83,16 +89,21 @@ const ResizableTable: React.FC<ResizableTableProps> = ({
 
     console.log('Mouse move:', currentPos, delta, newSize);
 
+    // Update mouse position for dimension display
+    setMousePosition({ x: e.clientX, y: e.clientY });
+
     if (resizeTypeRef.current === 'column') {
       setColumnWidths(prev => ({
         ...prev,
         [resizeIndexRef.current]: newSize
       }));
+      setDimensionInput(newSize.toString());
     } else {
       setRowHeights(prev => ({
         ...prev,
         [resizeIndexRef.current]: newSize
       }));
+      setDimensionInput(newSize.toString());
     }
   };
 
@@ -104,9 +115,60 @@ const ResizableTable: React.FC<ResizableTableProps> = ({
     
     setIsResizing(false);
     setResizeType(null);
+    setShowDimensionInput(false);
+    setActiveDimension(null);
     
     document.removeEventListener('mousemove', handleMouseMove);
     document.removeEventListener('mouseup', handleMouseUp);
+  };
+
+  const handleDimensionInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDimensionInput(e.target.value);
+  };
+
+  const handleDimensionInputKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && activeDimension) {
+      const newSize = parseInt(dimensionInput);
+      if (!isNaN(newSize) && newSize >= 50) {
+        if (activeDimension.type === 'column') {
+          setColumnWidths(prev => ({
+            ...prev,
+            [activeDimension.index]: newSize
+          }));
+        } else {
+          setRowHeights(prev => ({
+            ...prev,
+            [activeDimension.index]: newSize
+          }));
+        }
+        setShowDimensionInput(false);
+        setActiveDimension(null);
+      }
+    } else if (e.key === 'Escape') {
+      setShowDimensionInput(false);
+      setActiveDimension(null);
+    }
+  };
+
+  const handleDimensionInputBlur = () => {
+    if (activeDimension) {
+      const newSize = parseInt(dimensionInput);
+      if (!isNaN(newSize) && newSize >= 50) {
+        if (activeDimension.type === 'column') {
+          setColumnWidths(prev => ({
+            ...prev,
+            [activeDimension.index]: newSize
+          }));
+        } else {
+          setRowHeights(prev => ({
+            ...prev,
+            [activeDimension.index]: newSize
+          }));
+        }
+      }
+    }
+    setShowDimensionInput(false);
+    setActiveDimension(null);
   };
 
   const getColumnWidth = (index: number) => {
@@ -186,7 +248,7 @@ const ResizableTable: React.FC<ResizableTableProps> = ({
             marginTop: '4px',
             fontFamily: 'Calibri, "Segoe UI", Arial, sans-serif'
           }}>
-            💡 Drag column edges to resize width • Drag row edges to resize height
+            💡 Drag column edges to resize width • Drag row edges to resize height • Double-click to enter exact dimensions
           </div>
         </div>
         <span style={{
@@ -202,7 +264,8 @@ const ResizableTable: React.FC<ResizableTableProps> = ({
         maxHeight: '500px',
         borderRadius: '6px',
         border: '1px solid #d1d5db',
-        background: '#ffffff'
+        background: '#ffffff',
+        position: 'relative'
       }}>
         <table 
           ref={tableRef}
@@ -227,6 +290,11 @@ const ResizableTable: React.FC<ResizableTableProps> = ({
                   <div
                     className="resize-handle column"
                     onMouseDown={(e) => handleMouseDown(e, 'column', index)}
+                    onDoubleClick={() => {
+                      setShowDimensionInput(true);
+                      setActiveDimension({ type: 'column', index });
+                      setDimensionInput(getColumnWidth(index).toString());
+                    }}
                     style={{
                       position: 'absolute',
                       right: 0,
@@ -266,6 +334,11 @@ const ResizableTable: React.FC<ResizableTableProps> = ({
                 <div
                   className="resize-handle row"
                   onMouseDown={(e) => handleMouseDown(e, 'row', rowIndex)}
+                  onDoubleClick={() => {
+                    setShowDimensionInput(true);
+                    setActiveDimension({ type: 'row', index: rowIndex });
+                    setDimensionInput(getRowHeight(rowIndex).toString());
+                  }}
                   style={{
                     position: 'absolute',
                     bottom: 0,
@@ -288,6 +361,72 @@ const ResizableTable: React.FC<ResizableTableProps> = ({
             ))}
           </tbody>
         </table>
+
+        {/* Dimension Display and Input */}
+        {showDimensionInput && (
+          <div style={{
+            position: 'fixed',
+            left: mousePosition.x + 10,
+            top: mousePosition.y - 30,
+            background: '#1f2937',
+            color: '#ffffff',
+            padding: '8px 12px',
+            borderRadius: '4px',
+            fontSize: '12px',
+            fontFamily: 'Calibri, "Segoe UI", Arial, sans-serif',
+            zIndex: 1000,
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+            border: '1px solid #374151'
+          }}>
+            {activeDimension?.type === 'column' ? (
+              <div>
+                <div>Column Width: {getColumnWidth(activeDimension.index)}px</div>
+                <input
+                  type="number"
+                  value={dimensionInput}
+                  onChange={handleDimensionInputChange}
+                  onKeyDown={handleDimensionInputKeyDown}
+                  onBlur={handleDimensionInputBlur}
+                  style={{
+                    width: '60px',
+                    padding: '2px 4px',
+                    fontSize: '11px',
+                    border: '1px solid #6b7280',
+                    borderRadius: '2px',
+                    background: '#ffffff',
+                    color: '#1f2937',
+                    marginTop: '4px'
+                  }}
+                  placeholder="Enter width"
+                  min="50"
+                />
+              </div>
+            ) : (
+              <div>
+                <div>Row Height: {getRowHeight(activeDimension?.index || 0)}px</div>
+                <input
+                  type="number"
+                  value={dimensionInput}
+                  onChange={handleDimensionInputChange}
+                  onKeyDown={handleDimensionInputKeyDown}
+                  onBlur={handleDimensionInputBlur}
+                  style={{
+                    width: '60px',
+                    padding: '2px 4px',
+                    fontSize: '11px',
+                    border: '1px solid #6b7280',
+                    borderRadius: '2px',
+                    background: '#ffffff',
+                    color: '#1f2937',
+                    marginTop: '4px'
+                  }}
+                  placeholder="Enter height"
+                  min="50"
+                />
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
