@@ -142,10 +142,16 @@ function App() {
         setAiFormatting(null);
       }
     } catch (err: unknown) {
+      console.error('AI processing error:', err);
       if (err instanceof Error) {
-        setAiError(err.message || 'AI processing failed');
+        // Check if it's a server connection error
+        if (err.message.includes('Server error') || err.message.includes('Network error')) {
+          setAiError(`${err.message}\n\nTo fix this:\n1. Make sure the backend server is running (npm start)\n2. Check if port 5001 is available\n3. Verify your OpenAI API key is set in .env file`);
+        } else {
+          setAiError(err.message || 'AI processing failed');
+        }
       } else {
-        setAiError('AI processing failed');
+        setAiError('AI processing failed - unknown error occurred');
       }
     } finally {
       setAiLoading(false);
