@@ -4,6 +4,7 @@ import * as XLSX from 'xlsx';
 import { AIService } from './services/aiService';
 import LandingPage from './LandingPage';
 import ResizableTable from './components/ResizableTable';
+import React, { useState, useRef, useEffect } from 'react';
 
 // Supported file types
 const SUPPORTED_EXTENSIONS = [
@@ -36,6 +37,49 @@ type AIResult = {
   newData?: SpreadsheetData;
   formatting?: SpreadsheetFormatting;
 };
+
+// Add fuzzy string matching utility (Levenshtein distance)
+function levenshtein(a: string, b: string): number {
+  const matrix = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+  for (let j = 1; j <= b.length; j++) matrix[0][j] = j;
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      if (a[i - 1] === b[j - 1]) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1, // substitution
+          matrix[i][j - 1] + 1,     // insertion
+          matrix[i - 1][j] + 1      // deletion
+        );
+      }
+    }
+  }
+  return matrix[a.length][b.length];
+}
+
+// List of supported UI command templates for suggestions
+const uiCommandTemplates = [
+  'set column 1 width to 100',
+  'set all columns width to 80',
+  'set row 1 height to 40',
+  'set all rows height to 40',
+  'freeze first row',
+  'hide column 1',
+  'show column 1',
+  'show gridlines',
+  'hide gridlines',
+];
+
+function getClosestUICommands(input: string, maxDistance = 6) {
+  // Return the closest UI command templates within a distance threshold
+  const distances = uiCommandTemplates.map(cmd => ({
+    cmd,
+    dist: levenshtein(input.toLowerCase(), cmd.toLowerCase())
+  }));
+  const minDist = Math.min(...distances.map(d => d.dist));
+  return distances.filter(d => d.dist <= Math.max(maxDistance, minDist)).map(d => d.cmd);
+}
 
 // File processing function
 const processFile = async (file: File): Promise<SpreadsheetData> => {
@@ -103,6 +147,7 @@ function App() {
     hideGridlines: () => void;
   }>(null);
   const [userFeedback, setUserFeedback] = useState<string | null>(null);
+  const [promptSuggestion, setPromptSuggestion] = useState<string | null>(null);
   
   // File validation function
   const validateFile = (file: File): { isValid: boolean; error?: string } => {
@@ -254,6 +299,7 @@ function App() {
     // 1. Try regex-based UI command parser
     const uiCommand = parseUICommand(prompt);
     if (uiCommand) {
+      setPromptSuggestion(null); // clear suggestion
       // Handle UI commands
       if (uiCommand.type === 'setColumnWidth' && typeof uiCommand.col === 'number' && typeof uiCommand.width === 'number') {
         resizableTableRef.current?.setColumnWidth(uiCommand.col, uiCommand.width);
@@ -304,11 +350,29 @@ function App() {
     // 2. If not matched, use OpenAI to classify
     const aiIntent = await classifyPromptWithAI(prompt);
     if (aiIntent === 'ui') {
-      setUserFeedback('This looks like a UI command, but it is not recognized. Please use a supported format.');
+      // Try to suggest the closest valid UI command
+      const suggestions = getClosestUICommands(prompt);
+      if (suggestions.length > 0) {
+        setPromptSuggestion(suggestions[0]);
+        setUserFeedback(`Did you mean: "${suggestions[0]}"? Click to accept.`);
+      } else {
+        setPromptSuggestion(null);
+        setUserFeedback('This looks like a UI command, but it is not recognized. Please use a supported format.');
+      }
       return;
     }
+    setPromptSuggestion(null);
     // 3. Otherwise, send to backend/AI
     handleRunAI();
+  }
+
+  // Add handler for accepting prompt suggestion
+  function handleAcceptSuggestion() {
+    if (promptSuggestion) {
+      setPrompt(promptSuggestion);
+      setPromptSuggestion(null);
+      setTimeout(() => handleUserPrompt(), 0); // re-run with suggestion
+    }
   }
 
   useEffect(() => {
@@ -370,6 +434,30 @@ function App() {
         </div>
         
         <div style={{ flex: 1 }}>
+          {/* Prompt input and suggestion UI */}
+          <div style={{ margin: '20px 0', textAlign: 'center' }}>
+            <input
+              type="text"
+              value={prompt}
+              onChange={e => setPrompt(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') handleUserPrompt(); }}
+              placeholder="Type a command or ask a question..."
+              style={{ width: '60%', padding: '10px', fontSize: '1.1rem', borderRadius: 6, border: '1px solid #ccc', fontFamily: 'Hammersmith One, Segoe UI, Arial, sans-serif' }}
+            />
+            <button
+              onClick={handleUserPrompt}
+              style={{ marginLeft: 12, padding: '10px 18px', fontSize: '1.1rem', borderRadius: 6, border: 'none', background: '#2563eb', color: 'white', fontWeight: 600, cursor: 'pointer' }}
+            >Go</button>
+            {promptSuggestion && (
+              <div style={{ marginTop: 10, color: '#fbbf24', background: '#1e293b', padding: '8px 16px', borderRadius: 6, display: 'inline-block', cursor: 'pointer', fontWeight: 500 }}
+                onClick={handleAcceptSuggestion}
+                title="Click to accept suggestion"
+              >
+                Did you mean: <span style={{ textDecoration: 'underline', color: '#38bdf8' }}>{promptSuggestion}</span>?
+                <span style={{ marginLeft: 8, color: '#38bdf8' }}>[Click to accept]</span>
+              </div>
+            )}
+          </div>
           {spreadsheetData.length > 0 && (
             <div style={{
               marginBottom: '20px',
