@@ -39,68 +39,7 @@ type AIResult = {
   formatting?: SpreadsheetFormatting;
 };
 
-// Add fuzzy string matching utility (Levenshtein distance)
-function levenshtein(a: string, b: string): number {
-  const matrix = Array.from({ length: a.length + 1 }, (_, i) => [i]);
-  for (let j = 1; j <= b.length; j++) matrix[0][j] = j;
-  for (let i = 1; i <= a.length; i++) {
-    for (let j = 1; j <= b.length; j++) {
-      if (a[i - 1] === b[j - 1]) {
-        matrix[i][j] = matrix[i - 1][j - 1];
-      } else {
-        matrix[i][j] = Math.min(
-          matrix[i - 1][j - 1] + 1, // substitution
-          matrix[i][j - 1] + 1,     // insertion
-          matrix[i - 1][j] + 1      // deletion
-        );
-      }
-    }
-  }
-  return matrix[a.length][b.length];
-}
 
-// Add this utility to extract numbers from a string
-function extractNumbers(str: string): number[] {
-  return (str.match(/\d+/g) || []).map(Number);
-}
-
-// Update getClosestUICommands to also substitute numbers from the input into the template
-function getPersonalizedSuggestion(input: string, template: string): string {
-  const inputNumbers = extractNumbers(input);
-  let result = template;
-  // Replace numbers in template with those from input, in order
-  let i = 0;
-  result = result.replace(/\d+/g, () => {
-    const val = inputNumbers[i];
-    i++;
-    return val !== undefined ? String(val) : '';
-  });
-  return result;
-}
-
-// List of supported UI command templates for suggestions
-const uiCommandTemplates = [
-  'set column 1 width to 100',
-  'set all columns width to 80',
-  'set row 1 height to 40',
-  'set all rows height to 40',
-  'freeze first row',
-  'hide column 1',
-  'show column 1',
-  'show gridlines',
-  'hide gridlines',
-];
-
-function getClosestUICommands(input: string, maxDistance = 6) {
-  // Return the closest UI command templates within a distance threshold
-  const distances = uiCommandTemplates.map(cmd => ({
-    cmd,
-    dist: levenshtein(input.toLowerCase(), cmd.toLowerCase())
-  }));
-  const minDist = Math.min(...distances.map(d => d.dist));
-  // Return personalized suggestions
-  return distances.filter(d => d.dist <= Math.max(maxDistance, minDist)).map(d => getPersonalizedSuggestion(input, d.cmd));
-}
 
 const presetColors: string[] = ['#e5e7eb', '#fbbf24', '#34d399', '#60a5fa', '#a78bfa', '#f472b6', '#f87171', '#facc15', '#38bdf8', '#6366f1'];
 
@@ -163,29 +102,7 @@ function App() {
   const [contextMenuAnchor, setContextMenuAnchor] = useState<{ x: number; y: number } | null>(null);
   const contextMenuRef = useRef<HTMLDivElement | null>(null);
   
-  // File validation function
-  // Remove: const validateFile = (file: File): { isValid: boolean; error?: string } => {
-  // Remove:   // Check file size (max 10MB)
-  // Remove:   if (file.size > 10 * 1024 * 1024) {
-  // Remove:   //   return { isValid: false, error: 'File size must be less than 10MB' };
-  // Remove:   // }
-    
-  // Remove:   // Check file extension
-  // Remove:   const extension = '.' + file.name.split('.').pop()?.toLowerCase();
-  // Remove:   if (!SUPPORTED_EXTENSIONS.includes(extension)) {
-  // Remove:   //   return { 
-  // Remove:   //   isValid: false, 
-  // Remove:   //   error: `Unsupported file type. Supported formats: ${SUPPORTED_EXTENSIONS.join(', ')}` 
-  // Remove:   //   };
-  // Remove:   // }
-    
-  // Remove:   // Check MIME type (optional, as some systems may not report correct MIME types)
-  // Remove:   if (file.type && !SUPPORTED_MIME_TYPES.includes(file.type)) {
-  // Remove:   //   console.warn(`MIME type ${file.type} not in supported list, but continuing with extension check`);
-  // Remove:   // }
-    
-  // Remove:   return { isValid: true };
-  // Remove: };
+
   
   // AI prompt handler
   const handleRunAI = async () => {
@@ -276,44 +193,15 @@ function App() {
     return null;
   }
 
-  // OpenAI-powered intent classifier for ambiguous prompts
-  async function classifyPromptWithAI(prompt: string): Promise<'ui' | 'data' | 'unknown'> {
-    // Use OpenAI to classify the prompt
-    try {
-      const systemPrompt = `Classify the following prompt as either 'ui' (if it is about column width, row height, freeze, hide, show, gridlines, etc.) or 'data' (if it is about formulas, values, formatting, calculations, etc.). Only reply with 'ui' or 'data'.`;
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: prompt }
-          ],
-          max_tokens: 1,
-          temperature: 0
-        })
-      });
-      const data = await response.json();
-      const content = data.choices?.[0]?.message?.content?.trim().toLowerCase();
-      if (content === 'ui') return 'ui';
-      if (content === 'data') return 'data';
-      return 'unknown';
-    } catch (e) {
-      return 'unknown';
-    }
-  }
+
 
   // Unified prompt handler
-  async function handleUserPrompt() {
+  function handleUserPrompt() {
     if (!prompt.trim() || !selectedFile) return;
-    // 1. Try regex-based UI command parser
+    // 1. Try regex-based UI command parser for exact matches only
     const uiCommand = parseUICommand(prompt);
     if (uiCommand) {
-      setPromptSuggestion(null); // clear suggestion
+      setPromptSuggestion(null);
       // Handle UI commands
       if (uiCommand.type === 'setColumnWidth' && typeof uiCommand.col === 'number' && typeof uiCommand.width === 'number') {
         resizableTableRef.current?.setColumnWidth(uiCommand.col, uiCommand.width);
@@ -361,33 +249,12 @@ function App() {
         return;
       }
     }
-    // 2. If not matched, use OpenAI to classify
-    const aiIntent = await classifyPromptWithAI(prompt);
-    if (aiIntent === 'ui') {
-      // Try to suggest the closest valid UI command
-      const suggestions = getClosestUICommands(prompt);
-      if (suggestions.length > 0) {
-        setPromptSuggestion(suggestions[0]);
-        setUserFeedback(`Did you mean: "${suggestions[0]}"? Click to accept.`);
-      } else {
-        setPromptSuggestion(null);
-        setUserFeedback('This looks like a UI command, but it is not recognized. Please use a supported format.');
-      }
-      return;
-    }
+    // 2. For everything else, send directly to AI
     setPromptSuggestion(null);
-    // 3. Otherwise, send to backend/AI
     handleRunAI();
   }
 
-  // Add handler for accepting prompt suggestion
-  function handleAcceptSuggestion() {
-    if (promptSuggestion) {
-      setPrompt(promptSuggestion);
-      setPromptSuggestion(null);
-      setTimeout(() => handleUserPrompt(), 0); // re-run with suggestion
-    }
-  }
+
 
   const handleCellEdit = (row: number, col: number, value: string) => {
     if (isCurrentSheetLocked) return;
@@ -450,6 +317,13 @@ function App() {
       return () => clearTimeout(timer);
     }
   }, [showSuccess]);
+
+  useEffect(() => {
+    if (userFeedback) {
+      const timer = setTimeout(() => setUserFeedback(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [userFeedback]);
 
   useEffect(() => {
     if (contextMenuSheet === null) return;
@@ -533,15 +407,7 @@ function App() {
                 style={{ marginLeft: 12, padding: '10px 18px', fontSize: '1.1rem', borderRadius: 6, border: 'none', background: '#2563eb', color: 'white', fontWeight: 600, cursor: 'pointer' }}
                 disabled={!prompt.trim() || aiLoading}
               >{aiLoading ? 'Processing...' : 'Go'}</button>
-              {promptSuggestion && (
-                <div style={{ marginTop: 10, color: '#fbbf24', background: '#1e293b', padding: '8px 16px', borderRadius: 6, display: 'inline-block', cursor: 'pointer', fontWeight: 500 }}
-                  onClick={handleAcceptSuggestion}
-                  title="Click to accept suggestion"
-                >
-                  Did you mean: <span style={{ textDecoration: 'underline', color: '#38bdf8' }}>{promptSuggestion}</span>?
-                  <span style={{ marginLeft: 8, color: '#38bdf8' }}>[Click to accept]</span>
-                </div>
-              )}
+
             </div>
           )}
           {/* File upload UI remains unchanged */}
@@ -927,6 +793,13 @@ function App() {
             </div>
             <div style={{ display: 'flex', gap: '10px' }}>
               <button 
+                onClick={() => {
+                  if (!spreadsheetData.length) return;
+                  const ws = XLSX.utils.aoa_to_sheet(spreadsheetData);
+                  const wb = XLSX.utils.book_new();
+                  XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+                  XLSX.writeFile(wb, 'spreadsheet.xlsx');
+                }}
                 style={{
                   padding: '8px 16px',
                   background: 'linear-gradient(90deg, #3b82f6 0%, #1e40af 100%)',
@@ -946,6 +819,17 @@ function App() {
                 Download Excel
               </button>
               <button 
+                onClick={() => {
+                  if (!spreadsheetData.length) return;
+                  const csv = spreadsheetData.map(row => row.map(cell => `"${cell || ''}"`).join(',')).join('\n');
+                  const blob = new Blob([csv], { type: 'text/csv' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = 'spreadsheet.csv';
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
                 style={{
                   padding: '8px 16px',
                   background: 'linear-gradient(90deg, #3b82f6 0%, #1e40af 100%)',
