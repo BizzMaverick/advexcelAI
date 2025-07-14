@@ -10,7 +10,7 @@ dotenv.config();
 
 const app = express();
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174'],
+  origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'],
   credentials: true
 }));
 app.use(express.json({ limit: '50mb' }));
@@ -52,12 +52,19 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
       console.log('About to call Gemini...');
       const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
       
-      const systemPrompt = `You are an Excel AI assistant. When the user asks for a change, you MUST return ONLY a valid JSON object with two keys: 'data' (the updated spreadsheet as an array of arrays) and 'formatting' (an array of arrays of formatting objects, matching the data structure, with keys like 'color', 'background', 'bold', 'italic'). Do not return any explanation, markdown, or extra text.
+      const systemPrompt = `You are an Excel AI assistant. Analyze the user's request carefully and return ONLY a valid JSON object.
+
+IMPORTANT RULES:
+1. ALWAYS include the header row as the first row in your response
+2. For FILTERING ("show only", "where", "<", ">", "="): Return header + only matching rows
+3. For SORTING ("sort by"): Return header + all rows sorted by specified column
+4. For FORMATTING ("highlight", "color", "bold"): Return original data with formatting array
+5. Be precise with numerical comparisons
 
 User request: "${prompt}"
-
 Spreadsheet data: ${JSON.stringify(spreadsheetData)}
 
+Return format: {"data": [["Header1", "Header2"], ["row1col1", "row1col2"]], "formatting": [[{}, {}], [{}, {}]]}
 Return only the JSON object.`;
 
       try {
@@ -97,9 +104,28 @@ Return only the JSON object.`;
         
       } catch (geminiErr) {
         console.error('Error during Gemini API call:', geminiErr);
+        
+        // Check for rate limiting
+        if (geminiErr.message && geminiErr.message.includes('429')) {
+          return res.status(429).json({ 
+            error: 'Rate limit exceeded', 
+            details: 'Gemini free tier allows 15 requests/minute. Please wait a moment and try again.',
+            retryAfter: 60
+          });
+        }
+        
+        // Check for quota exceeded
+        if (geminiErr.message && (geminiErr.message.includes('quota') || geminiErr.message.includes('QUOTA'))) {
+          return res.status(429).json({ 
+            error: 'API quota exceeded', 
+            details: 'Gemini monthly quota reached. Try again next month or upgrade your plan.',
+            retryAfter: 3600
+          });
+        }
+        
         return res.status(500).json({ 
           error: 'Gemini API call failed', 
-          details: geminiErr.message 
+          details: geminiErr.message || 'Unknown error occurred'
         });
       }
     } else {

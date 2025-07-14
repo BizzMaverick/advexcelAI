@@ -3,6 +3,7 @@ import './App.css';
 import { AIService } from './services/aiService';
 import LandingPage from './LandingPage';
 import ResizableTable from './components/ResizableTable';
+import HelpPanel from './components/HelpPanel';
 import * as XLSX from 'xlsx';
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import {
@@ -101,6 +102,7 @@ function App() {
   const [contextMenuSheet, setContextMenuSheet] = useState<number | null>(null);
   const [contextMenuAnchor, setContextMenuAnchor] = useState<{ x: number; y: number } | null>(null);
   const contextMenuRef = useRef<HTMLDivElement | null>(null);
+  const [showHelp, setShowHelp] = useState(false);
   
 
   
@@ -134,7 +136,11 @@ function App() {
       if (err instanceof Error) {
         // Check if it's a server connection error
         if (err.message.includes('Server error') || err.message.includes('Network error')) {
-          setAiError(`${err.message}\n\nTo fix this:\n1. Make sure the backend server is running (npm start)\n2. Check if port 5001 is available\n3. Verify your OpenAI API key is set in .env file`);
+          setAiError(`${err.message}\n\nTo fix this:\n1. Make sure the backend server is running (npm start)\n2. Check if port 5001 is available\n3. Verify your AI API key is set in .env file`);
+        } else if (err.message.includes('Rate limit') || err.message.includes('429')) {
+          setAiError('Rate limit exceeded. Gemini free tier allows 15 requests/minute. Please wait a moment and try again.');
+        } else if (err.message.includes('quota') || err.message.includes('QUOTA')) {
+          setAiError('API quota exceeded. You may have reached your monthly limit. Try again later or check your Gemini API usage.');
         } else {
           setAiError(err.message || 'AI processing failed');
         }
@@ -370,23 +376,47 @@ function App() {
           padding: 'clamp(10px, 2vw, 20px) 0',
           fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif'
         }}>
-          <h1 style={{
-            fontSize: 'clamp(1.3rem, 4vw, 2.4rem)',
-            fontWeight: 700,
-            color: '#ffffff',
-            textShadow: '0 2px 8px rgba(30, 58, 138, 0.5)',
-            marginBottom: '10px',
-            letterSpacing: 1,
-            fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif'
-          }}>Advanced Excel AI Assistant</h1>
-          <p style={{
-            fontSize: 'clamp(0.9rem, 2vw, 1.2rem)',
-            color: '#bfdbfe',
-            fontWeight: 400,
-            textShadow: '0 1px 4px rgba(30, 58, 138, 0.5)',
-            lineHeight: 1.6,
-            fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif'
-          }}>Upload your Excel files and use AI to perform advanced operations</p>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '20px' }}>
+            <div>
+              <h1 style={{
+                fontSize: 'clamp(1.3rem, 4vw, 2.4rem)',
+                fontWeight: 700,
+                color: '#ffffff',
+                textShadow: '0 2px 8px rgba(30, 58, 138, 0.5)',
+                marginBottom: '10px',
+                letterSpacing: 1,
+                fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif'
+              }}>🤖 Excel AI Assistant</h1>
+              <p style={{
+                fontSize: 'clamp(0.9rem, 2vw, 1.2rem)',
+                color: '#bfdbfe',
+                fontWeight: 400,
+                textShadow: '0 1px 4px rgba(30, 58, 138, 0.5)',
+                lineHeight: 1.6,
+                fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif'
+              }}>Upload Excel files → Type what you want → Get results instantly!</p>
+            </div>
+            <button
+              onClick={() => setShowHelp(true)}
+              style={{
+                background: 'rgba(255,255,255,0.2)',
+                border: '2px solid rgba(255,255,255,0.3)',
+                borderRadius: '50%',
+                width: '50px',
+                height: '50px',
+                color: 'white',
+                fontSize: '24px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.2s'
+              }}
+              onMouseOver={e => e.currentTarget.style.background = 'rgba(255,255,255,0.3)'}
+              onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+              title="Need help? Click for examples!"
+            >❓</button>
+          </div>
         </div>
         
         <div style={{ flex: 1 }}>
@@ -420,15 +450,20 @@ function App() {
               minHeight: '400px',
               width: '100%'
             }}>
+              <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                <h2 style={{ color: '#60a5fa', fontSize: '1.5rem', marginBottom: '8px' }}>📁 Step 1: Upload Your File</h2>
+                <p style={{ color: '#93c5fd', fontSize: '1rem', marginBottom: '20px' }}>Drag & drop or click to select Excel/CSV files</p>
+              </div>
               <div
                 onClick={() => document.getElementById('file-input')?.click()}
                 style={{
-                  width: 120,
-                  height: 120,
-                  borderRadius: '50%',
+                  width: 140,
+                  height: 140,
+                  borderRadius: '20px',
                   background: 'linear-gradient(145deg, #3b82f6 60%, #1e40af 100%)',
                   boxShadow: '0 8px 32px 0 rgba(30,64,175,0.25), 0 1.5px 4px 0 #2563eb',
                   display: 'flex',
+                  flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
@@ -441,7 +476,7 @@ function App() {
                 }}
                 onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.08)'}
                 onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
-                title="Click to upload file"
+                title="Click to upload your Excel or CSV file"
               >
                 {/* SVG 3D Folder Icon */}
                 <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -505,14 +540,24 @@ function App() {
                 }}
               />
               <div style={{
-                fontSize: '1.3rem',
+                fontSize: '1.1rem',
+                color: '#ffffff',
+                fontWeight: 600,
+                textAlign: 'center',
+                lineHeight: '1.3'
+              }}>
+                📄 Click to Upload<br/>
+                <span style={{ fontSize: '0.9rem', opacity: 0.9 }}>Excel • CSV • Up to 20MB</span>
+              </div>
+              <div style={{
+                fontSize: '1.1rem',
                 color: '#60a5fa',
                 fontWeight: 700,
-                marginTop: 8,
+                marginTop: 12,
                 letterSpacing: 1,
                 textShadow: '0 2px 8px rgba(30, 58, 138, 0.15)'
               }}>
-                upload file
+                🚀 Start Here!
               </div>
               {fileError && <div style={{ color: '#f87171', marginTop: 8 }}>{fileError}</div>}
               <style>{`
