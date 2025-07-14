@@ -15,7 +15,9 @@ app.use(cors({
     'http://localhost:5174', 
     'http://localhost:5175',
     'https://advexcel.online',
-    'https://www.advexcel.online'
+    'https://www.advexcel.online',
+    /\.netlify\.app$/,
+    /\.railway\.app$/
   ],
   credentials: true
 }));
@@ -23,6 +25,11 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 const upload = multer({ dest: 'uploads/', limits: { fileSize: 20 * 1024 * 1024 } });
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+});
 
 // Initialize Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
