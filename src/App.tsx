@@ -4,6 +4,7 @@ import { AIService } from './services/aiService';
 import LandingPage from './LandingPage';
 import ResizableTable from './components/ResizableTable';
 import HelpPanel from './components/HelpPanel';
+import Footer from './components/Footer';
 import * as XLSX from 'xlsx';
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import {
@@ -982,6 +983,8 @@ function App() {
           )}
         </div>
       </div>
+      
+      <Footer />
       <style>{`
         @media (max-width: 800px) {
           .spreadsheet-table th, .spreadsheet-table td {
