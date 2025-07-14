@@ -955,22 +955,7 @@ function App() {
               <strong>AI Error:</strong> {aiError}
             </div>
           )}
-          {aiInstructions && (
-            <div style={{
-              background: 'rgba(59, 130, 246, 0.1)',
-              border: '1px solid #3b82f6',
-              borderRadius: '8px',
-              padding: '15px',
-              margin: '20px 0',
-              color: '#bfdbfe',
-              fontSize: '0.9rem',
-              fontFamily: 'Hammersmith One, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
-              lineHeight: 1.6
-            }}>
-              <strong>AI Instructions:</strong>
-              <div style={{ marginTop: '8px' }}>{aiInstructions}</div>
-            </div>
-          )}
+
           {aiResultData && aiResultData.length > 0 && (
             <ResizableTable
               data={aiResultData}
