@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, MouseEvent, KeyboardEvent, useImperativeHandle, forwardRef } from 'react';
+import { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 
 interface ResizableTableProps {
   data: (string | number | boolean | null | undefined)[][];
@@ -14,11 +14,9 @@ interface ColumnWidths {
   [key: number]: number;
 }
 
-interface RowHeights {
-  [key: number]: number;
-}
 
-function evaluateFormula(formula: string, data: any[][]): number | string {
+
+function evaluateFormula(formula: string): number | string {
   try {
     let expr = formula.slice(1).trim();
     if (/^(SUM|AVERAGE|MIN|MAX)\(/i.test(expr)) {
@@ -36,13 +34,12 @@ const ResizableTable = forwardRef<any, ResizableTableProps>(({
   formatting,
   title = "Spreadsheet Data",
   subtitle,
-  onCellEdit,
-  onCellFormat
+  onCellEdit
 }, ref) => {
   const [columnWidths, setColumnWidths] = useState<ColumnWidths>({});
   const [editingCell, setEditingCell] = useState<{ row: number; col: number } | null>(null);
   const [editValue, setEditValue] = useState<string>('');
-  const [selectedCell, setSelectedCell] = useState<{ row: number; col: number } | null>(null);
+
 
   useImperativeHandle(ref, () => ({
     setColumnWidth: (col: number, width: number) => {
@@ -214,12 +211,11 @@ const ResizableTable = forwardRef<any, ResizableTableProps>(({
                         onClick={() => {
                           setEditingCell({ row: rowIndex, col: cellIndex });
                           setEditValue(String(cell ?? ''));
-                          setSelectedCell({ row: rowIndex, col: cellIndex });
                         }}
                         style={{ cursor: 'pointer', display: 'block' }}
                       >
                         {typeof cell === 'string' && cell.startsWith('=')
-                          ? evaluateFormula(cell, data)
+                          ? evaluateFormula(cell)
                           : cell}
                       </span>
                     )}

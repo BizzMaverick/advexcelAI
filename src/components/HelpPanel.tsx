@@ -74,7 +74,7 @@ const HelpPanel: React.FC<HelpPanelProps> = ({ isVisible, onClose }) => {
         <h3 style={{ color: '#1f2937' }}>⚡ Tips</h3>
         <ul style={{ paddingLeft: '20px' }}>
           <li><strong>Be specific:</strong> "highlight excellent performers" vs "highlight column 1"</li>
-          <li><strong>Use numbers:</strong> "salary > 50000" vs "high salary"</li>
+          <li><strong>Use numbers:</strong> "salary {'>'}50000" vs "high salary"</li>
           <li><strong>Wait between requests:</strong> Free AI has 15 requests/minute limit</li>
           <li><strong>Keep files under 5MB</strong> for best performance</li>
         </ul>

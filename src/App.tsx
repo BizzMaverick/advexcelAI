@@ -65,7 +65,7 @@ function App() {
   const [prompt, setPrompt] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
-  const [aiInstructions, setAiInstructions] = useState<string | null>(null);
+  // const [aiInstructions, setAiInstructions] = useState<string | null>(null);
   const [aiResultData, setAiResultData] = useState<SpreadsheetData | null>(null);
   const [aiFormatting, setAiFormatting] = useState<SpreadsheetFormatting | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -82,7 +82,7 @@ function App() {
     hideGridlines: () => void;
   }>(null);
   const [userFeedback, setUserFeedback] = useState<string | null>(null);
-  const [promptSuggestion, setPromptSuggestion] = useState<string | null>(null);
+  // const [promptSuggestion, setPromptSuggestion] = useState<string | null>(null);
   const [showChartModal, setShowChartModal] = useState(false);
   const [chartType, setChartType] = useState<'bar' | 'line' | 'pie'>('bar');
   const [chartRange, setChartRange] = useState<{ startRow: number; endRow: number; startCol: number; endCol: number }>({ startRow: 1, endRow: 1, startCol: 0, endCol: 0 });
@@ -112,13 +112,13 @@ function App() {
     if (!prompt.trim() || !selectedFile) return;
     setAiLoading(true);
     setAiError(null);
-    setAiInstructions(null);
+    // setAiInstructions(null);
     setAiResultData(null);
     setAiFormatting(null);
     try {
       const result: AIResult = await AIService.uploadSpreadsheetWithPrompt(selectedFile, prompt);
       console.log('AI result:', result);
-      setAiInstructions(result.result || '');
+      // setAiInstructions(result.result || '');
       if (result.aiError) {
         setAiError(result.aiError);
       }
@@ -208,7 +208,7 @@ function App() {
     // 1. Try regex-based UI command parser for exact matches only
     const uiCommand = parseUICommand(prompt);
     if (uiCommand) {
-      setPromptSuggestion(null);
+      // setPromptSuggestion(null);
       // Handle UI commands
       if (uiCommand.type === 'setColumnWidth' && typeof uiCommand.col === 'number' && typeof uiCommand.width === 'number') {
         resizableTableRef.current?.setColumnWidth(uiCommand.col, uiCommand.width);
@@ -257,7 +257,7 @@ function App() {
       }
     }
     // 2. For everything else, send directly to AI
-    setPromptSuggestion(null);
+    // setPromptSuggestion(null);
     handleRunAI();
   }
 
@@ -985,6 +985,7 @@ function App() {
       </div>
       
       <Footer />
+      <HelpPanel isVisible={showHelp} onClose={() => setShowHelp(false)} />
       <style>{`
         @media (max-width: 800px) {
           .spreadsheet-table th, .spreadsheet-table td {
