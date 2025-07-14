@@ -16,7 +16,7 @@ app.use(cors({
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-const upload = multer({ dest: 'uploads/', limits: { fileSize: 100 * 1024 * 1024 } });
+const upload = multer({ dest: 'uploads/', limits: { fileSize: 20 * 1024 * 1024 } });
 
 // Initialize Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -31,8 +31,22 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
     const workbook = XLSX.read(fileBuffer, { type: 'buffer' });
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
-    const spreadsheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+    let spreadsheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
     fs.unlinkSync(filePath);
+
+    // Limit data size to prevent crashes
+    const MAX_ROWS = 1000;
+    const MAX_COLS = 50;
+    
+    if (spreadsheetData.length > MAX_ROWS) {
+      console.log(`Large file detected: ${spreadsheetData.length} rows. Limiting to ${MAX_ROWS} rows.`);
+      spreadsheetData = spreadsheetData.slice(0, MAX_ROWS);
+    }
+    
+    if (spreadsheetData[0] && spreadsheetData[0].length > MAX_COLS) {
+      console.log(`Wide file detected: ${spreadsheetData[0].length} columns. Limiting to ${MAX_COLS} columns.`);
+      spreadsheetData = spreadsheetData.map(row => row.slice(0, MAX_COLS));
+    }
 
     if (process.env.GEMINI_API_KEY) {
       console.log('About to call Gemini...');

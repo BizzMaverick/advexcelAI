@@ -184,7 +184,7 @@ const ResizableTable = forwardRef<any, ResizableTableProps>(({
             </tr>
           </thead>
           <tbody>
-            {data.map((row, rowIndex) => (
+            {data.slice(0, 100).map((row, rowIndex) => (
               <tr key={rowIndex} style={{
                 background: rowIndex % 2 === 0 ? '#ffffff' : '#f9fafb'
               }}>
@@ -227,6 +227,19 @@ const ResizableTable = forwardRef<any, ResizableTableProps>(({
                 ))}
               </tr>
             ))}
+            {data.length > 100 && (
+              <tr>
+                <td colSpan={headers.length} style={{
+                  padding: '16px',
+                  textAlign: 'center',
+                  color: '#6b7280',
+                  fontStyle: 'italic',
+                  background: '#f9fafb'
+                }}>
+                  Showing first 100 rows of {data.length} total rows. Large files are limited for performance.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
