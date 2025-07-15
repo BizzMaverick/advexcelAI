@@ -1,1 +1,1 @@
-web: node openai-proxy-gemini.js
+web: node server.js
