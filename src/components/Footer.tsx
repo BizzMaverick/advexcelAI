@@ -264,51 +264,52 @@ const Footer: React.FC = () => {
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ 
             display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
-            gap: '30px',
-            marginBottom: '30px',
-            alignItems: 'start'
+            gridTemplateColumns: 'repeat(4, 1fr)', 
+            gap: '40px',
+            marginBottom: '40px'
           }}>
             {/* Company Info */}
-            <div style={{ minHeight: '180px' }}>
-              <h3 style={{ color: '#ffffff', marginBottom: '15px' }}>🤖 Excel AI Assistant</h3>
-              <p style={{ marginBottom: '15px', lineHeight: '1.6' }}>
+            <div>
+              <h3 style={{ color: '#ffffff', marginBottom: '20px', fontSize: '1.2rem', fontWeight: '600' }}>🤖 Excel AI Assistant</h3>
+              <p style={{ marginBottom: '20px', lineHeight: '1.7', fontSize: '0.95rem', color: '#cbd5e1' }}>
                 Transform your Excel workflow with AI. Upload, ask, and get results instantly.
               </p>
-              <div style={{ marginBottom: '10px' }}>
-                <strong>📧 Contact:</strong> <a href="mailto:contact@advexcel.online" style={{ color: '#60a5fa' }}>contact@advexcel.online</a>
+              <div style={{ marginBottom: '12px', fontSize: '0.9rem' }}>
+                <strong style={{ color: '#e2e8f0' }}>📧 Contact:</strong><br/>
+                <a href="mailto:contact@advexcel.online" style={{ color: '#60a5fa', textDecoration: 'none' }}>contact@advexcel.online</a>
               </div>
-              <div>
-                <strong>🌐 Website:</strong> <a href="https://advexcel.online" style={{ color: '#60a5fa' }}>advexcel.online</a>
+              <div style={{ fontSize: '0.9rem' }}>
+                <strong style={{ color: '#e2e8f0' }}>🌐 Website:</strong><br/>
+                <a href="https://advexcel.online" style={{ color: '#60a5fa', textDecoration: 'none' }}>advexcel.online</a>
               </div>
             </div>
 
             {/* Quick Links */}
-            <div style={{ minHeight: '180px' }}>
-              <h4 style={{ color: '#ffffff', marginBottom: '15px' }}>Quick Links</h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <button onClick={() => setShowPolicy('about')} style={{ background: 'none', border: 'none', color: '#60a5fa', cursor: 'pointer', textAlign: 'left', padding: 0 }}>About Us</button>
-                <a href="#features" style={{ color: '#60a5fa', textDecoration: 'none' }}>Features</a>
-                <a href="#pricing" style={{ color: '#60a5fa', textDecoration: 'none' }}>Pricing</a>
-                <a href="mailto:contact@advexcel.online" style={{ color: '#60a5fa', textDecoration: 'none' }}>Contact Support</a>
+            <div>
+              <h4 style={{ color: '#ffffff', marginBottom: '20px', fontSize: '1.1rem', fontWeight: '600' }}>Quick Links</h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <button onClick={() => setShowPolicy('about')} style={{ background: 'none', border: 'none', color: '#cbd5e1', cursor: 'pointer', textAlign: 'left', padding: '4px 0', fontSize: '0.9rem', transition: 'color 0.2s' }} onMouseOver={e => e.target.style.color = '#60a5fa'} onMouseOut={e => e.target.style.color = '#cbd5e1'}>About Us</button>
+                <a href="#features" style={{ color: '#cbd5e1', textDecoration: 'none', padding: '4px 0', fontSize: '0.9rem', transition: 'color 0.2s' }} onMouseOver={e => e.target.style.color = '#60a5fa'} onMouseOut={e => e.target.style.color = '#cbd5e1'}>Features</a>
+                <a href="#pricing" style={{ color: '#cbd5e1', textDecoration: 'none', padding: '4px 0', fontSize: '0.9rem', transition: 'color 0.2s' }} onMouseOver={e => e.target.style.color = '#60a5fa'} onMouseOut={e => e.target.style.color = '#cbd5e1'}>Pricing</a>
+                <a href="mailto:contact@advexcel.online" style={{ color: '#cbd5e1', textDecoration: 'none', padding: '4px 0', fontSize: '0.9rem', transition: 'color 0.2s' }} onMouseOver={e => e.target.style.color = '#60a5fa'} onMouseOut={e => e.target.style.color = '#cbd5e1'}>Contact Support</a>
               </div>
             </div>
 
             {/* Legal */}
-            <div style={{ minHeight: '180px' }}>
-              <h4 style={{ color: '#ffffff', marginBottom: '15px' }}>Legal & Policies</h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <button onClick={() => setShowPolicy('privacy')} style={{ background: 'none', border: 'none', color: '#60a5fa', cursor: 'pointer', textAlign: 'left', padding: 0 }}>Privacy Policy</button>
-                <button onClick={() => setShowPolicy('terms')} style={{ background: 'none', border: 'none', color: '#60a5fa', cursor: 'pointer', textAlign: 'left', padding: 0 }}>Terms of Service</button>
-                <button onClick={() => setShowPolicy('security')} style={{ background: 'none', border: 'none', color: '#60a5fa', cursor: 'pointer', textAlign: 'left', padding: 0 }}>Security Policy</button>
-                <button onClick={() => setShowPolicy('refund')} style={{ background: 'none', border: 'none', color: '#60a5fa', cursor: 'pointer', textAlign: 'left', padding: 0 }}>Refund Policy</button>
+            <div>
+              <h4 style={{ color: '#ffffff', marginBottom: '20px', fontSize: '1.1rem', fontWeight: '600' }}>Legal & Policies</h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <button onClick={() => setShowPolicy('privacy')} style={{ background: 'none', border: 'none', color: '#cbd5e1', cursor: 'pointer', textAlign: 'left', padding: '4px 0', fontSize: '0.9rem', transition: 'color 0.2s' }} onMouseOver={e => e.target.style.color = '#60a5fa'} onMouseOut={e => e.target.style.color = '#cbd5e1'}>Privacy Policy</button>
+                <button onClick={() => setShowPolicy('terms')} style={{ background: 'none', border: 'none', color: '#cbd5e1', cursor: 'pointer', textAlign: 'left', padding: '4px 0', fontSize: '0.9rem', transition: 'color 0.2s' }} onMouseOver={e => e.target.style.color = '#60a5fa'} onMouseOut={e => e.target.style.color = '#cbd5e1'}>Terms of Service</button>
+                <button onClick={() => setShowPolicy('security')} style={{ background: 'none', border: 'none', color: '#cbd5e1', cursor: 'pointer', textAlign: 'left', padding: '4px 0', fontSize: '0.9rem', transition: 'color 0.2s' }} onMouseOver={e => e.target.style.color = '#60a5fa'} onMouseOut={e => e.target.style.color = '#cbd5e1'}>Security Policy</button>
+                <button onClick={() => setShowPolicy('refund')} style={{ background: 'none', border: 'none', color: '#cbd5e1', cursor: 'pointer', textAlign: 'left', padding: '4px 0', fontSize: '0.9rem', transition: 'color 0.2s' }} onMouseOver={e => e.target.style.color = '#60a5fa'} onMouseOut={e => e.target.style.color = '#cbd5e1'}>Refund Policy</button>
               </div>
             </div>
 
             {/* Features */}
-            <div style={{ minHeight: '180px' }}>
-              <h4 style={{ color: '#ffffff', marginBottom: '15px' }}>Features</h4>
-              <div style={{ fontSize: '0.9rem', lineHeight: '1.6' }}>
+            <div>
+              <h4 style={{ color: '#ffffff', marginBottom: '20px', fontSize: '1.1rem', fontWeight: '600' }}>Features</h4>
+              <div style={{ fontSize: '0.9rem', lineHeight: '1.8', color: '#cbd5e1' }}>
                 ✨ Natural Language Processing<br/>
                 📊 Data Analytics & Pivot Tables<br/>
                 📈 Chart Generation<br/>
@@ -330,10 +331,10 @@ const Footer: React.FC = () => {
             gap: '15px',
             textAlign: 'center'
           }}>
-            <div style={{ fontSize: '0.9rem' }}>
+            <div style={{ fontSize: '0.9rem', color: '#cbd5e1' }}>
               © 2024 Excel AI Assistant. All rights reserved. Made with ❤️ for Excel users.
             </div>
-            <div style={{ display: 'flex', gap: '15px', fontSize: '0.9rem' }}>
+            <div style={{ display: 'flex', gap: '20px', fontSize: '0.9rem', color: '#94a3b8' }}>
               <span>🇮🇳 Proudly Made in India</span>
               <span>🤖 Powered by Google Gemini AI</span>
             </div>
