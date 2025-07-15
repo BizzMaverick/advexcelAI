@@ -1,9 +1,4 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
 const XLSX = require('xlsx');
-const multer = require('multer');
-
-const upload = multer();
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 exports.handler = async (event, context) => {
   const headers = {
@@ -21,39 +16,48 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const contentType = event.headers['content-type'] || '';
-    if (!contentType.includes('multipart/form-data')) {
-      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid content type' }) };
+    // Simple multipart parsing
+    const body = Buffer.from(event.body, 'base64');
+    const boundary = event.headers['content-type'].split('boundary=')[1];
+    const parts = body.toString('binary').split('--' + boundary);
+    
+    let prompt = 'process data';
+    let fileBuffer = null;
+    
+    for (const part of parts) {
+      if (part.includes('name="prompt"')) {
+        const lines = part.split('\r\n');
+        prompt = lines[lines.length - 2] || 'process data';
+      }
+      if (part.includes('name="file"') && part.includes('Content-Type:')) {
+        const headerEnd = part.indexOf('\r\n\r\n');
+        if (headerEnd !== -1) {
+          const fileData = part.substring(headerEnd + 4);
+          fileBuffer = Buffer.from(fileData, 'binary');
+        }
+      }
+    }
+    
+    if (!fileBuffer) {
+      return { statusCode: 400, headers, body: JSON.stringify({ error: 'No file found' }) };
     }
 
-    // Parse multipart form data
-    const boundary = event.headers['content-type'].split('boundary=')[1];
-    const bodyBuffer = Buffer.from(event.body, 'base64');
-    const bodyStr = bodyBuffer.toString();
-    
-    // Extract prompt
-    const promptMatch = bodyStr.match(/name="prompt"[\s\S]*?\r\n\r\n([^\r\n]+)/);
-    const prompt = promptMatch ? promptMatch[1].trim() : 'process data';
-    
-    // Extract file data
-    const fileMatch = bodyStr.match(/name="file"[\s\S]*?Content-Type: [^\r\n]+\r\n\r\n([\s\S]*?)\r\n--/);
-    if (!fileMatch) {
-      return { statusCode: 400, headers, body: JSON.stringify({ error: 'No file uploaded' }) };
-    }
-    
-    // Process the uploaded file
-    const fileData = bodyBuffer.slice(bodyStr.indexOf(fileMatch[1]), bodyStr.lastIndexOf('\r\n--'));
-    const workbook = XLSX.read(fileData, { type: 'buffer' });
+    // Process Excel file
+    const workbook = XLSX.read(fileBuffer, { type: 'buffer' });
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
-    let uploadedData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+    let data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+    
+    // Limit data size
+    if (data.length > 100) data = data.slice(0, 100);
+    if (data[0] && data[0].length > 20) {
+      data = data.map(row => row.slice(0, 20));
+    }
 
-    // Process data and formatting based on prompt
-    let data = uploadedData;
+    // Process based on prompt
     let formatting = [];
     
     if (prompt.toLowerCase().includes('pivot') && prompt.toLowerCase().includes('countries')) {
-      // Create clean pivot table with only requested columns
       data = [
         ['Country', 'Rank', 'Economic Inequality Index'],
         ['United States', 1, 0.85],
@@ -65,10 +69,8 @@ exports.handler = async (event, context) => {
         ['Australia', 7, 0.34],
         ['Sweden', 8, 0.25]
       ];
-      // Create clean formatting array matching the data structure
       formatting = data.map(() => [{}, {}, {}]);
     } else if (prompt.toLowerCase().includes('highlight') && prompt.toLowerCase().includes('red')) {
-      // Create formatting array with red background for column 1
       formatting = data.map((row, rowIndex) => 
         row.map((cell, colIndex) => 
           colIndex === 0 ? { background: '#ffebee', color: '#c62828' } : {}
@@ -86,6 +88,7 @@ exports.handler = async (event, context) => {
       })
     };
   } catch (error) {
+    console.error('Function error:', error);
     return {
       statusCode: 500,
       headers,
