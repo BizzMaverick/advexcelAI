@@ -1,5 +1,5 @@
 const API_URL = import.meta.env.PROD 
-  ? 'https://advexcel-backend.onrender.com/api/upload'
+  ? '/.netlify/functions/upload'
   : 'http://localhost:5001/api/upload';
 
 type SpreadsheetData = (string | number | boolean | null | undefined)[][];
