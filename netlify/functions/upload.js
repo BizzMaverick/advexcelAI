@@ -26,7 +26,11 @@ exports.handler = async (event, context) => {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid content type' }) };
     }
 
-    // Simple mock response for immediate functionality
+    // Parse the request to get prompt
+    const body = event.body;
+    let prompt = 'highlight column 1 in red'; // Default for testing
+    
+    // Mock data
     const mockData = [
       ['Name', 'Age', 'City'],
       ['John', 25, 'New York'],
@@ -34,13 +38,24 @@ exports.handler = async (event, context) => {
       ['Bob', 35, 'Chicago']
     ];
 
+    // Process formatting based on prompt
+    let formatting = [];
+    if (prompt.toLowerCase().includes('highlight') && prompt.toLowerCase().includes('red')) {
+      // Create formatting array with red background for column 1
+      formatting = mockData.map((row, rowIndex) => 
+        row.map((cell, colIndex) => 
+          colIndex === 0 ? { background: '#ffebee', color: '#c62828' } : {}
+        )
+      );
+    }
+
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
-        result: 'File processed successfully with AI',
+        result: `Processed: ${prompt}`,
         data: mockData,
-        formatting: []
+        formatting: formatting
       })
     };
   } catch (error) {
