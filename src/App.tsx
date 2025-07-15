@@ -959,9 +959,9 @@ function App() {
 
           {aiResultData && aiResultData.length > 0 && (
             <ResizableTable
-              data={aiResultData}
-              headers={Array.isArray(spreadsheetData[0]) ? spreadsheetData[0].map(cell => String(cell ?? '')) : []}
-              formatting={aiFormatting || undefined}
+              data={aiResultData.slice(1)}
+              headers={Array.isArray(aiResultData[0]) ? aiResultData[0].map(cell => String(cell ?? '')) : []}
+              formatting={aiFormatting ? aiFormatting.slice(1) : undefined}
               title="AI Result Data"
               subtitle={`Rows: ${aiResultData.length} | Columns: ${aiResultData[0]?.length || 0}`}
             />
