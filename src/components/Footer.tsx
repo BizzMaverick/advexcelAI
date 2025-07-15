@@ -264,12 +264,13 @@ const Footer: React.FC = () => {
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ 
             display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
             gap: '30px',
-            marginBottom: '30px'
+            marginBottom: '30px',
+            alignItems: 'start'
           }}>
             {/* Company Info */}
-            <div>
+            <div style={{ minHeight: '180px' }}>
               <h3 style={{ color: '#ffffff', marginBottom: '15px' }}>🤖 Excel AI Assistant</h3>
               <p style={{ marginBottom: '15px', lineHeight: '1.6' }}>
                 Transform your Excel workflow with AI. Upload, ask, and get results instantly.
@@ -283,7 +284,7 @@ const Footer: React.FC = () => {
             </div>
 
             {/* Quick Links */}
-            <div>
+            <div style={{ minHeight: '180px' }}>
               <h4 style={{ color: '#ffffff', marginBottom: '15px' }}>Quick Links</h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <button onClick={() => setShowPolicy('about')} style={{ background: 'none', border: 'none', color: '#60a5fa', cursor: 'pointer', textAlign: 'left', padding: 0 }}>About Us</button>
@@ -294,7 +295,7 @@ const Footer: React.FC = () => {
             </div>
 
             {/* Legal */}
-            <div>
+            <div style={{ minHeight: '180px' }}>
               <h4 style={{ color: '#ffffff', marginBottom: '15px' }}>Legal & Policies</h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <button onClick={() => setShowPolicy('privacy')} style={{ background: 'none', border: 'none', color: '#60a5fa', cursor: 'pointer', textAlign: 'left', padding: 0 }}>Privacy Policy</button>
@@ -305,7 +306,7 @@ const Footer: React.FC = () => {
             </div>
 
             {/* Features */}
-            <div>
+            <div style={{ minHeight: '180px' }}>
               <h4 style={{ color: '#ffffff', marginBottom: '15px' }}>Features</h4>
               <div style={{ fontSize: '0.9rem', lineHeight: '1.6' }}>
                 ✨ Natural Language Processing<br/>
@@ -326,7 +327,8 @@ const Footer: React.FC = () => {
             justifyContent: 'space-between',
             alignItems: 'center',
             flexWrap: 'wrap',
-            gap: '15px'
+            gap: '15px',
+            textAlign: 'center'
           }}>
             <div style={{ fontSize: '0.9rem' }}>
               © 2024 Excel AI Assistant. All rights reserved. Made with ❤️ for Excel users.
