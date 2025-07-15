@@ -113,7 +113,17 @@ Return ONLY the JSON object, no other text.`;
     // Fallback: Basic processing without AI
     let formatting = [];
     
-    if (prompt.toLowerCase().includes('highlight') && prompt.toLowerCase().includes('red')) {
+    if (prompt.toLowerCase().includes('alphabetical') || prompt.toLowerCase().includes('sort')) {
+      // Sort data alphabetically by first column (country name)
+      const headers = data[0];
+      const rows = data.slice(1);
+      const sortedRows = rows.sort((a, b) => {
+        const aVal = String(a[0] || '').toLowerCase();
+        const bVal = String(b[0] || '').toLowerCase();
+        return aVal.localeCompare(bVal);
+      });
+      data = [headers, ...sortedRows];
+    } else if (prompt.toLowerCase().includes('highlight') && prompt.toLowerCase().includes('red')) {
       formatting = data.map((row) => 
         row.map((cell, colIndex) => 
           colIndex === 0 ? { background: '#ffebee', color: '#c62828' } : {}
