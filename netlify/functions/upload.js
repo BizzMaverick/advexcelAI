@@ -1,4 +1,7 @@
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 const XLSX = require('xlsx');
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 exports.handler = async (event, context) => {
   const headers = {
@@ -16,7 +19,7 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // Simple multipart parsing
+    // Parse multipart form data
     const body = Buffer.from(event.body, 'base64');
     const boundary = event.headers['content-type'].split('boundary=')[1];
     const parts = body.toString('binary').split('--' + boundary);
@@ -48,44 +51,70 @@ exports.handler = async (event, context) => {
     const worksheet = workbook.Sheets[sheetName];
     let data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
     
-    // Limit data size
-    if (data.length > 100) data = data.slice(0, 100);
-    if (data[0] && data[0].length > 20) {
-      data = data.map(row => row.slice(0, 20));
+    // Limit data for AI processing
+    if (data.length > 50) data = data.slice(0, 50);
+    if (data[0] && data[0].length > 15) {
+      data = data.map(row => row.slice(0, 15));
     }
 
-    // Process based on prompt
+    // Use AI to process the request
+    if (process.env.GEMINI_API_KEY) {
+      try {
+        const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+        
+        const systemPrompt = `You are an Excel AI assistant. Process this request and return ONLY valid JSON.
+
+User Request: "${prompt}"
+Excel Data: ${JSON.stringify(data)}
+
+Instructions:
+- Analyze the data and user request
+- Create appropriate output based on the request
+- For pivot tables, aggregate and summarize data
+- For highlighting, return formatting info
+- For calculations, perform the math
+- Always return valid JSON in this format:
+{
+  "data": [["Header1", "Header2"], ["row1col1", "row1col2"]],
+  "formatting": [[{}, {}], [{}, {}]]
+}
+
+Return ONLY the JSON object, no other text.`;
+
+        const result = await model.generateContent(systemPrompt);
+        const response = result.response.text();
+        
+        // Extract JSON from response
+        const jsonMatch = response.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const aiResult = JSON.parse(jsonMatch[0]);
+          if (aiResult.data && Array.isArray(aiResult.data)) {
+            return {
+              statusCode: 200,
+              headers,
+              body: JSON.stringify({
+                result: `AI processed: ${prompt}`,
+                data: aiResult.data,
+                formatting: aiResult.formatting || []
+              })
+            };
+          }
+        }
+        
+        // Fallback if AI response is invalid
+        throw new Error('Invalid AI response format');
+        
+      } catch (aiError) {
+        console.error('AI Error:', aiError);
+        // Fallback to basic processing
+      }
+    }
+    
+    // Fallback: Basic processing without AI
     let formatting = [];
     
-    if (prompt.toLowerCase().includes('pivot') && prompt.toLowerCase().includes('countries')) {
-      if (prompt.toLowerCase().includes('group grievance')) {
-        data = [
-          ['Country', 'Rank', 'Group Grievance Score'],
-          ['Somalia', 1, 9.8],
-          ['Yemen', 2, 9.5],
-          ['Syria', 3, 9.3],
-          ['Afghanistan', 4, 9.1],
-          ['South Sudan', 5, 8.9],
-          ['Central African Republic', 6, 8.7],
-          ['Chad', 7, 8.5],
-          ['Sudan', 8, 8.3]
-        ];
-      } else {
-        data = [
-          ['Country', 'Rank', 'Economic Inequality Index'],
-          ['United States', 1, 0.85],
-          ['Germany', 2, 0.31],
-          ['Japan', 3, 0.33],
-          ['United Kingdom', 4, 0.35],
-          ['France', 5, 0.29],
-          ['Canada', 6, 0.31],
-          ['Australia', 7, 0.34],
-          ['Sweden', 8, 0.25]
-        ];
-      }
-      formatting = data.map(() => [{}, {}, {}]);
-    } else if (prompt.toLowerCase().includes('highlight') && prompt.toLowerCase().includes('red')) {
-      formatting = data.map((row, rowIndex) => 
+    if (prompt.toLowerCase().includes('highlight') && prompt.toLowerCase().includes('red')) {
+      formatting = data.map((row) => 
         row.map((cell, colIndex) => 
           colIndex === 0 ? { background: '#ffebee', color: '#c62828' } : {}
         )
@@ -101,6 +130,7 @@ exports.handler = async (event, context) => {
         formatting: formatting
       })
     };
+    
   } catch (error) {
     console.error('Function error:', error);
     return {
