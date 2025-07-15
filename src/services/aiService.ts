@@ -1,5 +1,5 @@
 const API_URL = import.meta.env.PROD 
-  ? 'https://advexcel-backend-production.up.railway.app/api/upload'
+  ? 'https://advexcel-backend.onrender.com/api/upload'
   : 'http://localhost:5001/api/upload';
 
 type SpreadsheetData = (string | number | boolean | null | undefined)[][];
