@@ -124,11 +124,12 @@ const ResizableTable = forwardRef<any, ResizableTableProps>(({
       <div style={{
         overflow: 'auto',
         maxHeight: '500px',
+        maxWidth: '100%',
         border: '1px solid #d1d5db',
         borderRadius: '6px'
       }}>
         <table style={{
-          width: '100%',
+          minWidth: '100%',
           borderCollapse: 'collapse',
           fontFamily: 'Calibri, "Segoe UI", Arial, sans-serif',
           fontSize: '13px'
