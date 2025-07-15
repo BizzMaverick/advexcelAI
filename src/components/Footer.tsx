@@ -263,14 +263,14 @@ const Footer: React.FC = () => {
       }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ 
-            display: 'flex', 
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr 1fr 1fr',
             gap: '40px',
-            marginBottom: '40px'
+            marginBottom: '40px',
+            alignItems: 'start'
           }}>
             {/* Company Info */}
-            <div style={{ flex: '1', minWidth: '250px' }}>
+            <div>
               <h3 style={{ color: '#ffffff', marginBottom: '20px', fontSize: '1.2rem', fontWeight: '600' }}>🤖 Excel AI Assistant</h3>
               <p style={{ marginBottom: '20px', lineHeight: '1.7', fontSize: '0.95rem', color: '#cbd5e1' }}>
                 Transform your Excel workflow with AI. Upload, ask, and get results instantly.
@@ -286,7 +286,7 @@ const Footer: React.FC = () => {
             </div>
 
             {/* Quick Links */}
-            <div style={{ flex: '1', minWidth: '200px' }}>
+            <div>
               <h4 style={{ color: '#ffffff', marginBottom: '20px', fontSize: '1.1rem', fontWeight: '600' }}>Quick Links</h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <button onClick={() => setShowPolicy('about')} style={{ background: 'none', border: 'none', color: '#cbd5e1', cursor: 'pointer', textAlign: 'left', padding: '4px 0', fontSize: '0.9rem', transition: 'color 0.2s' }} onMouseOver={e => e.target.style.color = '#60a5fa'} onMouseOut={e => e.target.style.color = '#cbd5e1'}>About Us</button>
@@ -297,7 +297,7 @@ const Footer: React.FC = () => {
             </div>
 
             {/* Legal */}
-            <div style={{ flex: '1', minWidth: '200px' }}>
+            <div>
               <h4 style={{ color: '#ffffff', marginBottom: '20px', fontSize: '1.1rem', fontWeight: '600' }}>Legal & Policies</h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <button onClick={() => setShowPolicy('privacy')} style={{ background: 'none', border: 'none', color: '#cbd5e1', cursor: 'pointer', textAlign: 'left', padding: '4px 0', fontSize: '0.9rem', transition: 'color 0.2s' }} onMouseOver={e => e.target.style.color = '#60a5fa'} onMouseOut={e => e.target.style.color = '#cbd5e1'}>Privacy Policy</button>
@@ -308,7 +308,7 @@ const Footer: React.FC = () => {
             </div>
 
             {/* Features */}
-            <div style={{ flex: '1', minWidth: '200px' }}>
+            <div>
               <h4 style={{ color: '#ffffff', marginBottom: '20px', fontSize: '1.1rem', fontWeight: '600' }}>Features</h4>
               <div style={{ fontSize: '0.9rem', lineHeight: '1.8', color: '#cbd5e1' }}>
                 ✨ Natural Language Processing<br/>
