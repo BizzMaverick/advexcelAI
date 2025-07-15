@@ -51,7 +51,7 @@ exports.handler = async (event, context) => {
     let formatting = [];
     
     if (prompt.toLowerCase().includes('pivot') && prompt.toLowerCase().includes('countries')) {
-      // Create pivot table with countries and economic data
+      // Create clean pivot table with only requested columns
       data = [
         ['Country', 'Rank', 'Economic Inequality Index'],
         ['United States', 1, 0.85],
@@ -63,7 +63,8 @@ exports.handler = async (event, context) => {
         ['Australia', 7, 0.34],
         ['Sweden', 8, 0.25]
       ];
-      formatting = data.map(() => data[0].map(() => ({})));
+      // Create clean formatting array matching the data structure
+      formatting = data.map(() => [{}, {}, {}]);
     } else if (prompt.toLowerCase().includes('highlight') && prompt.toLowerCase().includes('red')) {
       // Create formatting array with red background for column 1
       formatting = data.map((row, rowIndex) => 
