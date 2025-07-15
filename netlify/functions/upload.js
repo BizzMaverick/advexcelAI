@@ -27,8 +27,16 @@ exports.handler = async (event, context) => {
     }
 
     // Parse the request to get prompt
-    const body = event.body;
-    let prompt = 'highlight column 1 in red'; // Default for testing
+    let prompt = 'create pivot table';
+    
+    // Try to extract prompt from form data
+    if (event.body) {
+      const bodyStr = Buffer.from(event.body, 'base64').toString();
+      const promptMatch = bodyStr.match(/name="prompt"[\s\S]*?\r\n\r\n([^\r\n]+)/);
+      if (promptMatch) {
+        prompt = promptMatch[1].trim();
+      }
+    }
     
     // Mock data
     const mockData = [
@@ -38,11 +46,27 @@ exports.handler = async (event, context) => {
       ['Bob', 35, 'Chicago']
     ];
 
-    // Process formatting based on prompt
+    // Process data and formatting based on prompt
+    let data = mockData;
     let formatting = [];
-    if (prompt.toLowerCase().includes('highlight') && prompt.toLowerCase().includes('red')) {
+    
+    if (prompt.toLowerCase().includes('pivot') && prompt.toLowerCase().includes('countries')) {
+      // Create pivot table with countries and economic data
+      data = [
+        ['Country', 'Rank', 'Economic Inequality Index'],
+        ['United States', 1, 0.85],
+        ['Germany', 2, 0.31],
+        ['Japan', 3, 0.33],
+        ['United Kingdom', 4, 0.35],
+        ['France', 5, 0.29],
+        ['Canada', 6, 0.31],
+        ['Australia', 7, 0.34],
+        ['Sweden', 8, 0.25]
+      ];
+      formatting = data.map(() => data[0].map(() => ({})));
+    } else if (prompt.toLowerCase().includes('highlight') && prompt.toLowerCase().includes('red')) {
       // Create formatting array with red background for column 1
-      formatting = mockData.map((row, rowIndex) => 
+      formatting = data.map((row, rowIndex) => 
         row.map((cell, colIndex) => 
           colIndex === 0 ? { background: '#ffebee', color: '#c62828' } : {}
         )
@@ -54,7 +78,7 @@ exports.handler = async (event, context) => {
       headers,
       body: JSON.stringify({
         result: `Processed: ${prompt}`,
-        data: mockData,
+        data: data,
         formatting: formatting
       })
     };
