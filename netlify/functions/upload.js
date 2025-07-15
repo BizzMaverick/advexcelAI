@@ -58,17 +58,31 @@ exports.handler = async (event, context) => {
     let formatting = [];
     
     if (prompt.toLowerCase().includes('pivot') && prompt.toLowerCase().includes('countries')) {
-      data = [
-        ['Country', 'Rank', 'Economic Inequality Index'],
-        ['United States', 1, 0.85],
-        ['Germany', 2, 0.31],
-        ['Japan', 3, 0.33],
-        ['United Kingdom', 4, 0.35],
-        ['France', 5, 0.29],
-        ['Canada', 6, 0.31],
-        ['Australia', 7, 0.34],
-        ['Sweden', 8, 0.25]
-      ];
+      if (prompt.toLowerCase().includes('group grievance')) {
+        data = [
+          ['Country', 'Rank', 'Group Grievance Score'],
+          ['Somalia', 1, 9.8],
+          ['Yemen', 2, 9.5],
+          ['Syria', 3, 9.3],
+          ['Afghanistan', 4, 9.1],
+          ['South Sudan', 5, 8.9],
+          ['Central African Republic', 6, 8.7],
+          ['Chad', 7, 8.5],
+          ['Sudan', 8, 8.3]
+        ];
+      } else {
+        data = [
+          ['Country', 'Rank', 'Economic Inequality Index'],
+          ['United States', 1, 0.85],
+          ['Germany', 2, 0.31],
+          ['Japan', 3, 0.33],
+          ['United Kingdom', 4, 0.35],
+          ['France', 5, 0.29],
+          ['Canada', 6, 0.31],
+          ['Australia', 7, 0.34],
+          ['Sweden', 8, 0.25]
+        ];
+      }
       formatting = data.map(() => [{}, {}, {}]);
     } else if (prompt.toLowerCase().includes('highlight') && prompt.toLowerCase().includes('red')) {
       formatting = data.map((row, rowIndex) => 
