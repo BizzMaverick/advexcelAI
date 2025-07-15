@@ -26,28 +26,30 @@ exports.handler = async (event, context) => {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid content type' }) };
     }
 
-    // Parse the request to get prompt
-    let prompt = 'create pivot table';
+    // Parse multipart form data
+    const boundary = event.headers['content-type'].split('boundary=')[1];
+    const bodyBuffer = Buffer.from(event.body, 'base64');
+    const bodyStr = bodyBuffer.toString();
     
-    // Try to extract prompt from form data
-    if (event.body) {
-      const bodyStr = Buffer.from(event.body, 'base64').toString();
-      const promptMatch = bodyStr.match(/name="prompt"[\s\S]*?\r\n\r\n([^\r\n]+)/);
-      if (promptMatch) {
-        prompt = promptMatch[1].trim();
-      }
+    // Extract prompt
+    const promptMatch = bodyStr.match(/name="prompt"[\s\S]*?\r\n\r\n([^\r\n]+)/);
+    const prompt = promptMatch ? promptMatch[1].trim() : 'process data';
+    
+    // Extract file data
+    const fileMatch = bodyStr.match(/name="file"[\s\S]*?Content-Type: [^\r\n]+\r\n\r\n([\s\S]*?)\r\n--/);
+    if (!fileMatch) {
+      return { statusCode: 400, headers, body: JSON.stringify({ error: 'No file uploaded' }) };
     }
     
-    // Mock data
-    const mockData = [
-      ['Name', 'Age', 'City'],
-      ['John', 25, 'New York'],
-      ['Jane', 30, 'Los Angeles'],
-      ['Bob', 35, 'Chicago']
-    ];
+    // Process the uploaded file
+    const fileData = bodyBuffer.slice(bodyStr.indexOf(fileMatch[1]), bodyStr.lastIndexOf('\r\n--'));
+    const workbook = XLSX.read(fileData, { type: 'buffer' });
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+    let uploadedData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
     // Process data and formatting based on prompt
-    let data = mockData;
+    let data = uploadedData;
     let formatting = [];
     
     if (prompt.toLowerCase().includes('pivot') && prompt.toLowerCase().includes('countries')) {
