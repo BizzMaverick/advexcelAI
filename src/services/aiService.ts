@@ -1,6 +1,4 @@
-const API_URL = import.meta.env.PROD 
-  ? 'https://advexcel-backend-production-b16d756.up.railway.app/api/upload'
-  : 'http://localhost:5001/api/upload';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api/upload';
 
 type SpreadsheetData = (string | number | boolean | null | undefined)[][];
 type SpreadsheetFormatting = ({ color?: string; background?: string; bold?: boolean; italic?: boolean } | undefined)[][];
