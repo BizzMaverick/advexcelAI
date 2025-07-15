@@ -51,10 +51,11 @@ exports.handler = async (event, context) => {
     const worksheet = workbook.Sheets[sheetName];
     let data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
     
-    // Limit data for AI processing
-    if (data.length > 50) data = data.slice(0, 50);
-    if (data[0] && data[0].length > 15) {
-      data = data.map(row => row.slice(0, 15));
+    // Keep original data size for processing
+    // Only limit if extremely large
+    if (data.length > 200) data = data.slice(0, 200);
+    if (data[0] && data[0].length > 20) {
+      data = data.map(row => row.slice(0, 20));
     }
 
     // Use AI to process the request
