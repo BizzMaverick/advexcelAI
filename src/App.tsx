@@ -421,24 +421,53 @@ function App() {
         </div>
         
         <div style={{ flex: 1 }}>
-          {/* Only show prompt input after upload */}
+          {/* Enhanced prompt input with UX improvements */}
           {spreadsheetData.length > 0 && (
             <div style={{ margin: '20px 0', textAlign: 'center' }}>
-              <input
-                type="text"
-                value={prompt}
-                onChange={e => setPrompt(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') handleUserPrompt(); }}
-                placeholder="Type a command or ask a question..."
-                style={{ width: '60%', padding: '10px', fontSize: '1.1rem', borderRadius: 6, border: '1px solid #ccc', fontFamily: 'Hammersmith One, Segoe UI, Arial, sans-serif' }}
-                autoFocus
-              />
-              <button
-                onClick={handleUserPrompt}
-                style={{ marginLeft: 12, padding: '10px 18px', fontSize: '1.1rem', borderRadius: 6, border: 'none', background: '#2563eb', color: 'white', fontWeight: 600, cursor: 'pointer' }}
-                disabled={!prompt.trim() || aiLoading}
-              >{aiLoading ? 'Processing...' : 'Go'}</button>
-
+              <div style={{ marginBottom: '15px' }}>
+                <input
+                  type="text"
+                  value={prompt}
+                  onChange={e => setPrompt(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') handleUserPrompt(); }}
+                  placeholder="Type a command or ask a question..."
+                  style={{ width: '60%', padding: '12px', fontSize: '1.1rem', borderRadius: 8, border: '2px solid #e5e7eb', fontFamily: 'Hammersmith One, Segoe UI, Arial, sans-serif', outline: 'none' }}
+                  autoFocus
+                />
+                <button
+                  onClick={handleUserPrompt}
+                  style={{ marginLeft: 12, padding: '12px 20px', fontSize: '1.1rem', borderRadius: 8, border: 'none', background: aiLoading ? '#9ca3af' : '#2563eb', color: 'white', fontWeight: 600, cursor: aiLoading ? 'not-allowed' : 'pointer', transition: 'all 0.2s' }}
+                  disabled={!prompt.trim() || aiLoading}
+                >
+                  {aiLoading ? (
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div style={{ width: '16px', height: '16px', border: '2px solid #ffffff', borderTop: '2px solid transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+                      Processing...
+                    </span>
+                  ) : 'Go'}
+                </button>
+                {aiResultData && (
+                  <button
+                    onClick={() => { setAiResultData(null); setAiFormatting(null); setPrompt(''); }}
+                    style={{ marginLeft: 8, padding: '12px 16px', fontSize: '1rem', borderRadius: 8, border: '2px solid #ef4444', background: 'transparent', color: '#ef4444', fontWeight: 600, cursor: 'pointer' }}
+                  >
+                    ↶ Undo
+                  </button>
+                )}
+              </div>
+              
+              {/* Quick Action Buttons */}
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '10px' }}>
+                <button onClick={() => { setPrompt('sort data alphabetically'); setTimeout(handleUserPrompt, 100); }} style={{ padding: '6px 12px', fontSize: '0.9rem', borderRadius: 6, border: '1px solid #3b82f6', background: '#eff6ff', color: '#1e40af', cursor: 'pointer' }} disabled={aiLoading}>📝 Sort A-Z</button>
+                <button onClick={() => { setPrompt('highlight top 10 rows in red'); setTimeout(handleUserPrompt, 100); }} style={{ padding: '6px 12px', fontSize: '0.9rem', borderRadius: 6, border: '1px solid #ef4444', background: '#fef2f2', color: '#dc2626', cursor: 'pointer' }} disabled={aiLoading}>🔴 Highlight Top 10</button>
+                <button onClick={() => { setPrompt('show only countries from Africa'); setTimeout(handleUserPrompt, 100); }} style={{ padding: '6px 12px', fontSize: '0.9rem', borderRadius: 6, border: '1px solid #10b981', background: '#f0fdf4', color: '#059669', cursor: 'pointer' }} disabled={aiLoading}>🌍 Filter Africa</button>
+                <button onClick={() => { setPrompt('calculate average of total column'); setTimeout(handleUserPrompt, 100); }} style={{ padding: '6px 12px', fontSize: '0.9rem', borderRadius: 6, border: '1px solid #f59e0b', background: '#fffbeb', color: '#d97706', cursor: 'pointer' }} disabled={aiLoading}>📊 Calculate Average</button>
+              </div>
+              
+              {/* Example Prompts */}
+              <div style={{ fontSize: '0.85rem', color: '#94a3b8', marginTop: '8px' }}>
+                💡 <strong>Try:</strong> "sort by country", "highlight top 5", "show African countries", "calculate total average"
+              </div>
             </div>
           )}
           {/* File upload UI remains unchanged */}
@@ -987,6 +1016,10 @@ function App() {
       <Footer />
       <HelpPanel isVisible={showHelp} onClose={() => setShowHelp(false)} />
       <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
         @media (max-width: 800px) {
           .spreadsheet-table th, .spreadsheet-table td {
             font-size: 0.8rem !important;
