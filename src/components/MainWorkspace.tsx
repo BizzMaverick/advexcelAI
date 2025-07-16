@@ -289,17 +289,39 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
   };
 
   const handleRunAI = async () => {
-    if (!prompt.trim() || !selectedFile) return;
+    if (!prompt.trim()) return;
     setAiLoading(true);
     setAiError(null);
     
+    console.log('Starting AI request with prompt:', prompt);
+    
     try {
-      const result = await AIService.uploadSpreadsheetWithPrompt(selectedFile, prompt);
-      if (result.data && Array.isArray(result.data)) {
-        setAiResultData(result.data);
-        setAiFormatting(result.formatting || null);
+      if (selectedFile) {
+        console.log('Using file:', selectedFile.name);
+        const result = await AIService.uploadSpreadsheetWithPrompt(selectedFile, prompt);
+        console.log('AI Result received:', result);
+        
+        if (result.data && Array.isArray(result.data)) {
+          setAiResultData(result.data);
+          setAiFormatting(result.formatting || null);
+          console.log('Formatting applied:', result.formatting);
+        }
+      } else {
+        // Test with current sheet data
+        console.log('Testing with current sheet data');
+        if (prompt.toLowerCase().includes('highlight') && prompt.toLowerCase().includes('red')) {
+          const testFormatting = spreadsheetData.map((row, rowIndex) => 
+            row.map(() => ({
+              background: rowIndex > 0 ? '#ff6b6b' : '#ffffff',
+              color: rowIndex > 0 ? '#ffffff' : '#1f2937'
+            }))
+          );
+          setFormatting(testFormatting);
+          console.log('Direct formatting applied:', testFormatting);
+        }
       }
     } catch (err: any) {
+      console.error('AI Error:', err);
       setAiError(err.message || 'AI processing failed');
     } finally {
       setAiLoading(false);
