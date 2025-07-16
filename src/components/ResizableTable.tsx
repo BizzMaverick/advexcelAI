@@ -71,6 +71,12 @@ const ResizableTable = forwardRef<any, ResizableTableProps>(({
 
   const getCellStyle = (rowIndex: number, cellIndex: number) => {
     const fmt = formatting?.[rowIndex]?.[cellIndex] || {};
+    
+    // Debug: Log formatting to see what we're getting
+    if (rowIndex === 0 && cellIndex === 0 && formatting) {
+      console.log('Formatting received:', formatting);
+    }
+    
     return {
       padding: '8px 12px',
       color: fmt.color || '#1f2937',
