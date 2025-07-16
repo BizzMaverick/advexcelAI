@@ -1,3 +1,5 @@
+const XLSX = require('xlsx');
+
 exports.handler = async (event, context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -14,98 +16,96 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // For now, return working mock data based on common prompts
-    const mockCountryData = [
-      ['Country', 'Rank', 'Score'],
-      ['Afghanistan', 6, 106.6],
-      ['Algeria', 83, 70.0],
-      ['Angola', 39, 86.9],
-      ['Bangladesh', 41, 85.2],
-      ['Brazil', 71, 74.5],
-      ['Canada', 6, 31.0],
-      ['Chad', 9, 104.6],
-      ['Egypt', 50, 81.6],
-      ['France', 5, 29.0],
-      ['Germany', 2, 31.0],
-      ['Haiti', 10, 102.9],
-      ['India', 73, 74.1],
-      ['Japan', 3, 33.0],
-      ['Kenya', 35, 87.8],
-      ['Libya', 17, 96.1],
-      ['Mali', 13, 99.5],
-      ['Nigeria', 15, 98.0],
-      ['Pakistan', 32, 89.9],
-      ['Somalia', 1, 111.9],
-      ['Sudan', 7, 106.2],
-      ['Syria', 5, 107.1],
-      ['Uganda', 26, 91.5],
-      ['United Kingdom', 4, 35.0],
-      ['United States', 1, 85.0],
-      ['Yemen', 2, 108.9],
-      ['Zimbabwe', 16, 96.9]
-    ];
+    // Parse multipart form data properly
+    const contentType = event.headers['content-type'] || '';
+    if (!contentType.includes('multipart/form-data')) {
+      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid content type' }) };
+    }
 
-    // Simple prompt detection
-    const body = event.body || '';
-    let prompt = 'process data';
+    const boundary = contentType.split('boundary=')[1];
+    const body = Buffer.from(event.body, 'base64');
+    const parts = body.toString('binary').split('--' + boundary);
     
-    // Try to extract prompt from body (simple approach)
-    if (body.includes('prompt')) {
-      const promptMatch = body.match(/prompt[^a-zA-Z]*([^&\r\n]+)/);
-      if (promptMatch) {
-        prompt = promptMatch[1].trim().replace(/[+]/g, ' ');
+    let prompt = '';
+    let fileBuffer = null;
+    
+    // Extract prompt and file from multipart data
+    for (const part of parts) {
+      if (part.includes('name="prompt"')) {
+        const lines = part.split('\r\n');
+        for (let i = 0; i < lines.length; i++) {
+          if (lines[i] === '' && i + 1 < lines.length) {
+            prompt = lines[i + 1].trim();
+            break;
+          }
+        }
+      }
+      
+      if (part.includes('name="file"') && part.includes('Content-Type:')) {
+        const headerEnd = part.indexOf('\r\n\r\n');
+        if (headerEnd !== -1) {
+          const fileStart = headerEnd + 4;
+          const fileEnd = part.lastIndexOf('\r\n--');
+          const fileContent = part.substring(fileStart, fileEnd > 0 ? fileEnd : undefined);
+          fileBuffer = Buffer.from(fileContent, 'binary');
+        }
       }
     }
 
-    let data = [...mockCountryData];
-    let formatting = [];
+    if (!fileBuffer) {
+      return { statusCode: 400, headers, body: JSON.stringify({ error: 'No file uploaded' }) };
+    }
 
-    // Process based on prompt
-    if (prompt.toLowerCase().includes('alphabetical') || prompt.toLowerCase().includes('sort')) {
-      // Sort by country name
-      const headers = data[0];
-      const rows = data.slice(1);
-      const sortedRows = rows.sort((a, b) => a[0].localeCompare(b[0]));
-      data = [headers, ...sortedRows];
-      
-    } else if (prompt.toLowerCase().includes('highlight') && prompt.toLowerCase().includes('top')) {
-      // Highlight top 10
+    // Process the actual uploaded Excel file
+    let data;
+    try {
+      const workbook = XLSX.read(fileBuffer, { type: 'buffer' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+    } catch (error) {
+      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Failed to parse Excel file' }) };
+    }
+
+    if (!data || data.length === 0) {
+      return { statusCode: 400, headers, body: JSON.stringify({ error: 'No data in file' }) };
+    }
+
+    let formatting = [];
+    const promptLower = prompt.toLowerCase();
+
+    // Process based on actual prompt
+    if (promptLower.includes('highlight') && promptLower.includes('red')) {
+      // Highlight all rows in red
       formatting = data.map((row, rowIndex) => 
         row.map(() => 
-          rowIndex > 0 && rowIndex <= 10 
-            ? { background: '#fef2f2', color: '#dc2626' } 
-            : {}
+          rowIndex > 0 ? { background: '#fef2f2', color: '#dc2626' } : {}
         )
       );
-      
-    } else if (prompt.toLowerCase().includes('africa')) {
-      // Filter African countries
-      const headers = data[0];
-      const africanCountries = ['Algeria', 'Angola', 'Chad', 'Egypt', 'Kenya', 'Libya', 'Mali', 'Nigeria', 'Somalia', 'Sudan', 'Uganda', 'Zimbabwe'];
-      const filteredRows = data.slice(1).filter(row => 
-        africanCountries.includes(row[0])
-      );
-      data = [headers, ...filteredRows];
-      
-    } else if (prompt.toLowerCase().includes('average')) {
-      // Add average row
+    } else if (promptLower.includes('sort') || promptLower.includes('alphabetical')) {
+      // Sort by first column
       const headers = data[0];
       const rows = data.slice(1);
-      const avgScore = rows.reduce((sum, row) => sum + row[2], 0) / rows.length;
-      data = [headers, ['AVERAGE', '-', avgScore.toFixed(1)], ...rows];
+      const sortedRows = rows.sort((a, b) => {
+        const aVal = String(a[0] || '').toLowerCase();
+        const bVal = String(b[0] || '').toLowerCase();
+        return aVal.localeCompare(bVal);
+      });
+      data = [headers, ...sortedRows];
     }
 
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
-        result: `Processed: ${prompt}`,
+        result: `Successfully processed: ${prompt}`,
         data: data,
         formatting: formatting
       })
     };
 
   } catch (error) {
+    console.error('Function error:', error);
     return {
       statusCode: 500,
       headers,
