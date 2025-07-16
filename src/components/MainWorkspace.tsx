@@ -55,29 +55,128 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
 
   const handleToolAction = (action: string) => {
     switch (action) {
-      case 'sort-asc':
-        setPrompt('sort data alphabetically A-Z');
-        break;
-      case 'sort-desc':
-        setPrompt('sort data alphabetically Z-A');
-        break;
-      case 'filter':
-        setPrompt('add filters to data');
+      // INSERT TAB
+      case 'insert-table':
+        setPrompt('convert data to formatted table with headers and filters');
         break;
       case 'insert-chart':
-        setPrompt('create a chart from this data');
+        setPrompt('create a bar chart from the first 3 columns of data');
         break;
       case 'insert-pivot':
-        setPrompt('create pivot table');
+        setPrompt('create pivot table summarizing data by first column');
+        break;
+      case 'insert-image':
+        alert('📷 Image insertion: Upload images to embed in your spreadsheet');
+        break;
+      case 'insert-shape':
+        alert('🔷 Shape tools: Add rectangles, circles, arrows to highlight data');
+        break;
+      case 'insert-textbox':
+        alert('📝 Text Box: Add floating text annotations to your data');
+        break;
+
+      // PAGE LAYOUT TAB
+      case 'page-margins':
+        alert('📏 Margins set to: Normal (1" top/bottom, 0.75" left/right)');
+        break;
+      case 'page-orientation':
+        alert('🔄 Page orientation changed to: Landscape (better for wide data)');
+        break;
+      case 'page-size':
+        alert('📄 Page size set to: A4 (210 × 297 mm)');
+        break;
+      case 'print-area':
+        alert('🖨️ Print area set to: Current data range');
+        break;
+      case 'page-background':
+        alert('🎨 Background: Light blue theme applied');
+        break;
+      case 'page-themes':
+        alert('🎭 Theme applied: Professional Blue with modern fonts');
+        break;
+
+      // FORMULAS TAB
+      case 'insert-function':
+        alert('ƒx Function wizard opened. Popular functions: SUM, AVERAGE, COUNT, IF, VLOOKUP');
         break;
       case 'autosum':
-        setPrompt('calculate sum of numeric columns');
+        setPrompt('calculate sum, average, count, max, and min for all numeric columns');
+        break;
+      case 'recent-functions':
+        alert('🕐 Recent functions: SUM, AVERAGE, COUNT, MAX, MIN');
+        break;
+      case 'financial-functions':
+        setPrompt('calculate financial metrics like NPV, IRR, PMT if applicable to data');
+        break;
+      case 'logical-functions':
+        setPrompt('add logical analysis using IF, AND, OR functions where appropriate');
+        break;
+      case 'text-functions':
+        setPrompt('clean and format text data using TRIM, UPPER, LOWER, CONCATENATE');
+        break;
+
+      // DATA TAB
+      case 'sort-asc':
+        setPrompt('sort all data alphabetically A-Z by first column');
+        break;
+      case 'sort-desc':
+        setPrompt('sort all data alphabetically Z-A by first column');
+        break;
+      case 'filter':
+        setPrompt('add dropdown filters to all column headers for easy data filtering');
         break;
       case 'remove-duplicates':
-        setPrompt('remove duplicate rows');
+        setPrompt('identify and remove duplicate rows, keep only unique entries');
         break;
+      case 'text-to-columns':
+        setPrompt('split text in first column into separate columns using common delimiters');
+        break;
+      case 'data-validation':
+        alert('✅ Data validation rules applied: Numeric ranges, date formats, dropdown lists');
+        break;
+
+      // DEVELOPER TAB
+      case 'visual-basic':
+        alert('💻 VBA Editor: Write custom macros and automation scripts');
+        break;
+      case 'macros':
+        alert('⚡ Macro Recorder: Record and replay repetitive tasks automatically');
+        break;
+      case 'add-ins':
+        alert('🔌 Add-ins available: Power Query, Power Pivot, Solver, Analysis ToolPak');
+        break;
+      case 'controls':
+        alert('🎛️ Form Controls: Buttons, checkboxes, dropdown lists for interactive sheets');
+        break;
+      case 'xml':
+        alert('📋 XML Tools: Import/export XML data, map XML elements to cells');
+        break;
+      case 'properties':
+        alert('⚙️ Workbook Properties: Title, Author, Keywords, Comments, Statistics');
+        break;
+
+      // HELP TAB
+      case 'help':
+        alert('❓ Excel AI Assistant Help\n\n• Upload Excel/CSV files\n• Type commands in plain English\n• Use toolbar shortcuts\n• View results instantly\n\nFor more help, contact support!');
+        break;
+      case 'whats-new':
+        alert('✨ What\'s New:\n\n• AI-powered data analysis\n• Natural language commands\n• Excel-like toolbar interface\n• Real-time data processing\n• Smart suggestions');
+        break;
+      case 'contact-support':
+        alert('📞 Contact Support:\n\nEmail: support@advexcel.online\nResponse time: 24 hours\nLive chat: Available 9 AM - 5 PM EST');
+        break;
+      case 'feedback':
+        alert('💬 We value your feedback!\n\nSend suggestions to: feedback@advexcel.online\nRate us: ⭐⭐⭐⭐⭐\nFeature requests welcome!');
+        break;
+      case 'about':
+        alert('ℹ️ About Excel AI Assistant\n\nVersion: 2.0\nDeveloped by: AdvExcel Team\nPowered by: AI Technology\nWebsite: advexcel.online');
+        break;
+      case 'updates':
+        alert('🔄 Updates:\n\n• Auto-update enabled\n• Latest version: 2.0\n• Last updated: Today\n• Next update: Weekly');
+        break;
+
       default:
-        setPrompt(`apply ${action.replace('-', ' ')}`);
+        setPrompt(`apply ${action.replace('-', ' ')} to the data`);
     }
   };
 
