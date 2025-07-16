@@ -39,6 +39,9 @@ const ResizableTable = forwardRef<any, ResizableTableProps>(({
   const [columnWidths, setColumnWidths] = useState<ColumnWidths>({});
   const [editingCell, setEditingCell] = useState<{ row: number; col: number } | null>(null);
   const [editValue, setEditValue] = useState<string>('');
+  const [selectedCells, setSelectedCells] = useState<{start: {row: number, col: number}, end: {row: number, col: number}} | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState<{row: number, col: number} | null>(null);
 
 
   useImperativeHandle(ref, () => ({
@@ -67,23 +70,39 @@ const ResizableTable = forwardRef<any, ResizableTableProps>(({
     setColumnWidths(defaultWidths);
   }, [headers]);
 
+  useEffect(() => {
+    const handleMouseUp = () => {
+      setIsDragging(false);
+      setDragStart(null);
+    };
+    
+    document.addEventListener('mouseup', handleMouseUp);
+    return () => document.removeEventListener('mouseup', handleMouseUp);
+  }, []);
+
   const getColumnWidth = (index: number) => columnWidths[index] || 150;
+
+  const isCellSelected = (rowIndex: number, cellIndex: number) => {
+    if (!selectedCells) return false;
+    const { start, end } = selectedCells;
+    const minRow = Math.min(start.row, end.row);
+    const maxRow = Math.max(start.row, end.row);
+    const minCol = Math.min(start.col, end.col);
+    const maxCol = Math.max(start.col, end.col);
+    return rowIndex >= minRow && rowIndex <= maxRow && cellIndex >= minCol && cellIndex <= maxCol;
+  };
 
   const getCellStyle = (rowIndex: number, cellIndex: number) => {
     const fmt = formatting?.[rowIndex]?.[cellIndex] || {};
-    
-    // Debug: Log formatting to see what we're getting
-    if (rowIndex === 0 && cellIndex === 0 && formatting) {
-      console.log('Formatting received:', formatting);
-    }
+    const isSelected = isCellSelected(rowIndex, cellIndex);
     
     return {
       padding: '8px 12px',
       color: fmt.color || '#1f2937',
-      background: fmt.background || '#ffffff',
+      background: isSelected ? '#cce7ff' : (fmt.background || '#ffffff'),
       fontWeight: fmt.bold ? 'bold' : 'normal',
       fontStyle: fmt.italic ? 'italic' : 'normal',
-      border: '1px solid #e5e7eb',
+      border: isSelected ? '2px solid #007bff' : '1px solid #e5e7eb',
       fontSize: '13px',
       width: `${getColumnWidth(cellIndex)}px`,
       minWidth: `${getColumnWidth(cellIndex)}px`,
@@ -92,6 +111,7 @@ const ResizableTable = forwardRef<any, ResizableTableProps>(({
       textOverflow: 'ellipsis',
       whiteSpace: 'nowrap',
       fontFamily: 'Calibri, "Segoe UI", Arial, sans-serif',
+      userSelect: 'none' as const,
     } as React.CSSProperties;
   };
 
@@ -239,8 +259,29 @@ const ResizableTable = forwardRef<any, ResizableTableProps>(({
                       />
                     ) : (
                       <div
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          setDragStart({ row: rowIndex, col: cellIndex });
+                          setSelectedCells({ 
+                            start: { row: rowIndex, col: cellIndex }, 
+                            end: { row: rowIndex, col: cellIndex } 
+                          });
+                          setIsDragging(true);
+                        }}
+                        onMouseEnter={() => {
+                          if (isDragging && dragStart) {
+                            setSelectedCells({ 
+                              start: dragStart, 
+                              end: { row: rowIndex, col: cellIndex } 
+                            });
+                          }
+                        }}
+                        onMouseUp={() => {
+                          setIsDragging(false);
+                          setDragStart(null);
+                        }}
                         onClick={() => {
-                          if (onCellEdit) {
+                          if (!isDragging && onCellEdit) {
                             setEditingCell({ row: rowIndex, col: cellIndex });
                             setEditValue(String(cell ?? ''));
                           }
@@ -252,7 +293,7 @@ const ResizableTable = forwardRef<any, ResizableTableProps>(({
                           }
                         }}
                         style={{ 
-                          cursor: onCellEdit ? 'text' : 'default', 
+                          cursor: onCellEdit ? 'cell' : 'default', 
                           display: 'block',
                           minHeight: '20px',
                           padding: '2px'
