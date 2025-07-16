@@ -200,31 +200,48 @@ const ResizableTable = forwardRef<any, ResizableTableProps>(({
                         autoFocus
                         onChange={e => setEditValue(e.target.value)}
                         onBlur={() => {
-                          if (onCellEdit) onCellEdit(rowIndex, cellIndex, editValue);
+                          if (onCellEdit) {
+                            onCellEdit(rowIndex, cellIndex, editValue);
+                          }
                           setEditingCell(null);
                         }}
                         onKeyDown={e => {
                           if (e.key === 'Enter') {
-                            if (onCellEdit) onCellEdit(rowIndex, cellIndex, editValue);
+                            if (onCellEdit) {
+                              onCellEdit(rowIndex, cellIndex, editValue);
+                            }
                             setEditingCell(null);
                           } else if (e.key === 'Escape') {
                             setEditingCell(null);
                           }
                         }}
-                        style={{ width: '100%', border: 'none', outline: 'none' }}
+                        style={{ 
+                          width: '100%', 
+                          border: '2px solid #007bff', 
+                          outline: 'none',
+                          padding: '4px',
+                          borderRadius: '2px'
+                        }}
                       />
                     ) : (
-                      <span
+                      <div
                         onClick={() => {
-                          setEditingCell({ row: rowIndex, col: cellIndex });
-                          setEditValue(String(cell ?? ''));
+                          if (onCellEdit) {
+                            setEditingCell({ row: rowIndex, col: cellIndex });
+                            setEditValue(String(cell ?? ''));
+                          }
                         }}
-                        style={{ cursor: 'pointer', display: 'block' }}
+                        style={{ 
+                          cursor: onCellEdit ? 'text' : 'default', 
+                          display: 'block',
+                          minHeight: '20px',
+                          padding: '2px'
+                        }}
                       >
                         {typeof cell === 'string' && cell.startsWith('=')
                           ? evaluateFormula(cell)
-                          : cell}
-                      </span>
+                          : (cell || '')}
+                      </div>
                     )}
                   </td>
                 ))}
