@@ -104,6 +104,7 @@ function App() {
   const [contextMenuAnchor, setContextMenuAnchor] = useState<{ x: number; y: number } | null>(null);
   const contextMenuRef = useRef<HTMLDivElement | null>(null);
   const [showHelp, setShowHelp] = useState(false);
+  const [smartSuggestions, setSmartSuggestions] = useState<string[]>([]);
   
 
   
@@ -281,6 +282,37 @@ function App() {
     });
   };
 
+  // Analyze data and generate smart suggestions
+  const analyzeDataAndSuggest = (data: SpreadsheetData) => {
+    if (!data || data.length < 2) return [];
+    
+    const headers = data[0]?.map(h => String(h).toLowerCase()) || [];
+    const suggestions: string[] = [];
+    
+    // Detect data patterns
+    const hasCountry = headers.some(h => h.includes('country') || h.includes('nation'));
+    const hasRank = headers.some(h => h.includes('rank') || h.includes('position'));
+    const hasScore = headers.some(h => h.includes('score') || h.includes('total') || h.includes('index'));
+    const hasYear = headers.some(h => h.includes('year') || h.includes('date'));
+    const hasName = headers.some(h => h.includes('name') || h.includes('title'));
+    
+    // Generate smart suggestions based on data type
+    if (hasCountry && hasRank) {
+      suggestions.push('🏆 Show top 10 countries', '🌍 Filter by continent', '📊 Sort by ranking');
+    } else if (hasCountry && hasScore) {
+      suggestions.push('📈 Highest scoring countries', '📉 Lowest performing countries', '🔢 Calculate country averages');
+    } else if (hasName && hasScore) {
+      suggestions.push('⭐ Top performers', '📊 Sort by score', '🎯 Highlight best results');
+    } else if (hasYear) {
+      suggestions.push('📅 Filter by year', '📈 Show trends over time', '🔍 Compare years');
+    } else {
+      // Generic suggestions
+      suggestions.push('📝 Sort data A-Z', '🔴 Highlight top rows', '📊 Calculate averages');
+    }
+    
+    return suggestions.slice(0, 4); // Limit to 4 suggestions
+  };
+
   // Update file upload logic to read all sheets
   const handleFileUpload = (jsonData: SpreadsheetData, allSheets?: { name: string; data: SpreadsheetData }[]) => {
     if (allSheets && allSheets.length > 0) {
@@ -288,11 +320,15 @@ function App() {
       setSelectedSheet(0);
       setSpreadsheetData(allSheets[0].data);
       setFormatting(allSheets[0].data.map(row => row.map(() => ({}))));
+      // Generate smart suggestions
+      setSmartSuggestions(analyzeDataAndSuggest(allSheets[0].data));
     } else {
       setSheets([{ name: 'Sheet1', data: jsonData, locked: false }]);
       setSelectedSheet(0);
       setSpreadsheetData(jsonData);
       setFormatting(jsonData.map(row => row.map(() => ({}))));
+      // Generate smart suggestions
+      setSmartSuggestions(analyzeDataAndSuggest(jsonData));
     }
   };
 
@@ -455,6 +491,40 @@ function App() {
                   </button>
                 )}
               </div>
+              
+              {/* Smart AI Suggestions */}
+              {smartSuggestions.length > 0 && (
+                <div style={{ marginBottom: '15px' }}>
+                  <div style={{ fontSize: '0.9rem', color: '#60a5fa', fontWeight: 600, marginBottom: '8px' }}>
+                    🤖 <strong>AI Detected:</strong> Smart suggestions for your data
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    {smartSuggestions.map((suggestion, index) => (
+                      <button 
+                        key={index}
+                        onClick={() => { setPrompt(suggestion.replace(/[🏆🌍📊📈💰🎯📉💵⭐🔴📝📅🔍🔢]/g, '').trim()); setTimeout(handleUserPrompt, 100); }} 
+                        style={{ 
+                          padding: '8px 14px', 
+                          fontSize: '0.9rem', 
+                          borderRadius: 8, 
+                          border: '2px solid #3b82f6', 
+                          background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)', 
+                          color: '#1e40af', 
+                          cursor: 'pointer',
+                          fontWeight: 600,
+                          boxShadow: '0 2px 4px rgba(59, 130, 246, 0.1)',
+                          transition: 'all 0.2s'
+                        }} 
+                        disabled={aiLoading}
+                        onMouseOver={e => e.currentTarget.style.transform = 'translateY(-1px)'}
+                        onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
               
               {/* Quick Action Buttons */}
               <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '10px' }}>
