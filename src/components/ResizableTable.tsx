@@ -96,6 +96,11 @@ const ResizableTable = forwardRef<any, ResizableTableProps>(({
     const fmt = formatting?.[rowIndex]?.[cellIndex] || {};
     const isSelected = isCellSelected(rowIndex, cellIndex);
     
+    // Debug formatting
+    if (rowIndex === 1 && cellIndex === 0 && fmt.background) {
+      console.log('Cell formatting applied:', fmt);
+    }
+    
     return {
       padding: '8px 12px',
       color: fmt.color || '#1f2937',

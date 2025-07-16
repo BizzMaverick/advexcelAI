@@ -78,9 +78,10 @@ exports.handler = async (event, context) => {
     if (promptLower.includes('highlight') && promptLower.includes('red')) {
       // Highlight all rows in red
       formatting = data.map((row, rowIndex) => 
-        row.map(() => 
-          rowIndex > 0 ? { background: '#fef2f2', color: '#dc2626' } : {}
-        )
+        row.map(() => ({
+          background: rowIndex > 0 ? '#fef2f2' : '#ffffff',
+          color: rowIndex > 0 ? '#dc2626' : '#1f2937'
+        }))
       );
     } else if (promptLower.includes('sort') || promptLower.includes('alphabetical')) {
       // Sort by first column
