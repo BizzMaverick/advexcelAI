@@ -3,6 +3,35 @@ const XLSX = require('xlsx');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+// Simple multipart parser
+function parseMultipart(body, boundary) {
+  const parts = body.split('--' + boundary);
+  const result = {};
+  
+  for (const part of parts) {
+    if (part.includes('Content-Disposition: form-data')) {
+      const nameMatch = part.match(/name="([^"]+)"/);
+      if (nameMatch) {
+        const name = nameMatch[1];
+        if (name === 'prompt') {
+          const lines = part.split('\r\n');
+          result.prompt = lines[lines.length - 2] || '';
+        } else if (name === 'file') {
+          const headerEnd = part.indexOf('\r\n\r\n');
+          if (headerEnd !== -1) {
+            const fileContent = part.substring(headerEnd + 4);
+            // Remove trailing boundary markers
+            const cleanContent = fileContent.replace(/\r\n--.*$/, '');
+            result.fileBuffer = Buffer.from(cleanContent, 'binary');
+          }
+        }
+      }
+    }
+  }
+  
+  return result;
+}
+
 exports.handler = async (event, context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -19,103 +48,45 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // Parse multipart form data
-    const body = Buffer.from(event.body, 'base64');
-    const boundary = event.headers['content-type'].split('boundary=')[1];
-    const parts = body.toString('binary').split('--' + boundary);
-    
-    let prompt = 'process data';
-    let fileBuffer = null;
-    
-    for (const part of parts) {
-      if (part.includes('name="prompt"')) {
-        const lines = part.split('\r\n');
-        prompt = lines[lines.length - 2] || 'process data';
-      }
-      if (part.includes('name="file"') && part.includes('Content-Type:')) {
-        const headerEnd = part.indexOf('\r\n\r\n');
-        if (headerEnd !== -1) {
-          const fileData = part.substring(headerEnd + 4);
-          fileBuffer = Buffer.from(fileData, 'binary');
-        }
-      }
+    // Parse form data
+    const contentType = event.headers['content-type'] || '';
+    if (!contentType.includes('multipart/form-data')) {
+      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid content type' }) };
     }
+
+    const boundary = contentType.split('boundary=')[1];
+    if (!boundary) {
+      return { statusCode: 400, headers, body: JSON.stringify({ error: 'No boundary found' }) };
+    }
+
+    const body = Buffer.from(event.body, 'base64').toString('binary');
+    const parsed = parseMultipart(body, boundary);
     
-    if (!fileBuffer) {
-      return { statusCode: 400, headers, body: JSON.stringify({ error: 'No file found' }) };
+    if (!parsed.fileBuffer || !parsed.prompt) {
+      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing file or prompt' }) };
     }
 
     // Process Excel file
-    const workbook = XLSX.read(fileBuffer, { type: 'buffer' });
-    const sheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[sheetName];
-    let data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-    
-    // Keep original data size for processing
-    // Only limit if extremely large
-    if (data.length > 200) data = data.slice(0, 200);
-    if (data[0] && data[0].length > 20) {
-      data = data.map(row => row.slice(0, 20));
+    let data;
+    try {
+      const workbook = XLSX.read(parsed.fileBuffer, { type: 'buffer' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+    } catch (xlsxError) {
+      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Failed to parse Excel file' }) };
     }
 
-    // Use AI to process the request
-    if (process.env.GEMINI_API_KEY) {
-      try {
-        const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
-        
-        const systemPrompt = `You are an Excel AI assistant. Process this request and return ONLY valid JSON.
-
-User Request: "${prompt}"
-Excel Data: ${JSON.stringify(data)}
-
-Instructions:
-- Analyze the data and user request
-- Create appropriate output based on the request
-- For pivot tables, aggregate and summarize data
-- For highlighting, return formatting info
-- For calculations, perform the math
-- Always return valid JSON in this format:
-{
-  "data": [["Header1", "Header2"], ["row1col1", "row1col2"]],
-  "formatting": [[{}, {}], [{}, {}]]
-}
-
-Return ONLY the JSON object, no other text.`;
-
-        const result = await model.generateContent(systemPrompt);
-        const response = result.response.text();
-        
-        // Extract JSON from response
-        const jsonMatch = response.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          const aiResult = JSON.parse(jsonMatch[0]);
-          if (aiResult.data && Array.isArray(aiResult.data)) {
-            return {
-              statusCode: 200,
-              headers,
-              body: JSON.stringify({
-                result: `AI processed: ${prompt}`,
-                data: aiResult.data,
-                formatting: aiResult.formatting || []
-              })
-            };
-          }
-        }
-        
-        // Fallback if AI response is invalid
-        throw new Error('Invalid AI response format');
-        
-      } catch (aiError) {
-        console.error('AI Error:', aiError);
-        // Fallback to basic processing
-      }
+    if (!data || data.length === 0) {
+      return { statusCode: 400, headers, body: JSON.stringify({ error: 'No data found in file' }) };
     }
-    
-    // Fallback: Basic processing without AI
+
+    const prompt = parsed.prompt.toLowerCase().trim();
     let formatting = [];
-    
-    if (prompt.toLowerCase().includes('alphabetical') || prompt.toLowerCase().includes('sort')) {
-      // Sort data alphabetically by first column (country name)
+
+    // Process based on prompt - RELIABLE LOGIC
+    if (prompt.includes('alphabetical') || prompt.includes('sort')) {
+      // Sort alphabetically by first column
       const headers = data[0];
       const rows = data.slice(1);
       const sortedRows = rows.sort((a, b) => {
@@ -124,30 +95,67 @@ Return ONLY the JSON object, no other text.`;
         return aVal.localeCompare(bVal);
       });
       data = [headers, ...sortedRows];
-    } else if (prompt.toLowerCase().includes('highlight') && prompt.toLowerCase().includes('red')) {
-      formatting = data.map((row) => 
-        row.map((cell, colIndex) => 
-          colIndex === 0 ? { background: '#ffebee', color: '#c62828' } : {}
+      
+    } else if (prompt.includes('highlight') && prompt.includes('top')) {
+      // Highlight top rows
+      const numToHighlight = prompt.includes('10') ? 10 : 5;
+      formatting = data.map((row, rowIndex) => 
+        row.map(() => 
+          rowIndex > 0 && rowIndex <= numToHighlight 
+            ? { background: '#fef2f2', color: '#dc2626' } 
+            : {}
         )
       );
+      
+    } else if (prompt.includes('filter') && prompt.includes('africa')) {
+      // Filter African countries
+      const headers = data[0];
+      const africanCountries = ['Algeria', 'Angola', 'Benin', 'Botswana', 'Burkina Faso', 'Burundi', 'Cameroon', 'Cape Verde', 'Central African Republic', 'Chad', 'Comoros', 'Congo', 'Djibouti', 'Egypt', 'Equatorial Guinea', 'Eritrea', 'Ethiopia', 'Gabon', 'Gambia', 'Ghana', 'Guinea', 'Guinea Bissau', 'Ivory Coast', 'Kenya', 'Lesotho', 'Liberia', 'Libya', 'Madagascar', 'Malawi', 'Mali', 'Mauritania', 'Mauritius', 'Morocco', 'Mozambique', 'Namibia', 'Niger', 'Nigeria', 'Rwanda', 'Sao Tome and Principe', 'Senegal', 'Seychelles', 'Sierra Leone', 'Somalia', 'South Africa', 'South Sudan', 'Sudan', 'Swaziland', 'Tanzania', 'Togo', 'Tunisia', 'Uganda', 'Zambia', 'Zimbabwe'];
+      
+      const filteredRows = data.slice(1).filter(row => {
+        const country = String(row[0] || '').toLowerCase();
+        return africanCountries.some(ac => country.includes(ac.toLowerCase()));
+      });
+      data = [headers, ...filteredRows];
+      
+    } else if (prompt.includes('average') || prompt.includes('calculate')) {
+      // Calculate averages for numeric columns
+      const headers = data[0];
+      const rows = data.slice(1);
+      const averages = [];
+      
+      for (let col = 0; col < headers.length; col++) {
+        const values = rows.map(row => parseFloat(row[col])).filter(v => !isNaN(v));
+        if (values.length > 0) {
+          const avg = values.reduce((sum, val) => sum + val, 0) / values.length;
+          averages.push(avg.toFixed(2));
+        } else {
+          averages.push('N/A');
+        }
+      }
+      
+      data = [headers, ['AVERAGES', ...averages.slice(1)], ...rows];
     }
 
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
-        result: `Processed: ${prompt}`,
+        result: `Successfully processed: ${parsed.prompt}`,
         data: data,
         formatting: formatting
       })
     };
-    
+
   } catch (error) {
     console.error('Function error:', error);
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: error.message })
+      body: JSON.stringify({ 
+        error: 'Processing failed', 
+        details: error.message 
+      })
     };
   }
 };
