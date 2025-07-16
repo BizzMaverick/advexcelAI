@@ -19,6 +19,8 @@ type SpreadsheetFormatting = ({ color?: string; background?: string; bold?: bool
 
 export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [sheets, setSheets] = useState<{name: string; data: SpreadsheetData; formatting: SpreadsheetFormatting}[]>([]);
+  const [activeSheet, setActiveSheet] = useState(0);
   const [spreadsheetData, setSpreadsheetData] = useState<SpreadsheetData>([]);
   const [formatting, setFormatting] = useState<SpreadsheetFormatting>([]);
   const [aiResultData, setAiResultData] = useState<SpreadsheetData | null>(null);
@@ -27,6 +29,36 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const createNewSheet = () => {
+    const newSheetName = `Sheet${sheets.length + 1}`;
+    const emptyData = Array(20).fill(null).map(() => Array(10).fill(''));
+    const emptyFormatting = emptyData.map(row => row.map(() => ({})));
+    
+    const newSheet = {
+      name: newSheetName,
+      data: emptyData,
+      formatting: emptyFormatting
+    };
+    
+    setSheets([...sheets, newSheet]);
+    setActiveSheet(sheets.length);
+    setSpreadsheetData(emptyData);
+    setFormatting(emptyFormatting);
+  };
+
+  const handleCellEdit = (row: number, col: number, value: string) => {
+    const newData = [...spreadsheetData];
+    newData[row][col] = value;
+    setSpreadsheetData(newData);
+    
+    // Update sheet data
+    if (sheets[activeSheet]) {
+      const updatedSheets = [...sheets];
+      updatedSheets[activeSheet].data = newData;
+      setSheets(updatedSheets);
+    }
+  };
 
   const handleFileUpload = async (file: File) => {
     try {
@@ -41,8 +73,17 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
           const worksheet = workbook.Sheets[sheetName];
           const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as SpreadsheetData;
           
+          const newFormatting = jsonData.map(row => row.map(() => ({})));
+          const newSheet = {
+            name: file.name.replace(/\.[^/.]+$/, ""),
+            data: jsonData,
+            formatting: newFormatting
+          };
+          
+          setSheets([newSheet]);
+          setActiveSheet(0);
           setSpreadsheetData(jsonData);
-          setFormatting(jsonData.map(row => row.map(() => ({}))));
+          setFormatting(newFormatting);
         } catch (err) {
           console.error('Failed to process file:', err);
         }
@@ -338,46 +379,110 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
         </div>
 
         {/* Main Spreadsheet Area */}
-        <div style={{ flex: 1, padding: '20px', overflow: 'auto' }}>
-          {!selectedFile ? (
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: '100%',
-              color: '#666',
-              textAlign: 'center'
-            }}>
-              <div style={{ fontSize: '4rem', marginBottom: '16px' }}>📊</div>
-              <h2>Upload an Excel or CSV file to get started</h2>
-              <p>Use the file upload panel on the left or click the toolbar buttons above</p>
-            </div>
-          ) : (
-            <>
-              {/* Original Data */}
-              {spreadsheetData.length > 0 && (
-                <ResizableTable
-                  data={spreadsheetData.slice(1)}
-                  headers={spreadsheetData[0]?.map(h => String(h || '')) || []}
-                  formatting={formatting.slice(1)}
-                  title="📋 Original Data"
-                  subtitle={`${spreadsheetData.length} rows × ${spreadsheetData[0]?.length || 0} columns`}
-                />
-              )}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+          {/* Sheet Tabs */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            background: '#f8f9fa',
+            borderBottom: '1px solid #e9ecef',
+            padding: '8px 16px',
+            gap: '8px'
+          }}>
+            {sheets.map((sheet, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  setActiveSheet(index);
+                  setSpreadsheetData(sheet.data);
+                  setFormatting(sheet.formatting);
+                }}
+                style={{
+                  padding: '6px 12px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px 4px 0 0',
+                  background: activeSheet === index ? '#ffffff' : '#f8f9fa',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem',
+                  borderBottom: activeSheet === index ? '1px solid #ffffff' : '1px solid #ddd'
+                }}
+              >
+                {sheet.name}
+              </button>
+            ))}
+            <button
+              onClick={createNewSheet}
+              style={{
+                padding: '6px 12px',
+                border: '1px solid #28a745',
+                borderRadius: '4px',
+                background: '#28a745',
+                color: 'white',
+                cursor: 'pointer',
+                fontSize: '0.9rem'
+              }}
+            >
+              + New Sheet
+            </button>
+          </div>
 
-              {/* AI Result */}
-              {aiResultData && aiResultData.length > 0 && (
-                <ResizableTable
-                  data={aiResultData.slice(1)}
-                  headers={aiResultData[0]?.map(h => String(h || '')) || []}
-                  formatting={aiFormatting?.slice(1)}
-                  title="🤖 AI Result"
-                  subtitle={`${aiResultData.length} rows × ${aiResultData[0]?.length || 0} columns`}
-                />
-              )}
-            </>
-          )}
+          <div style={{ flex: 1, padding: '20px', overflow: 'auto' }}>
+            {sheets.length === 0 ? (
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '100%',
+                color: '#666',
+                textAlign: 'center'
+              }}>
+                <div style={{ fontSize: '4rem', marginBottom: '16px' }}>📊</div>
+                <h2>Create a new sheet or upload a file</h2>
+                <p>Click "+ New Sheet" above or use the file upload panel on the left</p>
+                <button
+                  onClick={createNewSheet}
+                  style={{
+                    padding: '12px 24px',
+                    background: '#007bff',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '1rem',
+                    marginTop: '16px'
+                  }}
+                >
+                  📄 Create New Sheet
+                </button>
+              </div>
+            ) : (
+              <>
+                {/* Current Sheet Data */}
+                {spreadsheetData.length > 0 && (
+                  <ResizableTable
+                    data={spreadsheetData}
+                    headers={Array.from({length: spreadsheetData[0]?.length || 10}, (_, i) => String.fromCharCode(65 + i))}
+                    formatting={formatting}
+                    title={`📋 ${sheets[activeSheet]?.name || 'Sheet'}`}
+                    subtitle={`${spreadsheetData.length} rows × ${spreadsheetData[0]?.length || 0} columns`}
+                    onCellEdit={handleCellEdit}
+                  />
+                )}
+
+                {/* AI Result */}
+                {aiResultData && aiResultData.length > 0 && (
+                  <ResizableTable
+                    data={aiResultData.slice(1)}
+                    headers={aiResultData[0]?.map(h => String(h || '')) || []}
+                    formatting={aiFormatting?.slice(1)}
+                    title="🤖 AI Result"
+                    subtitle={`${aiResultData.length} rows × ${aiResultData[0]?.length || 0} columns`}
+                  />
+                )}
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>
