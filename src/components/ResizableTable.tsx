@@ -213,6 +213,20 @@ const ResizableTable = forwardRef<any, ResizableTableProps>(({
                             setEditingCell(null);
                           } else if (e.key === 'Escape') {
                             setEditingCell(null);
+                          } else if (e.key === 'Tab') {
+                            e.preventDefault();
+                            if (onCellEdit) {
+                              onCellEdit(rowIndex, cellIndex, editValue);
+                            }
+                            setEditingCell(null);
+                            // Move to next cell
+                            const nextCol = cellIndex + 1;
+                            if (nextCol < (data[rowIndex]?.length || 0)) {
+                              setTimeout(() => {
+                                setEditingCell({ row: rowIndex, col: nextCol });
+                                setEditValue(String(data[rowIndex][nextCol] ?? ''));
+                              }, 50);
+                            }
                           }
                         }}
                         style={{ 
@@ -226,6 +240,12 @@ const ResizableTable = forwardRef<any, ResizableTableProps>(({
                     ) : (
                       <div
                         onClick={() => {
+                          if (onCellEdit) {
+                            setEditingCell({ row: rowIndex, col: cellIndex });
+                            setEditValue(String(cell ?? ''));
+                          }
+                        }}
+                        onDoubleClick={() => {
                           if (onCellEdit) {
                             setEditingCell({ row: rowIndex, col: cellIndex });
                             setEditValue(String(cell ?? ''));

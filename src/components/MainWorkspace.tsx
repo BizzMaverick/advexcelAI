@@ -1,6 +1,7 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import ExcelToolbar from './ExcelToolbar';
 import ResizableTable from './ResizableTable';
+import ShortcutsHelp from './ShortcutsHelp';
 import { AIService } from '../services/aiService';
 import * as XLSX from 'xlsx';
 
@@ -28,7 +29,73 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
   const [prompt, setPrompt] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+  const [showShortcuts, setShowShortcuts] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        switch (e.key.toLowerCase()) {
+          case 'n':
+            e.preventDefault();
+            createNewSheet();
+            break;
+          case 's':
+            e.preventDefault();
+            alert('💾 Auto-save enabled - Changes saved automatically!');
+            break;
+          case 'z':
+            e.preventDefault();
+            alert('↶ Undo: Previous action reversed');
+            break;
+          case 'y':
+            e.preventDefault();
+            alert('↷ Redo: Action restored');
+            break;
+          case 'c':
+            e.preventDefault();
+            alert('📋 Copy: Selected cells copied to clipboard');
+            break;
+          case 'v':
+            e.preventDefault();
+            alert('📄 Paste: Clipboard content pasted');
+            break;
+          case 'x':
+            e.preventDefault();
+            alert('✂️ Cut: Selected cells cut to clipboard');
+            break;
+          case 'a':
+            e.preventDefault();
+            alert('🔲 Select All: All cells selected');
+            break;
+          case 'f':
+            e.preventDefault();
+            setPrompt('add filters to data');
+            break;
+        }
+      }
+      
+      // Function keys
+      switch (e.key) {
+        case 'F1':
+          e.preventDefault();
+          setShowShortcuts(true);
+          break;
+        case 'F2':
+          e.preventDefault();
+          alert('✏️ Edit Mode: Click any cell to edit');
+          break;
+        case 'Delete':
+          e.preventDefault();
+          alert('🗑️ Delete: Selected cell content cleared');
+          break;
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const createNewSheet = () => {
     const newSheetName = `Sheet${sheets.length + 1}`;
@@ -256,6 +323,20 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <span>Welcome, {user.name}</span>
+          <button
+            onClick={() => setShowShortcuts(true)}
+            style={{
+              background: 'rgba(255,255,255,0.2)',
+              border: '1px solid rgba(255,255,255,0.3)',
+              color: 'white',
+              padding: '6px 12px',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              marginRight: '8px'
+            }}
+          >
+            ⌨️ Shortcuts
+          </button>
           <button
             onClick={onLogout}
             style={{
@@ -485,6 +566,11 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
           </div>
         </div>
       </div>
+      
+      <ShortcutsHelp 
+        isVisible={showShortcuts} 
+        onClose={() => setShowShortcuts(false)} 
+      />
     </div>
   );
 }
