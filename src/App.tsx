@@ -44,6 +44,15 @@ function App() {
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <img 
+            src="/logo.png" 
+            alt="Excel AI Assistant" 
+            style={{ height: '32px' }}
+            onError={(e) => {
+              // Fallback if logo image doesn't exist
+              e.currentTarget.style.display = 'none';
+            }}
+          />
           <h1 style={{ margin: 0, fontSize: '20px' }}>Excel AI Assistant</h1>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
