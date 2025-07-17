@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import ExcelToolbar from './ExcelToolbar';
 import ResizableTable from './ResizableTable';
 import ShortcutsHelp from './ShortcutsHelp';
+import DirectFormatting from './DirectFormatting';
 import { AIService } from '../services/aiService';
 import * as XLSX from 'xlsx';
 
@@ -125,6 +126,111 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
       updatedSheets[activeSheet].data = newData;
       setSheets(updatedSheets);
     }
+  };
+  
+  const handleDirectFormatting = (action: string) => {
+    // Apply direct formatting without backend
+    const newFormatting = [...formatting];
+    
+    switch (action) {
+      case 'highlight-all-red':
+        // Highlight all data rows in red
+        for (let row = 0; row < spreadsheetData.length; row++) {
+          for (let col = 0; col < spreadsheetData[row].length; col++) {
+            if (row > 0) { // Skip header row
+              newFormatting[row][col] = { 
+                background: '#fef2f2', 
+                color: '#dc2626' 
+              };
+            }
+          }
+        }
+        break;
+        
+      case 'highlight-top-10':
+        // Highlight top 10 rows in blue
+        for (let row = 1; row <= Math.min(10, spreadsheetData.length - 1); row++) {
+          for (let col = 0; col < spreadsheetData[row].length; col++) {
+            newFormatting[row][col] = { 
+              background: '#eff6ff', 
+              color: '#1d4ed8' 
+            };
+          }
+        }
+        break;
+        
+      case 'highlight-bottom-10':
+        // Highlight bottom 10 rows in green
+        const startRow = Math.max(1, spreadsheetData.length - 10);
+        for (let row = startRow; row < spreadsheetData.length; row++) {
+          for (let col = 0; col < spreadsheetData[row].length; col++) {
+            newFormatting[row][col] = { 
+              background: '#f0fdf4', 
+              color: '#16a34a' 
+            };
+          }
+        }
+        break;
+        
+      case 'bold-headers':
+        // Make header row bold
+        if (spreadsheetData.length > 0) {
+          for (let col = 0; col < spreadsheetData[0].length; col++) {
+            newFormatting[0][col] = { 
+              ...newFormatting[0][col],
+              bold: true,
+              background: '#f8fafc'
+            };
+          }
+        }
+        break;
+        
+      case 'alternate-rows':
+        // Apply alternating row colors
+        for (let row = 0; row < spreadsheetData.length; row++) {
+          for (let col = 0; col < spreadsheetData[row].length; col++) {
+            if (row === 0) {
+              // Header row
+              newFormatting[row][col] = { 
+                background: '#f8fafc',
+                bold: true
+              };
+            } else if (row % 2 === 1) {
+              // Odd rows
+              newFormatting[row][col] = { 
+                background: '#f9fafb'
+              };
+            } else {
+              // Even rows
+              newFormatting[row][col] = { 
+                background: '#ffffff'
+              };
+            }
+          }
+        }
+        break;
+        
+      case 'clear-formatting':
+        // Clear all formatting
+        for (let row = 0; row < spreadsheetData.length; row++) {
+          for (let col = 0; col < spreadsheetData[row].length; col++) {
+            newFormatting[row][col] = {};
+          }
+        }
+        break;
+    }
+    
+    // Update formatting
+    setFormatting(newFormatting);
+    
+    // Update sheet formatting
+    if (sheets[activeSheet]) {
+      const updatedSheets = [...sheets];
+      updatedSheets[activeSheet].formatting = newFormatting;
+      setSheets(updatedSheets);
+    }
+    
+    console.log(`Direct formatting applied: ${action}`);
   };
 
   const handleFileUpload = async (file: File) => {
@@ -431,6 +537,9 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
               <small>{spreadsheetData.length} rows</small>
             </div>
           )}
+          
+          {/* Direct Formatting */}
+          <DirectFormatting onApplyFormatting={handleDirectFormatting} />
 
           {/* AI Prompt */}
           <h4 style={{ margin: '20px 0 8px 0', color: '#333' }}>🤖 AI Command</h4>
@@ -451,7 +560,7 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
           
           <button
             onClick={handleRunAI}
-            disabled={!selectedFile || !prompt.trim() || aiLoading}
+            disabled={!prompt.trim() || aiLoading}
             style={{
               width: '100%',
               padding: '10px',
