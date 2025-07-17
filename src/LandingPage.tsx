@@ -104,6 +104,9 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
         // Set pending user and show verification screen
         setPendingUser({ email, name: user?.name || name });
         setNeedsVerification(true);
+        
+        // In a real app, this would send an email with the verification code
+        console.log(`Verification code for ${email}: ${code}`);
       } else {
         // Login existing user
         const user = await authService.login(email, password);
@@ -127,7 +130,7 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
     setError('');
     
     try {
-      // For development, just check if the code matches the displayed code
+      // For development, just check if the code matches the stored code
       if (verificationCode === actualVerificationCode) {
         // Try to login after verification
         try {
@@ -159,7 +162,11 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
       // Generate a new verification code
       const newCode = Math.floor(100000 + Math.random() * 900000).toString();
       setActualVerificationCode(newCode);
-      alert('A new verification code has been generated');
+      
+      // In a real app, this would send an email with the verification code
+      console.log(`New verification code for ${pendingUser.email}: ${newCode}`);
+      
+      alert('A new verification code has been sent to your email');
     } catch (err: any) {
       setError(err.message || 'Failed to resend verification code');
     } finally {
@@ -253,7 +260,6 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
         handleResendCode={handleResendCode}
         setNeedsVerification={setNeedsVerification}
         setPendingUser={setPendingUser}
-        actualCode={actualVerificationCode}
       />
     );
   }

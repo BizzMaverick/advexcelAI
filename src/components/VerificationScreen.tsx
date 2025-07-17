@@ -10,7 +10,6 @@ interface VerificationScreenProps {
   handleResendCode: () => void;
   setNeedsVerification: (value: boolean) => void;
   setPendingUser: (user: { email: string; name: string } | null) => void;
-  actualCode: string; // The actual verification code to display
 }
 
 export default function VerificationScreen({
@@ -22,8 +21,7 @@ export default function VerificationScreen({
   handleVerify,
   handleResendCode,
   setNeedsVerification,
-  setPendingUser,
-  actualCode
+  setPendingUser
 }: VerificationScreenProps) {
   // Professional color palette
   const colors = {
@@ -83,23 +81,6 @@ export default function VerificationScreen({
           }}>
             <p>We've sent a verification code to <strong>{pendingUser?.email}</strong></p>
             <p>Please enter the code below to verify your email address.</p>
-            
-            {/* Display the verification code directly */}
-            <div style={{
-              margin: '20px 0',
-              padding: '15px',
-              background: colors.success + '10',
-              border: `1px solid ${colors.success}`,
-              borderRadius: '4px',
-              color: colors.success,
-              fontWeight: 'bold',
-              fontSize: '18px'
-            }}>
-              Your verification code: {actualCode}
-            </div>
-            <p style={{ fontSize: '13px', color: colors.textSecondary }}>
-              For development purposes, the code is displayed here.
-            </p>
           </div>
           
           <form onSubmit={handleVerify} style={{ 
