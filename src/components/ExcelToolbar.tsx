@@ -193,4 +193,14 @@ export default function ExcelToolbar({ onToolAction }: ExcelToolbarProps) {
       </div>
     </div>
   );
+}   {getIcon(tool.icon)}
+            </span>
+            <span style={{ textAlign: 'center', lineHeight: '1.2', fontWeight: '500' }}>
+              {tool.name}
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
 }
