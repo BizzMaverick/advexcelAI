@@ -4,7 +4,8 @@ import emailConfig from '../config/emailConfig';
 // EmailJS configuration
 const { 
   serviceId, 
-  templateId, 
+  verificationTemplateId,
+  passwordResetTemplateId,
   userId, 
   fromEmail, 
   fromName, 
@@ -58,7 +59,7 @@ const sendVerificationEmail = async (email: string, name: string, code: string):
   try {
     const response = await emailjs.send(
       serviceId,
-      templateId,
+      verificationTemplateId,
       {
         to_email: email,
         to_name: name,
@@ -87,13 +88,12 @@ const sendPasswordResetEmail = async (email: string, code: string): Promise<bool
     
     const response = await emailjs.send(
       serviceId,
-      templateId,
+      passwordResetTemplateId,
       {
         to_email: email,
         to_name: user.name,
-        verification_code: code,
+        reset_code: code,
         app_name: 'Excel AI Assistant',
-        email_type: 'password reset',
         from_email: fromEmail,
         from_name: fromName,
         reply_to: replyTo
