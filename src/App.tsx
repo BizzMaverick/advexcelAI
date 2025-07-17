@@ -1,48 +1,23 @@
-import { useState } from 'react';
+import React from 'react';
 import './App.css';
-import LandingPage from './LandingPage';
-import LoginPage from './components/LoginPage';
-import MainWorkspace from './components/MainWorkspace';
-
-interface User {
-  email: string;
-  name: string;
-}
+import ExcelToolbar from './components/ExcelToolbar';
 
 function App() {
-  const [showLanding, setShowLanding] = useState(true);
-  const [showLogin, setShowLogin] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-
-  const handleGetStarted = () => {
-    setShowLanding(false);
-    setShowLogin(true);
+  const handleToolAction = (action: string) => {
+    console.log(`Action: ${action}`);
   };
 
-  const handleLogin = (userData: User) => {
-    setUser(userData);
-    setShowLogin(false);
-  };
-
-  const handleLogout = () => {
-    setUser(null);
-    setShowLanding(true);
-    setShowLogin(false);
-  };
-
-  if (showLanding) {
-    return <LandingPage onBegin={handleGetStarted} />;
-  }
-
-  if (showLogin) {
-    return <LoginPage onLogin={handleLogin} />;
-  }
-
-  if (user) {
-    return <MainWorkspace user={user} onLogout={handleLogout} />;
-  }
-
-  return null;
+  return (
+    <div className="App">
+      <header style={{ background: '#0078d4', color: 'white', padding: '20px' }}>
+        <h1>Excel AI Assistant</h1>
+      </header>
+      <ExcelToolbar onToolAction={handleToolAction} />
+      <div style={{ padding: '20px' }}>
+        <p>Welcome to Excel AI Assistant</p>
+      </div>
+    </div>
+  );
 }
 
 export default App;
