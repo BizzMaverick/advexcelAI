@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import logo from './assets/logo.png';
 import authService from './services/authService';
+import emailService from './services/emailService';
 import VerificationScreen from './components/VerificationScreen';
 
 interface LandingPageProps {
@@ -36,8 +37,9 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
     textSecondary: '#666',
   };
 
-  // Initialize
+  // Initialize EmailJS
   useEffect(() => {
+    emailService.initEmailJS();
     authService.init();
   }, []);
 
@@ -101,12 +103,12 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
         const code = Math.floor(100000 + Math.random() * 900000).toString();
         setActualVerificationCode(code);
         
+        // Send verification email
+        await emailService.sendVerificationEmail(email, name, code);
+        
         // Set pending user and show verification screen
         setPendingUser({ email, name: user?.name || name });
         setNeedsVerification(true);
-        
-        // In a real app, this would send an email with the verification code
-        console.log(`Verification code for ${email}: ${code}`);
       } else {
         // Login existing user
         const user = await authService.login(email, password);
@@ -130,7 +132,7 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
     setError('');
     
     try {
-      // For development, just check if the code matches the stored code
+      // Check if the code matches the stored code
       if (verificationCode === actualVerificationCode) {
         // Try to login after verification
         try {
@@ -163,8 +165,8 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
       const newCode = Math.floor(100000 + Math.random() * 900000).toString();
       setActualVerificationCode(newCode);
       
-      // In a real app, this would send an email with the verification code
-      console.log(`New verification code for ${pendingUser.email}: ${newCode}`);
+      // Send verification email
+      await emailService.sendVerificationEmail(pendingUser.email, pendingUser.name, newCode);
       
       alert('A new verification code has been sent to your email');
     } catch (err: any) {
@@ -185,7 +187,15 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
         throw new Error('Please enter your email address');
       }
       
+      // Generate reset code
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+      
+      // Send password reset email
+      await emailService.sendPasswordResetEmail(email, 'User', code);
+      
+      // Store the reset code for verification
       await authService.forgotPassword(email);
+      
       setForgotPassword(true);
     } catch (err: any) {
       setError(err.message || 'Failed to send password reset code');
