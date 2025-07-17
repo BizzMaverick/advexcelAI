@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import logo from './assets/logo.png';
 
 interface LandingPageProps {
   onLogin: (userData: { email: string; name: string }) => void;
@@ -54,15 +55,11 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
           textAlign: 'center'
         }}>
           <img 
-            src="/logo.png" 
+            src={logo} 
             alt="Excel AI Assistant" 
             style={{ 
               height: '60px',
               marginBottom: '10px'
-            }}
-            onError={(e) => {
-              // Fallback if logo image doesn't exist
-              e.currentTarget.style.display = 'none';
             }}
           />
           <h1 style={{ 

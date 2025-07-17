@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './App.css';
 import ExcelToolbar from './components/ExcelToolbar';
 import LandingPage from './LandingPage';
+import logo from './assets/logo.png';
 
 function App() {
   const [user, setUser] = useState<{ name: string; email: string } | null>(null);
@@ -45,13 +46,9 @@ function App() {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <img 
-            src="/logo.png" 
+            src={logo} 
             alt="Excel AI Assistant" 
             style={{ height: '32px' }}
-            onError={(e) => {
-              // Fallback if logo image doesn't exist
-              e.currentTarget.style.display = 'none';
-            }}
           />
           <h1 style={{ margin: 0, fontSize: '20px' }}>Excel AI Assistant</h1>
         </div>

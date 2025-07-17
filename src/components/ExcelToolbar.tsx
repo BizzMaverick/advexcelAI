@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import logo from '../assets/logo.png';
 
 interface ExcelToolbarProps {
   onToolAction: (action: string, params?: any) => void;
@@ -43,12 +44,28 @@ export default function ExcelToolbar({ onToolAction }: ExcelToolbarProps) {
       borderBottom: `1px solid ${colors.border}`,
       padding: '0'
     }}>
-      {/* Tab Headers */}
+      {/* Logo and Tab Headers */}
       <div style={{
         display: 'flex',
         borderBottom: `1px solid ${colors.border}`,
-        background: colors.background
+        background: colors.background,
+        alignItems: 'center'
       }}>
+        {/* Logo */}
+        <div style={{ 
+          padding: '5px 16px', 
+          display: 'flex', 
+          alignItems: 'center',
+          borderRight: `1px solid ${colors.border}`
+        }}>
+          <img 
+            src={logo} 
+            alt="Excel AI Assistant" 
+            style={{ height: '24px' }}
+          />
+        </div>
+        
+        {/* Tabs */}
         {Object.keys(toolbarTabs).map((tab) => (
           <button
             key={tab}
