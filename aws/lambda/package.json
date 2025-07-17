@@ -1,0 +1,9 @@
+{
+  "name": "excel-ai-function",
+  "version": "1.0.0",
+  "description": "AWS Lambda function for Excel AI Assistant",
+  "main": "index.js",
+  "dependencies": {
+    "xlsx": "^0.18.5"
+  }
+}
