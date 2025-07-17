@@ -34,6 +34,11 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
     textSecondary: '#666',
   };
 
+  // Initialize EmailJS
+  useEffect(() => {
+    authService.init();
+  }, []);
+
   // Check if user is already logged in
   useEffect(() => {
     const checkCurrentUser = async () => {

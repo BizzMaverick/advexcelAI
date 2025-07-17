@@ -1,7 +1,8 @@
-/**
- * Simple authentication service with mock user database
- * This can be replaced with AWS Cognito or another auth provider in production
- */
+import emailjs from '@emailjs/browser';
+import emailConfig from '../config/emailConfig';
+
+// EmailJS configuration
+const { serviceId, templateId, userId } = emailConfig;
 
 interface User {
   id: string;
@@ -11,7 +12,7 @@ interface User {
   verified: boolean;
 }
 
-// Mock user database - in production, this would be replaced with a real database
+// User database - in production, this would be a real database
 const users: User[] = [
   {
     id: '1',
@@ -29,22 +30,82 @@ const users: User[] = [
   }
 ];
 
-// Mock verification codes - in production, this would be sent via email
+// Store verification codes
 const verificationCodes: Record<string, string> = {};
 
-// Mock password reset codes - in production, this would be sent via email
+// Store password reset codes
 const resetCodes: Record<string, string> = {};
 
-// Simple password hashing - in production, use a proper hashing library
+// Generate a random 6-digit code
+const generateCode = (): string => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+// Simple password hashing - in production, use a proper hashing library like bcrypt
 const hashPassword = (password: string): string => {
   return password; // This is just a placeholder - NEVER do this in production
 };
 
+// Send verification email using EmailJS
+const sendVerificationEmail = async (email: string, name: string, code: string): Promise<boolean> => {
+  try {
+    const response = await emailjs.send(
+      serviceId,
+      templateId,
+      {
+        to_email: email,
+        to_name: name,
+        verification_code: code,
+        app_name: 'Excel AI Assistant'
+      },
+      userId
+    );
+    
+    console.log('Email sent successfully:', response);
+    return true;
+  } catch (error) {
+    console.error('Failed to send email:', error);
+    return false;
+  }
+};
+
+// Send password reset email using EmailJS
+const sendPasswordResetEmail = async (email: string, code: string): Promise<boolean> => {
+  try {
+    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    if (!user) return false;
+    
+    const response = await emailjs.send(
+      serviceId,
+      templateId,
+      {
+        to_email: email,
+        to_name: user.name,
+        verification_code: code,
+        app_name: 'Excel AI Assistant',
+        email_type: 'password reset'
+      },
+      userId
+    );
+    
+    console.log('Password reset email sent successfully:', response);
+    return true;
+  } catch (error) {
+    console.error('Failed to send password reset email:', error);
+    return false;
+  }
+};
+
 export const authService = {
+  // Initialize EmailJS
+  init: () => {
+    emailjs.init(userId);
+  },
+  
   // Login a user
   login: async (email: string, password: string): Promise<{ email: string; name: string }> => {
     // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 800));
+    await new Promise(resolve => setTimeout(resolve, 300));
     
     const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
     
@@ -65,9 +126,6 @@ export const authService = {
   
   // Register a new user
   register: async (email: string, password: string, name: string): Promise<{ email: string; name: string }> => {
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
     // Check if user already exists
     const existingUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
     if (existingUser) {
@@ -100,24 +158,25 @@ export const authService = {
       verified: false
     };
     
-    // Add to mock database
-    users.push(newUser);
-    
     // Generate verification code
-    const verificationCode = '123456'; // In production, generate a random code
+    const verificationCode = generateCode();
     verificationCodes[email.toLowerCase()] = verificationCode;
     
-    // In production, send email with verification code
-    console.log(`Verification code for ${email}: ${verificationCode}`);
+    // Send verification email
+    const emailSent = await sendVerificationEmail(email, name, verificationCode);
+    
+    if (!emailSent) {
+      throw new Error('Failed to send verification email. Please try again.');
+    }
+    
+    // Add to database
+    users.push(newUser);
     
     return { email, name };
   },
   
   // Verify email with code
   verifyEmail: async (email: string, code: string): Promise<boolean> => {
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
     const storedCode = verificationCodes[email.toLowerCase()];
     
     if (!storedCode) {
@@ -142,9 +201,6 @@ export const authService = {
   
   // Resend verification code
   resendVerificationCode: async (email: string): Promise<void> => {
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
     const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
     
     if (!user) {
@@ -156,18 +212,19 @@ export const authService = {
     }
     
     // Generate new verification code
-    const verificationCode = '123456'; // In production, generate a random code
+    const verificationCode = generateCode();
     verificationCodes[email.toLowerCase()] = verificationCode;
     
-    // In production, send email with verification code
-    console.log(`New verification code for ${email}: ${verificationCode}`);
+    // Send verification email
+    const emailSent = await sendVerificationEmail(email, user.name, verificationCode);
+    
+    if (!emailSent) {
+      throw new Error('Failed to send verification email. Please try again.');
+    }
   },
   
   // Forgot password
   forgotPassword: async (email: string): Promise<void> => {
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
     const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
     
     if (!user) {
@@ -175,18 +232,19 @@ export const authService = {
     }
     
     // Generate reset code
-    const resetCode = '123456'; // In production, generate a random code
+    const resetCode = generateCode();
     resetCodes[email.toLowerCase()] = resetCode;
     
-    // In production, send email with reset code
-    console.log(`Password reset code for ${email}: ${resetCode}`);
+    // Send password reset email
+    const emailSent = await sendPasswordResetEmail(email, resetCode);
+    
+    if (!emailSent) {
+      throw new Error('Failed to send password reset email. Please try again.');
+    }
   },
   
   // Reset password with code
   resetPassword: async (email: string, code: string, newPassword: string): Promise<void> => {
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
     const storedCode = resetCodes[email.toLowerCase()];
     
     if (!storedCode) {
