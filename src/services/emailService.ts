@@ -4,7 +4,7 @@ import emailjs from '@emailjs/browser';
 const serviceId = 'service_gyuegyb';
 const verificationTemplateId = 'template_47ro7ih';
 const passwordResetTemplateId = 'template_cn1z44j';
-const userId = 'YOUR_EMAILJS_USER_ID'; // Replace with your actual user ID
+const userId = '3xCIlXaFmm79QkBaB'; // Replace with your actual user ID
 
 // Initialize EmailJS
 export const initEmailJS = () => {
