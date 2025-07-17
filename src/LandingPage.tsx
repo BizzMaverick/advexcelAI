@@ -10,7 +10,6 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [showDemo, setShowDemo] = useState(false);
 
   // Professional color palette
   const colors = {
@@ -39,14 +38,6 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
     setTimeout(() => {
       setIsLoading(false);
       onLogin({ email, name: email.split('@')[0] });
-    }, 1000);
-  };
-  
-  const handleDemoLogin = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      onLogin({ email: 'demo@example.com', name: 'Demo User' });
     }, 1000);
   };
 
@@ -225,8 +216,7 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
               fontWeight: '500',
               cursor: isLoading ? 'not-allowed' : 'pointer',
               opacity: isLoading ? 0.7 : 1,
-              transition: 'background-color 0.2s',
-              marginBottom: '16px'
+              transition: 'background-color 0.2s'
             }}
             onMouseOver={(e) => {
               if (!isLoading) {
@@ -238,62 +228,6 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
             }}
           >
             {isLoading ? 'Logging in...' : 'Login'}
-          </button>
-          
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '16px 0',
-            position: 'relative'
-          }}>
-            <div style={{ 
-              height: '1px', 
-              background: colors.border, 
-              flexGrow: 1 
-            }} />
-            <span style={{ 
-              padding: '0 10px', 
-              color: colors.textSecondary,
-              fontSize: '14px',
-              background: 'white'
-            }}>
-              or
-            </span>
-            <div style={{ 
-              height: '1px', 
-              background: colors.border, 
-              flexGrow: 1 
-            }} />
-          </div>
-          
-          <button
-            type="button"
-            onClick={handleDemoLogin}
-            disabled={isLoading}
-            style={{
-              width: '100%',
-              padding: '12px',
-              background: 'white',
-              color: colors.primary,
-              border: `1px solid ${colors.primary}`,
-              borderRadius: '4px',
-              fontSize: '15px',
-              fontWeight: '500',
-              cursor: isLoading ? 'not-allowed' : 'pointer',
-              opacity: isLoading ? 0.7 : 1,
-              transition: 'background-color 0.2s'
-            }}
-            onMouseOver={(e) => {
-              if (!isLoading) {
-                e.currentTarget.style.background = '#f0f7ff';
-              }
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.background = 'white';
-            }}
-          >
-            Try Demo
           </button>
           
           <p style={{ 
@@ -326,34 +260,6 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
             </a>
           </p>
         </form>
-      </div>
-      
-      <div style={{ 
-        marginTop: '20px',
-        display: 'flex',
-        gap: '16px',
-        justifyContent: 'center'
-      }}>
-        <a 
-          href="#" 
-          style={{ color: 'white', textDecoration: 'none', fontSize: '14px' }}
-          onClick={(e) => {
-            e.preventDefault();
-            alert('Help Center would be displayed here');
-          }}
-        >
-          Help Center
-        </a>
-        <a 
-          href="#" 
-          style={{ color: 'white', textDecoration: 'none', fontSize: '14px' }}
-          onClick={(e) => {
-            e.preventDefault();
-            alert('Contact Support would be displayed here');
-          }}
-        >
-          Contact Support
-        </a>
       </div>
     </div>
   );
