@@ -2,10 +2,10 @@ import { useState, useRef, useEffect } from 'react';
 import ExcelToolbar from './ExcelToolbar';
 import ResizableTable from './ResizableTable';
 import ShortcutsHelp from './ShortcutsHelp';
+import DirectFormatting from './DirectFormatting';
 import SimpleHighlight from './SimpleHighlight';
 // import { AIService } from '../services/aiService'; // Using direct fetch instead
 import * as XLSX from 'xlsx';
-import { parseHighlightingPrompt } from '../utils/highlightParser';
 
 interface User {
   email: string;
@@ -249,7 +249,7 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
           
           const newFormatting = jsonData.map(row => row.map(() => ({})));
           const newSheet = {
-            name: file.name.replace(/\.[^/.]+$/, ""),
+            name: file.name.replace(/\\.[^/.]+$/, ""),
             data: jsonData,
             formatting: newFormatting
           };
@@ -372,22 +372,22 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
 
       // HELP TAB
       case 'help':
-        alert('❓ Excel AI Assistant Help\n\n• Upload Excel/CSV files\n• Type commands in plain English\n• Use toolbar shortcuts\n• View results instantly\n\nFor more help, contact support!');
+        alert('❓ Excel AI Assistant Help\\n\\n• Upload Excel/CSV files\\n• Type commands in plain English\\n• Use toolbar shortcuts\\n• View results instantly\\n\\nFor more help, contact support!');
         break;
       case 'whats-new':
-        alert('✨ What\'s New:\n\n• AI-powered data analysis\n• Natural language commands\n• Excel-like toolbar interface\n• Real-time data processing\n• Smart suggestions');
+        alert('✨ What\'s New:\\n\\n• AI-powered data analysis\\n• Natural language commands\\n• Excel-like toolbar interface\\n• Real-time data processing\\n• Smart suggestions');
         break;
       case 'contact-support':
-        alert('📞 Contact Support:\n\nEmail: support@advexcel.online\nResponse time: 24 hours\nLive chat: Available 9 AM - 5 PM EST');
+        alert('📞 Contact Support:\\n\\nEmail: support@advexcel.online\\nResponse time: 24 hours\\nLive chat: Available 9 AM - 5 PM EST');
         break;
       case 'feedback':
-        alert('💬 We value your feedback!\n\nSend suggestions to: feedback@advexcel.online\nRate us: ⭐⭐⭐⭐⭐\nFeature requests welcome!');
+        alert('💬 We value your feedback!\\n\\nSend suggestions to: feedback@advexcel.online\\nRate us: ⭐⭐⭐⭐⭐\\nFeature requests welcome!');
         break;
       case 'about':
-        alert('ℹ️ About Excel AI Assistant\n\nVersion: 2.0\nDeveloped by: AdvExcel Team\nPowered by: AI Technology\nWebsite: advexcel.online');
+        alert('ℹ️ About Excel AI Assistant\\n\\nVersion: 2.0\\nDeveloped by: AdvExcel Team\\nPowered by: AI Technology\\nWebsite: advexcel.online');
         break;
       case 'updates':
-        alert('🔄 Updates:\n\n• Auto-update enabled\n• Latest version: 2.0\n• Last updated: Today\n• Next update: Weekly');
+        alert('🔄 Updates:\\n\\n• Auto-update enabled\\n• Latest version: 2.0\\n• Last updated: Today\\n• Next update: Weekly');
         break;
 
       default:
@@ -412,7 +412,7 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
         console.log('Using file:', selectedFile.name);
       } else {
         // If no file, create a CSV from current data
-        const csvContent = spreadsheetData.map(row => row.join(',')).join('\n');
+        const csvContent = spreadsheetData.map(row => row.join(',')).join('\\n');
         const csvFile = new File([csvContent], 'current-data.csv', { type: 'text/csv' });
         formData.append('file', csvFile);
         console.log('Using current sheet data as CSV');
@@ -440,21 +440,34 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
         }
       }
       
-      // Apply intelligent highlighting for any highlighting request
-      const highlightFormatting = parseHighlightingPrompt(prompt, spreadsheetData);
-      if (highlightFormatting) {
-        setFormatting(highlightFormatting);
-        console.log('Applied intelligent highlighting');
+      // Fallback for highlighting if backend fails to provide formatting
+      if (prompt.toLowerCase().includes('highlight') && prompt.toLowerCase().includes('red')) {
+        if (!result.formatting || !Array.isArray(result.formatting)) {
+          console.log('No formatting from backend, applying direct formatting');
+          const testFormatting = spreadsheetData.map((row, rowIndex) => 
+            row.map(() => ({
+              background: rowIndex > 0 ? '#fef2f2' : '#ffffff',
+              color: rowIndex > 0 ? '#dc2626' : '#1f2937'
+            }))
+          );
+          setFormatting(testFormatting);
+          console.log('Direct formatting applied:', testFormatting);
+        }
       }
     } catch (err: any) {
       console.error('AI Error:', err);
       setAiError(err.message || 'AI processing failed');
       
-      // Apply intelligent highlighting on error
-      const highlightFormatting = parseHighlightingPrompt(prompt, spreadsheetData);
-      if (highlightFormatting) {
-        setFormatting(highlightFormatting);
-        console.log('Applied intelligent highlighting after error');
+      // Apply direct formatting on error for highlight requests
+      if (prompt.toLowerCase().includes('highlight')) {
+        const testFormatting = spreadsheetData.map((row, rowIndex) => 
+          row.map(() => ({
+            background: rowIndex > 0 ? '#fef2f2' : '#ffffff',
+            color: rowIndex > 0 ? '#dc2626' : '#1f2937'
+          }))
+        );
+        setFormatting(testFormatting);
+        console.log('Applied fallback formatting after error');
       }
     } finally {
       setAiLoading(false);

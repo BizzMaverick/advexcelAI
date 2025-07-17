@@ -64,21 +64,12 @@ exports.handler = async (event, context) => {
     
     if (promptLower.includes('highlight') && promptLower.includes('red')) {
       // Highlight all rows in red
-      result.formatting = [];
-      for (let i = 0; i < data.length; i++) {
-        const row = [];
-        for (let j = 0; j < data[i].length; j++) {
-          if (i === 0) {
-            row.push({});
-          } else {
-            row.push({
-              background: '#fef2f2',
-              color: '#dc2626'
-            });
-          }
-        }
-        result.formatting.push(row);
-      }
+      result.formatting = data.map((row, rowIndex) => 
+        row.map(() => ({
+          background: rowIndex > 0 ? '#fef2f2' : '#ffffff',
+          color: rowIndex > 0 ? '#dc2626' : '#1f2937'
+        }))
+      );
       console.log('Applied red highlighting');
     } 
     else if (promptLower.includes('sort') && promptLower.includes('a-z')) {
@@ -107,23 +98,12 @@ exports.handler = async (event, context) => {
     }
     else if (promptLower.includes('top') && promptLower.includes('10')) {
       // Highlight top 10 rows
-      result.formatting = [];
-      for (let i = 0; i < data.length; i++) {
-        const row = [];
-        for (let j = 0; j < data[i].length; j++) {
-          if (i === 0) {
-            row.push({});
-          } else if (i <= 10) {
-            row.push({
-              background: '#eff6ff',
-              color: '#1d4ed8'
-            });
-          } else {
-            row.push({});
-          }
-        }
-        result.formatting.push(row);
-      }
+      result.formatting = data.map((row, rowIndex) => 
+        row.map(() => ({
+          background: rowIndex > 0 && rowIndex <= 10 ? '#eff6ff' : '#ffffff',
+          color: rowIndex > 0 && rowIndex <= 10 ? '#1d4ed8' : '#1f2937'
+        }))
+      );
       console.log('Applied top 10 highlighting');
     }
     
