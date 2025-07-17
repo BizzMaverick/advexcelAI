@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 import ExcelToolbar from './ExcelToolbar';
 import ResizableTable from './ResizableTable';
 import ShortcutsHelp from './ShortcutsHelp';
-import SimpleHighlight from './SimpleHighlight';
 import { AWSService } from '../services/awsService';
 import * as XLSX from 'xlsx';
 
@@ -651,94 +650,7 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
             </div>
           )}
           
-          {/* Direct Formatting Buttons */}
-          <div style={{ marginBottom: '24px' }}>
-            <h4 style={{ 
-              margin: '0 0 12px 0', 
-              color: colors.text, 
-              fontSize: '16px', 
-              fontWeight: '500',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 19L19 12L22 15L15 22L12 19Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M18 13L16.5 5.5L2 2L5.5 16.5L13 18L18 13Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M2 2L9.586 9.586" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M11 13C12.1046 13 13 12.1046 13 11C13 9.89543 12.1046 9 11 9C9.89543 9 9 9.89543 9 11C9 12.1046 9.89543 13 11 13Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              Formatting
-            </h4>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <button
-                onClick={() => handleDirectFormatting('highlight-all-red')}
-                style={{
-                  padding: '10px 12px',
-                  background: 'white',
-                  color: colors.text,
-                  border: `1px solid ${colors.border}`,
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '13px',
-                  textAlign: 'left',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  transition: 'all 0.2s'
-                }}
-              >
-                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#dc2626' }}></div>
-                Highlight All Rows
-              </button>
-              
-              <button
-                onClick={() => handleDirectFormatting('highlight-top-10')}
-                style={{
-                  padding: '10px 12px',
-                  background: 'white',
-                  color: colors.text,
-                  border: `1px solid ${colors.border}`,
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '13px',
-                  textAlign: 'left',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  transition: 'all 0.2s'
-                }}
-              >
-                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#1d4ed8' }}></div>
-                Highlight Top 10
-              </button>
-              
-              <button
-                onClick={() => handleDirectFormatting('clear-formatting')}
-                style={{
-                  padding: '10px 12px',
-                  background: 'white',
-                  color: colors.text,
-                  border: `1px solid ${colors.border}`,
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '13px',
-                  textAlign: 'left',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  transition: 'all 0.2s'
-                }}
-              >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M3 6H5H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                Clear Formatting
-              </button>
-            </div>
-          </div>
+          {/* AI Command section will be below */}
 
           {/* AI Prompt */}
           <h4 style={{ 
@@ -970,10 +882,7 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
               </div>
             ) : (
               <>
-                {/* Simple Highlight Test */}
-                {spreadsheetData.length > 0 && (
-                  <SimpleHighlight data={spreadsheetData} />
-                )}
+                {/* Spreadsheet data will be displayed below */}
                 
                 {/* Current Sheet Data */}
                 {spreadsheetData.length > 0 && (
