@@ -7,7 +7,9 @@
     "start": "node backend.js",
     "dev": "vite --port 5173",
     "build": "npx vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy:lambda": "aws lambda update-function-code --function-name excel-ai-function --zip-file fileb://aws/lambda/function.zip",
+    "package:lambda": "cd aws/lambda && zip -r function.zip . && cd ../.."
   },
   "dependencies": {
     "@google/generative-ai": "^0.2.1",

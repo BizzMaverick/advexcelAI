@@ -3,9 +3,8 @@ import ExcelToolbar from './ExcelToolbar';
 import ResizableTable from './ResizableTable';
 import ShortcutsHelp from './ShortcutsHelp';
 import SimpleHighlight from './SimpleHighlight';
-// import { AIService } from '../services/aiService'; // Using direct fetch instead
+import { AWSService } from '../services/awsService';
 import * as XLSX from 'xlsx';
-import { parseHighlightingPrompt } from '../utils/highlightParser';
 
 interface User {
   email: string;
@@ -403,58 +402,52 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
     console.log('Starting AI request with prompt:', prompt);
     
     try {
-      // Create form data for API call
-      const formData = new FormData();
-      formData.append('prompt', prompt);
+      let result;
       
       if (selectedFile) {
-        formData.append('file', selectedFile);
-        console.log('Using file:', selectedFile.name);
+        // Use AWS service with file
+        console.log('Using file with AWS service:', selectedFile.name);
+        result = await AWSService.uploadSpreadsheetWithPrompt(selectedFile, prompt);
       } else {
-        // If no file, create a CSV from current data
-        const csvContent = spreadsheetData.map(row => row.join(',')).join('\n');
-        const csvFile = new File([csvContent], 'current-data.csv', { type: 'text/csv' });
-        formData.append('file', csvFile);
-        console.log('Using current sheet data as CSV');
+        // Use AWS service with current data
+        console.log('Using current sheet data with AWS service');
+        result = await AWSService.processPromptWithData(spreadsheetData, prompt);
       }
       
-      // Direct API call to Netlify function
-      const response = await fetch('/.netlify/functions/upload', {
-        method: 'POST',
-        body: formData
-      });
-      
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
-      
-      const result = await response.json();
-      console.log('AI Result received:', result);
+      console.log('AWS Result received:', result);
       
       if (result.data && Array.isArray(result.data)) {
         setAiResultData(result.data);
         if (result.formatting && Array.isArray(result.formatting)) {
           setAiFormatting(result.formatting);
           setFormatting(result.formatting);
-          console.log('Formatting applied:', result.formatting);
+          console.log('AWS formatting applied:', result.formatting);
         }
       }
-      
-      // Apply intelligent highlighting for any highlighting request
-      const highlightFormatting = parseHighlightingPrompt(prompt, spreadsheetData);
-      if (highlightFormatting) {
-        setFormatting(highlightFormatting);
-        console.log('Applied intelligent highlighting');
-      }
     } catch (err: any) {
-      console.error('AI Error:', err);
-      setAiError(err.message || 'AI processing failed');
+      console.error('AWS Error:', err);
+      setAiError(err.message || 'AWS processing failed');
       
-      // Apply intelligent highlighting on error
-      const highlightFormatting = parseHighlightingPrompt(prompt, spreadsheetData);
-      if (highlightFormatting) {
-        setFormatting(highlightFormatting);
-        console.log('Applied intelligent highlighting after error');
+      // Apply local highlighting on error as fallback
+      if (prompt.toLowerCase().includes('highlight')) {
+        // Simple fallback highlighting
+        const newFormatting = [];
+        for (let i = 0; i < spreadsheetData.length; i++) {
+          const row = [];
+          for (let j = 0; j < spreadsheetData[i].length; j++) {
+            if (i === 0) {
+              row.push({}); // Skip header
+            } else {
+              row.push({
+                background: '#fef2f2',
+                color: '#dc2626'
+              });
+            }
+          }
+          newFormatting.push(row);
+        }
+        setFormatting(newFormatting);
+        console.log('Applied fallback highlighting after error');
       }
     } finally {
       setAiLoading(false);
