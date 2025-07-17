@@ -1,16 +1,6 @@
-import emailjs from '@emailjs/browser';
-import emailConfig from '../config/emailConfig';
-
-// EmailJS configuration
-const { 
-  serviceId, 
-  verificationTemplateId,
-  passwordResetTemplateId,
-  userId, 
-  fromEmail, 
-  fromName, 
-  replyTo
-} = emailConfig;
+/**
+ * Simple authentication service with mock user database
+ */
 
 interface User {
   id: string;
@@ -20,7 +10,7 @@ interface User {
   verified: boolean;
 }
 
-// User database - in production, this would be a real database
+// Mock user database - in production, this would be a real database
 const users: User[] = [
   {
     id: '1',
@@ -54,65 +44,10 @@ const hashPassword = (password: string): string => {
   return password; // This is just a placeholder - NEVER do this in production
 };
 
-// Send verification email using EmailJS
-const sendVerificationEmail = async (email: string, name: string, code: string): Promise<boolean> => {
-  try {
-    const response = await emailjs.send(
-      serviceId,
-      verificationTemplateId,
-      {
-        to_email: email,
-        to_name: name,
-        verification_code: code,
-        app_name: 'Excel AI Assistant',
-        from_email: fromEmail,
-        from_name: fromName,
-        reply_to: replyTo
-      },
-      userId
-    );
-    
-    console.log('Email sent successfully:', response);
-    return true;
-  } catch (error) {
-    console.error('Failed to send email:', error);
-    return false;
-  }
-};
-
-// Send password reset email using EmailJS
-const sendPasswordResetEmail = async (email: string, code: string): Promise<boolean> => {
-  try {
-    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-    if (!user) return false;
-    
-    const response = await emailjs.send(
-      serviceId,
-      passwordResetTemplateId,
-      {
-        to_email: email,
-        to_name: user.name,
-        reset_code: code,
-        app_name: 'Excel AI Assistant',
-        from_email: fromEmail,
-        from_name: fromName,
-        reply_to: replyTo
-      },
-      userId
-    );
-    
-    console.log('Password reset email sent successfully:', response);
-    return true;
-  } catch (error) {
-    console.error('Failed to send password reset email:', error);
-    return false;
-  }
-};
-
 export const authService = {
-  // Initialize EmailJS
+  // Initialize
   init: () => {
-    emailjs.init(userId);
+    // No initialization needed for the simplified version
   },
   
   // Login a user
@@ -175,12 +110,8 @@ export const authService = {
     const verificationCode = generateCode();
     verificationCodes[email.toLowerCase()] = verificationCode;
     
-    // Send verification email
-    const emailSent = await sendVerificationEmail(email, name, verificationCode);
-    
-    if (!emailSent) {
-      throw new Error('Failed to send verification email. Please try again.');
-    }
+    // In a real app, send verification email here
+    console.log(`Verification code for ${email}: ${verificationCode}`);
     
     // Add to database
     users.push(newUser);
@@ -228,12 +159,8 @@ export const authService = {
     const verificationCode = generateCode();
     verificationCodes[email.toLowerCase()] = verificationCode;
     
-    // Send verification email
-    const emailSent = await sendVerificationEmail(email, user.name, verificationCode);
-    
-    if (!emailSent) {
-      throw new Error('Failed to send verification email. Please try again.');
-    }
+    // In a real app, send verification email here
+    console.log(`New verification code for ${email}: ${verificationCode}`);
   },
   
   // Forgot password
@@ -248,12 +175,8 @@ export const authService = {
     const resetCode = generateCode();
     resetCodes[email.toLowerCase()] = resetCode;
     
-    // Send password reset email
-    const emailSent = await sendPasswordResetEmail(email, resetCode);
-    
-    if (!emailSent) {
-      throw new Error('Failed to send password reset email. Please try again.');
-    }
+    // In a real app, send password reset email here
+    console.log(`Password reset code for ${email}: ${resetCode}`);
   },
   
   // Reset password with code
