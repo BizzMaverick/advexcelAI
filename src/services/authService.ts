@@ -2,7 +2,7 @@ import emailjs from '@emailjs/browser';
 import emailConfig from '../config/emailConfig';
 
 // EmailJS configuration
-const { serviceId, templateId, userId } = emailConfig;
+const { serviceId, templateId, userId, fromEmail, fromName, replyTo } = emailConfig;
 
 interface User {
   id: string;
@@ -46,7 +46,7 @@ const hashPassword = (password: string): string => {
   return password; // This is just a placeholder - NEVER do this in production
 };
 
-// Send verification email using EmailJS
+// Send verification email using EmailJS with custom domain
 const sendVerificationEmail = async (email: string, name: string, code: string): Promise<boolean> => {
   try {
     const response = await emailjs.send(
@@ -56,7 +56,10 @@ const sendVerificationEmail = async (email: string, name: string, code: string):
         to_email: email,
         to_name: name,
         verification_code: code,
-        app_name: 'Excel AI Assistant'
+        app_name: 'Excel AI Assistant',
+        from_email: fromEmail,
+        from_name: fromName,
+        reply_to: replyTo
       },
       userId
     );
@@ -69,7 +72,7 @@ const sendVerificationEmail = async (email: string, name: string, code: string):
   }
 };
 
-// Send password reset email using EmailJS
+// Send password reset email using EmailJS with custom domain
 const sendPasswordResetEmail = async (email: string, code: string): Promise<boolean> => {
   try {
     const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
@@ -83,7 +86,10 @@ const sendPasswordResetEmail = async (email: string, code: string): Promise<bool
         to_name: user.name,
         verification_code: code,
         app_name: 'Excel AI Assistant',
-        email_type: 'password reset'
+        email_type: 'password reset',
+        from_email: fromEmail,
+        from_name: fromName,
+        reply_to: replyTo
       },
       userId
     );
