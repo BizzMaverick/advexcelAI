@@ -12,6 +12,7 @@
     "package:lambda": "cd aws/lambda && zip -r function.zip . && cd ../.."
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@google/generative-ai": "^0.2.1",
     "chart.js": "^4.5.0",
     "cors": "^2.8.5",
