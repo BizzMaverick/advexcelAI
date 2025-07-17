@@ -1,11 +1,16 @@
-// EmailJS configuration with Google Workspace account
+// EmailJS configuration with Google Workspace email
 export const emailConfig = {
   serviceId: 'service_advexcel', // Replace with your EmailJS service ID
   templateId: 'template_verification', // Replace with your EmailJS template ID
   userId: 'YOUR_EMAILJS_USER_ID', // Replace with your EmailJS user ID
-  fromEmail: 'support@yourdomain.com', // Replace with your GoDaddy domain email
-  fromName: 'Excel AI Assistant Support',
-  replyTo: 'no-reply@yourdomain.com', // Replace with your no-reply email
+  
+  // Google Workspace email configuration
+  fromEmail: 'contact@advexcel.online', // Your active Google Workspace email
+  fromName: 'Yadunandan Katragadda',
+  replyTo: 'contact@advexcel.online', // Your active Google Workspace email
 };
+
+// Flag to use Google Workspace email (now active)
+export const useWorkspaceEmail = true;
 
 export default emailConfig;

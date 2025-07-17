@@ -2,7 +2,14 @@ import emailjs from '@emailjs/browser';
 import emailConfig from '../config/emailConfig';
 
 // EmailJS configuration
-const { serviceId, templateId, userId, fromEmail, fromName, replyTo } = emailConfig;
+const { 
+  serviceId, 
+  templateId, 
+  userId, 
+  fromEmail, 
+  fromName, 
+  replyTo
+} = emailConfig;
 
 interface User {
   id: string;
@@ -46,7 +53,7 @@ const hashPassword = (password: string): string => {
   return password; // This is just a placeholder - NEVER do this in production
 };
 
-// Send verification email using EmailJS with custom domain
+// Send verification email using EmailJS
 const sendVerificationEmail = async (email: string, name: string, code: string): Promise<boolean> => {
   try {
     const response = await emailjs.send(
@@ -72,7 +79,7 @@ const sendVerificationEmail = async (email: string, name: string, code: string):
   }
 };
 
-// Send password reset email using EmailJS with custom domain
+// Send password reset email using EmailJS
 const sendPasswordResetEmail = async (email: string, code: string): Promise<boolean> => {
   try {
     const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
