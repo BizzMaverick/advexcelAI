@@ -1,9 +1,18 @@
 import React, { useState } from 'react';
 import './App.css';
 import ExcelToolbar from './components/ExcelToolbar';
+import LandingPage from './LandingPage';
 
 function App() {
-  const [user] = useState({ name: 'User', email: 'user@example.com' });
+  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
+  
+  const handleLogin = (userData: { name: string; email: string }) => {
+    setUser(userData);
+  };
+  
+  const handleLogout = () => {
+    setUser(null);
+  };
   
   const handleToolAction = (action: string) => {
     console.log(`Action: ${action}`);
@@ -16,6 +25,12 @@ function App() {
     }
   };
 
+  // Show landing page if user is not logged in
+  if (!user) {
+    return <LandingPage onLogin={handleLogin} />;
+  }
+
+  // Show main application if user is logged in
   return (
     <div className="App" style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
@@ -33,14 +48,17 @@ function App() {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <span>Welcome, {user.name}</span>
-          <button style={{ 
-            background: 'rgba(255,255,255,0.2)', 
-            border: '1px solid rgba(255,255,255,0.3)',
-            color: 'white',
-            padding: '6px 12px',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}>
+          <button 
+            onClick={handleLogout}
+            style={{ 
+              background: 'rgba(255,255,255,0.2)', 
+              border: '1px solid rgba(255,255,255,0.3)',
+              color: 'white',
+              padding: '6px 12px',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
             Logout
           </button>
         </div>
