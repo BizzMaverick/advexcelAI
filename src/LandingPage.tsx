@@ -92,196 +92,185 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
         </div>
         
         {/* Login Form */}
-        <form onSubmit={handleSubmit} style={{ 
-          padding: '30px',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          width: '100%'
-        }}>
-          <div style={{ 
-            marginBottom: '20px',
+        <div style={{ padding: '30px', textAlign: 'center' }}>
+          <form onSubmit={handleSubmit} style={{ 
+            display: 'inline-block',
             width: '100%',
-            maxWidth: '320px'
+            maxWidth: '320px',
+            textAlign: 'left'
           }}>
-            <label 
-              htmlFor="email" 
-              style={{ 
-                display: 'block', 
-                marginBottom: '6px',
-                fontSize: '14px',
-                fontWeight: '500',
-                color: colors.text
-              }}
-            >
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              style={{
-                width: '100%',
-                padding: '12px',
-                border: `1px solid ${colors.border}`,
-                borderRadius: '4px',
-                fontSize: '14px',
-                transition: 'border-color 0.2s',
-                outline: 'none',
-                boxSizing: 'border-box'
-              }}
-              onFocus={(e) => {
-                e.target.style.borderColor = colors.primary;
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = colors.border;
-              }}
-              required
-            />
-          </div>
-          
-          <div style={{ 
-            marginBottom: '24px',
-            width: '100%',
-            maxWidth: '320px'
-          }}>
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center',
-              marginBottom: '6px'
-            }}>
+            <div style={{ marginBottom: '20px' }}>
               <label 
-                htmlFor="password" 
+                htmlFor="email" 
                 style={{ 
+                  display: 'block', 
+                  marginBottom: '6px',
                   fontSize: '14px',
                   fontWeight: '500',
                   color: colors.text
                 }}
               >
-                Password
+                Email
               </label>
-              <a 
-                href="#" 
-                onClick={(e) => {
-                  e.preventDefault();
-                  alert('Password reset functionality would be implemented here');
-                }}
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
                 style={{
-                  fontSize: '12px',
-                  color: colors.primary,
-                  textDecoration: 'none'
+                  width: '100%',
+                  padding: '12px',
+                  border: `1px solid ${colors.border}`,
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  transition: 'border-color 0.2s',
+                  outline: 'none',
+                  boxSizing: 'border-box'
                 }}
-              >
-                Forgot password?
-              </a>
+                onFocus={(e) => {
+                  e.target.style.borderColor = colors.primary;
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = colors.border;
+                }}
+                required
+              />
             </div>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
+            
+            <div style={{ marginBottom: '24px' }}>
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center',
+                marginBottom: '6px'
+              }}>
+                <label 
+                  htmlFor="password" 
+                  style={{ 
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: colors.text
+                  }}
+                >
+                  Password
+                </label>
+                <a 
+                  href="#" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    alert('Password reset functionality would be implemented here');
+                  }}
+                  style={{
+                    fontSize: '12px',
+                    color: colors.primary,
+                    textDecoration: 'none'
+                  }}
+                >
+                  Forgot password?
+                </a>
+              </div>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  border: `1px solid ${colors.border}`,
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  transition: 'border-color 0.2s',
+                  outline: 'none',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = colors.primary;
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = colors.border;
+                }}
+                required
+              />
+            </div>
+            
+            {error && (
+              <div style={{
+                color: colors.error,
+                fontSize: '14px',
+                marginBottom: '20px',
+                padding: '10px',
+                background: colors.errorLight,
+                borderRadius: '4px',
+                border: `1px solid ${colors.error}40`,
+                boxSizing: 'border-box'
+              }}>
+                <strong>Error:</strong> {error}
+              </div>
+            )}
+            
+            <button
+              type="submit"
+              disabled={isLoading}
               style={{
                 width: '100%',
                 padding: '12px',
-                border: `1px solid ${colors.border}`,
+                background: colors.primary,
+                color: 'white',
+                border: 'none',
                 borderRadius: '4px',
-                fontSize: '14px',
-                transition: 'border-color 0.2s',
-                outline: 'none',
+                fontSize: '15px',
+                fontWeight: '500',
+                cursor: isLoading ? 'not-allowed' : 'pointer',
+                opacity: isLoading ? 0.7 : 1,
+                transition: 'background-color 0.2s',
                 boxSizing: 'border-box'
               }}
-              onFocus={(e) => {
-                e.target.style.borderColor = colors.primary;
+              onMouseOver={(e) => {
+                if (!isLoading) {
+                  e.currentTarget.style.background = colors.primaryDark;
+                }
               }}
-              onBlur={(e) => {
-                e.target.style.borderColor = colors.border;
+              onMouseOut={(e) => {
+                e.currentTarget.style.background = colors.primary;
               }}
-              required
-            />
-          </div>
-          
-          {error && (
-            <div style={{
-              color: colors.error,
-              fontSize: '14px',
-              marginBottom: '20px',
-              padding: '10px',
-              background: colors.errorLight,
-              borderRadius: '4px',
-              border: `1px solid ${colors.error}40`,
-              width: '100%',
-              maxWidth: '320px',
-              boxSizing: 'border-box'
+            >
+              {isLoading ? 'Logging in...' : 'Login'}
+            </button>
+            
+            <p style={{ 
+              textAlign: 'center', 
+              margin: '24px 0 0 0',
+              fontSize: '13px',
+              color: colors.textSecondary
             }}>
-              <strong>Error:</strong> {error}
-            </div>
-          )}
-          
-          <button
-            type="submit"
-            disabled={isLoading}
-            style={{
-              width: '100%',
-              maxWidth: '320px',
-              padding: '12px',
-              background: colors.primary,
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              fontSize: '15px',
-              fontWeight: '500',
-              cursor: isLoading ? 'not-allowed' : 'pointer',
-              opacity: isLoading ? 0.7 : 1,
-              transition: 'background-color 0.2s',
-              boxSizing: 'border-box'
-            }}
-            onMouseOver={(e) => {
-              if (!isLoading) {
-                e.currentTarget.style.background = colors.primaryDark;
-              }
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.background = colors.primary;
-            }}
-          >
-            {isLoading ? 'Logging in...' : 'Login'}
-          </button>
-          
-          <p style={{ 
-            textAlign: 'center', 
-            margin: '24px 0 0 0',
-            fontSize: '13px',
-            color: colors.textSecondary,
-            maxWidth: '320px'
-          }}>
-            By logging in, you agree to our{' '}
-            <a 
-              href="#" 
-              style={{ color: colors.primary, textDecoration: 'none' }}
-              onClick={(e) => {
-                e.preventDefault();
-                alert('Terms of Service would be displayed here');
-              }}
-            >
-              Terms of Service
-            </a>{' '}
-            and{' '}
-            <a 
-              href="#" 
-              style={{ color: colors.primary, textDecoration: 'none' }}
-              onClick={(e) => {
-                e.preventDefault();
-                alert('Privacy Policy would be displayed here');
-              }}
-            >
-              Privacy Policy
-            </a>
-          </p>
-        </form>
+              By logging in, you agree to our{' '}
+              <a 
+                href="#" 
+                style={{ color: colors.primary, textDecoration: 'none' }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  alert('Terms of Service would be displayed here');
+                }}
+              >
+                Terms of Service
+              </a>{' '}
+              and{' '}
+              <a 
+                href="#" 
+                style={{ color: colors.primary, textDecoration: 'none' }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  alert('Privacy Policy would be displayed here');
+                }}
+              >
+                Privacy Policy
+              </a>
+            </p>
+          </form>
+        </div>
       </div>
     </div>
   );
