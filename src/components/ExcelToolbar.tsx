@@ -8,33 +8,37 @@ interface ExcelToolbarProps {
 export default function ExcelToolbar({ onToolAction }: ExcelToolbarProps) {
   const [activeTab, setActiveTab] = useState('AWS');
   
-  // Simple color palette
+  // Professional color palette
   const colors = {
     primary: '#0078d4',
+    primaryLight: '#e6f2fa',
+    primaryDark: '#005a9e',
     border: '#e0e0e0',
     background: '#ffffff',
     text: '#252525',
+    textSecondary: '#505050',
+    hover: '#f5f5f5',
   };
 
-  // Simplified toolbar tabs
+  // Toolbar tabs with icons
   const toolbarTabs = {
     AWS: [
-      { name: 'Save to S3', action: 'aws-save-s3' },
-      { name: 'Share', action: 'aws-share-link' },
-      { name: 'Export', action: 'aws-export' },
-      { name: 'Import', action: 'aws-import' }
+      { name: 'Save to S3', icon: '☁️', action: 'aws-save-s3' },
+      { name: 'Share', icon: '🔗', action: 'aws-share-link' },
+      { name: 'Export', icon: '📤', action: 'aws-export' },
+      { name: 'Import', icon: '📥', action: 'aws-import' }
     ],
     Home: [
-      { name: 'Table', action: 'insert-table' },
-      { name: 'Chart', action: 'insert-chart' },
-      { name: 'Sort', action: 'sort-asc' },
-      { name: 'Filter', action: 'filter' }
+      { name: 'Table', icon: '📊', action: 'insert-table' },
+      { name: 'Chart', icon: '📈', action: 'insert-chart' },
+      { name: 'Sort', icon: '🔤', action: 'sort-asc' },
+      { name: 'Filter', icon: '🔍', action: 'filter' }
     ],
     Data: [
-      { name: 'Analysis', action: 'data-analysis' },
-      { name: 'Pivot', action: 'insert-pivot' },
-      { name: 'Clean', action: 'clean-data' },
-      { name: 'Validate', action: 'data-validation' }
+      { name: 'Analysis', icon: '📊', action: 'data-analysis' },
+      { name: 'Pivot', icon: '🔄', action: 'insert-pivot' },
+      { name: 'Clean', icon: '🧹', action: 'clean-data' },
+      { name: 'Validate', icon: '✓', action: 'data-validation' }
     ]
   };
 
@@ -42,7 +46,8 @@ export default function ExcelToolbar({ onToolAction }: ExcelToolbarProps) {
     <div style={{
       background: colors.background,
       borderBottom: `1px solid ${colors.border}`,
-      padding: '0'
+      padding: '0',
+      fontFamily: '"Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif',
     }}>
       {/* Logo and Tab Headers */}
       <div style={{
@@ -53,7 +58,7 @@ export default function ExcelToolbar({ onToolAction }: ExcelToolbarProps) {
       }}>
         {/* Logo */}
         <div style={{ 
-          padding: '5px 16px', 
+          padding: '8px 16px', 
           display: 'flex', 
           alignItems: 'center',
           borderRight: `1px solid ${colors.border}`
@@ -61,7 +66,7 @@ export default function ExcelToolbar({ onToolAction }: ExcelToolbarProps) {
           <img 
             src={logo} 
             alt="Excel AI Assistant" 
-            style={{ height: '24px' }}
+            style={{ height: '28px' }}
           />
         </div>
         
@@ -71,13 +76,27 @@ export default function ExcelToolbar({ onToolAction }: ExcelToolbarProps) {
             key={tab}
             onClick={() => setActiveTab(tab)}
             style={{
-              padding: '10px 16px',
+              padding: '12px 20px',
               border: 'none',
               background: 'transparent',
-              color: activeTab === tab ? colors.primary : colors.text,
+              color: activeTab === tab ? colors.primary : colors.textSecondary,
               cursor: 'pointer',
-              fontWeight: activeTab === tab ? 'bold' : 'normal',
-              borderBottom: activeTab === tab ? `2px solid ${colors.primary}` : 'none'
+              fontSize: '14px',
+              fontWeight: activeTab === tab ? '600' : '400',
+              borderBottom: activeTab === tab ? `2px solid ${colors.primary}` : '2px solid transparent',
+              transition: 'all 0.2s',
+              position: 'relative',
+              top: '1px'
+            }}
+            onMouseOver={(e) => {
+              if (activeTab !== tab) {
+                e.currentTarget.style.background = colors.hover;
+              }
+            }}
+            onMouseOut={(e) => {
+              if (activeTab !== tab) {
+                e.currentTarget.style.background = 'transparent';
+              }
             }}
           >
             {tab}
@@ -89,22 +108,42 @@ export default function ExcelToolbar({ onToolAction }: ExcelToolbarProps) {
       <div style={{
         display: 'flex',
         flexWrap: 'wrap',
-        padding: '10px',
-        gap: '5px'
+        padding: '12px 16px',
+        gap: '8px',
+        background: colors.background
       }}>
         {toolbarTabs[activeTab as keyof typeof toolbarTabs].map((tool) => (
           <button
             key={tool.action}
             onClick={() => onToolAction(tool.action)}
             style={{
-              padding: '8px 12px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              padding: '10px',
               border: `1px solid ${colors.border}`,
               borderRadius: '4px',
               background: colors.background,
-              cursor: 'pointer'
+              cursor: 'pointer',
+              minWidth: '70px',
+              transition: 'all 0.2s',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.background = colors.primaryLight;
+              e.currentTarget.style.borderColor = colors.primary;
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.background = colors.background;
+              e.currentTarget.style.borderColor = colors.border;
             }}
           >
-            {tool.name}
+            <span style={{ fontSize: '1.2rem', marginBottom: '4px' }}>
+              {tool.icon}
+            </span>
+            <span style={{ fontSize: '12px', textAlign: 'center' }}>
+              {tool.name}
+            </span>
           </button>
         ))}
       </div>
