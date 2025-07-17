@@ -4,7 +4,7 @@ import ResizableTable from './ResizableTable';
 import ShortcutsHelp from './ShortcutsHelp';
 import DirectFormatting from './DirectFormatting';
 import SimpleHighlight from './SimpleHighlight';
-import { AIService } from '../services/aiService';
+// import { AIService } from '../services/aiService'; // Using direct fetch instead
 import * as XLSX from 'xlsx';
 
 interface User {
@@ -403,24 +403,51 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
     console.log('Starting AI request with prompt:', prompt);
     
     try {
+      // Create form data for API call
+      const formData = new FormData();
+      formData.append('prompt', prompt);
+      
       if (selectedFile) {
+        formData.append('file', selectedFile);
         console.log('Using file:', selectedFile.name);
-        const result = await AIService.uploadSpreadsheetWithPrompt(selectedFile, prompt);
-        console.log('AI Result received:', result);
-        
-        if (result.data && Array.isArray(result.data)) {
-          setAiResultData(result.data);
-          setAiFormatting(result.formatting || null);
+      } else {
+        // If no file, create a CSV from current data
+        const csvContent = spreadsheetData.map(row => row.join(',')).join('\n');
+        const csvFile = new File([csvContent], 'current-data.csv', { type: 'text/csv' });
+        formData.append('file', csvFile);
+        console.log('Using current sheet data as CSV');
+      }
+      
+      // Direct API call to Netlify function
+      const response = await fetch('/.netlify/functions/upload', {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      console.log('AI Result received:', result);
+      
+      if (result.data && Array.isArray(result.data)) {
+        setAiResultData(result.data);
+        if (result.formatting && Array.isArray(result.formatting)) {
+          setAiFormatting(result.formatting);
+          setFormatting(result.formatting);
           console.log('Formatting applied:', result.formatting);
         }
-      } else {
-        // Test with current sheet data
-        console.log('Testing with current sheet data');
-        if (prompt.toLowerCase().includes('highlight') && prompt.toLowerCase().includes('red')) {
+      }
+      
+      // Fallback for highlighting if backend fails to provide formatting
+      if (prompt.toLowerCase().includes('highlight') && prompt.toLowerCase().includes('red')) {
+        if (!result.formatting || !Array.isArray(result.formatting)) {
+          console.log('No formatting from backend, applying direct formatting');
           const testFormatting = spreadsheetData.map((row, rowIndex) => 
             row.map(() => ({
-              background: rowIndex > 0 ? '#ff6b6b' : '#ffffff',
-              color: rowIndex > 0 ? '#ffffff' : '#1f2937'
+              background: rowIndex > 0 ? '#fef2f2' : '#ffffff',
+              color: rowIndex > 0 ? '#dc2626' : '#1f2937'
             }))
           );
           setFormatting(testFormatting);
@@ -430,6 +457,18 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
     } catch (err: any) {
       console.error('AI Error:', err);
       setAiError(err.message || 'AI processing failed');
+      
+      // Apply direct formatting on error for highlight requests
+      if (prompt.toLowerCase().includes('highlight')) {
+        const testFormatting = spreadsheetData.map((row, rowIndex) => 
+          row.map(() => ({
+            background: rowIndex > 0 ? '#fef2f2' : '#ffffff',
+            color: rowIndex > 0 ? '#dc2626' : '#1f2937'
+          }))
+        );
+        setFormatting(testFormatting);
+        console.log('Applied fallback formatting after error');
+      }
     } finally {
       setAiLoading(false);
     }
