@@ -92,8 +92,18 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
         </div>
         
         {/* Login Form */}
-        <form onSubmit={handleSubmit} style={{ padding: '30px' }}>
-          <div style={{ marginBottom: '20px' }}>
+        <form onSubmit={handleSubmit} style={{ 
+          padding: '30px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          width: '100%'
+        }}>
+          <div style={{ 
+            marginBottom: '20px',
+            width: '100%',
+            maxWidth: '320px'
+          }}>
             <label 
               htmlFor="email" 
               style={{ 
@@ -119,7 +129,8 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
                 borderRadius: '4px',
                 fontSize: '14px',
                 transition: 'border-color 0.2s',
-                outline: 'none'
+                outline: 'none',
+                boxSizing: 'border-box'
               }}
               onFocus={(e) => {
                 e.target.style.borderColor = colors.primary;
@@ -131,7 +142,11 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
             />
           </div>
           
-          <div style={{ marginBottom: '24px' }}>
+          <div style={{ 
+            marginBottom: '24px',
+            width: '100%',
+            maxWidth: '320px'
+          }}>
             <div style={{ 
               display: 'flex', 
               justifyContent: 'space-between', 
@@ -176,7 +191,8 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
                 borderRadius: '4px',
                 fontSize: '14px',
                 transition: 'border-color 0.2s',
-                outline: 'none'
+                outline: 'none',
+                boxSizing: 'border-box'
               }}
               onFocus={(e) => {
                 e.target.style.borderColor = colors.primary;
@@ -196,7 +212,10 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
               padding: '10px',
               background: colors.errorLight,
               borderRadius: '4px',
-              border: `1px solid ${colors.error}40`
+              border: `1px solid ${colors.error}40`,
+              width: '100%',
+              maxWidth: '320px',
+              boxSizing: 'border-box'
             }}>
               <strong>Error:</strong> {error}
             </div>
@@ -207,6 +226,7 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
             disabled={isLoading}
             style={{
               width: '100%',
+              maxWidth: '320px',
               padding: '12px',
               background: colors.primary,
               color: 'white',
@@ -216,7 +236,8 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
               fontWeight: '500',
               cursor: isLoading ? 'not-allowed' : 'pointer',
               opacity: isLoading ? 0.7 : 1,
-              transition: 'background-color 0.2s'
+              transition: 'background-color 0.2s',
+              boxSizing: 'border-box'
             }}
             onMouseOver={(e) => {
               if (!isLoading) {
@@ -234,7 +255,8 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
             textAlign: 'center', 
             margin: '24px 0 0 0',
             fontSize: '13px',
-            color: colors.textSecondary
+            color: colors.textSecondary,
+            maxWidth: '320px'
           }}>
             By logging in, you agree to our{' '}
             <a 
