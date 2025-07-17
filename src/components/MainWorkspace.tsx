@@ -3,6 +3,7 @@ import ExcelToolbar from './ExcelToolbar';
 import ResizableTable from './ResizableTable';
 import ShortcutsHelp from './ShortcutsHelp';
 import DirectFormatting from './DirectFormatting';
+import SimpleHighlight from './SimpleHighlight';
 import { AIService } from '../services/aiService';
 import * as XLSX from 'xlsx';
 
@@ -670,6 +671,11 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
               </div>
             ) : (
               <>
+                {/* Simple Highlight Test */}
+                {spreadsheetData.length > 0 && (
+                  <SimpleHighlight data={spreadsheetData} />
+                )}
+                
                 {/* Current Sheet Data */}
                 {spreadsheetData.length > 0 && (
                   <ResizableTable
