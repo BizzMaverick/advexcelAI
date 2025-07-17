@@ -8,8 +8,11 @@ interface LandingPageProps {
 export default function LandingPage({ onLogin }: LandingPageProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isSignup, setIsSignup] = useState(false);
 
   // Professional color palette
   const colors = {
@@ -29,16 +32,35 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
     
     // Simple validation
     if (!email || !password) {
-      setError('Please enter both email and password');
+      setError('Please fill in all required fields');
       setIsLoading(false);
       return;
     }
     
-    // Simulate login
+    if (isSignup) {
+      if (password !== confirmPassword) {
+        setError('Passwords do not match');
+        setIsLoading(false);
+        return;
+      }
+      
+      if (!name) {
+        setError('Please enter your name');
+        setIsLoading(false);
+        return;
+      }
+    }
+    
+    // Simulate login/signup
     setTimeout(() => {
       setIsLoading(false);
-      onLogin({ email, name: email.split('@')[0] });
+      onLogin({ email, name: isSignup ? name : email.split('@')[0] });
     }, 1000);
+  };
+
+  const toggleMode = () => {
+    setIsSignup(!isSignup);
+    setError('');
   };
 
   return (
@@ -91,14 +113,88 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
           </p>
         </div>
         
-        {/* Login Form */}
+        {/* Login/Signup Form */}
         <div style={{ padding: '30px', textAlign: 'center' }}>
+          <div style={{ marginBottom: '20px' }}>
+            <button 
+              onClick={() => setIsSignup(false)}
+              style={{
+                padding: '8px 16px',
+                background: !isSignup ? colors.primary : 'transparent',
+                color: !isSignup ? 'white' : colors.text,
+                border: `1px solid ${!isSignup ? colors.primary : colors.border}`,
+                borderRadius: '4px 0 0 4px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: !isSignup ? '500' : 'normal'
+              }}
+            >
+              Login
+            </button>
+            <button 
+              onClick={() => setIsSignup(true)}
+              style={{
+                padding: '8px 16px',
+                background: isSignup ? colors.primary : 'transparent',
+                color: isSignup ? 'white' : colors.text,
+                border: `1px solid ${isSignup ? colors.primary : colors.border}`,
+                borderRadius: '0 4px 4px 0',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: isSignup ? '500' : 'normal'
+              }}
+            >
+              Sign Up
+            </button>
+          </div>
+          
           <form onSubmit={handleSubmit} style={{ 
             display: 'inline-block',
             width: '100%',
             maxWidth: '320px',
             textAlign: 'left'
           }}>
+            {isSignup && (
+              <div style={{ marginBottom: '20px' }}>
+                <label 
+                  htmlFor="name" 
+                  style={{ 
+                    display: 'block', 
+                    marginBottom: '6px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: colors.text
+                  }}
+                >
+                  Full Name
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Enter your full name"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: '4px',
+                    fontSize: '14px',
+                    transition: 'border-color 0.2s',
+                    outline: 'none',
+                    boxSizing: 'border-box'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = colors.primary;
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = colors.border;
+                  }}
+                  required={isSignup}
+                />
+              </div>
+            )}
+            
             <div style={{ marginBottom: '20px' }}>
               <label 
                 htmlFor="email" 
@@ -138,7 +234,7 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
               />
             </div>
             
-            <div style={{ marginBottom: '24px' }}>
+            <div style={{ marginBottom: isSignup ? '20px' : '24px' }}>
               <div style={{ 
                 display: 'flex', 
                 justifyContent: 'space-between', 
@@ -155,20 +251,22 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
                 >
                   Password
                 </label>
-                <a 
-                  href="#" 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    alert('Password reset functionality would be implemented here');
-                  }}
-                  style={{
-                    fontSize: '12px',
-                    color: colors.primary,
-                    textDecoration: 'none'
-                  }}
-                >
-                  Forgot password?
-                </a>
+                {!isSignup && (
+                  <a 
+                    href="#" 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      alert('Password reset functionality would be implemented here');
+                    }}
+                    style={{
+                      fontSize: '12px',
+                      color: colors.primary,
+                      textDecoration: 'none'
+                    }}
+                  >
+                    Forgot password?
+                  </a>
+                )}
               </div>
               <input
                 id="password"
@@ -195,6 +293,47 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
                 required
               />
             </div>
+            
+            {isSignup && (
+              <div style={{ marginBottom: '24px' }}>
+                <label 
+                  htmlFor="confirmPassword" 
+                  style={{ 
+                    display: 'block', 
+                    marginBottom: '6px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: colors.text
+                  }}
+                >
+                  Confirm Password
+                </label>
+                <input
+                  id="confirmPassword"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm your password"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: '4px',
+                    fontSize: '14px',
+                    transition: 'border-color 0.2s',
+                    outline: 'none',
+                    boxSizing: 'border-box'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = colors.primary;
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = colors.border;
+                  }}
+                  required={isSignup}
+                />
+              </div>
+            )}
             
             {error && (
               <div style={{
@@ -237,7 +376,7 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
                 e.currentTarget.style.background = colors.primary;
               }}
             >
-              {isLoading ? 'Logging in...' : 'Login'}
+              {isLoading ? (isSignup ? 'Signing up...' : 'Logging in...') : (isSignup ? 'Sign Up' : 'Login')}
             </button>
             
             <p style={{ 
@@ -246,7 +385,7 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
               fontSize: '13px',
               color: colors.textSecondary
             }}>
-              By logging in, you agree to our{' '}
+              By {isSignup ? 'signing up' : 'logging in'}, you agree to our{' '}
               <a 
                 href="#" 
                 style={{ color: colors.primary, textDecoration: 'none' }}
