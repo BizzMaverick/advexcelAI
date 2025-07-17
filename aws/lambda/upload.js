@@ -1,5 +1,9 @@
 // AWS Lambda function for Excel AI Assistant
 const XLSX = require('xlsx');
+const GeminiService = require('./geminiService');
+
+// Initialize Gemini service with API key from environment variable
+const geminiService = new GeminiService(process.env.GEMINI_API_KEY);
 
 exports.handler = async (event) => {
   const headers = {
@@ -44,89 +48,116 @@ exports.handler = async (event) => {
     // Initialize formatting
     const formatting = data.map(row => row.map(() => ({})));
     
-    // Apply formatting based on prompt
-    const promptLower = prompt.toLowerCase();
+    // Process with Gemini API if API key is available
+    let result = {
+      result: `Successfully processed: ${prompt}`,
+      data: data,
+      formatting: formatting
+    };
     
-    if (promptLower.includes('highlight')) {
-      // Default to red highlighting
-      let bgColor = '#fef2f2';
-      let textColor = '#dc2626';
-      
-      // Check for colors
-      if (promptLower.includes('blue')) {
-        bgColor = '#eff6ff';
-        textColor = '#1d4ed8';
-      } else if (promptLower.includes('green')) {
-        bgColor = '#f0fdf4';
-        textColor = '#16a34a';
-      } else if (promptLower.includes('yellow')) {
-        bgColor = '#fefce8';
-        textColor = '#ca8a04';
-      }
-      
-      // Default to all rows except header
-      let startRow = 1;
-      let endRow = data.length - 1;
-      
-      // Check for top rows
-      if (promptLower.includes('top')) {
-        const match = promptLower.match(/top\s+(\d+)/);
-        if (match) {
-          endRow = Math.min(parseInt(match[1]) + 1, data.length - 1);
-        } else {
-          endRow = Math.min(11, data.length - 1); // Default to top 10
+    try {
+      if (process.env.GEMINI_API_KEY) {
+        console.log('Processing with Gemini API');
+        // Use Gemini API to process the prompt
+        const geminiResult = await geminiService.processPrompt(prompt, data);
+        
+        // If Gemini returns valid data, use it
+        if (geminiResult && geminiResult.data && Array.isArray(geminiResult.data)) {
+          result = geminiResult;
+          console.log('Successfully processed with Gemini API');
         }
-      }
-      
-      // Check for bottom rows
-      if (promptLower.includes('bottom')) {
-        const match = promptLower.match(/bottom\s+(\d+)/);
-        if (match) {
-          startRow = Math.max(data.length - parseInt(match[1]), 1);
-        } else {
-          startRow = Math.max(data.length - 10, 1); // Default to bottom 10
+      } else {
+        console.log('No Gemini API key found, using fallback processing');
+        // Fallback processing if no API key
+        const promptLower = prompt.toLowerCase();
+        
+        if (promptLower.includes('highlight')) {
+          // Default to red highlighting
+          let bgColor = '#fef2f2';
+          let textColor = '#dc2626';
+          
+          // Check for colors
+          if (promptLower.includes('blue')) {
+            bgColor = '#eff6ff';
+            textColor = '#1d4ed8';
+          } else if (promptLower.includes('green')) {
+            bgColor = '#f0fdf4';
+            textColor = '#16a34a';
+          } else if (promptLower.includes('yellow')) {
+            bgColor = '#fefce8';
+            textColor = '#ca8a04';
+          }
+          
+          // Default to all rows except header
+          let startRow = 1;
+          let endRow = data.length - 1;
+          
+          // Check for top rows
+          if (promptLower.includes('top')) {
+            const match = promptLower.match(/top\s+(\d+)/);
+            if (match) {
+              endRow = Math.min(parseInt(match[1]) + 1, data.length - 1);
+            } else {
+              endRow = Math.min(11, data.length - 1); // Default to top 10
+            }
+          }
+          
+          // Check for bottom rows
+          if (promptLower.includes('bottom')) {
+            const match = promptLower.match(/bottom\s+(\d+)/);
+            if (match) {
+              startRow = Math.max(data.length - parseInt(match[1]), 1);
+            } else {
+              startRow = Math.max(data.length - 10, 1); // Default to bottom 10
+            }
+          }
+          
+          // Apply highlighting
+          for (let i = startRow; i <= endRow; i++) {
+            for (let j = 0; j < (data[i] || []).length; j++) {
+              formatting[i][j] = {
+                background: bgColor,
+                color: textColor
+              };
+            }
+          }
+        } else if (promptLower.includes('sort') && promptLower.includes('a-z')) {
+          // Sort by first column A-Z
+          const headers = data[0];
+          const rows = data.slice(1);
+          const sortedRows = [...rows].sort((a, b) => {
+            const aVal = String(a[0] || '').toLowerCase();
+            const bVal = String(b[0] || '').toLowerCase();
+            return aVal.localeCompare(bVal);
+          });
+          data = [headers, ...sortedRows];
+        } else if (promptLower.includes('sort') && promptLower.includes('z-a')) {
+          // Sort by first column Z-A
+          const headers = data[0];
+          const rows = data.slice(1);
+          const sortedRows = [...rows].sort((a, b) => {
+            const aVal = String(a[0] || '').toLowerCase();
+            const bVal = String(b[0] || '').toLowerCase();
+            return bVal.localeCompare(aVal);
+          });
+          data = [headers, ...sortedRows];
         }
+        
+        result = {
+          result: `Successfully processed: ${prompt}`,
+          data: data,
+          formatting: formatting
+        };
       }
-      
-      // Apply highlighting
-      for (let i = startRow; i <= endRow; i++) {
-        for (let j = 0; j < (data[i] || []).length; j++) {
-          formatting[i][j] = {
-            background: bgColor,
-            color: textColor
-          };
-        }
-      }
-    } else if (promptLower.includes('sort') && promptLower.includes('a-z')) {
-      // Sort by first column A-Z
-      const headers = data[0];
-      const rows = data.slice(1);
-      const sortedRows = [...rows].sort((a, b) => {
-        const aVal = String(a[0] || '').toLowerCase();
-        const bVal = String(b[0] || '').toLowerCase();
-        return aVal.localeCompare(bVal);
-      });
-      data = [headers, ...sortedRows];
-    } else if (promptLower.includes('sort') && promptLower.includes('z-a')) {
-      // Sort by first column Z-A
-      const headers = data[0];
-      const rows = data.slice(1);
-      const sortedRows = [...rows].sort((a, b) => {
-        const aVal = String(a[0] || '').toLowerCase();
-        const bVal = String(b[0] || '').toLowerCase();
-        return bVal.localeCompare(aVal);
-      });
-      data = [headers, ...sortedRows];
+    } catch (error) {
+      console.error('Error processing with Gemini:', error);
+      // Continue with the default result if Gemini fails
     }
     
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({
-        result: `Successfully processed: ${prompt}`,
-        data,
-        formatting
-      })
+      body: JSON.stringify(result)
     };
   } catch (error) {
     console.error('Function error:', error);
