@@ -558,8 +558,76 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
             </div>
           )}
           
-          {/* Direct Formatting */}
-          <DirectFormatting onApplyFormatting={handleDirectFormatting} />
+          {/* Direct Formatting Buttons */}
+          <div style={{ marginTop: '20px' }}>
+            <h4 style={{ margin: '0 0 8px 0', color: '#333' }}>🎨 Direct Formatting</h4>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <button
+                onClick={() => handleDirectFormatting('highlight-all-red')}
+                style={{
+                  padding: '8px',
+                  background: '#fef2f2',
+                  color: '#dc2626',
+                  border: '1px solid #fecaca',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '0.85rem',
+                  textAlign: 'left'
+                }}
+              >
+                🔴 Highlight All Rows
+              </button>
+              
+              <button
+                onClick={() => handleDirectFormatting('highlight-top-10')}
+                style={{
+                  padding: '8px',
+                  background: '#eff6ff',
+                  color: '#1d4ed8',
+                  border: '1px solid #bfdbfe',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '0.85rem',
+                  textAlign: 'left'
+                }}
+              >
+                🔵 Highlight Top 10
+              </button>
+              
+              <button
+                onClick={() => handleDirectFormatting('highlight-bottom-10')}
+                style={{
+                  padding: '8px',
+                  background: '#f0fdf4',
+                  color: '#16a34a',
+                  border: '1px solid #bbf7d0',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '0.85rem',
+                  textAlign: 'left'
+                }}
+              >
+                🟢 Highlight Bottom 10
+              </button>
+              
+              <button
+                onClick={() => handleDirectFormatting('clear-formatting')}
+                style={{
+                  padding: '8px',
+                  background: '#ffffff',
+                  color: '#6b7280',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '0.85rem',
+                  textAlign: 'left'
+                }}
+              >
+                🧹 Clear Formatting
+              </button>
+            </div>
+          </div>
 
           {/* AI Prompt */}
           <h4 style={{ margin: '20px 0 8px 0', color: '#333' }}>🤖 AI Command</h4>
