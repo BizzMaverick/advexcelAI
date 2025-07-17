@@ -24,8 +24,7 @@ export const AWSService = {
       });
       
       // Call AWS Lambda function
-      // Replace this URL with your actual API Gateway URL when deployed
-      const response = await fetch('https://YOUR_API_GATEWAY_URL/prod/upload', {
+      const response = await fetch('https://3ptklhfjs6.execute-api.us-east-1.amazonaws.com/prod/upload', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -56,7 +55,7 @@ export const AWSService = {
       const csvContent = data.map(row => row.join(',')).join('\\n');
       
       // Call AWS Lambda function
-      const response = await fetch('https://YOUR_API_GATEWAY_URL/prod/upload', {
+      const response = await fetch('https://3ptklhfjs6.execute-api.us-east-1.amazonaws.com/prod/upload', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
