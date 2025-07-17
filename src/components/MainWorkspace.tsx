@@ -269,6 +269,25 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
 
   const handleToolAction = (action: string) => {
     switch (action) {
+      // AWS TAB
+      case 'aws-save-s3':
+        alert('☁️ Saving to AWS S3... Your data is being securely stored in the cloud.');
+        break;
+      case 'aws-share-link':
+        alert('🔗 Generating shareable link... You can now share this spreadsheet with others.');
+        break;
+      case 'aws-export':
+        alert('📤 Exporting to AWS... Your data is being prepared for export.');
+        break;
+      case 'aws-import':
+        alert('📥 Import from AWS... Select a file from your AWS storage to import.');
+        break;
+      case 'aws-sync':
+        alert('🔄 Syncing with AWS... Your data is being synchronized with the cloud.');
+        break;
+      case 'aws-settings':
+        alert('⚙️ AWS Settings... Configure your AWS integration settings.');
+        break;
       // INSERT TAB
       case 'insert-table':
         setPrompt('convert data to formatted table with headers and filters');

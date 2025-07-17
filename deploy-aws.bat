@@ -6,6 +6,12 @@ call npm run build
 
 echo Packaging Lambda function...
 cd aws\lambda
+
+echo Installing dependencies...
+npm init -y
+npm install xlsx
+
+echo Creating zip package...
 powershell Compress-Archive -Path * -DestinationPath function.zip -Force
 cd ..\..
 

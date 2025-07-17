@@ -19,7 +19,7 @@ class GeminiService {
   async processPrompt(prompt, data) {
     try {
       // Create a simple text representation of the data
-      const dataText = data.map(row => row.join(',')).join('\\n');
+      const dataText = data.map(row => row.join(',')).join('\n');
       
       // Create the request payload
       const payload = {
@@ -27,7 +27,7 @@ class GeminiService {
           {
             parts: [
               {
-                text: `I have a spreadsheet with the following data:\\n${dataText}\\n\\nThe user wants to: ${prompt}\\n\\nPlease provide a response in JSON format with the following structure:\\n{\\n  "result": "Brief description of what was done",\\n  "data": [Array of arrays representing the modified data],\\n  "formatting": [Array of arrays representing cell formatting]\\n}\\n\\nFor formatting, each cell should have a structure like: { "background": "#fef2f2", "color": "#dc2626" } for red highlighting.`
+                text: `I have a spreadsheet with the following data:\n${dataText}\n\nThe user wants to: ${prompt}\n\nPlease provide a response in JSON format with the following structure:\n{\n  "result": "Brief description of what was done",\n  "data": [Array of arrays representing the modified data],\n  "formatting": [Array of arrays representing cell formatting]\n}\n\nFor formatting, each cell should have a structure like: { "background": "#fef2f2", "color": "#dc2626" } for red highlighting.`
               }
             ]
           }
@@ -45,19 +45,30 @@ class GeminiService {
       const text = response.candidates[0].content.parts[0].text;
       
       // Extract JSON from the response
-      const jsonMatch = text.match(/```json\\n([\\s\\S]*?)\\n```/) || 
-                        text.match(/```([\\s\\S]*?)```/) || 
-                        text.match(/{[\\s\\S]*}/);
+      const jsonMatch = text.match(/```json\n([\s\S]*?)\n```/) || 
+                        text.match(/```([\s\S]*?)```/) || 
+                        text.match(/{[\s\S]*}/);
                         
       let jsonText = jsonMatch ? jsonMatch[1] || jsonMatch[0] : text;
       
       // Clean up the JSON text
       jsonText = jsonText.replace(/^{/g, '{').replace(/}$/g, '}');
       
-      // Parse the JSON
-      const result = JSON.parse(jsonText);
-      
-      return result;
+      try {
+        // Parse the JSON
+        const result = JSON.parse(jsonText);
+        return result;
+      } catch (parseError) {
+        console.error('Failed to parse JSON from Gemini response:', parseError);
+        console.log('Raw response text:', text);
+        
+        // Return a fallback result
+        return {
+          result: `Processed with fallback: ${prompt}`,
+          data: data,
+          formatting: data.map(row => row.map(() => ({})))
+        };
+      }
     } catch (error) {
       console.error('Gemini API Error:', error);
       throw new Error(`Gemini API Error: ${error.message}`);

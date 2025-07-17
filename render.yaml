@@ -1,9 +1,0 @@
-services:
-  - type: web
-    name: advexcel-backend
-    env: node
-    buildCommand: npm install
-    startCommand: node backend.js
-    envVars:
-      - key: NODE_ENV
-        value: production

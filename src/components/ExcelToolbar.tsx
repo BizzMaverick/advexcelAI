@@ -5,9 +5,17 @@ interface ExcelToolbarProps {
 }
 
 export default function ExcelToolbar({ onToolAction }: ExcelToolbarProps) {
-  const [activeTab, setActiveTab] = useState('Insert');
+  const [activeTab, setActiveTab] = useState('AWS');
 
   const toolbarTabs = {
+    AWS: [
+      { name: 'Save to S3', icon: '☁️', action: 'aws-save-s3' },
+      { name: 'Share Link', icon: '🔗', action: 'aws-share-link' },
+      { name: 'Export', icon: '📤', action: 'aws-export' },
+      { name: 'Import', icon: '📥', action: 'aws-import' },
+      { name: 'Sync', icon: '🔄', action: 'aws-sync' },
+      { name: 'Settings', icon: '⚙️', action: 'aws-settings' }
+    ],
     Insert: [
       { name: 'Table', icon: '📊', action: 'insert-table' },
       { name: 'Chart', icon: '📈', action: 'insert-chart' },

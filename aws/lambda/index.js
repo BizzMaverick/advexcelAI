@@ -19,7 +19,7 @@ exports.handler = async (event) => {
   try {
     // Parse request body
     const body = JSON.parse(event.body);
-    const { prompt, fileContent } = body;
+    const { prompt, fileContent, csvContent } = body;
     
     // Process data
     let data = [];
@@ -28,6 +28,11 @@ exports.handler = async (event) => {
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
       data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+    } else if (csvContent) {
+      // Parse CSV content from frontend
+      data = csvContent.split('\n').map(row => row.split(','));
+      // Handle empty rows
+      data = data.filter(row => row.length > 0 && row.some(cell => cell.trim() !== ''));
     } else {
       // Sample data
       data = [

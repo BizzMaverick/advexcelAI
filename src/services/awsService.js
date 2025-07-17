@@ -52,7 +52,7 @@ export const AWSService = {
   async processPromptWithData(data, prompt) {
     try {
       // Convert data to CSV
-      const csvContent = data.map(row => row.join(',')).join('\\n');
+      const csvContent = data.map(row => row.join(',')).join('\n');
       
       // Call AWS Lambda function
       const response = await fetch('https://3ptklhfjs6.execute-api.us-east-1.amazonaws.com/prod/upload', {
