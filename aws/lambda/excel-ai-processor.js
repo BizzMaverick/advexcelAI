@@ -35,7 +35,7 @@ Command: ${prompt}`;
 
         // Call Bedrock Claude
         const input = {
-            modelId: "amazon.nova-premier-v1:0:8k",
+            modelId: "amazon.nova-micro-v1:0",
             contentType: "application/json",
             accept: "application/json",
             body: JSON.stringify({
