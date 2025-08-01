@@ -100,9 +100,9 @@ exports.handler = async (event) => {
             if (sanitizedPrompt.includes('age')) {
                 processedData = sortData(fileData, 'age');
                 explanation = 'Data sorted by age';
-            } else if (sanitizedPrompt.includes('name')) {
-                processedData = sortData(fileData, 'name');
-                explanation = 'Data sorted by name';
+            } else if (sanitizedPrompt.includes('name') || sanitizedPrompt.includes('country')) {
+                processedData = sortData(fileData, 'country');
+                explanation = 'Data sorted by country name';
             } else if (sanitizedPrompt.includes('rank')) {
                 processedData = sortData(fileData, 'rank');
                 explanation = 'Data sorted by rank';
