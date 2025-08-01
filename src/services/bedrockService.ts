@@ -11,7 +11,7 @@ class BedrockService {
 
   constructor() {
     // This will be updated after AWS deployment
-    this.apiEndpoint = process.env.REACT_APP_API_ENDPOINT || 'https://z64bxyj98g.execute-api.us-east-1.amazonaws.com/prod';
+    this.apiEndpoint = process.env.REACT_APP_API_ENDPOINT || 'https://z64bxyj98g.execute-api.us-east-1.amazonaws.com/prod/process';
   }
 
   async processExcelData(fileData: any[][], prompt: string, fileName: string): Promise<BedrockResponse> {
