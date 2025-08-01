@@ -1,0 +1,22 @@
+Google Workspace MX Records for AWS Route 53
+
+Copy and paste each of these records into AWS Route 53:
+
+1 ASPMX.L.GOOGLE.COM
+5 ALT1.ASPMX.L.GOOGLE.COM
+5 ALT2.ASPMX.L.GOOGLE.COM
+10 ALT3.ASPMX.L.GOOGLE.COM
+10 ALT4.ASPMX.L.GOOGLE.COM
+
+Steps:
+1. Go to AWS Console > Route 53 > Hosted Zones
+2. Click on your domain
+3. Click "Create Record"
+4. Leave "Record name" blank
+5. Select "MX" as record type
+6. Set TTL to 3600
+7. Paste one record in "Value" field
+8. Click "Create records"
+9. Repeat for each record
+
+After adding all records, go back to Google Workspace and click "Verify"

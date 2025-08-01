@@ -12,7 +12,11 @@ npm install
 
 echo Creating zip package...
 del function.zip 2>nul
-powershell Compress-Archive -Path index.js,geminiService.js,node_modules,package.json -DestinationPath function.zip -Force
+if exist node_modules (
+  powershell Compress-Archive -Path index.js,geminiService.js,node_modules,package.json -DestinationPath function.zip -Force
+) else (
+  powershell Compress-Archive -Path index.js,geminiService.js,package.json -DestinationPath function.zip -Force
+)
 cd ..\..
 
 echo Deploying to AWS...

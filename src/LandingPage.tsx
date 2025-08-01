@@ -37,7 +37,7 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
     textSecondary: '#666',
   };
 
-  // Initialize EmailJS
+  // Initialize
   useEffect(() => {
     emailService.initEmailJS();
     authService.init();
