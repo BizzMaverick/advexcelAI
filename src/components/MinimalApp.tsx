@@ -102,17 +102,60 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
         </div>
       </header>
       
-      <main style={{ padding: '40px 20px', textAlign: 'center' }}>
-        <h2 style={{ color: '#333', marginBottom: '20px' }}>Excel AI Assistant</h2>
-        <p style={{ color: '#666', marginBottom: '30px' }}>Upload Excel files and process them with AI commands</p>
-        
-        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <input 
-            type="file" 
-            accept=".xlsx,.xls,.csv" 
-            onChange={handleFileUpload}
-            style={{ marginBottom: '20px', padding: '10px', width: '100%', border: '1px solid #ddd', borderRadius: '4px' }} 
-          />
+      <main style={{ 
+        padding: '40px 20px', 
+        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+        minHeight: 'calc(100vh - 80px)'
+      }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+            <h2 style={{ 
+              color: '#333', 
+              fontSize: '32px',
+              marginBottom: '10px',
+              fontWeight: 'bold'
+            }}>
+              Excel AI Assistant
+            </h2>
+            <p style={{ 
+              color: '#666', 
+              fontSize: '18px',
+              margin: 0
+            }}>
+              Upload Excel files and process them with AI commands
+            </p>
+          </div>
+          
+          {/* File Upload Section */}
+          <div style={{
+            background: 'white',
+            borderRadius: '12px',
+            padding: '30px',
+            marginBottom: '30px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            textAlign: 'center'
+          }}>
+            <div style={{ marginBottom: '20px' }}>
+              <div style={{ fontSize: '48px', marginBottom: '15px' }}>📁</div>
+              <h3 style={{ color: '#333', marginBottom: '10px' }}>Upload Your File</h3>
+              <p style={{ color: '#666', fontSize: '14px' }}>Supports .xlsx, .xls, and .csv files</p>
+            </div>
+            <input 
+              type="file" 
+              accept=".xlsx,.xls,.csv" 
+              onChange={handleFileUpload}
+              style={{ 
+                padding: '12px 20px',
+                border: '2px dashed #667eea',
+                borderRadius: '8px',
+                background: '#f8f9ff',
+                cursor: 'pointer',
+                fontSize: '14px',
+                width: '100%',
+                maxWidth: '400px'
+              }} 
+            />
+          </div>
           
           {selectedFile && (
             <div style={{ marginBottom: '20px', padding: '15px', background: '#f0f8ff', border: '1px solid #0078d4', borderRadius: '4px' }}>
@@ -122,64 +165,138 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
           )}
           
           {fileData.length > 0 && (
-            <div style={{ marginBottom: '20px', overflowX: 'auto', maxHeight: '400px', overflowY: 'auto', border: '1px solid #ddd', borderRadius: '4px' }}>
-              <h4 style={{ color: '#333', marginBottom: '10px', padding: '10px', background: '#f8f9fa', margin: 0 }}>File Data ({fileData.length} rows):</h4>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <tbody>
-                  {fileData.map((row, i) => (
-                    <tr key={i} style={{ background: i === 0 ? '#f5f5f5' : 'white' }}>
-                      {Array.isArray(row) ? row.map((cell, j) => (
-                        <td key={j} style={{ padding: '8px', border: '1px solid #ddd', fontSize: '14px', minWidth: '100px' }}>
-                          {cell !== null && cell !== undefined ? String(cell) : ''}
-                        </td>
-                      )) : (
-                        <td style={{ padding: '8px', border: '1px solid #ddd', fontSize: '14px' }}>Invalid row data</td>
-                      )}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div style={{ 
+              marginBottom: '30px', 
+              background: 'white',
+              borderRadius: '12px',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+              overflow: 'hidden'
+            }}>
+              <div style={{ 
+                padding: '20px', 
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                color: 'white'
+              }}>
+                <h3 style={{ margin: 0, fontSize: '18px' }}>📊 {selectedFile?.name}</h3>
+                <p style={{ margin: '5px 0 0 0', opacity: 0.9, fontSize: '14px' }}>
+                  {fileData.length} rows × {fileData[0]?.length || 0} columns
+                </p>
+              </div>
+              <div style={{ 
+                maxHeight: '500px', 
+                overflow: 'auto',
+                padding: '0'
+              }}>
+                <table style={{ 
+                  width: '100%', 
+                  borderCollapse: 'collapse',
+                  fontSize: '14px'
+                }}>
+                  <tbody>
+                    {fileData.map((row, i) => (
+                      <tr key={i} style={{ 
+                        background: i === 0 ? '#f8f9ff' : (i % 2 === 0 ? '#fafafa' : 'white'),
+                        borderBottom: '1px solid #eee'
+                      }}>
+                        {Array.isArray(row) && row.length > 0 ? row.map((cell, j) => (
+                          <td key={j} style={{ 
+                            padding: '12px 16px', 
+                            borderRight: '1px solid #eee',
+                            fontWeight: i === 0 ? 'bold' : 'normal',
+                            color: i === 0 ? '#333' : '#666',
+                            minWidth: '120px',
+                            whiteSpace: 'nowrap'
+                          }}>
+                            {cell !== null && cell !== undefined ? String(cell) : ''}
+                          </td>
+                        )) : (
+                          <td style={{ 
+                            padding: '12px 16px', 
+                            color: '#999',
+                            fontStyle: 'italic'
+                          }}>
+                            No data in this row
+                          </td>
+                        )}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
           
-          <textarea 
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Type your AI command here... (e.g., 'Sort by age', 'Calculate average', 'Filter by city')"
-            style={{ width: '100%', height: '100px', padding: '12px', border: '1px solid #ddd', borderRadius: '4px', marginBottom: '20px', resize: 'vertical' }}
-          />
-          
-          <button 
-            onClick={handleProcessAI}
-            disabled={isProcessing}
-            style={{ 
-              background: isProcessing ? '#ccc' : '#0078d4', 
-              color: 'white', 
-              border: 'none', 
-              padding: '12px 24px', 
-              borderRadius: '4px', 
-              cursor: isProcessing ? 'not-allowed' : 'pointer', 
-              fontSize: '16px' 
-            }}
-          >
-            {isProcessing ? 'Processing with AI...' : 'Process with AI'}
-          </button>
+          {/* AI Command Section */}
+          <div style={{
+            background: 'white',
+            borderRadius: '12px',
+            padding: '30px',
+            marginBottom: '30px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+              <div style={{ fontSize: '32px', marginRight: '15px' }}>🤖</div>
+              <div>
+                <h3 style={{ color: '#333', margin: 0 }}>AI Assistant</h3>
+                <p style={{ color: '#666', fontSize: '14px', margin: '5px 0 0 0' }}>Ask questions about your data</p>
+              </div>
+            </div>
+            <textarea 
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              placeholder="Type your AI command here... (e.g., 'Sort by age', 'Calculate average', 'Filter by city')"
+              style={{ 
+                width: '100%', 
+                height: '120px', 
+                padding: '16px', 
+                border: '2px solid #eee', 
+                borderRadius: '8px', 
+                marginBottom: '20px', 
+                resize: 'vertical',
+                fontSize: '14px',
+                fontFamily: 'inherit'
+              }}
+            />
+            <button 
+              onClick={handleProcessAI}
+              disabled={isProcessing || !selectedFile}
+              style={{ 
+                background: isProcessing || !selectedFile ? '#ccc' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', 
+                color: 'white', 
+                border: 'none', 
+                padding: '14px 28px', 
+                borderRadius: '8px', 
+                cursor: isProcessing || !selectedFile ? 'not-allowed' : 'pointer', 
+                fontSize: '16px',
+                fontWeight: 'bold',
+                boxShadow: isProcessing || !selectedFile ? 'none' : '0 4px 12px rgba(102, 126, 234, 0.3)'
+              }}
+            >
+              {isProcessing ? '🔄 Processing...' : '✨ Process with AI'}
+            </button>
+          </div>
           
           {aiResponse && (
             <div style={{ 
-              marginTop: '30px', 
-              padding: '20px', 
-              background: '#f8f9fa', 
-              border: '1px solid #dee2e6', 
-              borderRadius: '8px',
+              background: 'white',
+              borderRadius: '12px',
+              padding: '30px',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
               textAlign: 'left'
             }}>
-              <h4 style={{ color: '#0078d4', marginBottom: '15px' }}>AI Response:</h4>
+              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+                <div style={{ fontSize: '32px', marginRight: '15px' }}>💡</div>
+                <h4 style={{ color: '#333', margin: 0, fontSize: '20px' }}>AI Response</h4>
+              </div>
               <div style={{ 
                 whiteSpace: 'pre-wrap', 
-                fontSize: '14px', 
-                lineHeight: '1.5',
-                color: '#333'
+                fontSize: '15px', 
+                lineHeight: '1.6',
+                color: '#555',
+                background: '#f8f9ff',
+                padding: '20px',
+                borderRadius: '8px',
+                border: '1px solid #e6f2fa'
               }}>
                 {aiResponse}
               </div>
@@ -187,14 +304,6 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
           )}
         </div>
         
-        <div style={{ marginTop: '40px', padding: '20px', background: '#f5f5f5', borderRadius: '8px', maxWidth: '600px', margin: '40px auto 0' }}>
-          <h3 style={{ margin: '0 0 16px 0', color: '#333' }}>Features</h3>
-          <ul style={{ textAlign: 'left', color: '#666' }}>
-            <li>Upload Excel and CSV files</li>
-            <li>Process data with AI commands</li>
-            <li>Natural language processing</li>
-            <li>Data analysis and formatting</li>
-          </ul>
         </div>
       </main>
     </div>
