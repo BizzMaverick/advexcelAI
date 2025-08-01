@@ -251,11 +251,8 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
     }
   };
 
-  const toggleMode = () => {
-    setIsSignup(!isSignup);
-    setError('');
-    setForgotPassword(false);
-  };
+  // Unused function - removed to fix TypeScript error
+  // const toggleMode = () => { ... };
 
   // Render verification screen
   if (needsVerification) {

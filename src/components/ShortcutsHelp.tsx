@@ -1,4 +1,4 @@
-import { useState } from 'react';
+// No imports needed for this component
 
 interface ShortcutsHelpProps {
   isVisible: boolean;
