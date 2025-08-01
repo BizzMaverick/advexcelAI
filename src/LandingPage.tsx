@@ -512,35 +512,33 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1), 0 2px 5px rgba(0, 0, 0, 0.05)',
         overflow: 'hidden'
       }}>
-        {/* Logo Section */}
+        {/* Welcome Header */}
         <div style={{
-          background: colors.primary,
-          padding: '30px 20px',
-          textAlign: 'center'
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          padding: '40px 20px',
+          textAlign: 'center',
+          color: 'white'
         }}>
-          <img 
-            src={logo} 
-            alt="Excel AI Assistant" 
-            style={{ 
-              height: '70px',
-              marginBottom: '16px'
-            }}
-          />
+          <div style={{ fontSize: '60px', marginBottom: '20px' }}>🎉</div>
           <h1 style={{ 
-            color: 'white', 
-            margin: '0',
-            fontSize: '26px',
-            fontWeight: '500'
+            margin: '0 0 10px 0',
+            fontSize: '28px',
+            fontWeight: 'bold'
           }}>
-            Excel AI Assistant
+            Welcome to Excel AI Assistant!
           </h1>
           <p style={{ 
-            color: 'rgba(255, 255, 255, 0.8)', 
-            margin: '10px 0 0 0',
-            fontSize: '15px'
+            margin: '0 0 20px 0',
+            fontSize: '16px',
+            opacity: 0.9
           }}>
-            Powered by AWS
+            Transform your Excel experience with AI power
           </p>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', fontSize: '14px' }}>
+            <span>📊 Smart Analysis</span>
+            <span>🤖 AI Powered</span>
+            <span>⚡ Lightning Fast</span>
+          </div>
         </div>
         
         {/* Login/Signup Form */}
