@@ -993,6 +993,7 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
             </a>
           </p>
         </div>
+        </div>
       </div>
     </div>
   );
