@@ -26,11 +26,10 @@ export const sendVerificationEmail = async (
     console.log('Attempting to send verification email to:', email);
     
     const templateParams = {
-      user_email: email,
-      user_name: name,
-      message: code,
+      to_email: email,
       to_name: name,
-      to_email: email
+      passcode: code,
+      time: new Date(Date.now() + 15 * 60 * 1000).toLocaleTimeString()
     };
     
     console.log('Template params:', templateParams);
@@ -74,11 +73,10 @@ export const sendPasswordResetEmail = async (
     console.log('Attempting to send password reset email to:', email);
     
     const templateParams = {
-      user_email: email,
-      user_name: name,
-      message: code,
+      to_email: email,
       to_name: name,
-      to_email: email
+      passcode: code,
+      time: new Date(Date.now() + 15 * 60 * 1000).toLocaleTimeString()
     };
     
     const response = await emailjs.send(
