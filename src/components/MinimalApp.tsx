@@ -1,7 +1,12 @@
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import * as XLSX from 'xlsx';
 import logo from '../assets/logo.png';
 import bedrockService from '../services/bedrockService';
+import ErrorBoundary from './ErrorBoundary';
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_ROWS = 1000;
+const ALLOWED_TYPES = ['.xlsx', '.xls', '.csv'];
 
 interface User {
   email: string;
@@ -20,48 +25,101 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [aiResponse, setAiResponse] = useState<string>('');
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-      
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          if (file.name.endsWith('.csv')) {
-            const text = e.target?.result as string;
-            const rows = text.split('\n').map(row => row.split(','));
-            setFileData(rows.filter(row => row.some(cell => cell.trim()))); // Remove empty rows
-          } else {
-            // Parse Excel files
-            const data = new Uint8Array(e.target?.result as ArrayBuffer);
-            const workbook = XLSX.read(data, { type: 'array' });
-            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-            const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
-            setFileData(jsonData as any[][]);
-          }
-        } catch (error) {
-          console.error('Error parsing file:', error);
-          alert('Error reading file. Please make sure it\'s a valid Excel or CSV file.');
-        }
-      };
-      
-      if (file.name.endsWith('.csv')) {
-        reader.readAsText(file);
-      } else {
-        reader.readAsArrayBuffer(file);
-      }
-    }
-  };
+  const [fileLoading, setFileLoading] = useState(false);
+  const [fileError, setFileError] = useState<string>('');
 
-  const handleProcessAI = async () => {
-    if (!prompt.trim()) {
-      alert('Please enter a command');
+  const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setFileError('');
+    setFileLoading(true);
+
+    // Validate file
+    if (file.size > MAX_FILE_SIZE) {
+      setFileError(`File too large. Maximum size: ${MAX_FILE_SIZE / 1024 / 1024}MB`);
+      setFileLoading(false);
+      return;
+    }
+
+    const fileExt = '.' + file.name.split('.').pop()?.toLowerCase();
+    if (!ALLOWED_TYPES.includes(fileExt)) {
+      setFileError(`Invalid file type. Allowed: ${ALLOWED_TYPES.join(', ')}`);
+      setFileLoading(false);
+      return;
+    }
+
+    setSelectedFile(file);
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        let parsedData: any[][];
+        
+        if (file.name.endsWith('.csv')) {
+          const text = e.target?.result as string;
+          parsedData = text.split('\n')
+            .map(row => row.split(',').map(cell => cell.trim()))
+            .filter(row => row.some(cell => cell.length > 0));
+        } else {
+          const data = new Uint8Array(e.target?.result as ArrayBuffer);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          parsedData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 }) as any[][];
+        }
+
+        // Limit rows for performance
+        if (parsedData.length > MAX_ROWS) {
+          parsedData = parsedData.slice(0, MAX_ROWS);
+          setFileError(`File truncated to ${MAX_ROWS} rows for performance`);
+        }
+
+        // Sanitize data
+        const sanitizedData = parsedData.map(row => 
+          row.map(cell => {
+            if (typeof cell === 'string') {
+              return cell.replace(/<[^>]*>/g, '').substring(0, 200); // Remove HTML, limit length
+            }
+            return cell;
+          })
+        );
+
+        setFileData(sanitizedData);
+      } catch (error) {
+        console.error('Error parsing file:', error);
+        setFileError('Error reading file. Please ensure it\'s a valid Excel or CSV file.');
+      } finally {
+        setFileLoading(false);
+      }
+    };
+    
+    reader.onerror = () => {
+      setFileError('Error reading file');
+      setFileLoading(false);
+    };
+
+    if (file.name.endsWith('.csv')) {
+      reader.readAsText(file);
+    } else {
+      reader.readAsArrayBuffer(file);
+    }
+  }, []);
+
+  const handleProcessAI = useCallback(async () => {
+    const trimmedPrompt = prompt.trim();
+    if (!trimmedPrompt) {
+      setAiResponse('Error: Please enter a command');
       return;
     }
     
     if (!selectedFile || fileData.length === 0) {
-      alert('Please select a file first');
+      setAiResponse('Error: Please select a file first');
+      return;
+    }
+
+    // Validate prompt length and content
+    if (trimmedPrompt.length > 500) {
+      setAiResponse('Error: Command too long. Maximum 500 characters.');
       return;
     }
     
@@ -71,23 +129,77 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
     try {
       const result = await bedrockService.processExcelData(
         fileData,
-        prompt,
+        trimmedPrompt,
         selectedFile.name
       );
       
-      if (result.success && result.response) {
-        setAiResponse(result.response);
+      if (result.success) {
+        if (result.structured && result.structured.operation) {
+          const { operation, result: opResult, explanation, formulas, formatting } = result.structured;
+          
+          let displayResponse = `**${explanation || 'Operation completed'}**\n\n`;
+          
+          if (['sort', 'filter', 'calculate', 'edit', 'formula'].includes(operation)) {
+            if (Array.isArray(opResult)) {
+              setFileData(opResult);
+              displayResponse += `✅ Data has been updated and is displayed above.`;
+            } else {
+              displayResponse += String(opResult).substring(0, 1000);
+            }
+          } else if (operation === 'pivot') {
+            displayResponse += String(opResult).substring(0, 1000);
+            if (result.structured.pivotSummary) {
+              displayResponse += `\n\n**Pivot Analysis:**\n${String(result.structured.pivotSummary).substring(0, 500)}`;
+            }
+          } else if (operation === 'lookup') {
+            displayResponse += String(opResult).substring(0, 1000);
+            if (result.structured.lookupResults) {
+              displayResponse += `\n\n**Lookup Results:**\n${String(result.structured.lookupResults).substring(0, 500)}`;
+            }
+          } else if (operation === 'chart') {
+            displayResponse += String(opResult).substring(0, 1000);
+            if (result.structured.chartData) {
+              displayResponse += `\n\n**Chart Data:**\n${String(result.structured.chartData).substring(0, 500)}`;
+            }
+          } else if (operation === 'analytics') {
+            displayResponse += String(opResult).substring(0, 1000);
+            if (result.structured.analytics) {
+              displayResponse += `\n\n**Analytics Results:**\n${String(result.structured.analytics).substring(0, 500)}`;
+            }
+          } else {
+            displayResponse += String(opResult).substring(0, 1000);
+          }
+          
+          if (formulas && Array.isArray(formulas) && formulas.length > 0) {
+            displayResponse += `\n\n**📊 Formulas:**\n${formulas.slice(0, 5).join('\n')}`;
+          }
+          
+          if (formatting) {
+            displayResponse += `\n\n**🎨 Formatting:**\n${String(formatting).substring(0, 300)}`;
+          }
+          
+          setAiResponse(displayResponse);
+        } else {
+          setAiResponse(String(result.response || 'No response').substring(0, 2000));
+        }
       } else {
         setAiResponse(`Error: ${result.error || 'Unknown error occurred'}`);
       }
     } catch (error) {
+      console.error('AI processing error:', error);
       setAiResponse(`Error: ${error instanceof Error ? error.message : 'Failed to process request'}`);
     } finally {
       setIsProcessing(false);
     }
-  };
+  }, [prompt, selectedFile, fileData]);
+
+  // Memoize file display data for performance
+  const displayData = useMemo(() => {
+    return fileData.slice(0, 100); // Only display first 100 rows
+  }, [fileData]);
 
   return (
+    <ErrorBoundary>
     <div style={{ minHeight: '100vh', fontFamily: 'Arial, sans-serif' }}>
       <header style={{ background: '#0078d4', color: 'white', padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -144,17 +256,26 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               type="file" 
               accept=".xlsx,.xls,.csv" 
               onChange={handleFileUpload}
+              disabled={fileLoading}
               style={{ 
                 padding: '12px 20px',
                 border: '2px dashed #667eea',
                 borderRadius: '8px',
-                background: '#f8f9ff',
-                cursor: 'pointer',
+                background: fileLoading ? '#f0f0f0' : '#f8f9ff',
+                cursor: fileLoading ? 'not-allowed' : 'pointer',
                 fontSize: '14px',
                 width: '100%',
                 maxWidth: '400px'
               }} 
             />
+            {fileLoading && (
+              <div style={{ marginTop: '10px', color: '#667eea' }}>📁 Loading file...</div>
+            )}
+            {fileError && (
+              <div style={{ marginTop: '10px', color: '#e53e3e', fontSize: '14px' }}>
+                ⚠️ {fileError}
+              </div>
+            )}
           </div>
           
           {selectedFile && (
@@ -193,7 +314,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                   fontSize: '14px'
                 }}>
                   <tbody>
-                    {fileData.map((row, i) => (
+                    {displayData.map((row, i) => (
                       <tr key={i} style={{ 
                         background: i === 0 ? '#f8f9ff' : (i % 2 === 0 ? '#fafafa' : 'white'),
                         borderBottom: '1px solid #eee'
@@ -243,20 +364,29 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
             </div>
             <textarea 
               value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
+              onChange={(e) => setPrompt(e.target.value.substring(0, 500))}
               placeholder="Type your AI command here... (e.g., 'Sort by age', 'Calculate average', 'Filter by city')"
+              maxLength={500}
               style={{ 
                 width: '100%', 
                 height: '120px', 
                 padding: '16px', 
                 border: '2px solid #eee', 
                 borderRadius: '8px', 
-                marginBottom: '20px', 
+                marginBottom: '10px', 
                 resize: 'vertical',
                 fontSize: '14px',
                 fontFamily: 'inherit'
               }}
             />
+            <div style={{ 
+              fontSize: '12px', 
+              color: '#666', 
+              marginBottom: '20px',
+              textAlign: 'right'
+            }}>
+              {prompt.length}/500 characters
+            </div>
             <button 
               onClick={handleProcessAI}
               disabled={isProcessing || !selectedFile}
@@ -305,5 +435,6 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
         </div>
       </main>
     </div>
+    </ErrorBoundary>
   );
 }

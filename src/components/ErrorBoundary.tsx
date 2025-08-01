@@ -1,48 +1,56 @@
-import { Component, ErrorInfo, ReactNode } from 'react';
+import React from 'react';
 
-interface Props {
-  children: ReactNode;
-  fallback?: ReactNode;
-}
-
-interface State {
+interface ErrorBoundaryState {
   hasError: boolean;
   error?: Error;
 }
 
-class ErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+}
+
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(error: Error): State {
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('Error caught by boundary:', error, errorInfo);
   }
 
   render() {
     if (this.state.hasError) {
-      return this.props.fallback || (
+      return (
         <div style={{
-          padding: '20px',
-          background: '#fee2e2',
-          border: '1px solid #ef4444',
+          padding: '40px',
+          textAlign: 'center',
+          background: '#fff5f5',
+          border: '1px solid #fed7d7',
           borderRadius: '8px',
-          color: '#dc2626',
-          textAlign: 'center'
+          margin: '20px'
         }}>
-          <h3>Something went wrong</h3>
-          <p>Please refresh the page or try again later.</p>
-          <details style={{ marginTop: '10px', textAlign: 'left' }}>
-            <summary>Error details</summary>
-            <pre style={{ fontSize: '12px', overflow: 'auto' }}>
-              {this.state.error?.stack}
-            </pre>
-          </details>
+          <h2 style={{ color: '#e53e3e', marginBottom: '16px' }}>Something went wrong</h2>
+          <p style={{ color: '#666', marginBottom: '20px' }}>
+            The application encountered an unexpected error. Please refresh the page and try again.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              background: '#e53e3e',
+              color: 'white',
+              border: 'none',
+              padding: '12px 24px',
+              borderRadius: '6px',
+              cursor: 'pointer'
+            }}
+          >
+            Refresh Page
+          </button>
         </div>
       );
     }
