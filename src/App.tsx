@@ -116,6 +116,12 @@ const FileUploadPage: React.FC<FileUploadPageProps> = ({ user, onFileUpload, onL
           sheets[sheetName] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
         });
 
+        console.log('File processed:', {
+          fileName: file.name,
+          sheetNames: workbook.SheetNames,
+          sheetsData: sheets
+        });
+
         onFileUpload({
           fileName: file.name,
           sheets: sheets,

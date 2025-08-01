@@ -24,14 +24,22 @@ const ExcelViewer: React.FC<ExcelViewerProps> = ({ fileData, user, onBack, onLog
     
     setIsProcessing(true);
     try {
-      // Here you would call your Bedrock service
-      // For now, simulate AI response
-      setTimeout(() => {
-        setAiResponse(`AI Analysis: ${prompt}\n\nBased on your ${fileData.fileName} data, I can see ${currentSheetData.length} rows of data. The analysis shows interesting patterns in your dataset.`);
-        setIsProcessing(false);
-      }, 2000);
+      const { bedrockService } = await import('../services/bedrockService');
+      const result = await bedrockService.processExcelData(
+        currentSheetData,
+        prompt,
+        fileData.fileName
+      );
+      
+      if (result.success) {
+        setAiResponse(result.response || 'AI processing completed successfully.');
+      } else {
+        setAiResponse(`Error: ${result.error || 'Failed to process your request.'}`);
+      }
     } catch (error) {
-      setAiResponse('Error processing your request. Please try again.');
+      console.error('AI Query Error:', error);
+      setAiResponse('Error connecting to AI service. Please try again.');
+    } finally {
       setIsProcessing(false);
     }
   };
@@ -192,9 +200,9 @@ const ExcelViewer: React.FC<ExcelViewerProps> = ({ fileData, user, onBack, onLog
                 fontSize: '14px'
               }}>
                 <tbody>
-                  {currentSheetData.map((row, rowIndex) => (
+                  {currentSheetData.length > 0 ? currentSheetData.map((row, rowIndex) => (
                     <tr key={rowIndex}>
-                      {row.map((cell, cellIndex) => (
+                      {Array.isArray(row) && row.length > 0 ? row.map((cell, cellIndex) => (
                         <td
                           key={cellIndex}
                           style={{
@@ -206,11 +214,19 @@ const ExcelViewer: React.FC<ExcelViewerProps> = ({ fileData, user, onBack, onLog
                             whiteSpace: 'nowrap'
                           }}
                         >
-                          {cell || ''}
+                          {cell !== null && cell !== undefined ? String(cell) : ''}
                         </td>
-                      ))}
+                      )) : (
+                        <td style={{ border: '1px solid #eee', padding: '8px 12px' }}>No data</td>
+                      )}
                     </tr>
-                  ))}
+                  )) : (
+                    <tr>
+                      <td style={{ border: '1px solid #eee', padding: '20px', textAlign: 'center', color: '#666' }}>
+                        No data available in this sheet
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
@@ -222,6 +238,11 @@ const ExcelViewer: React.FC<ExcelViewerProps> = ({ fileData, user, onBack, onLog
               textAlign: 'center'
             }}>
               Showing {currentSheetData.length} rows × {currentSheetData[0]?.length || 0} columns
+              {currentSheetData.length === 0 && (
+                <div style={{ color: '#ff4757', marginTop: '10px' }}>
+                  ⚠️ No data found in this sheet. Please check your Excel file.
+                </div>
+              )}
             </div>
           </div>
         </div>
