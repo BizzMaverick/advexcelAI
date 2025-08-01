@@ -26,8 +26,8 @@ export const sendVerificationEmail = async (
     console.log('Attempting to send verification email to:', email);
     
     const templateParams = {
-      to_email: email,
-      to_name: name,
+      to: email,
+      name: name,
       passcode: code,
       time: new Date(Date.now() + 15 * 60 * 1000).toLocaleTimeString()
     };
@@ -73,8 +73,8 @@ export const sendPasswordResetEmail = async (
     console.log('Attempting to send password reset email to:', email);
     
     const templateParams = {
-      to_email: email,
-      to_name: name,
+      to: email,
+      name: name,
       passcode: code,
       time: new Date(Date.now() + 15 * 60 * 1000).toLocaleTimeString()
     };
