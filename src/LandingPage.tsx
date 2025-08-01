@@ -496,53 +496,122 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
   return (
     <div style={{
       minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
       background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
-      padding: '20px',
       fontFamily: '"Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif',
     }}>
+      {/* Logo at top center */}
       <div style={{
-        maxWidth: '400px',
-        width: '100%',
-        background: 'white',
-        borderRadius: '8px',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1), 0 2px 5px rgba(0, 0, 0, 0.05)',
-        overflow: 'hidden'
+        textAlign: 'center',
+        padding: '30px 20px',
+        background: 'rgba(255,255,255,0.1)'
       }}>
-        {/* Welcome Header */}
-        <div style={{
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          padding: '40px 20px',
-          textAlign: 'center',
-          color: 'white'
+        <img 
+          src={logo} 
+          alt="Excel AI Assistant" 
+          style={{ 
+            height: '80px',
+            marginBottom: '10px'
+          }}
+        />
+        <h1 style={{
+          color: '#333',
+          margin: 0,
+          fontSize: '24px',
+          fontWeight: 'bold'
         }}>
-          <div style={{ fontSize: '60px', marginBottom: '20px' }}>🎉</div>
-          <h1 style={{ 
-            margin: '0 0 10px 0',
-            fontSize: '28px',
+          Excel AI Assistant
+        </h1>
+      </div>
+
+      {/* Split layout */}
+      <div style={{
+        display: 'flex',
+        minHeight: 'calc(100vh - 140px)',
+        gap: '40px',
+        padding: '40px',
+        alignItems: 'center'
+      }}>
+        {/* Left side - Welcome message */}
+        <div style={{
+          flex: 1,
+          padding: '60px 40px',
+          textAlign: 'center'
+        }}>
+          <div style={{ fontSize: '80px', marginBottom: '30px' }}>🎉</div>
+          <h2 style={{
+            color: '#333',
+            fontSize: '36px',
+            marginBottom: '20px',
             fontWeight: 'bold'
           }}>
-            Welcome to Excel AI Assistant!
-          </h1>
-          <p style={{ 
-            margin: '0 0 20px 0',
-            fontSize: '16px',
-            opacity: 0.9
+            Welcome!
+          </h2>
+          <p style={{
+            color: '#666',
+            fontSize: '18px',
+            lineHeight: '1.6',
+            marginBottom: '40px',
+            maxWidth: '500px',
+            margin: '0 auto 40px'
           }}>
-            Transform your Excel experience with AI power
+            Transform your Excel experience with the power of AI! 
+            Upload your spreadsheets and let our intelligent assistant 
+            help you analyze, process, and gain insights from your data.
           </p>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', fontSize: '14px' }}>
-            <span>📊 Smart Analysis</span>
-            <span>🤖 AI Powered</span>
-            <span>⚡ Lightning Fast</span>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '40px',
+            marginBottom: '30px'
+          }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '50px', marginBottom: '10px' }}>📊</div>
+              <p style={{ color: '#666', fontSize: '16px', margin: 0 }}>Smart Analysis</p>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '50px', marginBottom: '10px' }}>🤖</div>
+              <p style={{ color: '#666', fontSize: '16px', margin: 0 }}>AI Powered</p>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '50px', marginBottom: '10px' }}>⚡</div>
+              <p style={{ color: '#666', fontSize: '16px', margin: 0 }}>Lightning Fast</p>
+            </div>
           </div>
         </div>
+
+        {/* Right side - Login form */}
+        <div style={{
+          flex: 1,
+          maxWidth: '450px',
+          background: 'white',
+          borderRadius: '12px',
+          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
+          overflow: 'hidden'
+        }}>
+          <div style={{
+            background: colors.primary,
+            padding: '30px 20px',
+            textAlign: 'center',
+            color: 'white'
+          }}>
+            <h2 style={{
+              margin: 0,
+              fontSize: '24px',
+              fontWeight: '500'
+            }}>
+              Get Started
+            </h2>
+            <p style={{
+              margin: '10px 0 0 0',
+              opacity: 0.9,
+              fontSize: '15px'
+            }}>
+              Sign in or create your account
+            </p>
+          </div>
         
         {/* Login/Signup Form */}
-        <div style={{ padding: '30px', textAlign: 'center' }}>
+        <div style={{ padding: '40px', textAlign: 'center' }}>
           <div style={{ marginBottom: '20px' }}>
             <button 
               onClick={() => setIsSignup(false)}
