@@ -10,23 +10,47 @@ interface User {
   verified: boolean;
 }
 
-// Mock user database - in production, this would be a real database
-const users: User[] = [
-  {
-    id: '1',
-    email: 'demo@example.com',
-    name: 'Demo User',
-    password: 'Password123!',
-    verified: true
-  },
-  {
-    id: '2',
-    email: 'admin@advexcel.com',
-    name: 'Admin User',
-    password: 'Admin123!',
-    verified: true
+// Load users from localStorage or use default users
+const loadUsers = (): User[] => {
+  try {
+    const stored = localStorage.getItem('advexcel_users');
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (error) {
+    console.error('Error loading users from localStorage:', error);
   }
-];
+  
+  // Default users
+  return [
+    {
+      id: '1',
+      email: 'demo@example.com',
+      name: 'Demo User',
+      password: 'Password123!',
+      verified: true
+    },
+    {
+      id: '2',
+      email: 'admin@advexcel.com',
+      name: 'Admin User',
+      password: 'Admin123!',
+      verified: true
+    }
+  ];
+};
+
+// Save users to localStorage
+const saveUsers = (users: User[]) => {
+  try {
+    localStorage.setItem('advexcel_users', JSON.stringify(users));
+  } catch (error) {
+    console.error('Error saving users to localStorage:', error);
+  }
+};
+
+// Mock user database - in production, this would be a real database
+let users: User[] = loadUsers();
 
 // Store verification codes
 const verificationCodes: Record<string, string> = {};
@@ -115,6 +139,7 @@ export const authService = {
     
     // Add to database
     users.push(newUser);
+    saveUsers(users);
     
     return { email, name, verificationCode };
   },
@@ -135,6 +160,7 @@ export const authService = {
     const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
     if (user) {
       user.verified = true;
+      saveUsers(users);
     }
     
     // Remove verification code
@@ -214,6 +240,7 @@ export const authService = {
     const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
     if (user) {
       user.password = hashPassword(newPassword);
+      saveUsers(users);
     }
     
     // Remove reset code
