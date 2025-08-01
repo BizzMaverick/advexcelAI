@@ -33,19 +33,24 @@ Command: ${prompt}`;
 
         // Call Bedrock Claude
         const input = {
-            modelId: "anthropic.claude-3-sonnet-20240229-v1:0",
+            modelId: "amazon.nova-premier-v1:0:8k",
             contentType: "application/json",
             accept: "application/json",
             body: JSON.stringify({
-                anthropic_version: "bedrock-2023-05-31",
-                max_tokens: 1000,
-                system: systemPrompt,
                 messages: [
                     {
                         role: "user",
-                        content: userPrompt
+                        content: [
+                            {
+                                text: `${systemPrompt}\n\n${userPrompt}`
+                            }
+                        ]
                     }
-                ]
+                ],
+                inferenceConfig: {
+                    max_new_tokens: 1000,
+                    temperature: 0.7
+                }
             })
         };
 
@@ -53,7 +58,7 @@ Command: ${prompt}`;
         const response = await bedrockClient.send(command);
         
         const responseBody = JSON.parse(new TextDecoder().decode(response.body));
-        const aiResponse = responseBody.content[0].text;
+        const aiResponse = responseBody.output.message.content[0].text;
 
         return {
             statusCode: 200,

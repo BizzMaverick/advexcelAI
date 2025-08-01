@@ -48,7 +48,7 @@ Resources:
                 Action:
                   - bedrock:InvokeModel
                 Resource: 
-                  - !Sub 'arn:aws:bedrock:${AWS::Region}::foundation-model/anthropic.claude-3-sonnet-20240229-v1:0'
+                  - !Sub 'arn:aws:bedrock:${AWS::Region}::foundation-model/*'
         - PolicyName: S3Access
           PolicyDocument:
             Version: '2012-10-17'
@@ -114,8 +114,6 @@ Resources:
         Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ExcelAIProcessor.Arn}/invocations'
       MethodResponses:
         - StatusCode: 200
-          ResponseHeaders:
-            Access-Control-Allow-Origin: true
 
   # OPTIONS Method for CORS
   ProcessOptionsMethod:
@@ -129,20 +127,20 @@ Resources:
         Type: MOCK
         IntegrationResponses:
           - StatusCode: 200
-            ResponseHeaders:
-              Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-              Access-Control-Allow-Methods: "'POST,OPTIONS'"
-              Access-Control-Allow-Origin: "'*'"
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'POST,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
             ResponseTemplates:
               application/json: ''
         RequestTemplates:
           application/json: '{"statusCode": 200}'
       MethodResponses:
         - StatusCode: 200
-          ResponseHeaders:
-            Access-Control-Allow-Headers: true
-            Access-Control-Allow-Methods: true
-            Access-Control-Allow-Origin: true
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: false
+            method.response.header.Access-Control-Allow-Methods: false
+            method.response.header.Access-Control-Allow-Origin: false
 
   # Lambda Permission for API Gateway
   LambdaApiPermission:

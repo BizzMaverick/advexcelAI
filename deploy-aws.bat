@@ -1,33 +1,52 @@
 @echo off
 echo ===== Excel AI Assistant AWS Deployment =====
 
-echo Building application...
-call npm run build
-
-echo Packaging Lambda function...
-cd aws\lambda
-
-echo Installing dependencies...
-npm install
-
-echo Creating zip package...
-del function.zip 2>nul
-if exist node_modules (
-  powershell Compress-Archive -Path index.js,geminiService.js,node_modules,package.json -DestinationPath function.zip -Force
-) else (
-  powershell Compress-Archive -Path index.js,geminiService.js,package.json -DestinationPath function.zip -Force
+REM Check AWS CLI
+where aws >nul 2>&1
+if %errorlevel% neq 0 (
+    echo AWS CLI not found. Please install AWS CLI first.
+    echo Download from: https://aws.amazon.com/cli/
+    pause
+    exit /b 1
 )
-cd ..\..
 
-echo Deploying to AWS...
-echo Please ensure you have AWS CLI configured with appropriate credentials.
+echo Checking AWS credentials...
+aws sts get-caller-identity >nul 2>&1
+if %errorlevel% neq 0 (
+    echo AWS credentials not configured. Run: aws configure
+    pause
+    exit /b 1
+)
 
-echo 1. Deploying Lambda function...
-aws lambda update-function-code --function-name excel-ai-function --zip-file fileb://aws/lambda/function.zip
+echo Step 1: Deploying CloudFormation infrastructure...
+aws cloudformation deploy ^
+    --template-file aws\cloudformation\excel-ai-infrastructure.yaml ^
+    --stack-name excel-ai-assistant-stack ^
+    --capabilities CAPABILITY_NAMED_IAM ^
+    --region us-east-1
 
-echo 2. Deploying frontend to Amplify...
-echo Please use the AWS Amplify Console to deploy the frontend.
-echo Visit: https://console.aws.amazon.com/amplify/
+if %errorlevel% neq 0 (
+    echo CloudFormation deployment failed. Checking events...
+    aws cloudformation describe-stack-events ^
+        --stack-name excel-ai-assistant-stack ^
+        --query "StackEvents[?ResourceStatus=='CREATE_FAILED'].[LogicalResourceId,ResourceStatusReason]" ^
+        --output table ^
+        --region us-east-1
+    pause
+    exit /b 1
+)
 
-echo Deployment complete!
-echo Don't forget to update the API Gateway URL in src/services/awsService.js
+echo Step 2: Getting API endpoint...
+for /f "tokens=*" %%i in ('aws cloudformation describe-stacks --stack-name excel-ai-assistant-stack --query "Stacks[0].Outputs[?OutputKey=='ApiEndpoint'].OutputValue" --output text --region us-east-1') do set API_ENDPOINT=%%i
+
+echo.
+echo ========================================
+echo Deployment completed successfully!
+echo ========================================
+echo API Endpoint: %API_ENDPOINT%
+echo.
+echo Next steps:
+echo 1. Update bedrockService.ts with API endpoint
+echo 2. Enable Bedrock model access in AWS Console
+echo 3. Deploy frontend to Amplify
+echo ========================================

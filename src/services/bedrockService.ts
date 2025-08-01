@@ -11,7 +11,7 @@ class BedrockService {
 
   constructor() {
     // This will be updated after AWS deployment
-    this.apiEndpoint = process.env.REACT_APP_API_ENDPOINT || 'https://your-api-gateway-url.execute-api.us-east-1.amazonaws.com/prod';
+    this.apiEndpoint = process.env.REACT_APP_API_ENDPOINT || 'https://z64bxyj98g.execute-api.us-east-1.amazonaws.com/prod';
   }
 
   async processExcelData(fileData: any[][], prompt: string, fileName: string): Promise<BedrockResponse> {
@@ -23,7 +23,7 @@ class BedrockService {
         dataRows: fileData.length
       });
 
-      const response = await fetch(`${this.apiEndpoint}/process`, {
+      const response = await fetch(this.apiEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -55,7 +55,7 @@ class BedrockService {
   // Test connection to API
   async testConnection(): Promise<boolean> {
     try {
-      const response = await fetch(`${this.apiEndpoint}/process`, {
+      const response = await fetch(this.apiEndpoint, {
         method: 'OPTIONS'
       });
       return response.ok;
