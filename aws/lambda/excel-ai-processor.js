@@ -1,8 +1,4 @@
 const { BedrockRuntimeClient, InvokeModelCommand } = require("@aws-sdk/client-bedrock-runtime");
-const { S3Client, GetObjectCommand, PutObjectCommand } = require("@aws-sdk/client-s3");
-
-const bedrockClient = new BedrockRuntimeClient({ region: process.env.AWS_REGION });
-const s3Client = new S3Client({ region: process.env.AWS_REGION });
 
 exports.handler = async (event) => {
     const headers = {
@@ -15,60 +11,57 @@ exports.handler = async (event) => {
         return { statusCode: 200, headers, body: '' };
     }
 
-    console.log('Event:', JSON.stringify(event, null, 2));
+    console.log('Event received:', JSON.stringify(event, null, 2));
 
     try {
         const { fileData, prompt, fileName } = JSON.parse(event.body);
+        console.log('Parsed request:', { fileName, prompt, dataRows: fileData.length });
         
-        // Prepare prompt for Claude
-        const systemPrompt = `You are an Excel AI assistant. Analyze the provided Excel/CSV data and respond to user commands.
-        
-Data format: The data is provided as an array of arrays where the first row contains headers.
-Your task: ${prompt}
+        const bedrockClient = new BedrockRuntimeClient({ 
+            region: 'us-east-1'
+        });
 
-Please provide a clear, actionable response. If the user asks for data manipulation, describe what changes should be made.`;
+        const modelInput = {
+            anthropic_version: "bedrock-2023-05-31",
+            max_tokens: 1000,
+            messages: [{
+                role: "user",
+                content: `You are an Excel AI assistant. Analyze this data and respond to the user's request.
 
-        const userPrompt = `File: ${fileName}
-Data: ${JSON.stringify(fileData.slice(0, 50))} ${fileData.length > 50 ? '...(truncated)' : ''}
+File: ${fileName}
+Request: ${prompt}
+Data (first 10 rows): ${JSON.stringify(fileData.slice(0, 10))}
+Total rows: ${fileData.length}
 
-Command: ${prompt}`;
+Please provide a helpful response about the data analysis.`
+            }]
+        };
 
-        // Call Bedrock Claude
-        const input = {
+        const command = new InvokeModelCommand({
             modelId: "anthropic.claude-3-sonnet-20240229-v1:0",
             contentType: "application/json",
             accept: "application/json",
-            body: JSON.stringify({
-                anthropic_version: "bedrock-2023-05-31",
-                max_tokens: 1000,
-                temperature: 0.7,
-                messages: [
-                    {
-                        role: "user",
-                        content: `${systemPrompt}\n\n${userPrompt}`
-                    }
-                ]
-            })
-        };
+            body: JSON.stringify(modelInput)
+        });
 
-        const command = new InvokeModelCommand(input);
+        console.log('Calling Bedrock...');
         const response = await bedrockClient.send(command);
         
         const responseBody = JSON.parse(new TextDecoder().decode(response.body));
-        const aiResponse = responseBody.content[0].text;
+        console.log('Bedrock response received');
 
         return {
             statusCode: 200,
             headers,
             body: JSON.stringify({
                 success: true,
-                response: aiResponse,
+                response: responseBody.content[0].text,
                 fileName: fileName
             })
         };
 
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Lambda error:', error);
         return {
             statusCode: 500,
             headers,
