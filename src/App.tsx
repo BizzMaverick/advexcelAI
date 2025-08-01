@@ -11,15 +11,10 @@ function App() {
   const [user, setUser] = useState<{ name: string; email: string } | null>(null);
   const [uploadedFile, setUploadedFile] = useState<any>(null);
 
-  useEffect(() => {
-    const savedUser = authService.getCurrentUser();
-    if (savedUser) {
-      setUser(savedUser);
-      setCurrentView('upload');
-    }
-  }, []);
+  // Remove auto-login check to always start with welcome page
 
   const handleLogin = (userData: { name: string; email: string }) => {
+    console.log('Login successful:', userData);
     setUser(userData);
     setCurrentView('upload');
   };
