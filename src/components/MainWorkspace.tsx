@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import ExcelToolbar from './ExcelToolbar';
-import ResizableTable from './ResizableTable';
+import SimpleTable from './SimpleTable';
 import ShortcutsHelp from './ShortcutsHelp';
 import { AWSService } from '../services/awsService.js';
 import * as XLSX from 'xlsx';
@@ -784,22 +784,19 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
                 
                 {/* Current Sheet Data */}
                 {spreadsheetData.length > 0 && (
-                  <ResizableTable
+                  <SimpleTable
                     data={spreadsheetData}
                     headers={Array.from({length: spreadsheetData[0]?.length || 10}, (_, i) => String.fromCharCode(65 + i))}
-                    formatting={formatting}
                     title={`📋 ${sheets[activeSheet]?.name || 'Sheet'}`}
                     subtitle={`${spreadsheetData.length} rows × ${spreadsheetData[0]?.length || 0} columns`}
-                    onCellEdit={handleCellEdit}
                   />
                 )}
 
                 {/* AI Result */}
                 {aiResultData && aiResultData.length > 0 && (
-                  <ResizableTable
+                  <SimpleTable
                     data={aiResultData.slice(1)}
                     headers={aiResultData[0]?.map(h => String(h || '')) || []}
-                    formatting={aiFormatting?.slice(1)}
                     title="🤖 AI Result"
                     subtitle={`${aiResultData.length} rows × ${aiResultData[0]?.length || 0} columns`}
                   />
