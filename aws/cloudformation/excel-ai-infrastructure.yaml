@@ -71,9 +71,20 @@ Resources:
       Code:
         ZipFile: |
           exports.handler = async (event) => {
+            const headers = {
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+              'Access-Control-Allow-Methods': 'POST,OPTIONS'
+            };
+            
+            if (event.httpMethod === 'OPTIONS') {
+              return { statusCode: 200, headers, body: '' };
+            }
+            
             return {
               statusCode: 200,
-              body: JSON.stringify({ message: 'Please deploy the actual function code' })
+              headers,
+              body: JSON.stringify({ message: 'Lambda function working - please deploy actual code' })
             };
           };
       Environment:
