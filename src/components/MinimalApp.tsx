@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import logo from '../assets/logo.png';
+import bedrockService from '../services/bedrockService';
 
 interface User {
   email: string;
@@ -16,6 +17,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileData, setFileData] = useState<any[][]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [aiResponse, setAiResponse] = useState<string>('');
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -43,24 +45,37 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
     }
   };
 
-  const handleProcessAI = () => {
+  const handleProcessAI = async () => {
     if (!prompt.trim()) {
       alert('Please enter a command');
       return;
     }
     
-    if (!selectedFile) {
+    if (!selectedFile || fileData.length === 0) {
       alert('Please select a file first');
       return;
     }
     
     setIsProcessing(true);
+    setAiResponse('');
     
-    // Simulate AI processing
-    setTimeout(() => {
+    try {
+      const result = await bedrockService.processExcelData(
+        fileData,
+        prompt,
+        selectedFile.name
+      );
+      
+      if (result.success && result.response) {
+        setAiResponse(result.response);
+      } else {
+        setAiResponse(`Error: ${result.error || 'Unknown error occurred'}`);
+      }
+    } catch (error) {
+      setAiResponse(`Error: ${error instanceof Error ? error.message : 'Failed to process request'}`);
+    } finally {
       setIsProcessing(false);
-      alert(`AI processed "${prompt}" on file "${selectedFile.name}"`);
-    }, 2000);
+    }
   };
 
   return (
@@ -136,8 +151,29 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               fontSize: '16px' 
             }}
           >
-            {isProcessing ? 'Processing...' : 'Process with AI'}
+            {isProcessing ? 'Processing with AI...' : 'Process with AI'}
           </button>
+          
+          {aiResponse && (
+            <div style={{ 
+              marginTop: '30px', 
+              padding: '20px', 
+              background: '#f8f9fa', 
+              border: '1px solid #dee2e6', 
+              borderRadius: '8px',
+              textAlign: 'left'
+            }}>
+              <h4 style={{ color: '#0078d4', marginBottom: '15px' }}>AI Response:</h4>
+              <div style={{ 
+                whiteSpace: 'pre-wrap', 
+                fontSize: '14px', 
+                lineHeight: '1.5',
+                color: '#333'
+              }}>
+                {aiResponse}
+              </div>
+            </div>
+          )}
         </div>
         
         <div style={{ marginTop: '40px', padding: '20px', background: '#f5f5f5', borderRadius: '8px', maxWidth: '600px', margin: '40px auto 0' }}>

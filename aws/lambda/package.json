@@ -1,9 +1,13 @@
 {
-  "name": "excel-ai-function",
+  "name": "excel-ai-processor",
   "version": "1.0.0",
-  "description": "AWS Lambda function for Excel AI Assistant",
-  "main": "index.js",
+  "description": "Lambda function for Excel AI processing with Bedrock",
+  "main": "excel-ai-processor.js",
   "dependencies": {
-    "xlsx": "^0.18.5"
+    "@aws-sdk/client-bedrock-runtime": "^3.490.0",
+    "@aws-sdk/client-s3": "^3.490.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   }
 }
