@@ -18,25 +18,31 @@ export const sendVerificationEmail = async (
   code: string
 ): Promise<boolean> => {
   try {
+    console.log('Attempting to send verification email to:', email);
+    
+    const templateParams = {
+      to_email: email,
+      to_name: name,
+      verification_code: code,
+      app_name: 'Excel AI Assistant',
+      from_name: 'Excel AI Assistant'
+    };
+    
+    console.log('Template params:', templateParams);
+    
     const response = await emailjs.send(
       serviceId,
       verificationTemplateId,
-      {
-        to_email: email,
-        to_name: name,
-        verification_code: code,
-        app_name: 'Excel AI Assistant',
-        from_email: 'contact@advexcel.online',
-        from_name: 'Excel AI Assistant',
-        reply_to: 'contact@advexcel.online'
-      },
+      templateParams,
       userId
     );
     
     console.log('Verification email sent successfully:', response);
+    alert(`Verification code sent to ${email}. Code: ${code}`);
     return true;
   } catch (error) {
     console.error('Failed to send verification email:', error);
+    alert(`Email sending failed: ${error}. Your verification code is: ${code}`);
     return false;
   }
 };
@@ -48,25 +54,29 @@ export const sendPasswordResetEmail = async (
   code: string
 ): Promise<boolean> => {
   try {
+    console.log('Attempting to send password reset email to:', email);
+    
+    const templateParams = {
+      to_email: email,
+      to_name: name,
+      reset_code: code,
+      app_name: 'Excel AI Assistant',
+      from_name: 'Excel AI Assistant'
+    };
+    
     const response = await emailjs.send(
       serviceId,
       passwordResetTemplateId,
-      {
-        to_email: email,
-        to_name: name,
-        reset_code: code,
-        app_name: 'Excel AI Assistant',
-        from_email: 'contact@advexcel.online',
-        from_name: 'Excel AI Assistant',
-        reply_to: 'contact@advexcel.online'
-      },
+      templateParams,
       userId
     );
     
     console.log('Password reset email sent successfully:', response);
+    alert(`Password reset code sent to ${email}. Code: ${code}`);
     return true;
   } catch (error) {
     console.error('Failed to send password reset email:', error);
+    alert(`Email sending failed: ${error}. Your reset code is: ${code}`);
     return false;
   }
 };
