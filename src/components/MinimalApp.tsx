@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import * as XLSX from 'xlsx';
 import logo from '../assets/logo.png';
 import bedrockService from '../services/bedrockService';
 
@@ -24,23 +25,31 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
     if (file) {
       setSelectedFile(file);
       
-      // Simple CSV parsing for demo
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          if (file.name.endsWith('.csv')) {
+            const text = e.target?.result as string;
+            const rows = text.split('\n').map(row => row.split(','));
+            setFileData(rows.filter(row => row.some(cell => cell.trim()))); // Remove empty rows
+          } else {
+            // Parse Excel files
+            const data = new Uint8Array(e.target?.result as ArrayBuffer);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+            setFileData(jsonData as any[][]);
+          }
+        } catch (error) {
+          console.error('Error parsing file:', error);
+          alert('Error reading file. Please make sure it\'s a valid Excel or CSV file.');
+        }
+      };
+      
       if (file.name.endsWith('.csv')) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const text = e.target?.result as string;
-          const rows = text.split('\n').map(row => row.split(','));
-          setFileData(rows.slice(0, 10)); // Show first 10 rows
-        };
         reader.readAsText(file);
       } else {
-        // For Excel files, show placeholder data
-        setFileData([
-          ['Name', 'Age', 'City'],
-          ['John Doe', '30', 'New York'],
-          ['Jane Smith', '25', 'Los Angeles'],
-          ['Bob Johnson', '35', 'Chicago']
-        ]);
+        reader.readAsArrayBuffer(file);
       }
     }
   };
@@ -113,17 +122,19 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
           )}
           
           {fileData.length > 0 && (
-            <div style={{ marginBottom: '20px', overflowX: 'auto' }}>
-              <h4 style={{ color: '#333', marginBottom: '10px' }}>File Preview:</h4>
-              <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ddd' }}>
+            <div style={{ marginBottom: '20px', overflowX: 'auto', maxHeight: '400px', overflowY: 'auto', border: '1px solid #ddd', borderRadius: '4px' }}>
+              <h4 style={{ color: '#333', marginBottom: '10px', padding: '10px', background: '#f8f9fa', margin: 0 }}>File Data ({fileData.length} rows):</h4>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <tbody>
                   {fileData.map((row, i) => (
                     <tr key={i} style={{ background: i === 0 ? '#f5f5f5' : 'white' }}>
-                      {row.map((cell, j) => (
-                        <td key={j} style={{ padding: '8px', border: '1px solid #ddd', fontSize: '14px' }}>
-                          {cell}
+                      {Array.isArray(row) ? row.map((cell, j) => (
+                        <td key={j} style={{ padding: '8px', border: '1px solid #ddd', fontSize: '14px', minWidth: '100px' }}>
+                          {cell !== null && cell !== undefined ? String(cell) : ''}
                         </td>
-                      ))}
+                      )) : (
+                        <td style={{ padding: '8px', border: '1px solid #ddd', fontSize: '14px' }}>Invalid row data</td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
