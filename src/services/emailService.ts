@@ -8,7 +8,12 @@ const userId = '3xCIlXaFmm79QkBaB'; // Your EmailJS user ID
 
 // Initialize EmailJS
 export const initEmailJS = () => {
-  emailjs.init(userId);
+  try {
+    emailjs.init(userId);
+    console.log('EmailJS initialized successfully with user ID:', userId);
+  } catch (error) {
+    console.error('Failed to initialize EmailJS:', error);
+  }
 };
 
 // Send verification email
@@ -30,6 +35,13 @@ export const sendVerificationEmail = async (
     
     console.log('Template params:', templateParams);
     
+    console.log('EmailJS send parameters:', {
+      serviceId,
+      templateId: verificationTemplateId,
+      templateParams,
+      userId
+    });
+    
     const response = await emailjs.send(
       serviceId,
       verificationTemplateId,
@@ -42,6 +54,12 @@ export const sendVerificationEmail = async (
     return true;
   } catch (error) {
     console.error('Failed to send verification email:', error);
+    console.error('Error details:', {
+      message: error.message,
+      status: error.status,
+      text: error.text
+    });
+    alert(`Failed to send verification email: ${error.message || error}`);
     return false;
   }
 };
