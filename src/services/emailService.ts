@@ -38,11 +38,10 @@ export const sendVerificationEmail = async (
     );
     
     console.log('Verification email sent successfully:', response);
-    alert(`Verification code sent to ${email}. Code: ${code}`);
+    alert(`Verification code sent to ${email}`);
     return true;
   } catch (error) {
     console.error('Failed to send verification email:', error);
-    alert(`Email sending failed: ${error}. Your verification code is: ${code}`);
     return false;
   }
 };
@@ -72,11 +71,10 @@ export const sendPasswordResetEmail = async (
     );
     
     console.log('Password reset email sent successfully:', response);
-    alert(`Password reset code sent to ${email}. Code: ${code}`);
+    alert(`Password reset code sent to ${email}`);
     return true;
   } catch (error) {
     console.error('Failed to send password reset email:', error);
-    alert(`Email sending failed: ${error}. Your reset code is: ${code}`);
     return false;
   }
 };
