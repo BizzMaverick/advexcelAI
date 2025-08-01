@@ -99,13 +99,8 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
         // Register new user
         const user = await authService.register(email, password, name);
         
-        // Get the verification code from authService (it's logged in console)
-        // We'll use the authService's verification system
-        
-        // Send verification email - we'll get the code from authService
-        // For now, we'll use a placeholder and let authService handle verification
-        const code = '000000'; // Placeholder - actual code is in authService
-        await emailService.sendVerificationEmail(email, name, code);
+        // Send verification email with the actual code from authService
+        await emailService.sendVerificationEmail(email, name, user.verificationCode);
         
         // Set pending user and show verification screen
         setPendingUser({ email, name: user?.name || name });
@@ -161,11 +156,10 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
     
     try {
       // Resend verification code using authService
-      await authService.resendVerificationCode(pendingUser.email);
+      const newCode = await authService.resendVerificationCode(pendingUser.email);
       
-      // Send verification email with placeholder (actual code is in authService)
-      const code = '000000'; // Placeholder
-      await emailService.sendVerificationEmail(pendingUser.email, pendingUser.name, code);
+      // Send verification email with the actual new code
+      await emailService.sendVerificationEmail(pendingUser.email, pendingUser.name, newCode);
       
       alert('A new verification code has been sent to your email');
     } catch (err: any) {

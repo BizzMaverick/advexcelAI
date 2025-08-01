@@ -73,7 +73,7 @@ export const authService = {
   },
   
   // Register a new user
-  register: async (email: string, password: string, name: string): Promise<{ email: string; name: string }> => {
+  register: async (email: string, password: string, name: string): Promise<{ email: string; name: string; verificationCode: string }> => {
     // Check if user already exists
     const existingUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
     if (existingUser) {
@@ -116,7 +116,7 @@ export const authService = {
     // Add to database
     users.push(newUser);
     
-    return { email, name };
+    return { email, name, verificationCode };
   },
   
   // Verify email with code
@@ -144,7 +144,7 @@ export const authService = {
   },
   
   // Resend verification code
-  resendVerificationCode: async (email: string): Promise<void> => {
+  resendVerificationCode: async (email: string): Promise<string> => {
     const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
     
     if (!user) {
@@ -161,6 +161,8 @@ export const authService = {
     
     // In a real app, send verification email here
     console.log(`New verification code for ${email}: ${verificationCode}`);
+    
+    return verificationCode;
   },
   
   // Forgot password
