@@ -33,9 +33,9 @@ Data: ${JSON.stringify(fileData.slice(0, 50))} ${fileData.length > 50 ? '...(tru
 
 Command: ${prompt}`;
 
-        // Call Bedrock Claude
+        // Call Bedrock Nova
         const input = {
-            modelId: "amazon.nova-micro-v1:0",
+            modelId: "anthropic.claude-3-sonnet-20240229-v1:0",
             contentType: "application/json",
             accept: "application/json",
             body: JSON.stringify({
@@ -50,7 +50,7 @@ Command: ${prompt}`;
                     }
                 ],
                 inferenceConfig: {
-                    max_new_tokens: 1000,
+                    maxTokens: 1000,
                     temperature: 0.7
                 }
             })
