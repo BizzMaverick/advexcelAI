@@ -15,6 +15,8 @@ exports.handler = async (event) => {
         return { statusCode: 200, headers, body: '' };
     }
 
+    console.log('Event:', JSON.stringify(event, null, 2));
+
     try {
         const { fileData, prompt, fileName } = JSON.parse(event.body);
         
