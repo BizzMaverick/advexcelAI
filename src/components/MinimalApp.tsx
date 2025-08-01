@@ -140,7 +140,8 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
           let displayResponse = `**${explanation || 'Operation completed'}**\n\n`;
           
           if (['sort', 'filter', 'calculate', 'edit', 'formula'].includes(operation)) {
-            if (Array.isArray(opResult)) {
+            if (Array.isArray(opResult) && opResult.length > 0) {
+              console.log('Updating fileData with:', opResult);
               setFileData(opResult);
               displayResponse += `✅ Data has been updated and is displayed above.`;
             } else {
