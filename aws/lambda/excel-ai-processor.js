@@ -1,8 +1,66 @@
 const { BedrockRuntimeClient, InvokeModelCommand } = require("@aws-sdk/client-bedrock-runtime");
 
-const MAX_DATA_SIZE = 100000; // 100KB limit
-const MAX_ROWS = 1000; // Max rows to process
-const TIMEOUT_MS = 25000; // 25 second timeout
+const MAX_DATA_SIZE = 100000;
+const MAX_ROWS = 1000;
+const TIMEOUT_MS = 25000;
+
+// Data processing functions
+function sortData(data, column, order = 'asc') {
+    if (!data || data.length < 2) return data;
+    
+    const headers = data[0];
+    const rows = data.slice(1);
+    const colIndex = headers.findIndex(h => h.toString().toLowerCase().includes(column.toLowerCase()));
+    
+    if (colIndex === -1) return data;
+    
+    const sortedRows = rows.sort((a, b) => {
+        const aVal = isNaN(a[colIndex]) ? a[colIndex] : Number(a[colIndex]);
+        const bVal = isNaN(b[colIndex]) ? b[colIndex] : Number(b[colIndex]);
+        
+        if (order === 'desc') return bVal > aVal ? 1 : -1;
+        return aVal > bVal ? 1 : -1;
+    });
+    
+    return [headers, ...sortedRows];
+}
+
+function filterData(data, column, value) {
+    if (!data || data.length < 2) return data;
+    
+    const headers = data[0];
+    const rows = data.slice(1);
+    const colIndex = headers.findIndex(h => h.toString().toLowerCase().includes(column.toLowerCase()));
+    
+    if (colIndex === -1) return data;
+    
+    const filteredRows = rows.filter(row => 
+        row[colIndex].toString().toLowerCase().includes(value.toLowerCase())
+    );
+    
+    return [headers, ...filteredRows];
+}
+
+function calculateStats(data, column) {
+    if (!data || data.length < 2) return null;
+    
+    const headers = data[0];
+    const rows = data.slice(1);
+    const colIndex = headers.findIndex(h => h.toString().toLowerCase().includes(column.toLowerCase()));
+    
+    if (colIndex === -1) return null;
+    
+    const values = rows.map(row => Number(row[colIndex])).filter(v => !isNaN(v));
+    if (values.length === 0) return null;
+    
+    return {
+        count: values.length,
+        sum: values.reduce((a, b) => a + b, 0),
+        average: values.reduce((a, b) => a + b, 0) / values.length,
+        min: Math.min(...values),
+        max: Math.max(...values)
+    };
+}
 
 exports.handler = async (event) => {
     const headers = {
@@ -15,130 +73,86 @@ exports.handler = async (event) => {
         return { statusCode: 200, headers, body: '' };
     }
 
-    console.log('Request received:', { 
-        httpMethod: event.httpMethod, 
-        origin: event.headers?.origin,
-        userAgent: event.headers?.['user-agent']
-    });
-
     try {
-        // Input validation
-        if (!event.body) {
-            throw new Error('Request body is required');
-        }
+        if (!event.body) throw new Error('Request body is required');
 
-        let requestData;
-        try {
-            requestData = JSON.parse(event.body);
-        } catch (e) {
-            throw new Error('Invalid JSON in request body');
-        }
+        const { fileData, prompt, fileName } = JSON.parse(event.body);
 
-        const { fileData, prompt, fileName } = requestData;
+        // Validation
+        if (!fileData || !Array.isArray(fileData)) throw new Error('fileData must be a valid array');
+        if (!prompt || typeof prompt !== 'string') throw new Error('prompt is required');
+        if (!fileName || typeof fileName !== 'string') throw new Error('fileName is required');
 
-        // Validate required fields
-        if (!fileData || !Array.isArray(fileData)) {
-            throw new Error('fileData must be a valid array');
-        }
-        if (!prompt || typeof prompt !== 'string' || prompt.trim().length === 0) {
-            throw new Error('prompt is required and must be a non-empty string');
-        }
-        if (!fileName || typeof fileName !== 'string') {
-            throw new Error('fileName is required');
-        }
-
-        // Size and safety limits
         const dataSize = JSON.stringify(fileData).length;
-        if (dataSize > MAX_DATA_SIZE) {
-            throw new Error(`Data too large. Maximum size: ${MAX_DATA_SIZE} bytes`);
-        }
-        if (fileData.length > MAX_ROWS) {
-            throw new Error(`Too many rows. Maximum: ${MAX_ROWS} rows`);
-        }
+        if (dataSize > MAX_DATA_SIZE) throw new Error(`Data too large. Maximum size: ${MAX_DATA_SIZE} bytes`);
+        if (fileData.length > MAX_ROWS) throw new Error(`Too many rows. Maximum: ${MAX_ROWS} rows`);
 
-        // Sanitize inputs
-        const sanitizedPrompt = prompt.trim().substring(0, 500);
+        const sanitizedPrompt = prompt.trim().toLowerCase();
         const sanitizedFileName = fileName.replace(/[<>:"/\\|?*]/g, '').substring(0, 100);
-        
-        // Limit data for AI processing (first 50 rows for analysis)
-        const limitedData = fileData.slice(0, 50);
 
-        console.log('Processing request:', { 
-            fileName: sanitizedFileName, 
-            prompt: sanitizedPrompt.substring(0, 100),
-            dataRows: fileData.length,
-            limitedRows: limitedData.length
-        });
+        // Process data based on prompt
+        let processedData = fileData;
+        let operation = 'other';
+        let explanation = 'Data processed';
 
-        const bedrockClient = new BedrockRuntimeClient({ 
-            region: process.env.AWS_REGION || 'us-east-1',
-            maxAttempts: 2
-        });
-
-        const command = new InvokeModelCommand({
-            modelId: "anthropic.claude-3-sonnet-20240229-v1:0",
-            contentType: "application/json",
-            accept: "application/json",
-            body: JSON.stringify({
-                anthropic_version: "bedrock-2023-05-31",
-                max_tokens: 1500,
-                messages: [
-                    {
-                        role: "user",
-                        content: `You are a data processor. You must ACTUALLY PROCESS the data, not give instructions.
-
-DATA: ${JSON.stringify(fileData)}
-TASK: ${sanitizedPrompt}
-
-You MUST return ONLY this JSON format with the PROCESSED data:
-{
-  "operation": "sort",
-  "result": [ACTUAL_PROCESSED_DATA_ARRAY_HERE],
-  "explanation": "brief description",
-  "success": true
-}
-
-DO NOT give steps or instructions. PROCESS the data and return the result.
-For "sort by age": return the actual sorted array.
-For "filter": return the actual filtered array.
-For "calculate": return the data with calculations.
-
-PROCESS THE DATA NOW:`
+        if (sanitizedPrompt.includes('sort')) {
+            operation = 'sort';
+            if (sanitizedPrompt.includes('age')) {
+                processedData = sortData(fileData, 'age');
+                explanation = 'Data sorted by age';
+            } else if (sanitizedPrompt.includes('name')) {
+                processedData = sortData(fileData, 'name');
+                explanation = 'Data sorted by name';
+            } else if (sanitizedPrompt.includes('rank')) {
+                processedData = sortData(fileData, 'rank');
+                explanation = 'Data sorted by rank';
+            } else {
+                // Try to find column to sort by
+                const words = sanitizedPrompt.split(' ');
+                const headers = fileData[0] || [];
+                for (const word of words) {
+                    const matchingHeader = headers.find(h => h.toString().toLowerCase().includes(word));
+                    if (matchingHeader) {
+                        processedData = sortData(fileData, word);
+                        explanation = `Data sorted by ${matchingHeader}`;
+                        break;
                     }
-                ]
-            })
-        });
+                }
+            }
+        } else if (sanitizedPrompt.includes('filter')) {
+            operation = 'filter';
+            // Simple filter implementation
+            const words = sanitizedPrompt.split(' ');
+            const filterValue = words[words.length - 1];
+            processedData = filterData(fileData, words[1] || 'name', filterValue);
+            explanation = `Data filtered by ${filterValue}`;
+        } else if (sanitizedPrompt.includes('calculate') || sanitizedPrompt.includes('average') || sanitizedPrompt.includes('sum')) {
+            operation = 'analytics';
+            const stats = calculateStats(fileData, 'age') || calculateStats(fileData, fileData[0]?.[1]);
+            if (stats) {
+                explanation = `Statistics calculated: Average: ${stats.average.toFixed(2)}, Sum: ${stats.sum}, Count: ${stats.count}`;
+            }
+        } else {
+            // Use AI for complex requests
+            const bedrockClient = new BedrockRuntimeClient({ region: 'us-east-1' });
+            
+            const command = new InvokeModelCommand({
+                modelId: "anthropic.claude-3-sonnet-20240229-v1:0",
+                contentType: "application/json",
+                accept: "application/json",
+                body: JSON.stringify({
+                    anthropic_version: "bedrock-2023-05-31",
+                    max_tokens: 1000,
+                    messages: [{
+                        role: "user",
+                        content: `Analyze this Excel data and provide insights for: "${prompt}"\n\nData: ${JSON.stringify(fileData.slice(0, 10))}\n\nProvide a brief analysis or answer.`
+                    }]
+                })
+            });
 
-        // Set timeout for Bedrock call
-        const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Bedrock request timeout')), TIMEOUT_MS)
-        );
-
-        const response = await Promise.race([
-            bedrockClient.send(command),
-            timeoutPromise
-        ]);
-
-        const responseBody = JSON.parse(new TextDecoder().decode(response.body));
-        const aiResponse = responseBody.content[0].text;
-
-        console.log('Bedrock response received, length:', aiResponse.length);
-
-        // Parse structured response safely
-        let structuredResponse = null;
-        try {
-            // Extract JSON from response if wrapped in text
-            const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
-            const jsonStr = jsonMatch ? jsonMatch[0] : aiResponse;
-            structuredResponse = JSON.parse(jsonStr);
-        } catch (e) {
-            console.log('Failed to parse structured response:', e.message);
-            structuredResponse = {
-                operation: "other",
-                result: aiResponse.substring(0, 1000), // Limit response size
-                explanation: "AI response",
-                success: true
-            };
+            const response = await bedrockClient.send(command);
+            const responseBody = JSON.parse(new TextDecoder().decode(response.body));
+            explanation = responseBody.content[0].text.substring(0, 500);
         }
 
         return {
@@ -146,8 +160,13 @@ PROCESS THE DATA NOW:`
             headers,
             body: JSON.stringify({
                 success: true,
-                response: aiResponse.substring(0, 2000), // Limit response size
-                structured: structuredResponse,
+                response: explanation,
+                structured: {
+                    operation,
+                    result: processedData,
+                    explanation,
+                    success: true
+                },
                 fileName: sanitizedFileName
             })
         };
@@ -155,7 +174,6 @@ PROCESS THE DATA NOW:`
     } catch (error) {
         console.error('Lambda error:', error);
         
-        // Don't expose internal errors to client
         const clientError = error.message.includes('Data too large') || 
                            error.message.includes('Too many rows') ||
                            error.message.includes('required') ||
