@@ -26,11 +26,11 @@ export const sendVerificationEmail = async (
     console.log('Attempting to send verification email to:', email);
     
     const templateParams = {
-      to_email: email,
+      user_email: email,
+      user_name: name,
+      message: code,
       to_name: name,
-      verification_code: code,
-      app_name: 'Excel AI Assistant',
-      from_name: 'Excel AI Assistant'
+      to_email: email
     };
     
     console.log('Template params:', templateParams);
@@ -74,11 +74,11 @@ export const sendPasswordResetEmail = async (
     console.log('Attempting to send password reset email to:', email);
     
     const templateParams = {
-      to_email: email,
+      user_email: email,
+      user_name: name,
+      message: code,
       to_name: name,
-      reset_code: code,
-      app_name: 'Excel AI Assistant',
-      from_name: 'Excel AI Assistant'
+      to_email: email
     };
     
     const response = await emailjs.send(
