@@ -134,6 +134,9 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
     try {
       // Check if the code matches the stored code
       if (verificationCode === actualVerificationCode) {
+        // Verify the user in authService first
+        await authService.verifyEmail(pendingUser.email, verificationCode);
+        
         // Try to login after verification
         try {
           const user = await authService.login(pendingUser.email, password);
