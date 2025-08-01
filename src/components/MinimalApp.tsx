@@ -303,8 +303,6 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
             </div>
           )}
         </div>
-        
-        </div>
       </main>
     </div>
   );
