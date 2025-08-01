@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import './App.css';
 import ExcelToolbar from './components/ExcelToolbar';
 import LandingPage from './LandingPage';
