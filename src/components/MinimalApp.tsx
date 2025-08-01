@@ -143,7 +143,8 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
           if (['sort', 'filter', 'calculate', 'edit', 'formula'].includes(operation)) {
             if (Array.isArray(opResult) && opResult.length > 0) {
               console.log('Updating fileData with:', opResult);
-              setFileData(opResult);
+              // Force React to detect the change by creating new array reference
+              setFileData([...opResult]);
               setLastUpdate(Date.now());
               displayResponse += `✅ Data has been updated and is displayed above.`;
             } else {
@@ -199,7 +200,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
   // Memoize file display data for performance
   const displayData = useMemo(() => {
     return fileData.slice(0, 100); // Only display first 100 rows
-  }, [fileData]);
+  }, [fileData, lastUpdate]);
 
   return (
     <ErrorBoundary>
