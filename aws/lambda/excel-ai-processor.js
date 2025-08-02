@@ -10,16 +10,22 @@ function sortData(data, column, order = 'asc') {
     
     const headers = data[0];
     const rows = data.slice(1);
+    console.log('Sorting by column:', column);
+    console.log('Headers:', headers);
     const colIndex = headers.findIndex(h => h.toString().toLowerCase().includes(column.toLowerCase()));
+    console.log('Column index found:', colIndex);
     
-    if (colIndex === -1) return data;
+    if (colIndex === -1) {
+        console.log('Column not found, returning original data');
+        return data;
+    }
     
     const sortedRows = rows.sort((a, b) => {
-        const aVal = isNaN(a[colIndex]) ? a[colIndex] : Number(a[colIndex]);
-        const bVal = isNaN(b[colIndex]) ? b[colIndex] : Number(b[colIndex]);
+        const aVal = String(a[colIndex] || '').toLowerCase();
+        const bVal = String(b[colIndex] || '').toLowerCase();
         
-        if (order === 'desc') return bVal > aVal ? 1 : -1;
-        return aVal > bVal ? 1 : -1;
+        if (order === 'desc') return bVal.localeCompare(aVal);
+        return aVal.localeCompare(bVal);
     });
     
     return [headers, ...sortedRows];
@@ -97,13 +103,17 @@ exports.handler = async (event) => {
 
         if (sanitizedPrompt.includes('sort')) {
             operation = 'sort';
+            console.log('Sort prompt detected:', sanitizedPrompt);
             if (sanitizedPrompt.includes('age')) {
+                console.log('Sorting by age');
                 processedData = sortData(fileData, 'age');
                 explanation = 'Data sorted by age';
-            } else if (sanitizedPrompt.includes('name') || sanitizedPrompt.includes('country')) {
+            } else if (sanitizedPrompt.includes('country') || sanitizedPrompt.includes('name')) {
+                console.log('Sorting by country/name');
                 processedData = sortData(fileData, 'country');
                 explanation = 'Data sorted by country name';
             } else if (sanitizedPrompt.includes('rank')) {
+                console.log('Sorting by rank');
                 processedData = sortData(fileData, 'rank');
                 explanation = 'Data sorted by rank';
             } else {
