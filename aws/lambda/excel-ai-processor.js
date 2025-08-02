@@ -284,9 +284,11 @@ exports.handler = async (event) => {
         // HIGHLIGHTING & FORMATTING
         else if (sanitizedPrompt.includes('highlight') || sanitizedPrompt.includes('color') || sanitizedPrompt.includes('format')) {
             operation = 'format';
+            console.log('Highlighting detected');
             processedData = [...fileData];
             
             if (sanitizedPrompt.includes('first row') || sanitizedPrompt.includes('header')) {
+                console.log('Highlighting first row');
                 processedData = fileData.map((row, i) => {
                     if (i === 0) {
                         return row.map(cell => `<span style="background-color: red; color: white; font-weight: bold; padding: 4px;">${cell}</span>`);
@@ -296,6 +298,7 @@ exports.handler = async (event) => {
             }
             
             if (sanitizedPrompt.includes('first column')) {
+                console.log('Highlighting first column');
                 processedData = processedData.map((row, i) => {
                     return row.map((cell, j) => {
                         if (j === 0 && i > 0) {
