@@ -146,12 +146,26 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
           
           if (['sort', 'filter', 'calculate', 'edit', 'formula'].includes(operation)) {
             if (Array.isArray(opResult) && opResult.length > 0) {
-              console.log('Updating fileData with:', opResult);
-              // Force React to detect the change by creating new array reference
-              setFileData([...opResult]);
-              setLastUpdate(Date.now());
-              setDataKey(`data-${Date.now()}-${Math.random()}`);
-              displayResponse += `✅ Data has been updated and is displayed above.`;
+              console.log('Showing processed data in response:', opResult.length, 'rows');
+              // Display processed data as a table in the response
+              let tableHtml = '<div style="max-height: 400px; overflow: auto; border: 1px solid #ddd; border-radius: 4px; margin: 10px 0;"><table style="width: 100%; border-collapse: collapse; font-size: 12px;">';
+              
+              opResult.slice(0, 50).forEach((row, i) => {
+                const isHeader = i === 0;
+                tableHtml += `<tr style="background: ${isHeader ? '#f0f8ff' : (i % 2 === 0 ? '#fafafa' : 'white')}; border-bottom: 1px solid #eee;">`;
+                row.forEach(cell => {
+                  tableHtml += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: ${isHeader ? 'bold' : 'normal'}; white-space: nowrap;">${String(cell || '')}</td>`;
+                });
+                tableHtml += '</tr>';
+              });
+              
+              tableHtml += '</table></div>';
+              
+              if (opResult.length > 50) {
+                tableHtml += `<p style="color: #666; font-size: 12px; margin: 5px 0;">Showing first 50 rows of ${opResult.length} total rows</p>`;
+              }
+              
+              displayResponse += `✅ **Processed Data:**\n\n${tableHtml}\n\n**Note:** Your original data remains unchanged. Copy the results above if you want to use them.`;
             } else {
               displayResponse += String(opResult).substring(0, 1000);
             }
@@ -431,7 +445,6 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 <h4 style={{ color: '#333', margin: 0, fontSize: '20px' }}>AI Response</h4>
               </div>
               <div style={{ 
-                whiteSpace: 'pre-wrap', 
                 fontSize: '15px', 
                 lineHeight: '1.6',
                 color: '#555',
@@ -440,7 +453,12 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 borderRadius: '8px',
                 border: '1px solid #e6f2fa'
               }}>
-                {aiResponse}
+                <div 
+                  style={{ whiteSpace: 'pre-wrap' }}
+                  dangerouslySetInnerHTML={{ 
+                    __html: aiResponse.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 
+                  }} 
+                />
               </div>
             </div>
           )}
