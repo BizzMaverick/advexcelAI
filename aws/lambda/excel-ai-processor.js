@@ -103,45 +103,115 @@ exports.handler = async (event) => {
 
         if (sanitizedPrompt.includes('sort')) {
             operation = 'sort';
-            console.log('Sort prompt detected:', sanitizedPrompt);
-            if (sanitizedPrompt.includes('age')) {
-                console.log('Sorting by age');
-                processedData = sortData(fileData, 'age');
-                explanation = 'Data sorted by age';
-            } else if (sanitizedPrompt.includes('country') || sanitizedPrompt.includes('name')) {
-                console.log('Sorting by country/name');
-                processedData = sortData(fileData, 'country');
-                explanation = 'Data sorted by country name';
-            } else if (sanitizedPrompt.includes('rank')) {
-                console.log('Sorting by rank');
-                processedData = sortData(fileData, 'rank');
-                explanation = 'Data sorted by rank';
-            } else {
-                // Try to find column to sort by
-                const words = sanitizedPrompt.split(' ');
-                const headers = fileData[0] || [];
-                for (const word of words) {
-                    const matchingHeader = headers.find(h => h.toString().toLowerCase().includes(word));
-                    if (matchingHeader) {
-                        processedData = sortData(fileData, word);
-                        explanation = `Data sorted by ${matchingHeader}`;
-                        break;
-                    }
+            const words = sanitizedPrompt.split(' ');
+            const headers = fileData[0] || [];
+            
+            // Find column to sort by
+            let sortColumn = null;
+            for (const word of words) {
+                const matchingHeader = headers.find(h => h.toString().toLowerCase().includes(word.toLowerCase()));
+                if (matchingHeader) {
+                    sortColumn = word;
+                    break;
                 }
+            }
+            
+            if (sortColumn) {
+                const order = sanitizedPrompt.includes('desc') || sanitizedPrompt.includes('descending') ? 'desc' : 'asc';
+                processedData = sortData(fileData, sortColumn, order);
+                explanation = `Data sorted by ${sortColumn} (${order}ending)`;
+            } else {
+                explanation = 'Column not found for sorting';
             }
         } else if (sanitizedPrompt.includes('filter')) {
             operation = 'filter';
-            // Simple filter implementation
             const words = sanitizedPrompt.split(' ');
-            const filterValue = words[words.length - 1];
-            processedData = filterData(fileData, words[1] || 'name', filterValue);
-            explanation = `Data filtered by ${filterValue}`;
-        } else if (sanitizedPrompt.includes('calculate') || sanitizedPrompt.includes('average') || sanitizedPrompt.includes('sum')) {
-            operation = 'analytics';
-            const stats = calculateStats(fileData, 'age') || calculateStats(fileData, fileData[0]?.[1]);
-            if (stats) {
-                explanation = `Statistics calculated: Average: ${stats.average.toFixed(2)}, Sum: ${stats.sum}, Count: ${stats.count}`;
+            let filterValue = words[words.length - 1];
+            let filterColumn = 'country'; // default
+            
+            // Find column to filter by
+            const headers = fileData[0] || [];
+            for (let i = 0; i < words.length - 1; i++) {
+                const matchingHeader = headers.find(h => h.toString().toLowerCase().includes(words[i].toLowerCase()));
+                if (matchingHeader) {
+                    filterColumn = words[i];
+                    break;
+                }
             }
+            
+            processedData = filterData(fileData, filterColumn, filterValue);
+            explanation = `Data filtered by ${filterColumn} containing '${filterValue}'`;
+        } else if (sanitizedPrompt.includes('calculate') || sanitizedPrompt.includes('average') || sanitizedPrompt.includes('sum') || sanitizedPrompt.includes('count') || sanitizedPrompt.includes('min') || sanitizedPrompt.includes('max')) {
+            operation = 'analytics';
+            const headers = fileData[0] || [];
+            let targetColumn = 'total';
+            
+            // Find numeric column
+            const words = sanitizedPrompt.split(' ');
+            for (const word of words) {
+                const matchingHeader = headers.find(h => h.toString().toLowerCase().includes(word.toLowerCase()));
+                if (matchingHeader) {
+                    targetColumn = word;
+                    break;
+                }
+            }
+            
+            const stats = calculateStats(fileData, targetColumn);
+            if (stats) {
+                processedData = [['Statistic', 'Value'], 
+                    ['Count', stats.count],
+                    ['Sum', stats.sum.toFixed(2)],
+                    ['Average', stats.average.toFixed(2)],
+                    ['Minimum', stats.min],
+                    ['Maximum', stats.max]];
+                explanation = `Statistical analysis of ${targetColumn}`;
+            } else {
+                explanation = `No numeric data found in ${targetColumn} column`;
+            }
+        } else if (sanitizedPrompt.includes('pivot') || sanitizedPrompt.includes('group')) {
+            operation = 'pivot';
+            // Simple pivot: group by first text column, sum numeric columns
+            const headers = fileData[0] || [];
+            const rows = fileData.slice(1);
+            const groupBy = headers[0]; // First column
+            
+            const grouped = {};
+            rows.forEach(row => {
+                const key = row[0];
+                if (!grouped[key]) grouped[key] = [];
+                grouped[key].push(row);
+            });
+            
+            processedData = [['Group', 'Count', 'First Total']];
+            Object.entries(grouped).forEach(([key, group]) => {
+                const count = group.length;
+                const firstTotal = group[0][3] || 0; // Assuming total is in 4th column
+                processedData.push([key, count, firstTotal]);
+            });
+            
+            explanation = `Pivot table grouped by ${groupBy}`;
+        } else if (sanitizedPrompt.includes('lookup') || sanitizedPrompt.includes('vlookup') || sanitizedPrompt.includes('find')) {
+            operation = 'lookup';
+            const words = sanitizedPrompt.split(' ');
+            const searchValue = words[words.length - 1];
+            
+            const results = fileData.filter((row, i) => 
+                i === 0 || row.some(cell => 
+                    String(cell).toLowerCase().includes(searchValue.toLowerCase())
+                )
+            );
+            
+            processedData = results;
+            explanation = `Lookup results for '${searchValue}'`;
+        } else if (sanitizedPrompt.includes('top') || sanitizedPrompt.includes('bottom') || sanitizedPrompt.includes('highest') || sanitizedPrompt.includes('lowest')) {
+            operation = 'filter';
+            const isTop = sanitizedPrompt.includes('top') || sanitizedPrompt.includes('highest');
+            const num = parseInt(sanitizedPrompt.match(/\d+/)?.[0] || '10');
+            
+            // Sort by total column and take top/bottom N
+            const sorted = sortData(fileData, 'total', isTop ? 'desc' : 'asc');
+            processedData = [sorted[0], ...sorted.slice(1, num + 1)];
+            explanation = `${isTop ? 'Top' : 'Bottom'} ${num} entries by total score`;
         } else {
             // Use AI for complex requests
             const bedrockClient = new BedrockRuntimeClient({ region: 'us-east-1' });
