@@ -128,6 +128,9 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
     setIsProcessing(true);
     setAiResponse('');
     
+    // Force a small delay to ensure state is clean
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     try {
       const result = await bedrockService.processExcelData(
         fileData,
@@ -196,13 +199,16 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       setAiResponse(`Error: ${error instanceof Error ? error.message : 'Failed to process request'}`);
     } finally {
       setIsProcessing(false);
+      // Clear the prompt for next request
+      setPrompt('');
     }
   }, [prompt, selectedFile, fileData]);
 
   // Memoize file display data for performance
   const displayData = useMemo(() => {
+    console.log('DisplayData updating, fileData length:', fileData.length, 'dataKey:', dataKey);
     return fileData.slice(0, 100); // Only display first 100 rows
-  }, [fileData, lastUpdate]);
+  }, [fileData, lastUpdate, dataKey]);
 
   return (
     <ErrorBoundary>
