@@ -25,6 +25,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [aiResponse, setAiResponse] = useState<string>('');
   const [lastUpdate, setLastUpdate] = useState<number>(Date.now());
+  const [dataKey, setDataKey] = useState<string>('initial');
 
   const [fileLoading, setFileLoading] = useState(false);
   const [fileError, setFileError] = useState<string>('');
@@ -146,6 +147,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               // Force React to detect the change by creating new array reference
               setFileData([...opResult]);
               setLastUpdate(Date.now());
+              setDataKey(`data-${Date.now()}-${Math.random()}`);
               displayResponse += `✅ Data has been updated and is displayed above.`;
             } else {
               displayResponse += String(opResult).substring(0, 1000);
@@ -290,7 +292,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
           )}
           
           {fileData.length > 0 && (
-            <div key={JSON.stringify(fileData.slice(0, 3))} style={{ 
+            <div key={dataKey} style={{ 
               marginBottom: '30px', 
               background: 'white',
               borderRadius: '12px',
@@ -312,7 +314,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 overflow: 'auto',
                 padding: '0'
               }}>
-                <table key={fileData.length + '-' + (fileData[1]?.[0] || '')} style={{ 
+                <table key={`${dataKey}-table`} style={{ 
                   width: '100%', 
                   borderCollapse: 'collapse',
                   fontSize: '14px'
