@@ -169,25 +169,63 @@ exports.handler = async (event) => {
         const sanitizedPrompt = prompt.trim().toLowerCase();
         console.log('Processing prompt:', sanitizedPrompt);
         
+        // Handle empty prompts
+        if (!sanitizedPrompt) {
+            explanation = 'Please enter a command. Try: "sort by country", "filter by Somalia", "calculate average total", "highlight first row in red"';
+            return {
+                statusCode: 200,
+                headers,
+                body: JSON.stringify({
+                    success: true,
+                    response: explanation,
+                    structured: {
+                        operation: 'help',
+                        result: fileData,
+                        explanation,
+                        success: true
+                    },
+                    fileName
+                })
+            };
+        }
+        
         // SORTING
         if (sanitizedPrompt.includes('sort')) {
             operation = 'sort';
+            console.log('Sort detected');
             const words = sanitizedPrompt.split(' ');
             const headers = fileData[0] || [];
+            console.log('Headers:', headers);
+            console.log('Words:', words);
             
             let sortColumn = null;
-            for (const word of words) {
-                const matchingHeader = headers.find(h => h.toString().toLowerCase().includes(word.toLowerCase()));
-                if (matchingHeader) {
-                    sortColumn = word;
-                    break;
+            
+            // Check for specific column names
+            if (sanitizedPrompt.includes('name') || sanitizedPrompt.includes('country')) {
+                sortColumn = 'country';
+            } else if (sanitizedPrompt.includes('rank')) {
+                sortColumn = 'rank';
+            } else if (sanitizedPrompt.includes('total')) {
+                sortColumn = 'total';
+            } else {
+                // Try to find matching header
+                for (const word of words) {
+                    const matchingHeader = headers.find(h => h.toString().toLowerCase().includes(word.toLowerCase()));
+                    if (matchingHeader) {
+                        sortColumn = word;
+                        break;
+                    }
                 }
             }
+            
+            console.log('Sort column found:', sortColumn);
             
             if (sortColumn) {
                 const order = sanitizedPrompt.includes('desc') || sanitizedPrompt.includes('descending') ? 'desc' : 'asc';
                 processedData = sortData(fileData, sortColumn, order);
                 explanation = `Data sorted by ${sortColumn} (${order}ending)`;
+            } else {
+                explanation = 'Could not find column to sort by. Available columns: ' + headers.join(', ');
             }
         }
         
