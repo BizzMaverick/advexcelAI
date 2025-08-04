@@ -3,6 +3,8 @@ import * as XLSX from 'xlsx';
 import logo from '../assets/logo.png';
 import bedrockService from '../services/bedrockService';
 import ErrorBoundary from './ErrorBoundary';
+import FormattingToolbar, { FormatStyle } from './FormattingToolbar';
+import { downloadFormattedExcel, downloadCSV } from '../utils/excelExport';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const MAX_ROWS = 1000;
@@ -26,9 +28,13 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
   const [aiResponse, setAiResponse] = useState<string>('');
   const [lastUpdate, setLastUpdate] = useState<number>(Date.now());
   const [dataKey, setDataKey] = useState<string>('initial');
+  const [cellFormatting, setCellFormatting] = useState<{ [key: string]: FormatStyle }>({});
+  const [selectedCells, setSelectedCells] = useState<string[]>([]);
 
   const [fileLoading, setFileLoading] = useState(false);
   const [fileError, setFileError] = useState<string>('');
+  const [showUseResultButton, setShowUseResultButton] = useState(false);
+  const [lastAiResult, setLastAiResult] = useState<any[][]>([]);
 
   const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -147,6 +153,11 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
           if (['sort', 'filter', 'calculate', 'edit', 'formula'].includes(operation)) {
             if (Array.isArray(opResult) && opResult.length > 0) {
               console.log('Showing processed data in response:', opResult.length, 'rows');
+              
+              // Store result for "Use this result" functionality
+              setLastAiResult([...opResult]);
+              setShowUseResultButton(true);
+              
               // Display processed data as a table in the response
               let tableHtml = '<div style="max-height: 400px; overflow: auto; border: 1px solid #ddd; border-radius: 4px; margin: 10px 0;"><table style="width: 100%; border-collapse: collapse; font-size: 12px;">';
               
@@ -165,7 +176,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 tableHtml += `<p style="color: #666; font-size: 12px; margin: 5px 0;">Showing first 50 rows of ${opResult.length} total rows</p>`;
               }
               
-              displayResponse += `✅ **Processed Data:**\n\n${tableHtml}\n\n**Note:** Your original data remains unchanged. Copy the results above if you want to use them.`;
+              displayResponse += `✅ **Processed Data:**\n\n${tableHtml}\n\n**Click "Use This Result" below to replace your main data with this result.**`;
             } else {
               displayResponse += String(opResult).substring(0, 1000);
             }
@@ -217,6 +228,69 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       setPrompt('');
     }
   }, [prompt, selectedFile, fileData]);
+
+  const handleFormatChange = useCallback((format: FormatStyle) => {
+    const newFormatting = { ...cellFormatting };
+    selectedCells.forEach(cellKey => {
+      newFormatting[cellKey] = { ...newFormatting[cellKey], ...format };
+    });
+    setCellFormatting(newFormatting);
+    setDataKey(`formatted-${Date.now()}`);
+  }, [cellFormatting, selectedCells]);
+
+  const handleClearFormat = useCallback(() => {
+    const newFormatting = { ...cellFormatting };
+    selectedCells.forEach(cellKey => {
+      delete newFormatting[cellKey];
+    });
+    setCellFormatting(newFormatting);
+    setSelectedCells([]);
+    setDataKey(`cleared-${Date.now()}`);
+  }, [cellFormatting, selectedCells]);
+
+  const handleCellClick = useCallback((rowIndex: number, colIndex: number, event: React.MouseEvent) => {
+    const cellKey = `${rowIndex}-${colIndex}`;
+    
+    if (event.ctrlKey || event.metaKey) {
+      // Multi-select with Ctrl/Cmd
+      setSelectedCells(prev => 
+        prev.includes(cellKey) 
+          ? prev.filter(key => key !== cellKey)
+          : [...prev, cellKey]
+      );
+    } else {
+      // Single select
+      setSelectedCells([cellKey]);
+    }
+  }, []);
+
+  const handleUseAiResult = useCallback(() => {
+    if (lastAiResult.length > 0) {
+      setFileData([...lastAiResult]);
+      setDataKey(`ai-result-${Date.now()}`);
+      setShowUseResultButton(false);
+      setCellFormatting({}); // Clear formatting when using new data
+      setSelectedCells([]);
+    }
+  }, [lastAiResult]);
+
+  const handleDownloadExcel = useCallback(() => {
+    const success = downloadFormattedExcel(fileData, cellFormatting, selectedFile?.name || 'data');
+    if (success) {
+      alert('Excel file downloaded successfully!');
+    } else {
+      alert('Error downloading Excel file. Please try again.');
+    }
+  }, [fileData, cellFormatting, selectedFile]);
+
+  const handleDownloadCSV = useCallback(() => {
+    const success = downloadCSV(fileData, selectedFile?.name || 'data');
+    if (success) {
+      alert('CSV file downloaded successfully!');
+    } else {
+      alert('Error downloading CSV file. Please try again.');
+    }
+  }, [fileData, selectedFile]);
 
   // Memoize file display data for performance
   const displayData = useMemo(() => {
@@ -319,15 +393,58 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
               overflow: 'hidden'
             }}>
+              {/* Formatting Toolbar */}
+              <div style={{ padding: '20px 20px 0 20px' }}>
+                <FormattingToolbar
+                  onFormatChange={handleFormatChange}
+                  onClearFormat={handleClearFormat}
+                  selectedCells={selectedCells}
+                />
+              </div>
               <div style={{ 
                 padding: '20px', 
                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                color: 'white'
+                color: 'white',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
               }}>
-                <h3 style={{ margin: 0, fontSize: '18px' }}>📊 {selectedFile?.name}</h3>
-                <p style={{ margin: '5px 0 0 0', opacity: 0.9, fontSize: '14px' }}>
-                  {fileData.length} rows × {fileData[0]?.length || 0} columns
-                </p>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '18px' }}>📊 {selectedFile?.name}</h3>
+                  <p style={{ margin: '5px 0 0 0', opacity: 0.9, fontSize: '14px' }}>
+                    {fileData.length} rows × {fileData[0]?.length || 0} columns
+                  </p>
+                </div>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button
+                    onClick={handleDownloadExcel}
+                    style={{
+                      padding: '8px 16px',
+                      backgroundColor: 'rgba(255,255,255,0.2)',
+                      border: '1px solid rgba(255,255,255,0.3)',
+                      color: 'white',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontSize: '12px'
+                    }}
+                  >
+                    📥 Download Excel
+                  </button>
+                  <button
+                    onClick={handleDownloadCSV}
+                    style={{
+                      padding: '8px 16px',
+                      backgroundColor: 'rgba(255,255,255,0.2)',
+                      border: '1px solid rgba(255,255,255,0.3)',
+                      color: 'white',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontSize: '12px'
+                    }}
+                  >
+                    📥 Download CSV
+                  </button>
+                </div>
               </div>
               <div style={{ 
                 maxHeight: '500px', 
@@ -345,18 +462,37 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                         background: i === 0 ? '#f8f9ff' : (i % 2 === 0 ? '#fafafa' : 'white'),
                         borderBottom: '1px solid #eee'
                       }}>
-                        {Array.isArray(row) && row.length > 0 ? row.map((cell, j) => (
-                          <td key={j} style={{ 
-                            padding: '12px 16px', 
-                            borderRight: '1px solid #eee',
-                            fontWeight: i === 0 ? 'bold' : 'normal',
-                            color: i === 0 ? '#333' : '#666',
-                            minWidth: '120px',
-                            whiteSpace: 'nowrap'
-                          }}>
-                            {cell !== null && cell !== undefined ? String(cell) : ''}
-                          </td>
-                        )) : (
+                        {Array.isArray(row) && row.length > 0 ? row.map((cell, j) => {
+                          const cellKey = `${i}-${j}`;
+                          const isSelected = selectedCells.includes(cellKey);
+                          const cellFormat = cellFormatting[cellKey] || {};
+                          
+                          return (
+                            <td 
+                              key={j} 
+                              onClick={(e) => handleCellClick(i, j, e)}
+                              style={{ 
+                                padding: '12px 16px', 
+                                borderRight: '1px solid #eee',
+                                fontWeight: cellFormat.fontWeight || (i === 0 ? 'bold' : 'normal'),
+                                fontStyle: cellFormat.fontStyle || 'normal',
+                                color: cellFormat.color || (i === 0 ? '#333' : '#666'),
+                                backgroundColor: isSelected 
+                                  ? '#e3f2fd' 
+                                  : cellFormat.backgroundColor || 'transparent',
+                                textAlign: cellFormat.textAlign as any || 'left',
+                                fontSize: cellFormat.fontSize || '14px',
+                                minWidth: '120px',
+                                whiteSpace: 'nowrap',
+                                cursor: 'pointer',
+                                userSelect: 'none',
+                                border: isSelected ? '2px solid #2196f3' : '1px solid #eee'
+                              }}
+                            >
+                              {cell !== null && cell !== undefined ? String(cell) : ''}
+                            </td>
+                          );
+                        }) : (
                           <td style={{ 
                             padding: '12px 16px', 
                             color: '#999',
@@ -440,9 +576,28 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
               textAlign: 'left'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
-                <div style={{ fontSize: '32px', marginRight: '15px' }}>💡</div>
-                <h4 style={{ color: '#333', margin: 0, fontSize: '20px' }}>AI Response</h4>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <div style={{ fontSize: '32px', marginRight: '15px' }}>💡</div>
+                  <h4 style={{ color: '#333', margin: 0, fontSize: '20px' }}>AI Response</h4>
+                </div>
+                {showUseResultButton && (
+                  <button
+                    onClick={handleUseAiResult}
+                    style={{
+                      padding: '10px 20px',
+                      backgroundColor: '#4caf50',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    ✅ Use This Result
+                  </button>
+                )}
               </div>
               <div style={{ 
                 fontSize: '15px', 

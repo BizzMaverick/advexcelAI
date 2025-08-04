@@ -11,14 +11,27 @@ function sortData(data, column, order = 'asc') {
     if (colIndex === -1) return data;
     
     const sortedRows = rows.sort((a, b) => {
-        const aVal = isNaN(a[colIndex]) ? String(a[colIndex]).toLowerCase() : Number(a[colIndex]);
-        const bVal = isNaN(b[colIndex]) ? String(b[colIndex]).toLowerCase() : Number(b[colIndex]);
+        let aVal = a[colIndex];
+        let bVal = b[colIndex];
         
-        if (typeof aVal === 'string') {
-            return order === 'desc' ? bVal.localeCompare(aVal) : aVal.localeCompare(bVal);
-        } else {
+        // Handle rank sorting (1st, 2nd, 3rd, etc.)
+        if (column.toLowerCase().includes('rank')) {
+            aVal = parseInt(String(aVal).replace(/[^0-9]/g, '')) || 0;
+            bVal = parseInt(String(bVal).replace(/[^0-9]/g, '')) || 0;
             return order === 'desc' ? bVal - aVal : aVal - bVal;
         }
+        
+        // Handle numeric sorting
+        const aNum = Number(aVal);
+        const bNum = Number(bVal);
+        if (!isNaN(aNum) && !isNaN(bNum)) {
+            return order === 'desc' ? bNum - aNum : aNum - bNum;
+        }
+        
+        // Handle string sorting
+        const aStr = String(aVal).toLowerCase();
+        const bStr = String(bVal).toLowerCase();
+        return order === 'desc' ? bStr.localeCompare(aStr) : aStr.localeCompare(bStr);
     });
     
     return [headers, ...sortedRows];
@@ -112,10 +125,11 @@ function createPivotTable(data, groupByCol, valueCol, operation = 'sum') {
 }
 
 function highlightData(data, target, color) {
-    const processedData = [...data];
+    let processedData = [...data];
     
+    // Handle first row highlighting
     if (target.includes('first row') || target.includes('header')) {
-        return processedData.map((row, i) => {
+        processedData = processedData.map((row, i) => {
             if (i === 0) {
                 return row.map(cell => `<span style="background-color: ${color}; color: white; font-weight: bold; padding: 4px;">${cell}</span>`);
             }
@@ -123,8 +137,9 @@ function highlightData(data, target, color) {
         });
     }
     
+    // Handle first column highlighting
     if (target.includes('first column')) {
-        return processedData.map((row, i) => {
+        processedData = processedData.map((row, i) => {
             return row.map((cell, j) => {
                 if (j === 0 && i > 0) {
                     return `<span style="background-color: ${color}; color: white; font-weight: bold; padding: 4px;">${cell}</span>`;
