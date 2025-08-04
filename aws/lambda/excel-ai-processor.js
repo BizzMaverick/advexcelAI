@@ -1,5 +1,6 @@
 const { BedrockRuntimeClient, InvokeModelCommand } = require("@aws-sdk/client-bedrock-runtime");
 
+// Utility functions for Excel operations
 function sortData(data, column, order = 'asc') {
     if (!data || data.length < 2) return data;
     
@@ -10,11 +11,14 @@ function sortData(data, column, order = 'asc') {
     if (colIndex === -1) return data;
     
     const sortedRows = rows.sort((a, b) => {
-        const aVal = String(a[colIndex] || '').toLowerCase();
-        const bVal = String(b[colIndex] || '').toLowerCase();
+        const aVal = isNaN(a[colIndex]) ? String(a[colIndex]).toLowerCase() : Number(a[colIndex]);
+        const bVal = isNaN(b[colIndex]) ? String(b[colIndex]).toLowerCase() : Number(b[colIndex]);
         
-        if (order === 'desc') return bVal.localeCompare(aVal);
-        return aVal.localeCompare(bVal);
+        if (typeof aVal === 'string') {
+            return order === 'desc' ? bVal.localeCompare(aVal) : aVal.localeCompare(bVal);
+        } else {
+            return order === 'desc' ? bVal - aVal : aVal - bVal;
+        }
     });
     
     return [headers, ...sortedRows];
@@ -25,15 +29,16 @@ function filterData(data, column, value) {
     
     const headers = data[0];
     const rows = data.slice(1);
-    const colIndex = headers.findIndex(h => h.toString().toLowerCase().includes(column.toLowerCase()));
     
-    if (colIndex === -1) {
-        // Filter across all columns if specific column not found
+    if (column === 'all') {
         const filteredRows = rows.filter(row => 
             row.some(cell => String(cell).toLowerCase().includes(value.toLowerCase()))
         );
         return [headers, ...filteredRows];
     }
+    
+    const colIndex = headers.findIndex(h => h.toString().toLowerCase().includes(column.toLowerCase()));
+    if (colIndex === -1) return data;
     
     const filteredRows = rows.filter(row => 
         String(row[colIndex]).toLowerCase().includes(value.toLowerCase())
@@ -54,22 +59,16 @@ function calculateStats(data, column) {
     const values = rows.map(row => Number(row[colIndex])).filter(v => !isNaN(v));
     if (values.length === 0) return null;
     
+    const sorted = [...values].sort((a, b) => a - b);
+    
     return {
         count: values.length,
         sum: values.reduce((a, b) => a + b, 0),
         average: values.reduce((a, b) => a + b, 0) / values.length,
         min: Math.min(...values),
         max: Math.max(...values),
-        median: values.sort((a, b) => a - b)[Math.floor(values.length / 2)]
+        median: sorted[Math.floor(sorted.length / 2)]
     };
-}
-
-function vlookup(data, searchValue, returnColumn) {
-    const rows = data.slice(1);
-    const found = rows.find(row => 
-        String(row[0]).toLowerCase() === searchValue.toLowerCase()
-    );
-    return found ? found[returnColumn] || 'Not found' : 'Not found';
 }
 
 function createPivotTable(data, groupByCol, valueCol, operation = 'sum') {
@@ -90,17 +89,17 @@ function createPivotTable(data, groupByCol, valueCol, operation = 'sum') {
             const value = Number(row[valueIndex]);
             if (!isNaN(value)) grouped[key].push(value);
         } else {
-            grouped[key].push(1); // Count
+            grouped[key].push(1);
         }
     });
     
-    const result = [['Group', operation === 'count' ? 'Count' : headers[valueIndex] || 'Value']];
+    const result = [['Group', operation.charAt(0).toUpperCase() + operation.slice(1)]];
     
     Object.entries(grouped).forEach(([key, values]) => {
         let aggregated;
         switch (operation) {
             case 'sum': aggregated = values.reduce((a, b) => a + b, 0); break;
-            case 'average': aggregated = values.reduce((a, b) => a + b, 0) / values.length; break;
+            case 'average': aggregated = (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2); break;
             case 'count': aggregated = values.length; break;
             case 'max': aggregated = Math.max(...values); break;
             case 'min': aggregated = Math.min(...values); break;
@@ -112,7 +111,33 @@ function createPivotTable(data, groupByCol, valueCol, operation = 'sum') {
     return result;
 }
 
-function conditionalFormat(data, condition, column, color = 'red') {
+function highlightData(data, target, color) {
+    const processedData = [...data];
+    
+    if (target.includes('first row') || target.includes('header')) {
+        return processedData.map((row, i) => {
+            if (i === 0) {
+                return row.map(cell => `<span style="background-color: ${color}; color: white; font-weight: bold; padding: 4px;">${cell}</span>`);
+            }
+            return row;
+        });
+    }
+    
+    if (target.includes('first column')) {
+        return processedData.map((row, i) => {
+            return row.map((cell, j) => {
+                if (j === 0 && i > 0) {
+                    return `<span style="background-color: ${color}; color: white; font-weight: bold; padding: 4px;">${cell}</span>`;
+                }
+                return cell;
+            });
+        });
+    }
+    
+    return processedData;
+}
+
+function conditionalFormat(data, condition, column, color) {
     if (!data || data.length < 2) return data;
     
     const headers = data[0];
@@ -121,7 +146,7 @@ function conditionalFormat(data, condition, column, color = 'red') {
     if (colIndex === -1) return data;
     
     return data.map((row, i) => {
-        if (i === 0) return row; // Skip header
+        if (i === 0) return row;
         
         return row.map((cell, j) => {
             if (j === colIndex) {
@@ -150,7 +175,7 @@ function conditionalFormat(data, condition, column, color = 'red') {
 
 exports.handler = async (event) => {
     const headers = {
-        'Access-Control-Allow-Origin': 'https://www.advexcel.online',
+        'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGIN || 'https://www.advexcel.online',
         'Access-Control-Allow-Headers': 'Content-Type,Authorization',
         'Access-Control-Allow-Methods': 'POST,OPTIONS'
     };
@@ -162,6 +187,10 @@ exports.handler = async (event) => {
     try {
         const { fileData, prompt, fileName } = JSON.parse(event.body);
         
+        if (!fileData || !Array.isArray(fileData) || !prompt || !fileName) {
+            throw new Error('Invalid request data');
+        }
+        
         let processedData = fileData;
         let explanation = 'Data processed';
         let operation = 'other';
@@ -171,46 +200,31 @@ exports.handler = async (event) => {
         
         // Handle empty prompts
         if (!sanitizedPrompt) {
-            explanation = 'Please enter a command. Try: "sort by country", "filter by Somalia", "calculate average total", "highlight first row in red"';
-            return {
-                statusCode: 200,
-                headers,
-                body: JSON.stringify({
-                    success: true,
-                    response: explanation,
-                    structured: {
-                        operation: 'help',
-                        result: fileData,
-                        explanation,
-                        success: true
-                    },
-                    fileName
-                })
-            };
+            explanation = 'Please enter a command. Examples: "sort by country", "filter by Somalia", "calculate average total", "highlight first row in red"';
+            operation = 'help';
         }
         
-        // SORTING
-        if (sanitizedPrompt.includes('sort')) {
+        // SORTING OPERATIONS
+        else if (sanitizedPrompt.includes('sort')) {
             operation = 'sort';
-            console.log('Sort detected');
-            const words = sanitizedPrompt.split(' ');
-            const headers = fileData[0] || [];
-            console.log('Headers:', headers);
-            console.log('Words:', words);
+            console.log('Sort operation detected');
             
             let sortColumn = null;
+            const order = sanitizedPrompt.includes('desc') || sanitizedPrompt.includes('descending') ? 'desc' : 'asc';
             
-            // Check for specific column names
+            // Map common terms to actual columns
             if (sanitizedPrompt.includes('name') || sanitizedPrompt.includes('country')) {
                 sortColumn = 'country';
             } else if (sanitizedPrompt.includes('rank')) {
                 sortColumn = 'rank';
-            } else if (sanitizedPrompt.includes('total')) {
+            } else if (sanitizedPrompt.includes('total') || sanitizedPrompt.includes('score')) {
                 sortColumn = 'total';
             } else {
-                // Try to find matching header
+                // Try to find matching column from headers
+                const words = sanitizedPrompt.split(' ');
+                const dataHeaders = fileData[0] || [];
                 for (const word of words) {
-                    const matchingHeader = headers.find(h => h.toString().toLowerCase().includes(word.toLowerCase()));
+                    const matchingHeader = dataHeaders.find(h => h.toString().toLowerCase().includes(word.toLowerCase()));
                     if (matchingHeader) {
                         sortColumn = word;
                         break;
@@ -218,27 +232,27 @@ exports.handler = async (event) => {
                 }
             }
             
-            console.log('Sort column found:', sortColumn);
-            
             if (sortColumn) {
-                const order = sanitizedPrompt.includes('desc') || sanitizedPrompt.includes('descending') ? 'desc' : 'asc';
                 processedData = sortData(fileData, sortColumn, order);
                 explanation = `Data sorted by ${sortColumn} (${order}ending)`;
             } else {
-                explanation = 'Could not find column to sort by. Available columns: ' + headers.join(', ');
+                explanation = 'Could not identify column to sort by. Available columns: ' + (fileData[0] || []).join(', ');
             }
         }
         
-        // FILTERING
+        // FILTERING OPERATIONS
         else if (sanitizedPrompt.includes('filter') || sanitizedPrompt.includes('show only') || sanitizedPrompt.includes('where')) {
             operation = 'filter';
+            console.log('Filter operation detected');
+            
             const words = sanitizedPrompt.split(' ');
             let filterValue = words[words.length - 1];
-            let filterColumn = 'country';
+            let filterColumn = 'all';
             
-            const headers = fileData[0] || [];
+            // Try to identify column
+            const dataHeaders = fileData[0] || [];
             for (let i = 0; i < words.length - 1; i++) {
-                const matchingHeader = headers.find(h => h.toString().toLowerCase().includes(words[i].toLowerCase()));
+                const matchingHeader = dataHeaders.find(h => h.toString().toLowerCase().includes(words[i].toLowerCase()));
                 if (matchingHeader) {
                     filterColumn = words[i];
                     break;
@@ -246,18 +260,22 @@ exports.handler = async (event) => {
             }
             
             processedData = filterData(fileData, filterColumn, filterValue);
-            explanation = `Data filtered by ${filterColumn} containing '${filterValue}'`;
+            explanation = `Data filtered for '${filterValue}' ${filterColumn !== 'all' ? 'in ' + filterColumn : 'across all columns'}`;
         }
         
-        // CALCULATIONS & STATISTICS
-        else if (sanitizedPrompt.includes('calculate') || sanitizedPrompt.includes('average') || sanitizedPrompt.includes('sum') || sanitizedPrompt.includes('count') || sanitizedPrompt.includes('min') || sanitizedPrompt.includes('max') || sanitizedPrompt.includes('median')) {
+        // STATISTICAL CALCULATIONS
+        else if (sanitizedPrompt.includes('calculate') || sanitizedPrompt.includes('average') || sanitizedPrompt.includes('sum') || 
+                 sanitizedPrompt.includes('count') || sanitizedPrompt.includes('min') || sanitizedPrompt.includes('max') || 
+                 sanitizedPrompt.includes('median') || sanitizedPrompt.includes('statistics')) {
             operation = 'analytics';
-            const headers = fileData[0] || [];
-            let targetColumn = 'total';
+            console.log('Analytics operation detected');
             
+            let targetColumn = 'total';
             const words = sanitizedPrompt.split(' ');
+            const dataHeaders = fileData[0] || [];
+            
             for (const word of words) {
-                const matchingHeader = headers.find(h => h.toString().toLowerCase().includes(word.toLowerCase()));
+                const matchingHeader = dataHeaders.find(h => h.toString().toLowerCase().includes(word.toLowerCase()));
                 if (matchingHeader) {
                     targetColumn = word;
                     break;
@@ -266,21 +284,26 @@ exports.handler = async (event) => {
             
             const stats = calculateStats(fileData, targetColumn);
             if (stats) {
-                processedData = [['Statistic', 'Value'], 
+                processedData = [
+                    ['Statistic', 'Value'],
                     ['Count', stats.count],
                     ['Sum', stats.sum.toFixed(2)],
                     ['Average', stats.average.toFixed(2)],
                     ['Median', stats.median.toFixed(2)],
                     ['Minimum', stats.min],
-                    ['Maximum', stats.max]];
+                    ['Maximum', stats.max]
+                ];
                 explanation = `Statistical analysis of ${targetColumn}`;
+            } else {
+                explanation = `No numeric data found in ${targetColumn} column`;
             }
         }
         
-        // PIVOT TABLES
+        // PIVOT TABLE OPERATIONS
         else if (sanitizedPrompt.includes('pivot') || sanitizedPrompt.includes('group by') || sanitizedPrompt.includes('summarize')) {
             operation = 'pivot';
-            const words = sanitizedPrompt.split(' ');
+            console.log('Pivot operation detected');
+            
             let groupBy = 'country';
             let valueCol = 'total';
             let pivotOperation = 'sum';
@@ -290,22 +313,15 @@ exports.handler = async (event) => {
             else if (sanitizedPrompt.includes('max')) pivotOperation = 'max';
             else if (sanitizedPrompt.includes('min')) pivotOperation = 'min';
             
-            const headers = fileData[0] || [];
-            for (const word of words) {
-                const matchingHeader = headers.find(h => h.toString().toLowerCase().includes(word.toLowerCase()));
-                if (matchingHeader && word !== 'by') {
-                    if (headers.indexOf(matchingHeader) === 0) groupBy = word;
-                    else valueCol = word;
-                }
-            }
-            
             processedData = createPivotTable(fileData, groupBy, valueCol, pivotOperation);
             explanation = `Pivot table: ${pivotOperation} of ${valueCol} grouped by ${groupBy}`;
         }
         
-        // VLOOKUP
-        else if (sanitizedPrompt.includes('lookup') || sanitizedPrompt.includes('vlookup') || sanitizedPrompt.includes('find')) {
+        // LOOKUP OPERATIONS
+        else if (sanitizedPrompt.includes('lookup') || sanitizedPrompt.includes('vlookup') || sanitizedPrompt.includes('find') || sanitizedPrompt.includes('search')) {
             operation = 'lookup';
+            console.log('Lookup operation detected');
+            
             const words = sanitizedPrompt.split(' ');
             const searchValue = words[words.length - 1];
             
@@ -316,13 +332,13 @@ exports.handler = async (event) => {
             );
             
             processedData = results;
-            explanation = `Lookup results for '${searchValue}'`;
+            explanation = `Lookup results for '${searchValue}' - Found ${results.length - 1} matches`;
         }
         
         // HIGHLIGHTING & FORMATTING
         else if (sanitizedPrompt.includes('highlight') || sanitizedPrompt.includes('color') || sanitizedPrompt.includes('format')) {
             operation = 'format';
-            console.log('Highlighting detected');
+            console.log('Formatting operation detected');
             
             // Extract color from prompt
             let color = 'red'; // default
@@ -334,89 +350,40 @@ exports.handler = async (event) => {
                 }
             }
             
-            console.log('Color detected:', color);
-            processedData = [...fileData];
-            
-            if (sanitizedPrompt.includes('first row') || sanitizedPrompt.includes('header')) {
-                console.log('Highlighting first row in', color);
-                processedData = fileData.map((row, i) => {
-                    if (i === 0) {
-                        return row.map(cell => `<span style="background-color: ${color}; color: white; font-weight: bold; padding: 4px;">${cell}</span>`);
-                    }
-                    return row;
-                });
+            // Check for conditional formatting
+            if (sanitizedPrompt.includes('>') || sanitizedPrompt.includes('<') || sanitizedPrompt.includes('=')) {
+                const condition = sanitizedPrompt.match(/[><=]\s*\d+/)?.[0] || '>100';
+                processedData = conditionalFormat(fileData, condition, 'total', color);
+                explanation = `Conditional formatting applied: values ${condition} highlighted in ${color}`;
+            } else {
+                processedData = highlightData(fileData, sanitizedPrompt, color);
+                let target = 'data';
+                if (sanitizedPrompt.includes('first row')) target = 'first row';
+                else if (sanitizedPrompt.includes('first column')) target = 'first column';
+                explanation = `${target.charAt(0).toUpperCase() + target.slice(1)} highlighted in ${color}`;
             }
-            
-            if (sanitizedPrompt.includes('first column')) {
-                console.log('Highlighting first column in', color);
-                processedData = processedData.map((row, i) => {
-                    return row.map((cell, j) => {
-                        if (j === 0 && i > 0) {
-                            return `<span style="background-color: ${color}; color: white; font-weight: bold; padding: 4px;">${cell}</span>`;
-                        }
-                        return cell;
-                    });
-                });
-            }
-            
-            explanation = `Data formatted with ${color} highlighting`;
         }
         
-        // CONDITIONAL FORMATTING
-        else if (sanitizedPrompt.includes('conditional') || (sanitizedPrompt.includes('highlight') && (sanitizedPrompt.includes('>') || sanitizedPrompt.includes('<') || sanitizedPrompt.includes('=')))) {
-            operation = 'format';
-            const condition = sanitizedPrompt.match(/[><=]\s*\d+/)?.[0] || '>100';
-            const column = 'total';
-            const color = sanitizedPrompt.includes('red') ? 'red' : sanitizedPrompt.includes('green') ? 'green' : sanitizedPrompt.includes('blue') ? 'blue' : 'yellow';
+        // TOP/BOTTOM ANALYSIS
+        else if (sanitizedPrompt.includes('top') || sanitizedPrompt.includes('bottom') || sanitizedPrompt.includes('highest') || sanitizedPrompt.includes('lowest')) {
+            operation = 'filter';
+            console.log('Top/Bottom operation detected');
             
-            processedData = conditionalFormat(fileData, condition, column, color);
-            explanation = `Conditional formatting applied: ${column} ${condition}`;
-        }
-        
-        // CORRELATION ANALYSIS
-        else if (sanitizedPrompt.includes('correlation') || sanitizedPrompt.includes('relationship')) {
-            operation = 'analytics';
-            const headers = fileData[0] || [];
-            const numericCols = [];
+            const isTop = sanitizedPrompt.includes('top') || sanitizedPrompt.includes('highest');
+            const num = parseInt(sanitizedPrompt.match(/\d+/)?.[0] || '10');
             
-            for (let i = 0; i < headers.length; i++) {
-                const values = fileData.slice(1).map(row => Number(row[i])).filter(v => !isNaN(v));
-                if (values.length > 0) numericCols.push({index: i, name: headers[i], values});
-            }
-            
-            if (numericCols.length >= 2) {
-                const col1 = numericCols[0];
-                const col2 = numericCols[1];
-                
-                const n = Math.min(col1.values.length, col2.values.length);
-                const mean1 = col1.values.reduce((a, b) => a + b, 0) / n;
-                const mean2 = col2.values.reduce((a, b) => a + b, 0) / n;
-                
-                let numerator = 0, denom1 = 0, denom2 = 0;
-                for (let i = 0; i < n; i++) {
-                    const diff1 = col1.values[i] - mean1;
-                    const diff2 = col2.values[i] - mean2;
-                    numerator += diff1 * diff2;
-                    denom1 += diff1 * diff1;
-                    denom2 += diff2 * diff2;
-                }
-                
-                const correlation = numerator / Math.sqrt(denom1 * denom2);
-                
-                processedData = [['Analysis', 'Value'],
-                    ['Correlation Coefficient', correlation.toFixed(4)],
-                    ['Relationship Strength', Math.abs(correlation) > 0.7 ? 'Strong' : Math.abs(correlation) > 0.3 ? 'Moderate' : 'Weak'],
-                    ['Direction', correlation > 0 ? 'Positive' : 'Negative']];
-                
-                explanation = `Correlation analysis between ${col1.name} and ${col2.name}`;
-            }
+            const sorted = sortData(fileData, 'total', isTop ? 'desc' : 'asc');
+            processedData = [sorted[0], ...sorted.slice(1, num + 1)];
+            explanation = `${isTop ? 'Top' : 'Bottom'} ${num} entries by total score`;
         }
         
         // PERCENTAGE CALCULATIONS
         else if (sanitizedPrompt.includes('percentage') || sanitizedPrompt.includes('percent')) {
             operation = 'calculate';
-            const headers = fileData[0] || [];
-            const totalColIndex = headers.findIndex(h => h.toLowerCase().includes('total'));
+            console.log('Percentage operation detected');
+            
+            const dataHeaders = fileData[0] || [];
+            const totalColIndex = dataHeaders.findIndex(h => h.toLowerCase().includes('total'));
             
             if (totalColIndex !== -1) {
                 const total = fileData.slice(1).reduce((sum, row) => sum + (Number(row[totalColIndex]) || 0), 0);
@@ -429,46 +396,44 @@ exports.handler = async (event) => {
                 });
                 
                 explanation = 'Percentage distribution calculated';
+            } else {
+                explanation = 'No total column found for percentage calculation';
             }
-        }
-        
-        // TOP/BOTTOM ANALYSIS
-        else if (sanitizedPrompt.includes('top') || sanitizedPrompt.includes('bottom') || sanitizedPrompt.includes('highest') || sanitizedPrompt.includes('lowest')) {
-            operation = 'filter';
-            const isTop = sanitizedPrompt.includes('top') || sanitizedPrompt.includes('highest');
-            const num = parseInt(sanitizedPrompt.match(/\d+/)?.[0] || '10');
-            
-            const sorted = sortData(fileData, 'total', isTop ? 'desc' : 'asc');
-            processedData = [sorted[0], ...sorted.slice(1, num + 1)];
-            explanation = `${isTop ? 'Top' : 'Bottom'} ${num} entries by total score`;
         }
         
         // CHART DATA PREPARATION
         else if (sanitizedPrompt.includes('chart') || sanitizedPrompt.includes('graph') || sanitizedPrompt.includes('plot')) {
             operation = 'chart';
-            const headers = fileData[0] || [];
+            console.log('Chart operation detected');
             
             if (sanitizedPrompt.includes('bar') || sanitizedPrompt.includes('column')) {
                 processedData = [['Category', 'Value']];
-                fileData.slice(1, 11).forEach(row => { // Top 10 for chart
+                fileData.slice(1, 11).forEach(row => {
                     processedData.push([row[0], Number(row[3]) || 0]);
                 });
                 explanation = 'Bar chart data prepared (top 10 entries)';
             } else if (sanitizedPrompt.includes('pie')) {
                 const total = fileData.slice(1).reduce((sum, row) => sum + (Number(row[3]) || 0), 0);
                 processedData = [['Category', 'Percentage']];
-                fileData.slice(1, 6).forEach(row => { // Top 5 for pie
+                fileData.slice(1, 6).forEach(row => {
                     const value = Number(row[3]) || 0;
                     const percentage = ((value / total) * 100).toFixed(1);
                     processedData.push([row[0], `${percentage}%`]);
                 });
                 explanation = 'Pie chart data prepared (top 5 entries)';
+            } else {
+                processedData = [['Category', 'Value']];
+                fileData.slice(1, 11).forEach(row => {
+                    processedData.push([row[0], Number(row[3]) || 0]);
+                });
+                explanation = 'Chart data prepared';
             }
         }
         
         // AI FALLBACK FOR COMPLEX REQUESTS
         else {
-            const bedrockClient = new BedrockRuntimeClient({ region: 'us-east-1' });
+            console.log('Using AI fallback for complex request');
+            const bedrockClient = new BedrockRuntimeClient({ region: process.env.AWS_REGION || 'us-east-1' });
             
             const command = new InvokeModelCommand({
                 modelId: "anthropic.claude-3-sonnet-20240229-v1:0",
@@ -479,14 +444,19 @@ exports.handler = async (event) => {
                     max_tokens: 1000,
                     messages: [{
                         role: "user",
-                        content: `Analyze this Excel data and provide insights for: "${prompt}"\n\nData: ${JSON.stringify(fileData.slice(0, 10))}\n\nProvide a brief analysis or answer.`
+                        content: `Analyze this Excel data and provide insights for: "${prompt}"\n\nData sample: ${JSON.stringify(fileData.slice(0, 5))}\n\nTotal rows: ${fileData.length}\n\nProvide a brief analysis or answer.`
                     }]
                 })
             });
 
-            const response = await bedrockClient.send(command);
-            const responseBody = JSON.parse(new TextDecoder().decode(response.body));
-            explanation = responseBody.content[0].text.substring(0, 500);
+            try {
+                const response = await bedrockClient.send(command);
+                const responseBody = JSON.parse(new TextDecoder().decode(response.body));
+                explanation = responseBody.content[0].text.substring(0, 800);
+            } catch (error) {
+                console.error('Bedrock error:', error);
+                explanation = 'AI analysis temporarily unavailable. Please try a specific command like "sort by country" or "calculate average total".';
+            }
         }
 
         return {
@@ -501,17 +471,19 @@ exports.handler = async (event) => {
                     explanation,
                     success: true
                 },
-                fileName
+                fileName: fileName.replace(/[<>:"/\\|?*]/g, '').substring(0, 100)
             })
         };
 
     } catch (error) {
+        console.error('Lambda error:', error);
+        
         return {
             statusCode: 500,
             headers,
             body: JSON.stringify({
                 success: false,
-                error: error.message
+                error: 'Processing error occurred. Please check your data and try again.'
             })
         };
     }
