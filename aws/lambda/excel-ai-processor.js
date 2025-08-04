@@ -323,31 +323,43 @@ exports.handler = async (event) => {
         else if (sanitizedPrompt.includes('highlight') || sanitizedPrompt.includes('color') || sanitizedPrompt.includes('format')) {
             operation = 'format';
             console.log('Highlighting detected');
+            
+            // Extract color from prompt
+            let color = 'red'; // default
+            const colors = ['red', 'green', 'blue', 'yellow', 'orange', 'purple', 'pink', 'cyan', 'lime', 'brown', 'gray', 'black'];
+            for (const c of colors) {
+                if (sanitizedPrompt.includes(c)) {
+                    color = c;
+                    break;
+                }
+            }
+            
+            console.log('Color detected:', color);
             processedData = [...fileData];
             
             if (sanitizedPrompt.includes('first row') || sanitizedPrompt.includes('header')) {
-                console.log('Highlighting first row');
+                console.log('Highlighting first row in', color);
                 processedData = fileData.map((row, i) => {
                     if (i === 0) {
-                        return row.map(cell => `<span style="background-color: red; color: white; font-weight: bold; padding: 4px;">${cell}</span>`);
+                        return row.map(cell => `<span style="background-color: ${color}; color: white; font-weight: bold; padding: 4px;">${cell}</span>`);
                     }
                     return row;
                 });
             }
             
             if (sanitizedPrompt.includes('first column')) {
-                console.log('Highlighting first column');
+                console.log('Highlighting first column in', color);
                 processedData = processedData.map((row, i) => {
                     return row.map((cell, j) => {
                         if (j === 0 && i > 0) {
-                            return `<span style="background-color: red; color: white; font-weight: bold; padding: 4px;">${cell}</span>`;
+                            return `<span style="background-color: ${color}; color: white; font-weight: bold; padding: 4px;">${cell}</span>`;
                         }
                         return cell;
                     });
                 });
             }
             
-            explanation = 'Data formatted with highlighting';
+            explanation = `Data formatted with ${color} highlighting`;
         }
         
         // CONDITIONAL FORMATTING
