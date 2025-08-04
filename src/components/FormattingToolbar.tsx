@@ -59,17 +59,18 @@ const FormattingToolbar: React.FC<FormattingToolbarProps> = ({
       alignItems: 'center',
       gap: '1px',
       padding: '8px 12px',
-      backgroundColor: '#f8f9fa',
-      borderBottom: '1px solid #e9ecef',
+      backgroundColor: '#f1f3f4',
+      borderBottom: '1px solid #dadce0',
       fontSize: '14px',
       position: 'relative'
     }}>
       {/* Selection Info */}
       <div style={{ 
         fontSize: '11px', 
-        color: '#6c757d', 
+        color: '#202124', 
         marginRight: '16px',
-        minWidth: '120px'
+        minWidth: '120px',
+        fontWeight: '500'
       }}>
         {selectedCells.length > 0 ? `${selectedCells.length} selected` : 'Select cells'}
       </div>
@@ -86,6 +87,7 @@ const FormattingToolbar: React.FC<FormattingToolbarProps> = ({
             cursor: 'pointer',
             fontWeight: 'bold',
             fontSize: '14px',
+            color: '#202124',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -106,6 +108,7 @@ const FormattingToolbar: React.FC<FormattingToolbarProps> = ({
             cursor: 'pointer',
             fontStyle: 'italic',
             fontSize: '14px',
+            color: '#202124',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -127,6 +130,7 @@ const FormattingToolbar: React.FC<FormattingToolbarProps> = ({
           backgroundColor: '#ffffff',
           cursor: 'pointer',
           fontSize: '12px',
+          color: '#202124',
           marginRight: '12px',
           minWidth: '60px'
         }}
@@ -288,7 +292,7 @@ const FormattingToolbar: React.FC<FormattingToolbarProps> = ({
           padding: '0 12px',
           border: '1px solid #d0d7de',
           backgroundColor: '#ffffff',
-          color: '#6c757d',
+          color: '#202124',
           cursor: 'pointer',
           borderRadius: '3px',
           fontSize: '11px',
