@@ -272,13 +272,17 @@ const FormattingToolbar: React.FC<FormattingToolbarProps> = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '14px',
+            fontSize: '10px',
             color: '#202124',
-            fontWeight: 'bold'
+            fontFamily: 'monospace'
           }}
           title="Align Left"
         >
-          ⬅
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+            <div style={{ width: '12px', height: '2px', backgroundColor: '#202124' }} />
+            <div style={{ width: '8px', height: '2px', backgroundColor: '#202124' }} />
+            <div style={{ width: '10px', height: '2px', backgroundColor: '#202124' }} />
+          </div>
         </button>
         <button
           onClick={() => handleAlignment('center')}
@@ -292,13 +296,16 @@ const FormattingToolbar: React.FC<FormattingToolbarProps> = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '14px',
-            color: '#202124',
-            fontWeight: 'bold'
+            fontSize: '10px',
+            color: '#202124'
           }}
           title="Align Center"
         >
-          ↔
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', alignItems: 'center' }}>
+            <div style={{ width: '12px', height: '2px', backgroundColor: '#202124' }} />
+            <div style={{ width: '8px', height: '2px', backgroundColor: '#202124' }} />
+            <div style={{ width: '10px', height: '2px', backgroundColor: '#202124' }} />
+          </div>
         </button>
         <button
           onClick={() => handleAlignment('right')}
@@ -313,13 +320,16 @@ const FormattingToolbar: React.FC<FormattingToolbarProps> = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '14px',
-            color: '#202124',
-            fontWeight: 'bold'
+            fontSize: '10px',
+            color: '#202124'
           }}
           title="Align Right"
         >
-          ➡
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', alignItems: 'flex-end' }}>
+            <div style={{ width: '12px', height: '2px', backgroundColor: '#202124' }} />
+            <div style={{ width: '8px', height: '2px', backgroundColor: '#202124' }} />
+            <div style={{ width: '10px', height: '2px', backgroundColor: '#202124' }} />
+          </div>
         </button>
       </div>
 
