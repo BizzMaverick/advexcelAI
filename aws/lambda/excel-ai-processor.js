@@ -10,17 +10,25 @@ function sortData(data, column, order = 'asc') {
     
     if (colIndex === -1) return data;
     
+    // Check for ordinal suffixes in rank data and suggest cleanup
+    if (column.toLowerCase().includes('rank')) {
+        const hasOrdinals = rows.some(row => {
+            const cellValue = String(row[colIndex]).toLowerCase();
+            return /(\d+)(st|nd|rd|th)$/.test(cellValue);
+        });
+        
+        if (hasOrdinals) {
+            // Return original data with suggestion
+            return {
+                data: data,
+                suggestion: `Your rank data contains ordinal suffixes (1st, 2nd, 3rd, etc.). For proper numerical sorting, please remove the suffixes (st, nd, rd, th) and keep only numbers (1, 2, 3, etc.), then try sorting again.`
+            };
+        }
+    }
+    
     const sortedRows = rows.sort((a, b) => {
         let aVal = a[colIndex];
         let bVal = b[colIndex];
-        
-        // Handle rank sorting (1st, 2nd, 3rd, etc.)
-        if (column.toLowerCase().includes('rank')) {
-            // Extract numeric part from rank (1st -> 1, 2nd -> 2, etc.)
-            const aNum = parseInt(String(aVal).replace(/[^0-9]/g, '')) || 999999;
-            const bNum = parseInt(String(bVal).replace(/[^0-9]/g, '')) || 999999;
-            return order === 'desc' ? bNum - aNum : aNum - bNum;
-        }
         
         // Handle numeric sorting
         const aNum = Number(aVal);
@@ -249,8 +257,16 @@ exports.handler = async (event) => {
             }
             
             if (sortColumn) {
-                processedData = sortData(fileData, sortColumn, order);
-                explanation = `Data sorted by ${sortColumn} (${order}ending)`;
+                const sortResult = sortData(fileData, sortColumn, order);
+                
+                // Check if sortData returned a suggestion instead of sorted data
+                if (sortResult && typeof sortResult === 'object' && sortResult.suggestion) {
+                    processedData = sortResult.data;
+                    explanation = `⚠️ **Sorting Issue Detected**\n\n${sortResult.suggestion}`;
+                } else {
+                    processedData = sortResult;
+                    explanation = `Data sorted by ${sortColumn} (${order}ending)`;
+                }
             } else {
                 explanation = 'Could not identify column to sort by. Available columns: ' + (fileData[0] || []).join(', ');
             }
