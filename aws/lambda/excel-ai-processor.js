@@ -16,9 +16,10 @@ function sortData(data, column, order = 'asc') {
         
         // Handle rank sorting (1st, 2nd, 3rd, etc.)
         if (column.toLowerCase().includes('rank')) {
-            aVal = parseInt(String(aVal).replace(/[^0-9]/g, '')) || 0;
-            bVal = parseInt(String(bVal).replace(/[^0-9]/g, '')) || 0;
-            return order === 'desc' ? bVal - aVal : aVal - bVal;
+            // Extract numeric part from rank (1st -> 1, 2nd -> 2, etc.)
+            const aNum = parseInt(String(aVal).replace(/[^0-9]/g, '')) || 999999;
+            const bNum = parseInt(String(bVal).replace(/[^0-9]/g, '')) || 999999;
+            return order === 'desc' ? bNum - aNum : aNum - bNum;
         }
         
         // Handle numeric sorting
