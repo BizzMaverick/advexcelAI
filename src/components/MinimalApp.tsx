@@ -394,13 +394,11 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               overflow: 'hidden'
             }}>
               {/* Formatting Toolbar */}
-              <div style={{ padding: '20px 20px 0 20px' }}>
-                <FormattingToolbar
-                  onFormatChange={handleFormatChange}
-                  onClearFormat={handleClearFormat}
-                  selectedCells={selectedCells}
-                />
-              </div>
+              <FormattingToolbar
+                onFormatChange={handleFormatChange}
+                onClearFormat={handleClearFormat}
+                selectedCells={selectedCells}
+              />
               <div style={{ 
                 padding: '20px', 
                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',

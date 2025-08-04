@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 interface FormattingToolbarProps {
   onFormatChange: (format: FormatStyle) => void;
@@ -20,23 +20,21 @@ const FormattingToolbar: React.FC<FormattingToolbarProps> = ({
   onClearFormat,
   selectedCells
 }) => {
+  const [showColorPicker, setShowColorPicker] = useState<'bg' | 'text' | null>(null);
+  
   const colors = [
-    { name: 'Red', value: '#ff4444' },
-    { name: 'Green', value: '#44ff44' },
-    { name: 'Blue', value: '#4444ff' },
-    { name: 'Yellow', value: '#ffff44' },
-    { name: 'Orange', value: '#ff8844' },
-    { name: 'Purple', value: '#8844ff' },
-    { name: 'Pink', value: '#ff44ff' },
-    { name: 'Cyan', value: '#44ffff' }
+    '#ffffff', '#000000', '#e74c3c', '#27ae60', '#3498db', '#f39c12',
+    '#9b59b6', '#1abc9c', '#34495e', '#95a5a6', '#f1c40f', '#e67e22'
   ];
 
   const handleBackgroundColor = (color: string) => {
     onFormatChange({ backgroundColor: color });
+    setShowColorPicker(null);
   };
 
   const handleTextColor = (color: string) => {
     onFormatChange({ color: color });
+    setShowColorPicker(null);
   };
 
   const handleBold = () => {
@@ -59,46 +57,61 @@ const FormattingToolbar: React.FC<FormattingToolbarProps> = ({
     <div style={{
       display: 'flex',
       alignItems: 'center',
-      gap: '10px',
-      padding: '10px',
+      gap: '1px',
+      padding: '8px 12px',
       backgroundColor: '#f8f9fa',
-      border: '1px solid #dee2e6',
-      borderRadius: '4px',
-      marginBottom: '10px',
-      flexWrap: 'wrap'
+      borderBottom: '1px solid #e9ecef',
+      fontSize: '14px',
+      position: 'relative'
     }}>
       {/* Selection Info */}
-      <div style={{ fontSize: '12px', color: '#666', marginRight: '10px' }}>
-        {selectedCells.length > 0 ? `${selectedCells.length} cells selected` : 'Select cells to format'}
+      <div style={{ 
+        fontSize: '11px', 
+        color: '#6c757d', 
+        marginRight: '16px',
+        minWidth: '120px'
+      }}>
+        {selectedCells.length > 0 ? `${selectedCells.length} selected` : 'Select cells'}
       </div>
 
-      {/* Font Formatting */}
-      <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+      {/* Font Controls */}
+      <div style={{ display: 'flex', marginRight: '12px' }}>
         <button
           onClick={handleBold}
           style={{
-            padding: '5px 10px',
-            border: '1px solid #ccc',
-            backgroundColor: 'white',
+            width: '28px',
+            height: '28px',
+            border: '1px solid #d0d7de',
+            backgroundColor: '#ffffff',
             cursor: 'pointer',
             fontWeight: 'bold',
-            borderRadius: '3px'
+            fontSize: '14px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: '3px 0 0 3px'
           }}
-          title="Bold"
+          title="Bold (Ctrl+B)"
         >
           B
         </button>
         <button
           onClick={handleItalic}
           style={{
-            padding: '5px 10px',
-            border: '1px solid #ccc',
-            backgroundColor: 'white',
+            width: '28px',
+            height: '28px',
+            border: '1px solid #d0d7de',
+            borderLeft: 'none',
+            backgroundColor: '#ffffff',
             cursor: 'pointer',
             fontStyle: 'italic',
-            borderRadius: '3px'
+            fontSize: '14px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: '0 3px 3px 0'
           }}
-          title="Italic"
+          title="Italic (Ctrl+I)"
         >
           I
         </button>
@@ -108,119 +121,182 @@ const FormattingToolbar: React.FC<FormattingToolbarProps> = ({
       <select
         onChange={(e) => handleFontSize(e.target.value)}
         style={{
-          padding: '5px',
-          border: '1px solid #ccc',
+          height: '28px',
+          border: '1px solid #d0d7de',
           borderRadius: '3px',
-          cursor: 'pointer'
+          backgroundColor: '#ffffff',
+          cursor: 'pointer',
+          fontSize: '12px',
+          marginRight: '12px',
+          minWidth: '60px'
         }}
-        title="Font Size"
+        defaultValue=""
       >
         <option value="">Size</option>
-        <option value="12px">Small</option>
-        <option value="14px">Medium</option>
-        <option value="16px">Large</option>
-        <option value="18px">X-Large</option>
+        <option value="10px">10</option>
+        <option value="12px">12</option>
+        <option value="14px">14</option>
+        <option value="16px">16</option>
+        <option value="18px">18</option>
+        <option value="20px">20</option>
       </select>
 
-      {/* Text Alignment */}
-      <div style={{ display: 'flex', gap: '2px' }}>
+      {/* Color Controls */}
+      <div style={{ display: 'flex', marginRight: '12px', position: 'relative' }}>
+        <button
+          onClick={() => setShowColorPicker(showColorPicker === 'bg' ? null : 'bg')}
+          style={{
+            width: '32px',
+            height: '28px',
+            border: '1px solid #d0d7de',
+            backgroundColor: '#ffffff',
+            cursor: 'pointer',
+            borderRadius: '3px 0 0 3px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '12px'
+          }}
+          title="Fill Color"
+        >
+          🎨
+          <div style={{ width: '20px', height: '3px', backgroundColor: '#ffeb3b', marginTop: '1px' }} />
+        </button>
+        <button
+          onClick={() => setShowColorPicker(showColorPicker === 'text' ? null : 'text')}
+          style={{
+            width: '32px',
+            height: '28px',
+            border: '1px solid #d0d7de',
+            borderLeft: 'none',
+            backgroundColor: '#ffffff',
+            cursor: 'pointer',
+            borderRadius: '0 3px 3px 0',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '12px'
+          }}
+          title="Text Color"
+        >
+          A
+          <div style={{ width: '20px', height: '3px', backgroundColor: '#f44336', marginTop: '1px' }} />
+        </button>
+        
+        {/* Color Picker Dropdown */}
+        {showColorPicker && (
+          <div style={{
+            position: 'absolute',
+            top: '32px',
+            left: '0',
+            backgroundColor: '#ffffff',
+            border: '1px solid #d0d7de',
+            borderRadius: '4px',
+            padding: '8px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+            zIndex: 1000,
+            display: 'grid',
+            gridTemplateColumns: 'repeat(6, 1fr)',
+            gap: '4px',
+            width: '120px'
+          }}>
+            {colors.map((color, index) => (
+              <button
+                key={index}
+                onClick={() => showColorPicker === 'bg' ? handleBackgroundColor(color) : handleTextColor(color)}
+                style={{
+                  width: '16px',
+                  height: '16px',
+                  backgroundColor: color,
+                  border: color === '#ffffff' ? '1px solid #d0d7de' : 'none',
+                  cursor: 'pointer',
+                  borderRadius: '2px'
+                }}
+                title={color}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Alignment */}
+      <div style={{ display: 'flex', marginRight: '12px' }}>
         <button
           onClick={() => handleAlignment('left')}
           style={{
-            padding: '5px 8px',
-            border: '1px solid #ccc',
-            backgroundColor: 'white',
+            width: '28px',
+            height: '28px',
+            border: '1px solid #d0d7de',
+            backgroundColor: '#ffffff',
             cursor: 'pointer',
-            borderRadius: '3px 0 0 3px'
+            borderRadius: '3px 0 0 3px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '12px'
           }}
           title="Align Left"
         >
-          ⬅
+          ≡
         </button>
         <button
           onClick={() => handleAlignment('center')}
           style={{
-            padding: '5px 8px',
-            border: '1px solid #ccc',
-            backgroundColor: 'white',
-            cursor: 'pointer',
+            width: '28px',
+            height: '28px',
+            border: '1px solid #d0d7de',
             borderLeft: 'none',
-            borderRight: 'none'
+            backgroundColor: '#ffffff',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '12px'
           }}
           title="Align Center"
         >
-          ↔
+          ≣
         </button>
         <button
           onClick={() => handleAlignment('right')}
           style={{
-            padding: '5px 8px',
-            border: '1px solid #ccc',
-            backgroundColor: 'white',
+            width: '28px',
+            height: '28px',
+            border: '1px solid #d0d7de',
+            borderLeft: 'none',
+            backgroundColor: '#ffffff',
             cursor: 'pointer',
-            borderRadius: '0 3px 3px 0'
+            borderRadius: '0 3px 3px 0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '12px'
           }}
           title="Align Right"
         >
-          ➡
+          ≡
         </button>
-      </div>
-
-      {/* Background Colors */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-        <span style={{ fontSize: '12px', color: '#666' }}>Background:</span>
-        {colors.map((color) => (
-          <button
-            key={color.name}
-            onClick={() => handleBackgroundColor(color.value)}
-            style={{
-              width: '20px',
-              height: '20px',
-              backgroundColor: color.value,
-              border: '1px solid #ccc',
-              cursor: 'pointer',
-              borderRadius: '3px'
-            }}
-            title={`Background ${color.name}`}
-          />
-        ))}
-      </div>
-
-      {/* Text Colors */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-        <span style={{ fontSize: '12px', color: '#666' }}>Text:</span>
-        {colors.map((color) => (
-          <button
-            key={color.name}
-            onClick={() => handleTextColor(color.value)}
-            style={{
-              width: '20px',
-              height: '20px',
-              backgroundColor: 'white',
-              border: `2px solid ${color.value}`,
-              cursor: 'pointer',
-              borderRadius: '3px'
-            }}
-            title={`Text ${color.name}`}
-          />
-        ))}
       </div>
 
       {/* Clear Formatting */}
       <button
         onClick={onClearFormat}
         style={{
-          padding: '5px 10px',
-          border: '1px solid #dc3545',
-          backgroundColor: '#dc3545',
-          color: 'white',
+          height: '28px',
+          padding: '0 12px',
+          border: '1px solid #d0d7de',
+          backgroundColor: '#ffffff',
+          color: '#6c757d',
           cursor: 'pointer',
           borderRadius: '3px',
-          fontSize: '12px'
+          fontSize: '11px',
+          fontWeight: '500'
         }}
         title="Clear Formatting"
       >
-        Clear Format
+        Clear
       </button>
     </div>
   );
