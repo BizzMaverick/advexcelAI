@@ -152,41 +152,74 @@ const FormattingToolbar: React.FC<FormattingToolbarProps> = ({
           style={{
             width: '32px',
             height: '28px',
-            border: '1px solid #d0d7de',
-            backgroundColor: '#ffffff',
+            border: '1px solid #dadce0',
+            backgroundColor: showColorPicker === 'bg' ? '#e8f0fe' : '#ffffff',
             cursor: 'pointer',
             borderRadius: '3px 0 0 3px',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '12px'
+            fontSize: '12px',
+            color: '#202124',
+            position: 'relative'
           }}
           title="Fill Color"
         >
-          🎨
-          <div style={{ width: '20px', height: '3px', backgroundColor: '#ffeb3b', marginTop: '1px' }} />
+          <div style={{ 
+            width: '16px', 
+            height: '12px', 
+            backgroundColor: '#4285f4',
+            border: '1px solid #dadce0',
+            borderRadius: '2px',
+            position: 'relative'
+          }}>
+            <div style={{
+              position: 'absolute',
+              bottom: '-4px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '0',
+              height: '0',
+              borderLeft: '3px solid transparent',
+              borderRight: '3px solid transparent',
+              borderTop: '3px solid #202124'
+            }} />
+          </div>
         </button>
         <button
           onClick={() => setShowColorPicker(showColorPicker === 'text' ? null : 'text')}
           style={{
             width: '32px',
             height: '28px',
-            border: '1px solid #d0d7de',
+            border: '1px solid #dadce0',
             borderLeft: 'none',
-            backgroundColor: '#ffffff',
+            backgroundColor: showColorPicker === 'text' ? '#e8f0fe' : '#ffffff',
             cursor: 'pointer',
             borderRadius: '0 3px 3px 0',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '12px'
+            fontSize: '14px',
+            color: '#202124',
+            fontWeight: 'bold',
+            position: 'relative'
           }}
           title="Text Color"
         >
           A
-          <div style={{ width: '20px', height: '3px', backgroundColor: '#f44336', marginTop: '1px' }} />
+          <div style={{ 
+            position: 'absolute',
+            bottom: '2px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '0',
+            height: '0',
+            borderLeft: '3px solid transparent',
+            borderRight: '3px solid transparent',
+            borderTop: '3px solid #202124'
+          }} />
         </button>
         
         {/* Color Picker Dropdown */}
@@ -232,43 +265,47 @@ const FormattingToolbar: React.FC<FormattingToolbarProps> = ({
           style={{
             width: '28px',
             height: '28px',
-            border: '1px solid #d0d7de',
+            border: '1px solid #dadce0',
             backgroundColor: '#ffffff',
             cursor: 'pointer',
             borderRadius: '3px 0 0 3px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '12px'
+            fontSize: '14px',
+            color: '#202124',
+            fontWeight: 'bold'
           }}
           title="Align Left"
         >
-          ≡
+          ⬅
         </button>
         <button
           onClick={() => handleAlignment('center')}
           style={{
             width: '28px',
             height: '28px',
-            border: '1px solid #d0d7de',
+            border: '1px solid #dadce0',
             borderLeft: 'none',
             backgroundColor: '#ffffff',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '12px'
+            fontSize: '14px',
+            color: '#202124',
+            fontWeight: 'bold'
           }}
           title="Align Center"
         >
-          ≣
+          ↔
         </button>
         <button
           onClick={() => handleAlignment('right')}
           style={{
             width: '28px',
             height: '28px',
-            border: '1px solid #d0d7de',
+            border: '1px solid #dadce0',
             borderLeft: 'none',
             backgroundColor: '#ffffff',
             cursor: 'pointer',
@@ -276,11 +313,13 @@ const FormattingToolbar: React.FC<FormattingToolbarProps> = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '12px'
+            fontSize: '14px',
+            color: '#202124',
+            fontWeight: 'bold'
           }}
           title="Align Right"
         >
-          ≡
+          ➡
         </button>
       </div>
 
