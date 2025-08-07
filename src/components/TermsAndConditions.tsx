@@ -1,72 +1,107 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 
-const TermsAndConditions: React.FC = () => {
+export default function TermsAndConditions() {
   return (
-    <div style={{ 
-      padding: '40px 20px', 
-      fontFamily: 'Arial, sans-serif',
-      maxWidth: '800px',
-      margin: '0 auto',
-      lineHeight: '1.8'
-    }}>
-      <h1 style={{ textAlign: 'center', marginBottom: '30px', color: '#333' }}>Terms and Conditions</h1>
-      <p style={{ textAlign: 'center', marginBottom: '40px', fontStyle: 'italic' }}><strong>Last updated:</strong> December 2024</p>
+    <div style={{ minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
+      {/* Header with Home Link */}
+      <header style={{ backgroundColor: '#0078d4', color: 'white', padding: '16px 0' }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto', padding: '0 20px', display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <a href="/" style={{ color: 'white', textDecoration: 'none', fontSize: '16px', fontWeight: 'bold' }}>← Back to Home</a>
+          <h1 style={{ margin: 0, fontSize: '24px' }}>Terms and Conditions</h1>
+        </div>
+      </header>
       
-      <h2 style={{ color: '#444', marginTop: '30px' }}>1. Acceptance of Terms</h2>
-      <p>By accessing and using AdvExcel Online, you accept and agree to be bound by the terms and provision of this agreement.</p>
-      
-      <h2 style={{ color: '#444', marginTop: '30px' }}>2. Service Description</h2>
-      <p>AdvExcel Online is an AI-powered Excel processing service that helps users analyze, sort, filter, and manipulate Excel data through natural language commands.</p>
-      
-      <h2 style={{ color: '#444', marginTop: '30px' }}>3. User Accounts</h2>
-      <p>Users must create an account to access our services. You are responsible for maintaining the confidentiality of your account credentials.</p>
-      
-      <h2 style={{ color: '#444', marginTop: '30px' }}>4. Subscription and Payment</h2>
-      <p>Our service is offered on a subscription basis at ₹249 per month. Payments are processed through Razorpay. Subscriptions automatically renew unless cancelled.</p>
-      
-      <h2 style={{ color: '#444', marginTop: '30px' }}>5. Data Privacy</h2>
-      <p>We process your Excel data to provide our AI services. Data is not stored permanently and is deleted after processing. See our Privacy Policy for details.</p>
-      
-      <h2 style={{ color: '#444', marginTop: '30px' }}>6. Acceptable Use</h2>
-      <p>Users agree not to:</p>
-      <div style={{ 
-        backgroundColor: '#f8f9fa', 
-        padding: '20px', 
-        borderRadius: '8px', 
-        margin: '15px 0' 
-      }}>
-        <ul style={{ margin: 0, paddingLeft: '20px' }}>
-          <li>Upload malicious or harmful content</li>
-          <li>Attempt to reverse engineer our services</li>
-          <li>Use the service for illegal activities</li>
-          <li>Share account credentials with others</li>
-        </ul>
-      </div>
-      
-      <h2 style={{ color: '#444', marginTop: '30px' }}>7. Service Availability</h2>
-      <p>We strive to maintain 99.9% uptime but cannot guarantee uninterrupted service. Maintenance windows will be announced in advance.</p>
-      
-      <h2 style={{ color: '#444', marginTop: '30px' }}>8. Limitation of Liability</h2>
-      <p>AdvExcel Online shall not be liable for any indirect, incidental, special, or consequential damages resulting from the use of our service.</p>
-      
-      <h2 style={{ color: '#444', marginTop: '30px' }}>9. Termination</h2>
-      <p>We reserve the right to terminate accounts that violate these terms. Users may cancel their subscription at any time.</p>
-      
-      <h2 style={{ color: '#444', marginTop: '30px' }}>10. Changes to Terms</h2>
-      <p>We reserve the right to modify these terms at any time. Users will be notified of significant changes via email.</p>
-      
-      <h2 style={{ color: '#444', marginTop: '30px' }}>11. Governing Law</h2>
-      <p>These terms are governed by the laws of India. Any disputes will be resolved in the courts of Mumbai, India.</p>
-      
-      <h2 style={{ color: '#444', marginTop: '30px' }}>Contact Information</h2>
-      <p>For questions about these terms, contact us at: <a href="mailto:contact@advexcel.online" style={{ color: '#007bff' }}>contact@advexcel.online</a></p>
-      
-      <div style={{ marginTop: '40px', textAlign: 'center' }}>
-        <Link to="/" style={{ color: '#007bff', textDecoration: 'none', fontSize: '16px' }}>← Back to Home</Link>
+      <div style={{ maxWidth: '800px', margin: '0 auto', padding: '40px 20px', fontFamily: 'system-ui, -apple-system, sans-serif', backgroundColor: 'white', minHeight: 'calc(100vh - 80px)', boxShadow: '0 0 20px rgba(0,0,0,0.1)', textAlign: 'center' }}>
+        <p style={{ color: '#666', marginBottom: '40px', fontSize: '14px' }}>Last updated: {new Date().toLocaleDateString()}</p>
+        
+        <section style={{ marginBottom: '50px' }}>
+          <h2 style={{ color: '#2c3e50', marginBottom: '25px', fontSize: '22px', fontWeight: '600', borderBottom: '3px solid #0078d4', paddingBottom: '15px', display: 'inline-block' }}>1. Acceptance of Terms</h2>
+          <p style={{ lineHeight: '2', color: '#495057', fontSize: '16px', marginBottom: '25px', maxWidth: '700px', margin: '0 auto 25px auto' }}>
+            By accessing and using the Excel AI Assistant service, you accept and agree to be bound by 
+            the terms and provision of this agreement. If you do not agree to abide by the above, 
+            please do not use this service.
+          </p>
+        </section>
+
+        <section style={{ marginBottom: '50px' }}>
+          <h2 style={{ color: '#2c3e50', marginBottom: '25px', fontSize: '22px', fontWeight: '600', borderBottom: '3px solid #0078d4', paddingBottom: '15px', display: 'inline-block' }}>2. Service Description</h2>
+          <p style={{ lineHeight: '2', color: '#495057', fontSize: '16px', marginBottom: '25px', maxWidth: '700px', margin: '0 auto 25px auto' }}>
+            Excel AI Assistant is a web-based service that provides AI-powered Excel file processing, 
+            including sorting, filtering, calculations, and data analysis. The service is provided 
+            on a subscription basis at ₹249 per month.
+          </p>
+        </section>
+
+        <section style={{ marginBottom: '50px' }}>
+          <h2 style={{ color: '#2c3e50', marginBottom: '25px', fontSize: '22px', fontWeight: '600', borderBottom: '3px solid #0078d4', paddingBottom: '15px', display: 'inline-block' }}>3. User Responsibilities</h2>
+          <p style={{ lineHeight: '2', color: '#495057', fontSize: '16px', marginBottom: '25px', maxWidth: '700px', margin: '0 auto 25px auto' }}>You agree to:</p>
+          <div style={{ textAlign: 'left', maxWidth: '600px', margin: '0 auto', backgroundColor: '#f8f9fa', padding: '25px', borderRadius: '8px' }}>
+            <ul style={{ lineHeight: '2', color: '#495057', fontSize: '16px', paddingLeft: '25px', margin: 0 }}>
+              <li style={{ marginBottom: '8px' }}>Provide accurate account information</li>
+              <li style={{ marginBottom: '8px' }}>Use the service only for lawful purposes</li>
+              <li style={{ marginBottom: '8px' }}>Not upload malicious or copyrighted content</li>
+              <li style={{ marginBottom: '8px' }}>Not attempt to reverse engineer or hack the service</li>
+              <li style={{ marginBottom: '8px' }}>Pay subscription fees on time</li>
+            </ul>
+          </div>
+        </section>
+
+        <section style={{ marginBottom: '50px' }}>
+          <h2 style={{ color: '#2c3e50', marginBottom: '25px', fontSize: '22px', fontWeight: '600', borderBottom: '3px solid #0078d4', paddingBottom: '15px', display: 'inline-block' }}>4. Payment Terms</h2>
+          <p style={{ lineHeight: '2', color: '#495057', fontSize: '16px', marginBottom: '25px', maxWidth: '700px', margin: '0 auto 25px auto' }}>
+            Subscription fees are ₹249 per month, charged monthly in advance. 
+            Payments are processed securely through Razorpay. 
+            All fees are non-refundable except as required by law or within our 7-day money-back guarantee period.
+          </p>
+        </section>
+
+        <section style={{ marginBottom: '50px' }}>
+          <h2 style={{ color: '#2c3e50', marginBottom: '25px', fontSize: '22px', fontWeight: '600', borderBottom: '3px solid #0078d4', paddingBottom: '15px', display: 'inline-block' }}>5. Service Limitations</h2>
+          <p style={{ lineHeight: '2', color: '#495057', fontSize: '16px', marginBottom: '25px', maxWidth: '700px', margin: '0 auto 25px auto' }}>
+            We strive to provide reliable service but do not guarantee 100% uptime. 
+            File size limits and processing limits may apply. 
+            We reserve the right to modify or discontinue the service with reasonable notice.
+          </p>
+        </section>
+
+        <section style={{ marginBottom: '50px' }}>
+          <h2 style={{ color: '#2c3e50', marginBottom: '25px', fontSize: '22px', fontWeight: '600', borderBottom: '3px solid #0078d4', paddingBottom: '15px', display: 'inline-block' }}>6. Intellectual Property</h2>
+          <p style={{ lineHeight: '2', color: '#495057', fontSize: '16px', marginBottom: '25px', maxWidth: '700px', margin: '0 auto 25px auto' }}>
+            The service and its original content remain our property. 
+            You retain ownership of your uploaded files and data. 
+            You grant us a limited license to process your files to provide the service.
+          </p>
+        </section>
+
+        <section style={{ marginBottom: '50px' }}>
+          <h2 style={{ color: '#2c3e50', marginBottom: '25px', fontSize: '22px', fontWeight: '600', borderBottom: '3px solid #0078d4', paddingBottom: '15px', display: 'inline-block' }}>7. Limitation of Liability</h2>
+          <p style={{ lineHeight: '2', color: '#495057', fontSize: '16px', marginBottom: '25px', maxWidth: '700px', margin: '0 auto 25px auto' }}>
+            We shall not be liable for any indirect, incidental, special, consequential, 
+            or punitive damages resulting from your use of the service. 
+            Our total liability is limited to the amount paid by you in the last 12 months.
+          </p>
+        </section>
+
+        <section style={{ marginBottom: '50px' }}>
+          <h2 style={{ color: '#2c3e50', marginBottom: '25px', fontSize: '22px', fontWeight: '600', borderBottom: '3px solid #0078d4', paddingBottom: '15px', display: 'inline-block' }}>8. Termination</h2>
+          <p style={{ lineHeight: '2', color: '#495057', fontSize: '16px', marginBottom: '25px', maxWidth: '700px', margin: '0 auto 25px auto' }}>
+            We reserve the right to terminate accounts that violate these terms. 
+            Users may cancel their subscription at any time through their account settings 
+            or by contacting support at contact@advexcel.online.
+          </p>
+        </section>
+
+        <section style={{ marginBottom: '50px' }}>
+          <h2 style={{ color: '#2c3e50', marginBottom: '25px', fontSize: '22px', fontWeight: '600', borderBottom: '3px solid #0078d4', paddingBottom: '15px', display: 'inline-block' }}>9. Contact Information</h2>
+          <p style={{ lineHeight: '2', color: '#495057', fontSize: '16px', marginBottom: '25px', maxWidth: '700px', margin: '0 auto 25px auto' }}>
+            For questions about these Terms, contact us at:
+            <br /><br />
+            <strong>Email:</strong> contact@advexcel.online
+            <br />
+            <strong>Website:</strong> https://www.advexcel.online
+          </p>
+        </section>
       </div>
     </div>
   );
-};
-
-export default TermsAndConditions;
+}
