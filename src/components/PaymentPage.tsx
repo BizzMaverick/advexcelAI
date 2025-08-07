@@ -40,7 +40,7 @@ export default function PaymentPage({ userEmail, onPaymentSuccess, onBackToLogin
     
     try {
       const options = {
-        key: 'rzp_test_GwLaqT264JyMlU',
+        key: process.env.REACT_APP_RAZORPAY_KEY_ID,
         amount: 24900, // ₹249 in paise
         currency: 'INR',
         name: 'Excel AI Assistant',
@@ -54,7 +54,8 @@ export default function PaymentPage({ userEmail, onPaymentSuccess, onBackToLogin
         },
         prefill: {
           email: userEmail,
-          contact: ''
+          contact: '',
+          method: 'card'
         },
         theme: {
           color: '#667eea'
@@ -70,6 +71,12 @@ export default function PaymentPage({ userEmail, onPaymentSuccess, onBackToLogin
         retry: {
           enabled: true,
           max_count: 3
+        },
+        method: {
+          card: true,
+          netbanking: true,
+          wallet: true,
+          upi: true
         }
       };
       
