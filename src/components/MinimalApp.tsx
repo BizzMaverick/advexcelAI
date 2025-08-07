@@ -186,9 +186,28 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               displayResponse += `\n\n**Pivot Analysis:**\n${String(result.structured.pivotSummary).substring(0, 500)}`;
             }
           } else if (operation === 'lookup') {
-            displayResponse += String(opResult).substring(0, 1000);
-            if (result.structured.lookupResults) {
-              displayResponse += `\n\n**Lookup Results:**\n${String(result.structured.lookupResults).substring(0, 500)}`;
+            if (Array.isArray(opResult) && opResult.length > 0) {
+              // Store result for "Use this result" functionality
+              setLastAiResult([...opResult]);
+              setShowUseResultButton(true);
+              
+              // Display lookup results as a table
+              let tableHtml = '<div style="max-height: 400px; overflow: auto; border: 1px solid #ddd; border-radius: 4px; margin: 10px 0;"><table style="width: 100%; border-collapse: collapse; font-size: 12px;">';
+              
+              opResult.forEach((row, i) => {
+                const isHeader = i === 0;
+                tableHtml += `<tr style="background: ${isHeader ? '#f0f8ff' : (i % 2 === 0 ? '#fafafa' : 'white')}; border-bottom: 1px solid #eee;">`;
+                row.forEach(cell => {
+                  tableHtml += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: ${isHeader ? 'bold' : 'normal'}; white-space: nowrap;">${String(cell || '')}</td>`;
+                });
+                tableHtml += '</tr>';
+              });
+              
+              tableHtml += '</table></div>';
+              
+              displayResponse += `✅ **Lookup Results:**\n\n${tableHtml}\n\n**Click "Use This Result" below to replace your main data with this result.**`;
+            } else {
+              displayResponse += String(opResult).substring(0, 1000);
             }
           } else if (operation === 'chart') {
             displayResponse += String(opResult).substring(0, 1000);
