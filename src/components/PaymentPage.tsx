@@ -8,13 +8,51 @@ interface PaymentPageProps {
 
 export default function PaymentPage({ userEmail, onPaymentSuccess, onBackToLogin }: PaymentPageProps) {
   const [isProcessing, setIsProcessing] = useState(false);
+  
+  // Load Razorpay script
+  React.useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
   const handlePayment = async () => {
     setIsProcessing(true);
-    setTimeout(() => {
+    
+    try {
+      const options = {
+        key: 'rzp_live_your_key_here', // Replace with your Razorpay key
+        amount: 24900, // ₹249 in paise
+        currency: 'INR',
+        name: 'Excel AI Assistant',
+        description: 'Monthly Subscription',
+        handler: function (response: any) {
+          console.log('Payment successful:', response);
+          onPaymentSuccess();
+        },
+        prefill: {
+          email: userEmail
+        },
+        theme: {
+          color: '#667eea'
+        },
+        modal: {
+          ondismiss: function() {
+            setIsProcessing(false);
+          }
+        }
+      };
+      
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
+    } catch (error) {
+      console.error('Payment error:', error);
       setIsProcessing(false);
-      onPaymentSuccess();
-    }, 2000);
+    }
   };
 
   return (
