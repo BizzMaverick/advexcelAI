@@ -35,6 +35,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
   const [fileError, setFileError] = useState<string>('');
   const [showUseResultButton, setShowUseResultButton] = useState(false);
   const [lastAiResult, setLastAiResult] = useState<any[][]>([]);
+  const [showFileInfo, setShowFileInfo] = useState(true);
 
   const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -93,6 +94,12 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
         );
 
         setFileData(sanitizedData);
+        setShowFileInfo(true);
+        
+        // Auto-hide file info after 10 seconds
+        setTimeout(() => {
+          setShowFileInfo(false);
+        }, 10000);
       } catch (error) {
         console.error('Error parsing file:', error);
         setFileError('Error reading file. Please ensure it\'s a valid Excel or CSV file.');
@@ -449,7 +456,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
             )}
           </div>
           
-          {selectedFile && (
+          {selectedFile && showFileInfo && (
             <div style={{ marginBottom: '20px', padding: '15px', background: '#f0f8ff', border: '1px solid #0078d4', borderRadius: '4px' }}>
               <h4 style={{ margin: '0 0 10px 0', color: '#0078d4' }}>Selected File: {selectedFile.name}</h4>
               <p style={{ margin: '0', fontSize: '14px', color: '#666' }}>Size: {(selectedFile.size / 1024).toFixed(2)} KB</p>
