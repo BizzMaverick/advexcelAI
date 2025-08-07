@@ -8,21 +8,29 @@ import TermsAndConditions from './components/TermsAndConditions';
 import CancellationRefund from './components/CancellationRefund';
 import ShippingDelivery from './components/ShippingDelivery';
 import ContactUs from './components/ContactUs';
+import PaymentPage from './components/PaymentPage';
 
 function App() {
   const [user, setUser] = useState<{ name: string; email: string } | null>(() => {
     const savedUser = localStorage.getItem('advexcel_user');
     return savedUser ? JSON.parse(savedUser) : null;
   });
+  const [showPayment, setShowPayment] = useState(false);
 
   const handleLogin = (userData: { name: string; email: string }) => {
     setUser(userData);
     localStorage.setItem('advexcel_user', JSON.stringify(userData));
+    setShowPayment(true);
   };
 
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem('advexcel_user');
+    setShowPayment(false);
+  };
+
+  const handlePaymentSuccess = () => {
+    setShowPayment(false);
   };
 
   return (
@@ -39,6 +47,12 @@ function App() {
         <Route path="/" element={
           !user ? (
             <LandingPage onLogin={handleLogin} />
+          ) : showPayment ? (
+            <PaymentPage 
+              userEmail={user.email} 
+              onPaymentSuccess={handlePaymentSuccess}
+              onBackToLogin={handleLogout}
+            />
           ) : (
             <MinimalApp user={user} onLogout={handleLogout} />
           )
