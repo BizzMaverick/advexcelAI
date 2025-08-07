@@ -161,7 +161,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               // Display processed data as a table in the response
               let tableHtml = '<div style="max-height: 400px; overflow: auto; border: 1px solid #ddd; border-radius: 4px; margin: 10px 0;"><table style="width: 100%; border-collapse: collapse; font-size: 12px;">';
               
-              opResult.slice(0, 50).forEach((row, i) => {
+              opResult.forEach((row, i) => {
                 const isHeader = i === 0;
                 tableHtml += `<tr style="background: ${isHeader ? '#f0f8ff' : (i % 2 === 0 ? '#fafafa' : 'white')}; border-bottom: 1px solid #eee;">`;
                 row.forEach(cell => {
@@ -172,18 +172,34 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               
               tableHtml += '</table></div>';
               
-              if (opResult.length > 50) {
-                tableHtml += `<p style="color: #666; font-size: 12px; margin: 5px 0;">Showing first 50 rows of ${opResult.length} total rows</p>`;
-              }
+              tableHtml += `<p style="color: #666; font-size: 12px; margin: 5px 0;">Showing all ${opResult.length} rows</p>`;
               
               displayResponse += `✅ **Processed Data:**\n\n${tableHtml}\n\n**Click "Use This Result" below to replace your main data with this result.**`;
             } else {
               displayResponse += String(opResult).substring(0, 1000);
             }
           } else if (operation === 'pivot') {
-            displayResponse += String(opResult).substring(0, 1000);
-            if (result.structured.pivotSummary) {
-              displayResponse += `\n\n**Pivot Analysis:**\n${String(result.structured.pivotSummary).substring(0, 500)}`;
+            if (Array.isArray(opResult) && opResult.length > 0) {
+              setLastAiResult([...opResult]);
+              setShowUseResultButton(true);
+              
+              let tableHtml = '<div style="max-height: 400px; overflow: auto; border: 1px solid #ddd; border-radius: 4px; margin: 10px 0;"><table style="width: 100%; border-collapse: collapse; font-size: 12px;">';
+              
+              opResult.forEach((row, i) => {
+                const isHeader = i === 0;
+                tableHtml += `<tr style="background: ${isHeader ? '#f0f8ff' : (i % 2 === 0 ? '#fafafa' : 'white')}; border-bottom: 1px solid #eee;">`;
+                row.forEach(cell => {
+                  tableHtml += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: ${isHeader ? 'bold' : 'normal'}; white-space: nowrap;">${String(cell || '')}</td>`;
+                });
+                tableHtml += '</tr>';
+              });
+              
+              tableHtml += '</table></div>';
+              tableHtml += `<p style="color: #666; font-size: 12px; margin: 5px 0;">Showing all ${opResult.length} rows</p>`;
+              
+              displayResponse += `✅ **Pivot Results:**\n\n${tableHtml}\n\n**Click "Use This Result" below to replace your main data with this result.**`;
+            } else {
+              displayResponse += String(opResult).substring(0, 1000);
             }
           } else if (operation === 'lookup') {
             if (Array.isArray(opResult) && opResult.length > 0) {
@@ -210,14 +226,50 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               displayResponse += String(opResult).substring(0, 1000);
             }
           } else if (operation === 'chart') {
-            displayResponse += String(opResult).substring(0, 1000);
-            if (result.structured.chartData) {
-              displayResponse += `\n\n**Chart Data:**\n${String(result.structured.chartData).substring(0, 500)}`;
+            if (Array.isArray(opResult) && opResult.length > 0) {
+              setLastAiResult([...opResult]);
+              setShowUseResultButton(true);
+              
+              let tableHtml = '<div style="max-height: 400px; overflow: auto; border: 1px solid #ddd; border-radius: 4px; margin: 10px 0;"><table style="width: 100%; border-collapse: collapse; font-size: 12px;">';
+              
+              opResult.forEach((row, i) => {
+                const isHeader = i === 0;
+                tableHtml += `<tr style="background: ${isHeader ? '#f0f8ff' : (i % 2 === 0 ? '#fafafa' : 'white')}; border-bottom: 1px solid #eee;">`;
+                row.forEach(cell => {
+                  tableHtml += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: ${isHeader ? 'bold' : 'normal'}; white-space: nowrap;">${String(cell || '')}</td>`;
+                });
+                tableHtml += '</tr>';
+              });
+              
+              tableHtml += '</table></div>';
+              tableHtml += `<p style="color: #666; font-size: 12px; margin: 5px 0;">Showing all ${opResult.length} rows</p>`;
+              
+              displayResponse += `✅ **Chart Data:**\n\n${tableHtml}\n\n**Click "Use This Result" below to replace your main data with this result.**`;
+            } else {
+              displayResponse += String(opResult).substring(0, 1000);
             }
           } else if (operation === 'analytics') {
-            displayResponse += String(opResult).substring(0, 1000);
-            if (result.structured.analytics) {
-              displayResponse += `\n\n**Analytics Results:**\n${String(result.structured.analytics).substring(0, 500)}`;
+            if (Array.isArray(opResult) && opResult.length > 0) {
+              setLastAiResult([...opResult]);
+              setShowUseResultButton(true);
+              
+              let tableHtml = '<div style="max-height: 400px; overflow: auto; border: 1px solid #ddd; border-radius: 4px; margin: 10px 0;"><table style="width: 100%; border-collapse: collapse; font-size: 12px;">';
+              
+              opResult.forEach((row, i) => {
+                const isHeader = i === 0;
+                tableHtml += `<tr style="background: ${isHeader ? '#f0f8ff' : (i % 2 === 0 ? '#fafafa' : 'white')}; border-bottom: 1px solid #eee;">`;
+                row.forEach(cell => {
+                  tableHtml += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: ${isHeader ? 'bold' : 'normal'}; white-space: nowrap;">${String(cell || '')}</td>`;
+                });
+                tableHtml += '</tr>';
+              });
+              
+              tableHtml += '</table></div>';
+              tableHtml += `<p style="color: #666; font-size: 12px; margin: 5px 0;">Showing all ${opResult.length} rows</p>`;
+              
+              displayResponse += `✅ **Analytics Results:**\n\n${tableHtml}\n\n**Click "Use This Result" below to replace your main data with this result.**`;
+            } else {
+              displayResponse += String(opResult).substring(0, 1000);
             }
           } else {
             displayResponse += String(opResult).substring(0, 1000);
