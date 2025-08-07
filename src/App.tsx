@@ -20,7 +20,12 @@ function App() {
   const handleLogin = (userData: { name: string; email: string }) => {
     setUser(userData);
     localStorage.setItem('advexcel_user', JSON.stringify(userData));
-    setShowPayment(true);
+    // Admin bypass for full access
+    if (userData.email === 'katragadda225@gmail.com') {
+      setShowPayment(false);
+    } else {
+      setShowPayment(true);
+    }
   };
 
   const handleLogout = () => {
