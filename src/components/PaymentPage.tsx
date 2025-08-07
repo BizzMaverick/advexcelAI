@@ -25,7 +25,7 @@ export default function PaymentPage({ userEmail, onPaymentSuccess, onBackToLogin
     
     try {
       const options = {
-        key: 'rzp_live_your_key_here', // Replace with your Razorpay key
+        key: 'rzp_test_GwLaqT264JyMlU', // Razorpay test key
         amount: 24900, // ₹249 in paise
         currency: 'INR',
         name: 'Excel AI Assistant',
