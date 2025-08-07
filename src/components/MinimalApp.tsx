@@ -405,7 +405,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               fontSize: '18px',
               margin: 0
             }}>
-              Upload Excel files and process them with AI commands
+              Upload Excel files and ask AI questions about your data
             </p>
           </div>
           
@@ -578,63 +578,71 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
             </div>
           )}
           
-          {/* AI Command Section */}
+          {/* AI Command Section - Google Style */}
           <div style={{
-            background: 'white',
-            borderRadius: '12px',
-            padding: '30px',
-            marginBottom: '30px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+            textAlign: 'center',
+            marginBottom: '30px'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
-              <div style={{ fontSize: '32px', marginRight: '15px' }}>🤖</div>
-              <div>
-                <h3 style={{ color: '#333', margin: 0 }}>AI Assistant</h3>
-                <p style={{ color: '#666', fontSize: '14px', margin: '5px 0 0 0' }}>Ask questions about your data</p>
-              </div>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              maxWidth: '600px',
+              margin: '0 auto',
+              position: 'relative'
+            }}>
+              <input 
+                type="text"
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value.substring(0, 200))}
+                placeholder="Ask AI about your data... (e.g., 'Sort by age', 'Calculate average')"
+                maxLength={200}
+                onKeyPress={(e) => e.key === 'Enter' && !isProcessing && selectedFile && handleProcessAI()}
+                style={{ 
+                  width: '100%',
+                  padding: '16px 60px 16px 20px',
+                  border: '1px solid #dfe1e5',
+                  borderRadius: '24px',
+                  fontSize: '16px',
+                  outline: 'none',
+                  boxShadow: '0 2px 5px 1px rgba(64,60,67,.16)',
+                  transition: 'box-shadow 0.2s ease',
+                  fontFamily: 'inherit'
+                }}
+                onFocus={(e) => {
+                  e.target.style.boxShadow = '0 2px 8px 1px rgba(64,60,67,.24)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.boxShadow = '0 2px 5px 1px rgba(64,60,67,.16)';
+                }}
+              />
+              <button 
+                onClick={handleProcessAI}
+                disabled={isProcessing || !selectedFile || !prompt.trim()}
+                style={{ 
+                  position: 'absolute',
+                  right: '8px',
+                  background: isProcessing || !selectedFile || !prompt.trim() ? '#f8f9fa' : '#4285f4',
+                  color: isProcessing || !selectedFile || !prompt.trim() ? '#9aa0a6' : 'white',
+                  border: 'none',
+                  padding: '10px 16px',
+                  borderRadius: '18px',
+                  cursor: isProcessing || !selectedFile || !prompt.trim() ? 'not-allowed' : 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                {isProcessing ? '⏳' : '🔍'}
+              </button>
             </div>
-            <textarea 
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value.substring(0, 500))}
-              placeholder="Type your AI command here... (e.g., 'Sort by age', 'Calculate average', 'Filter by city')"
-              maxLength={500}
-              style={{ 
-                width: '100%', 
-                height: '120px', 
-                padding: '16px', 
-                border: '2px solid #eee', 
-                borderRadius: '8px', 
-                marginBottom: '10px', 
-                resize: 'vertical',
-                fontSize: '14px',
-                fontFamily: 'inherit'
-              }}
-            />
             <div style={{ 
               fontSize: '12px', 
-              color: '#666', 
-              marginBottom: '20px',
-              textAlign: 'right'
+              color: '#70757a', 
+              marginTop: '8px'
             }}>
-              {prompt.length}/500 characters
+              {prompt.length}/200 • Press Enter to search
             </div>
-            <button 
-              onClick={handleProcessAI}
-              disabled={isProcessing || !selectedFile}
-              style={{ 
-                background: isProcessing || !selectedFile ? '#ccc' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', 
-                color: 'white', 
-                border: 'none', 
-                padding: '14px 28px', 
-                borderRadius: '8px', 
-                cursor: isProcessing || !selectedFile ? 'not-allowed' : 'pointer', 
-                fontSize: '16px',
-                fontWeight: 'bold',
-                boxShadow: isProcessing || !selectedFile ? 'none' : '0 4px 12px rgba(102, 126, 234, 0.3)'
-              }}
-            >
-              {isProcessing ? '🔄 Processing...' : '✨ Process with AI'}
-            </button>
           </div>
           
           {aiResponse && (
