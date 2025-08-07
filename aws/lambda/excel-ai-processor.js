@@ -12,12 +12,19 @@ function sortData(data, column, order = 'asc') {
     
     // Check for ordinal suffixes in rank data and suggest cleanup
     if (column.toLowerCase().includes('rank')) {
+        console.log('Checking for ordinals in rank column');
         const hasOrdinals = rows.some(row => {
             const cellValue = String(row[colIndex]).toLowerCase();
-            return /(\d+)(st|nd|rd|th)$/.test(cellValue);
+            console.log('Checking cell value:', cellValue);
+            const hasOrdinal = /(\d+)(st|nd|rd|th)$/.test(cellValue);
+            console.log('Has ordinal:', hasOrdinal);
+            return hasOrdinal;
         });
         
+        console.log('Overall hasOrdinals:', hasOrdinals);
+        
         if (hasOrdinals) {
+            console.log('Returning suggestion for ordinals');
             // Return original data with suggestion
             return {
                 data: data,
