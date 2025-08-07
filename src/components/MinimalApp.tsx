@@ -688,6 +688,37 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
           )}
         </div>
       </main>
+      
+      {/* Footer with Legal Links */}
+      <footer style={{
+        backgroundColor: '#333',
+        color: 'white',
+        padding: '40px 20px',
+        textAlign: 'center'
+      }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <div style={{ marginBottom: '20px' }}>
+            <h3 style={{ margin: '0 0 15px 0' }}>Excel AI Assistant</h3>
+            <p style={{ margin: '0', color: '#ccc' }}>AI-Powered Excel Processing</p>
+          </div>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            gap: '30px', 
+            flexWrap: 'wrap',
+            marginBottom: '20px'
+          }}>
+            <a href="/privacy-policy" style={{ color: '#ccc', textDecoration: 'none' }}>Privacy Policy</a>
+            <a href="/terms-conditions" style={{ color: '#ccc', textDecoration: 'none' }}>Terms & Conditions</a>
+            <a href="/cancellation-refund" style={{ color: '#ccc', textDecoration: 'none' }}>Refund Policy</a>
+            <a href="/shipping-delivery" style={{ color: '#ccc', textDecoration: 'none' }}>Service Delivery</a>
+            <a href="/contact-us" style={{ color: '#ccc', textDecoration: 'none' }}>Contact Us</a>
+          </div>
+          <p style={{ margin: '0', color: '#999', fontSize: '14px' }}>
+            © 2024 Excel AI Assistant. All rights reserved.
+          </p>
+        </div>
+      </footer>
     </div>
     </ErrorBoundary>
   );
