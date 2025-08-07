@@ -14,43 +14,77 @@ export default function PaymentPage({ userEmail, onPaymentSuccess, onBackToLogin
     const script = document.createElement('script');
     script.src = 'https://checkout.razorpay.com/v1/checkout.js';
     script.async = true;
+    script.onload = () => {
+      console.log('Razorpay script loaded successfully');
+    };
+    script.onerror = () => {
+      console.error('Failed to load Razorpay script');
+    };
     document.body.appendChild(script);
+    
     return () => {
-      document.body.removeChild(script);
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
     };
   }, []);
 
   const handlePayment = async () => {
     setIsProcessing(true);
     
+    if (!(window as any).Razorpay) {
+      alert('Payment system not loaded. Please refresh and try again.');
+      setIsProcessing(false);
+      return;
+    }
+    
     try {
       const options = {
-        key: 'rzp_test_GwLaqT264JyMlU', // Razorpay test key
+        key: 'rzp_test_GwLaqT264JyMlU',
         amount: 24900, // ₹249 in paise
         currency: 'INR',
         name: 'Excel AI Assistant',
-        description: 'Monthly Subscription',
+        description: 'Monthly Subscription - ₹249/month',
+        order_id: 'order_test_' + Date.now(), // Dummy order ID for testing
         handler: function (response: any) {
           console.log('Payment successful:', response);
+          alert('Payment successful! Welcome to Excel AI Assistant.');
+          setIsProcessing(false);
           onPaymentSuccess();
         },
         prefill: {
-          email: userEmail
+          email: userEmail,
+          contact: ''
         },
         theme: {
           color: '#667eea'
         },
         modal: {
           ondismiss: function() {
+            console.log('Payment cancelled by user');
             setIsProcessing(false);
-          }
+          },
+          escape: true,
+          backdropclose: false
+        },
+        retry: {
+          enabled: true,
+          max_count: 3
         }
       };
       
       const rzp = new (window as any).Razorpay(options);
+      
+      rzp.on('payment.failed', function (response: any) {
+        console.error('Payment failed:', response.error);
+        alert(`Payment failed: ${response.error.description}`);
+        setIsProcessing(false);
+      });
+      
       rzp.open();
     } catch (error) {
-      console.error('Payment error:', error);
+      console.error('Payment initialization error:', error);
+      alert('Failed to initialize payment. Please try again.');
       setIsProcessing(false);
     }
   };
