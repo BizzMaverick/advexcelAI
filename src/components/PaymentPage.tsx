@@ -39,23 +39,63 @@ export default function PaymentPage({ userEmail, onPaymentSuccess, onBackToLogin
     }
     
     try {
+      // Step 1: Create order on backend
+      const orderResponse = await fetch(`${process.env.REACT_APP_API_URL}/create-order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          amount: 24900, // ₹249 in paise
+          currency: 'INR',
+          userEmail: userEmail,
+          planName: 'Monthly Subscription'
+        })
+      });
+      
+      if (!orderResponse.ok) {
+        throw new Error('Failed to create order');
+      }
+      
+      const order = await orderResponse.json();
+      
+      // Step 2: Initialize Razorpay with real order
       const options = {
         key: process.env.REACT_APP_RAZORPAY_KEY_ID,
-        amount: 24900, // ₹249 in paise
-        currency: 'INR',
+        amount: order.amount,
+        currency: order.currency,
         name: 'Excel AI Assistant',
         description: 'Monthly Subscription - ₹249/month',
-        order_id: 'order_test_' + Date.now(), // Dummy order ID for testing
-        handler: function (response: any) {
-          console.log('Payment successful:', response);
-          alert('Payment successful! Welcome to Excel AI Assistant.');
-          setIsProcessing(false);
-          onPaymentSuccess();
+        order_id: order.id,
+        handler: async function (response: any) {
+          // Step 3: Verify payment on backend
+          try {
+            const verifyResponse = await fetch(`${process.env.REACT_APP_API_URL}/verify-payment`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature
+              })
+            });
+            
+            const result = await verifyResponse.json();
+            
+            if (result.success) {
+              alert('Payment successful! Welcome to Excel AI Assistant.');
+              onPaymentSuccess();
+            } else {
+              alert('Payment verification failed. Please contact support.');
+            }
+          } catch (error) {
+            console.error('Payment verification error:', error);
+            alert('Payment verification failed. Please contact support.');
+          } finally {
+            setIsProcessing(false);
+          }
         },
         prefill: {
           email: userEmail,
-          contact: '',
-          method: 'card'
+          contact: ''
         },
         theme: {
           color: '#667eea'
@@ -71,12 +111,6 @@ export default function PaymentPage({ userEmail, onPaymentSuccess, onBackToLogin
         retry: {
           enabled: true,
           max_count: 3
-        },
-        method: {
-          card: true,
-          netbanking: true,
-          wallet: true,
-          upi: true
         }
       };
       
