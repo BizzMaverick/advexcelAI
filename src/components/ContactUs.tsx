@@ -37,10 +37,10 @@ export default function ContactUs() {
           <div style={{ textAlign: 'left', maxWidth: '600px', margin: '0 auto', backgroundColor: '#f8f9fa', padding: '25px', borderRadius: '8px' }}>
             <ul style={{ lineHeight: '2', color: '#495057', fontSize: '16px', paddingLeft: '25px', margin: 0 }}>
               <li style={{ marginBottom: '8px' }}>Technical support and troubleshooting</li>
-              <li style={{ marginBottom: '8px' }}>Account and billing questions</li>
+              <li style={{ marginBottom: '8px' }}>Account management questions</li>
               <li style={{ marginBottom: '8px' }}>Feature requests and feedback</li>
-              <li style={{ marginBottom: '8px' }}>Subscription management and upgrades</li>
-              <li style={{ marginBottom: '8px' }}>Refund and cancellation requests</li>
+              <li style={{ marginBottom: '8px' }}>Account settings and preferences</li>
+              <li style={{ marginBottom: '8px' }}>Account deletion requests</li>
               <li style={{ marginBottom: '8px' }}>General inquiries about our service</li>
             </ul>
           </div>
@@ -53,8 +53,7 @@ export default function ContactUs() {
             <p style={{ lineHeight: '2', color: '#495057', fontSize: '16px', marginBottom: '12px' }}><strong>Website:</strong> https://www.advexcel.online</p>
             <p style={{ lineHeight: '2', color: '#495057', fontSize: '16px', marginBottom: '12px' }}><strong>Email:</strong> contact@advexcel.online</p>
             <p style={{ lineHeight: '2', color: '#495057', fontSize: '16px', marginBottom: '12px' }}><strong>Service Type:</strong> AI-powered Excel processing and analysis</p>
-            <p style={{ lineHeight: '2', color: '#495057', fontSize: '16px', marginBottom: '12px' }}><strong>Pricing:</strong> ₹249 per month</p>
-            <p style={{ lineHeight: '2', color: '#495057', fontSize: '16px', marginBottom: '12px' }}><strong>Payment Method:</strong> Razorpay (Cards, UPI, Net Banking)</p>
+            <p style={{ lineHeight: '2', color: '#495057', fontSize: '16px', marginBottom: '12px' }}><strong>Pricing:</strong> Free service</p>
           </div>
         </section>
 
@@ -65,9 +64,9 @@ export default function ContactUs() {
             <ul style={{ lineHeight: '2', color: '#495057', fontSize: '16px', paddingLeft: '25px', margin: 0 }}>
               <li style={{ marginBottom: '8px' }}><strong>General Inquiries:</strong> Within 24 hours</li>
               <li style={{ marginBottom: '8px' }}><strong>Technical Support:</strong> Within 12 hours</li>
-              <li style={{ marginBottom: '8px' }}><strong>Billing Issues:</strong> Within 6 hours</li>
+              <li style={{ marginBottom: '8px' }}><strong>Account Issues:</strong> Within 6 hours</li>
               <li style={{ marginBottom: '8px' }}><strong>Urgent Matters:</strong> Same day response</li>
-              <li style={{ marginBottom: '8px' }}><strong>Refund Requests:</strong> Within 24 hours</li>
+              <li style={{ marginBottom: '8px' }}><strong>Account Deletion:</strong> Within 24 hours</li>
             </ul>
           </div>
         </section>

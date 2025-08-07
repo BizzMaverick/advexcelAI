@@ -24,64 +24,63 @@ export default function CancellationRefund() {
         </section>
 
         <section style={{ marginBottom: '50px' }}>
-          <h2 style={{ color: '#2c3e50', marginBottom: '25px', fontSize: '22px', fontWeight: '600', borderBottom: '3px solid #0078d4', paddingBottom: '15px', display: 'inline-block' }}>2. Refund Policy</h2>
+          <h2 style={{ color: '#2c3e50', marginBottom: '25px', fontSize: '22px', fontWeight: '600', borderBottom: '3px solid #0078d4', paddingBottom: '15px', display: 'inline-block' }}>2. Service Access</h2>
           <p style={{ lineHeight: '2', color: '#495057', fontSize: '16px', marginBottom: '25px', maxWidth: '700px', margin: '0 auto 25px auto' }}>
-            We offer a 7-day money-back guarantee for new subscribers. If you are not satisfied with 
-            our service within the first 7 days of your subscription, you may request a full refund. 
-            This policy ensures you can try our service risk-free.
+            Excel AI Assistant is a free service available to all registered users. 
+            You can cancel your account at any time through your account settings.
           </p>
         </section>
 
         <section style={{ marginBottom: '50px' }}>
-          <h2 style={{ color: '#2c3e50', marginBottom: '25px', fontSize: '22px', fontWeight: '600', borderBottom: '3px solid #0078d4', paddingBottom: '15px', display: 'inline-block' }}>3. Refund Eligibility</h2>
-          <p style={{ lineHeight: '2', color: '#495057', fontSize: '16px', marginBottom: '25px', maxWidth: '700px', margin: '0 auto 25px auto' }}>Refunds are available under the following conditions:</p>
+          <h2 style={{ color: '#2c3e50', marginBottom: '25px', fontSize: '22px', fontWeight: '600', borderBottom: '3px solid #0078d4', paddingBottom: '15px', display: 'inline-block' }}>3. Data Retention</h2>
+          <p style={{ lineHeight: '2', color: '#495057', fontSize: '16px', marginBottom: '25px', maxWidth: '700px', margin: '0 auto 25px auto' }}>When you cancel your account:</p>
           <div style={{ textAlign: 'left', maxWidth: '600px', margin: '0 auto', backgroundColor: '#f8f9fa', padding: '25px', borderRadius: '8px' }}>
             <ul style={{ lineHeight: '2', color: '#495057', fontSize: '16px', paddingLeft: '25px', margin: 0 }}>
-              <li style={{ marginBottom: '8px' }}>Request made within 7 days of initial subscription</li>
-              <li style={{ marginBottom: '8px' }}>Technical issues that prevent service usage</li>
-              <li style={{ marginBottom: '8px' }}>Billing errors or duplicate charges</li>
-              <li style={{ marginBottom: '8px' }}>Service not delivered as promised</li>
-              <li style={{ marginBottom: '8px' }}>Unauthorized charges to your account</li>
+              <li style={{ marginBottom: '8px' }}>Your account will be deactivated immediately</li>
+              <li style={{ marginBottom: '8px' }}>Personal data will be deleted within 30 days</li>
+              <li style={{ marginBottom: '8px' }}>Processed files are not stored permanently</li>
+              <li style={{ marginBottom: '8px' }}>You can reactivate your account anytime</li>
+              <li style={{ marginBottom: '8px' }}>No charges or fees apply</li>
             </ul>
           </div>
         </section>
 
         <section style={{ marginBottom: '50px' }}>
-          <h2 style={{ color: '#2c3e50', marginBottom: '25px', fontSize: '22px', fontWeight: '600', borderBottom: '3px solid #0078d4', paddingBottom: '15px', display: 'inline-block' }}>4. Non-Refundable Items</h2>
-          <p style={{ lineHeight: '2', color: '#495057', fontSize: '16px', marginBottom: '25px', maxWidth: '700px', margin: '0 auto 25px auto' }}>The following are not eligible for refunds:</p>
+          <h2 style={{ color: '#2c3e50', marginBottom: '25px', fontSize: '22px', fontWeight: '600', borderBottom: '3px solid #0078d4', paddingBottom: '15px', display: 'inline-block' }}>4. Service Limitations</h2>
+          <p style={{ lineHeight: '2', color: '#495057', fontSize: '16px', marginBottom: '25px', maxWidth: '700px', margin: '0 auto 25px auto' }}>Please note the following service limitations:</p>
           <div style={{ textAlign: 'left', maxWidth: '600px', margin: '0 auto', backgroundColor: '#f8f9fa', padding: '25px', borderRadius: '8px' }}>
             <ul style={{ lineHeight: '2', color: '#495057', fontSize: '16px', paddingLeft: '25px', margin: 0 }}>
-              <li style={{ marginBottom: '8px' }}>Subscriptions older than 7 days</li>
-              <li style={{ marginBottom: '8px' }}>Partial month usage after the 7-day period</li>
-              <li style={{ marginBottom: '8px' }}>Account termination due to policy violations</li>
-              <li style={{ marginBottom: '8px' }}>Change of mind after the 7-day guarantee period</li>
-              <li style={{ marginBottom: '8px' }}>Renewal charges (unless cancelled before renewal)</li>
+              <li style={{ marginBottom: '8px' }}>File size limits may apply</li>
+              <li style={{ marginBottom: '8px' }}>Processing time depends on file complexity</li>
+              <li style={{ marginBottom: '8px' }}>Account termination for policy violations</li>
+              <li style={{ marginBottom: '8px' }}>Service availability subject to maintenance</li>
+              <li style={{ marginBottom: '8px' }}>No guaranteed uptime commitments</li>
             </ul>
           </div>
         </section>
 
         <section style={{ marginBottom: '50px' }}>
-          <h2 style={{ color: '#2c3e50', marginBottom: '25px', fontSize: '22px', fontWeight: '600', borderBottom: '3px solid #0078d4', paddingBottom: '15px', display: 'inline-block' }}>5. Refund Process</h2>
+          <h2 style={{ color: '#2c3e50', marginBottom: '25px', fontSize: '22px', fontWeight: '600', borderBottom: '3px solid #0078d4', paddingBottom: '15px', display: 'inline-block' }}>5. Account Deletion</h2>
           <p style={{ lineHeight: '2', color: '#495057', fontSize: '16px', marginBottom: '25px', maxWidth: '700px', margin: '0 auto 25px auto' }}>
-            To request a refund, contact us at contact@advexcel.online with your account details 
-            and reason for refund. Include your subscription date and any relevant screenshots. 
-            Approved refunds will be processed within 5-7 business days to your original payment method through Razorpay.
+            To delete your account, contact us at contact@advexcel.online with your account details. 
+            Include your registered email and any specific data deletion requests. 
+            Account deletion will be processed within 5-7 business days.
           </p>
         </section>
 
         <section style={{ marginBottom: '50px' }}>
-          <h2 style={{ color: '#2c3e50', marginBottom: '25px', fontSize: '22px', fontWeight: '600', borderBottom: '3px solid #0078d4', paddingBottom: '15px', display: 'inline-block' }}>6. Automatic Renewal</h2>
+          <h2 style={{ color: '#2c3e50', marginBottom: '25px', fontSize: '22px', fontWeight: '600', borderBottom: '3px solid #0078d4', paddingBottom: '15px', display: 'inline-block' }}>6. Service Updates</h2>
           <p style={{ lineHeight: '2', color: '#495057', fontSize: '16px', marginBottom: '25px', maxWidth: '700px', margin: '0 auto 25px auto' }}>
-            Subscriptions automatically renew monthly unless cancelled. You will be charged the current 
-            subscription rate at the time of renewal. Cancel before your renewal date to avoid charges. 
-            We will send reminder emails before renewal.
+            We continuously improve our service with new features and updates. 
+            All registered users automatically receive access to new features. 
+            We will notify users of major updates via email.
           </p>
         </section>
 
         <section style={{ marginBottom: '50px' }}>
           <h2 style={{ color: '#2c3e50', marginBottom: '25px', fontSize: '22px', fontWeight: '600', borderBottom: '3px solid #0078d4', paddingBottom: '15px', display: 'inline-block' }}>7. Contact Information</h2>
           <p style={{ lineHeight: '2', color: '#495057', fontSize: '16px', marginBottom: '25px', maxWidth: '700px', margin: '0 auto 25px auto' }}>
-            For cancellations or refund requests, contact us at:
+            For account cancellations or support, contact us at:
             <br /><br />
             <strong>Email:</strong> contact@advexcel.online
             <br />

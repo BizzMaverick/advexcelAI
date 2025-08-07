@@ -25,11 +25,11 @@ export default function ShippingDelivery() {
 
         <section style={{ marginBottom: '50px' }}>
           <h2 style={{ color: '#2c3e50', marginBottom: '25px', fontSize: '22px', fontWeight: '600', borderBottom: '3px solid #0078d4', paddingBottom: '15px', display: 'inline-block' }}>2. Service Delivery</h2>
-          <p style={{ lineHeight: '2', color: '#495057', fontSize: '16px', marginBottom: '25px', maxWidth: '700px', margin: '0 auto 25px auto' }}>Upon successful subscription and payment confirmation:</p>
+          <p style={{ lineHeight: '2', color: '#495057', fontSize: '16px', marginBottom: '25px', maxWidth: '700px', margin: '0 auto 25px auto' }}>Upon successful account registration:</p>
           <div style={{ textAlign: 'left', maxWidth: '600px', margin: '0 auto', backgroundColor: '#f8f9fa', padding: '25px', borderRadius: '8px' }}>
             <ul style={{ lineHeight: '2', color: '#495057', fontSize: '16px', paddingLeft: '25px', margin: 0 }}>
               <li style={{ marginBottom: '8px' }}>Immediate access to the Excel AI Assistant platform</li>
-              <li style={{ marginBottom: '8px' }}>Full feature availability within minutes of payment confirmation</li>
+              <li style={{ marginBottom: '8px' }}>Full feature availability within minutes of registration</li>
               <li style={{ marginBottom: '8px' }}>Account activation via email notification</li>
               <li style={{ marginBottom: '8px' }}>24/7 access to all subscribed features</li>
               <li style={{ marginBottom: '8px' }}>Instant processing of Excel files</li>
@@ -45,7 +45,7 @@ export default function ShippingDelivery() {
               <li style={{ marginBottom: '8px' }}>Stable internet connection (minimum 1 Mbps recommended)</li>
               <li style={{ marginBottom: '8px' }}>Modern web browser (Chrome, Firefox, Safari, Edge)</li>
               <li style={{ marginBottom: '8px' }}>Valid email address for account verification</li>
-              <li style={{ marginBottom: '8px' }}>Active subscription with confirmed payment</li>
+              <li style={{ marginBottom: '8px' }}>Active account with email verification</li>
               <li style={{ marginBottom: '8px' }}>JavaScript enabled in your browser</li>
             </ul>
           </div>
@@ -63,9 +63,8 @@ export default function ShippingDelivery() {
         <section style={{ marginBottom: '50px' }}>
           <h2 style={{ color: '#2c3e50', marginBottom: '25px', fontSize: '22px', fontWeight: '600', borderBottom: '3px solid #0078d4', paddingBottom: '15px', display: 'inline-block' }}>5. Geographic Availability</h2>
           <p style={{ lineHeight: '2', color: '#495057', fontSize: '16px', marginBottom: '25px', maxWidth: '700px', margin: '0 auto 25px auto' }}>
-            Excel AI Assistant is available globally. However, payment processing is currently optimized 
-            for Indian customers through Razorpay. International users may experience different payment 
-            options and should contact support for assistance with payment methods.
+            Excel AI Assistant is available globally to all users with internet access. 
+            The service works in all countries and regions without restrictions.
           </p>
         </section>
 

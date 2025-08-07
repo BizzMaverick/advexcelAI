@@ -24,7 +24,7 @@ export default function PrivacyPolicy() {
             <ul style={{ lineHeight: '2', color: '#495057', fontSize: '16px', paddingLeft: '25px', margin: 0 }}>
               <li style={{ marginBottom: '8px' }}>Email address and name for account creation</li>
               <li style={{ marginBottom: '8px' }}>Excel files you upload for processing</li>
-              <li style={{ marginBottom: '8px' }}>Payment information (processed securely by Razorpay)</li>
+
               <li style={{ marginBottom: '8px' }}>Usage data and service interactions</li>
             </ul>
           </div>
@@ -39,7 +39,7 @@ export default function PrivacyPolicy() {
             <ul style={{ lineHeight: '2', color: '#495057', fontSize: '16px', paddingLeft: '25px', margin: 0 }}>
               <li style={{ marginBottom: '8px' }}>Provide and improve our Excel AI Assistant service</li>
               <li style={{ marginBottom: '8px' }}>Process your Excel files and AI requests</li>
-              <li style={{ marginBottom: '8px' }}>Handle billing and payments</li>
+
               <li style={{ marginBottom: '8px' }}>Send service-related communications</li>
               <li style={{ marginBottom: '8px' }}>Ensure security and prevent fraud</li>
             </ul>
@@ -51,7 +51,7 @@ export default function PrivacyPolicy() {
           <p style={{ lineHeight: '2', color: '#495057', fontSize: '16px', marginBottom: '25px', maxWidth: '700px', margin: '0 auto 25px auto' }}>
             We implement appropriate security measures to protect your personal information. 
             Your Excel files are processed securely and are not stored permanently on our servers. 
-            Payment information is handled by Razorpay and follows industry-standard security practices.
+All data is processed securely and follows industry-standard security practices.
           </p>
         </section>
 
@@ -64,7 +64,7 @@ export default function PrivacyPolicy() {
             <ul style={{ lineHeight: '2', color: '#495057', fontSize: '16px', paddingLeft: '25px', margin: 0 }}>
               <li style={{ marginBottom: '8px' }}>With your consent</li>
               <li style={{ marginBottom: '8px' }}>To comply with legal obligations</li>
-              <li style={{ marginBottom: '8px' }}>With service providers (like AWS for hosting, Razorpay for payments)</li>
+              <li style={{ marginBottom: '8px' }}>With service providers (like AWS for hosting)</li>
               <li style={{ marginBottom: '8px' }}>To protect our rights and safety</li>
             </ul>
           </div>

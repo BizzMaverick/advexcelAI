@@ -26,9 +26,8 @@ export default function TermsAndConditions() {
         <section style={{ marginBottom: '50px' }}>
           <h2 style={{ color: '#2c3e50', marginBottom: '25px', fontSize: '22px', fontWeight: '600', borderBottom: '3px solid #0078d4', paddingBottom: '15px', display: 'inline-block' }}>2. Service Description</h2>
           <p style={{ lineHeight: '2', color: '#495057', fontSize: '16px', marginBottom: '25px', maxWidth: '700px', margin: '0 auto 25px auto' }}>
-            Excel AI Assistant is a web-based service that provides AI-powered Excel file processing, 
-            including sorting, filtering, calculations, and data analysis. The service is provided 
-            on a subscription basis at ₹249 per month.
+            Excel AI Assistant is a free web-based service that provides AI-powered Excel file processing, 
+            including sorting, filtering, calculations, and data analysis.
           </p>
         </section>
 
@@ -41,17 +40,17 @@ export default function TermsAndConditions() {
               <li style={{ marginBottom: '8px' }}>Use the service only for lawful purposes</li>
               <li style={{ marginBottom: '8px' }}>Not upload malicious or copyrighted content</li>
               <li style={{ marginBottom: '8px' }}>Not attempt to reverse engineer or hack the service</li>
-              <li style={{ marginBottom: '8px' }}>Pay subscription fees on time</li>
+
             </ul>
           </div>
         </section>
 
         <section style={{ marginBottom: '50px' }}>
-          <h2 style={{ color: '#2c3e50', marginBottom: '25px', fontSize: '22px', fontWeight: '600', borderBottom: '3px solid #0078d4', paddingBottom: '15px', display: 'inline-block' }}>4. Payment Terms</h2>
+          <h2 style={{ color: '#2c3e50', marginBottom: '25px', fontSize: '22px', fontWeight: '600', borderBottom: '3px solid #0078d4', paddingBottom: '15px', display: 'inline-block' }}>4. Service Access</h2>
           <p style={{ lineHeight: '2', color: '#495057', fontSize: '16px', marginBottom: '25px', maxWidth: '700px', margin: '0 auto 25px auto' }}>
-            Subscription fees are ₹249 per month, charged monthly in advance. 
-            Payments are processed securely through Razorpay. 
-            All fees are non-refundable except as required by law or within our 7-day money-back guarantee period.
+            Excel AI Assistant is provided as a free service to all registered users. 
+            No subscription fees or charges apply. 
+            Access is granted upon successful account registration and email verification.
           </p>
         </section>
 
@@ -86,7 +85,7 @@ export default function TermsAndConditions() {
           <h2 style={{ color: '#2c3e50', marginBottom: '25px', fontSize: '22px', fontWeight: '600', borderBottom: '3px solid #0078d4', paddingBottom: '15px', display: 'inline-block' }}>8. Termination</h2>
           <p style={{ lineHeight: '2', color: '#495057', fontSize: '16px', marginBottom: '25px', maxWidth: '700px', margin: '0 auto 25px auto' }}>
             We reserve the right to terminate accounts that violate these terms. 
-            Users may cancel their subscription at any time through their account settings 
+            Users may delete their account at any time through their account settings 
             or by contacting support at contact@advexcel.online.
           </p>
         </section>
