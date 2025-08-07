@@ -30,7 +30,7 @@ Resources:
   CreateOrderFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../lambda/
+      CodeUri: lambda/
       Handler: create-order.handler
       Runtime: nodejs18.x
       Environment:
@@ -55,7 +55,7 @@ Resources:
   VerifyPaymentFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../lambda/
+      CodeUri: lambda/
       Handler: verify-payment.handler
       Runtime: nodejs18.x
       Environment:
