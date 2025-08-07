@@ -1,0 +1,49 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  PaymentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Environment:
+        Variables:
+          RAZORPAY_KEY_SECRET: !Ref RazorpayKeySecret
+      Events:
+        PaymentApi:
+          Type: Api
+          Properties:
+            Path: /payment
+            Method: post
+        PaymentOptions:
+          Type: Api
+          Properties:
+            Path: /payment
+            Method: options
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PaymentTable
+
+  PaymentTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ExcelAIPayments
+      AttributeDefinitions:
+        - AttributeName: userEmail
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userEmail
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+Parameters:
+  RazorpayKeySecret:
+    Type: String
+    NoEcho: true
+
+Outputs:
+  PaymentApi:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/payment"
