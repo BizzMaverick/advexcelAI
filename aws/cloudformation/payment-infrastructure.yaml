@@ -10,6 +10,7 @@ Parameters:
     Type: String
     NoEcho: true
     Description: Razorpay Key Secret
+    Default: Q00UnCLaZmc2xr6F3JZ6tpl7
 
 Resources:
   # DynamoDB Table for Orders

@@ -13,7 +13,7 @@ sam deploy --template-file cloudformation/payment-infrastructure.yaml \
   --stack-name advexcel-payment-stack \
   --parameter-overrides \
     RazorpayKeyId="rzp_test_GwLaqT264JyMlU" \
-    RazorpayKeySecret="YOUR_RAZORPAY_KEY_SECRET" \
+    RazorpayKeySecret="Q00UnCLaZmc2xr6F3JZ6tpl7" \
   --capabilities CAPABILITY_IAM
 ```
 
