@@ -17,7 +17,9 @@ export class AIService {
   static async uploadSpreadsheetWithPrompt(file: File, prompt: string): Promise<AIResult> {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('prompt', prompt);
+    // Enhance prompt for better formatting
+    const enhancedPrompt = prompt + '\n\nPlease format your response in a clean, readable table format. Do not show raw CSV data. Present comparisons in a structured table with clear headers and organized rows.';
+    formData.append('prompt', enhancedPrompt);
 
     try {
       const response = await fetch(API_URL, {
