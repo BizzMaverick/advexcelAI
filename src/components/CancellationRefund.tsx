@@ -55,11 +55,10 @@ export default function CancellationRefund() {
             <li>Billing Errors: If you were charged incorrectly due to our system error</li>
             <li>Duplicate Payments: If you were charged multiple times for the same subscription</li>
             <li>Unauthorized Charges: If charges were made without your authorization</li>
-            <li>Service Dissatisfaction: Within 7 days of first subscription (one-time only)</li>
           </ul>
           <p style={{ marginBottom: '15px' }}>Refunds will not be provided in the following cases:</p>
           <ul style={{ paddingLeft: '20px' }}>
-            <li>Change of mind after using the service for more than 7 days</li>
+            <li>Change of mind or service dissatisfaction after payment</li>
             <li>Failure to use the service during your subscription period</li>
             <li>Violation of our Terms of Service leading to account suspension</li>
             <li>Requests made after the subscription period has ended</li>
