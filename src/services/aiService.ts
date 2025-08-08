@@ -18,7 +18,7 @@ export class AIService {
     const formData = new FormData();
     formData.append('file', file);
     // Enhance prompt for better formatting
-    const enhancedPrompt = prompt + '\n\nPlease format your response in a clean, readable table format. Do not show raw CSV data. Present comparisons in a structured table with clear headers and organized rows.';
+    const enhancedPrompt = prompt + '\n\nPlease provide ONLY the requested analysis or comparison. Do not include raw CSV data, full dataset dumps, or additional unrelated information. Keep the response clean and focused on the specific question asked.';
     formData.append('prompt', enhancedPrompt);
 
     try {
