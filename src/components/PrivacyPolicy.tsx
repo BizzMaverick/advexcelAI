@@ -2,15 +2,18 @@ import React from 'react';
 
 export default function PrivacyPolicy() {
   return (
-    <div style={{ 
-      padding: '40px 20px', 
-      maxWidth: '800px', 
-      margin: '0 auto',
-      fontFamily: 'system-ui, -apple-system, sans-serif',
-      lineHeight: '1.6',
-      color: '#000',
-      backgroundColor: '#fff'
-    }}>
+    <div style={{ backgroundColor: '#fff', minHeight: '100vh' }}>
+      <div style={{ padding: '20px', borderBottom: '1px solid #eee' }}>
+        <a href="/" style={{ color: '#007bff', textDecoration: 'none', fontSize: '16px' }}>← Back to Home</a>
+      </div>
+      <div style={{ 
+        padding: '40px 20px', 
+        maxWidth: '800px', 
+        margin: '0 auto',
+        fontFamily: 'system-ui, -apple-system, sans-serif',
+        lineHeight: '1.6',
+        color: '#000'
+      }}>
       <h1 style={{ fontSize: '28px', fontWeight: '600', color: '#000', marginBottom: '10px' }}>Privacy Policy</h1>
       <p style={{ color: '#666', fontSize: '14px', marginBottom: '30px' }}>Last updated on January 8th, 2025</p>
       
@@ -49,7 +52,7 @@ export default function PrivacyPolicy() {
       <section style={{ marginBottom: '30px' }}>
         <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#000', marginBottom: '15px' }}>3. How We Use Your Information</h2>
         <p style={{ marginBottom: '15px' }}>We use the information we collect to:</p>
-        <ul style={{ paddingLeft: '20px', marginBottom: '15px' }}>
+        <ul style={{ paddingLeft: '20px', marginBottom: '15px', textAlign: 'left' }}>
           <li>Provide, maintain, and improve our services</li>
           <li>Process transactions and send related information</li>
           <li>Send technical notices, updates, and support messages</li>
@@ -81,7 +84,7 @@ export default function PrivacyPolicy() {
       <section style={{ marginBottom: '30px' }}>
         <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#000', marginBottom: '15px' }}>6. Your Rights</h2>
         <p style={{ marginBottom: '15px' }}>You have the right to:</p>
-        <ul style={{ paddingLeft: '20px' }}>
+        <ul style={{ paddingLeft: '20px', textAlign: 'left' }}>
           <li>Access your Personal Information</li>
           <li>Correct inaccurate information</li>
           <li>Request deletion of your information</li>
@@ -103,6 +106,7 @@ export default function PrivacyPolicy() {
           If you have any questions about this Privacy Policy, please contact us at contact@advexcel.online
         </p>
       </section>
+      </div>
     </div>
   );
 }

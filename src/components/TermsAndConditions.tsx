@@ -2,15 +2,18 @@ import React from 'react';
 
 export default function TermsAndConditions() {
   return (
-    <div style={{ 
-      padding: '40px 20px', 
-      maxWidth: '800px', 
-      margin: '0 auto',
-      fontFamily: 'system-ui, -apple-system, sans-serif',
-      lineHeight: '1.6',
-      color: '#000',
-      backgroundColor: '#fff'
-    }}>
+    <div style={{ backgroundColor: '#fff', minHeight: '100vh' }}>
+      <div style={{ padding: '20px', borderBottom: '1px solid #eee' }}>
+        <a href="/" style={{ color: '#007bff', textDecoration: 'none', fontSize: '16px' }}>← Back to Home</a>
+      </div>
+      <div style={{ 
+        padding: '40px 20px', 
+        maxWidth: '800px', 
+        margin: '0 auto',
+        fontFamily: 'system-ui, -apple-system, sans-serif',
+        lineHeight: '1.6',
+        color: '#000'
+      }}>
       <h1 style={{ fontSize: '28px', fontWeight: '600', color: '#000', marginBottom: '10px' }}>Terms and Conditions</h1>
       <p style={{ color: '#666', fontSize: '14px', marginBottom: '30px' }}>Last updated on January 8th, 2025</p>
       
@@ -133,6 +136,7 @@ export default function TermsAndConditions() {
         <p style={{ marginBottom: '5px' }}>Website: www.advexcel.online</p>
         <p>For support inquiries, please use the contact form on our website.</p>
       </section>
+      </div>
     </div>
   );
 }
