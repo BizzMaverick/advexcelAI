@@ -5,13 +5,16 @@ const dynamodb = new AWS.DynamoDB.DocumentClient();
 exports.handler = async (event) => {
     const headers = {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS, GET',
-        'Access-Control-Max-Age': '86400'
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS'
     };
 
-    if (event.httpMethod === 'OPTIONS') {
-        return { statusCode: 200, headers };
+    // Handle OPTIONS preflight request
+    if (event.requestContext.http.method === 'OPTIONS') {
+        return {
+            statusCode: 200,
+            headers
+        };
     }
 
     try {
@@ -19,13 +22,11 @@ exports.handler = async (event) => {
         const { action } = body;
 
         if (action === 'verify-payment') {
-            return await verifyPayment(body);
+            return await verifyPayment(body, headers);
         } else if (action === 'check-status') {
-            return await checkPaymentStatus(body);
+            return await checkPaymentStatus(body, headers);
         } else if (action === 'create-order') {
-            return await createOrder(body);
-        } else if (action === 'create-order') {
-            return await createOrder(body);
+            return await createOrder(body, headers);
         }
 
         return {
@@ -42,10 +43,24 @@ exports.handler = async (event) => {
     }
 };
 
-async function verifyPayment(body) {
+async function createOrder(body, headers) {
+    const { amount } = body;
+    const orderId = 'order_' + Date.now() + Math.random().toString(36).substr(2, 9);
+    
+    return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ 
+            success: true, 
+            orderId: orderId,
+            amount: amount
+        })
+    };
+}
+
+async function verifyPayment(body, headers) {
     const { razorpay_payment_id, razorpay_order_id, razorpay_signature, userEmail } = body;
     
-    // Verify Razorpay signature
     const text = razorpay_order_id + "|" + razorpay_payment_id;
     const expectedSignature = crypto
         .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
@@ -55,12 +70,11 @@ async function verifyPayment(body) {
     if (expectedSignature !== razorpay_signature) {
         return {
             statusCode: 400,
-            headers: { 'Access-Control-Allow-Origin': '*' },
+            headers,
             body: JSON.stringify({ success: false, error: 'Invalid signature' })
         };
     }
 
-    // Store payment in DynamoDB
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + 30);
 
@@ -76,36 +90,18 @@ async function verifyPayment(body) {
 
     return {
         statusCode: 200,
-        headers: { 'Access-Control-Allow-Origin': '*' },
+        headers,
         body: JSON.stringify({ success: true })
     };
 }
 
-async function createOrder(body) {
-    const { amount } = body;
-    
-    // Generate order ID
-    const orderId = 'order_' + Date.now() + Math.random().toString(36).substr(2, 9);
-    
-    return {
-        statusCode: 200,
-        headers: { 'Access-Control-Allow-Origin': '*' },
-        body: JSON.stringify({ 
-            success: true, 
-            orderId: orderId,
-            amount: amount
-        })
-    };
-}
-
-async function checkPaymentStatus(body) {
+async function checkPaymentStatus(body, headers) {
     const { userEmail } = body;
     
-    // Admin bypass
     if (userEmail === 'katragadda225@gmail.com') {
         return {
             statusCode: 200,
-            headers: { 'Access-Control-Allow-Origin': '*' },
+            headers,
             body: JSON.stringify({ hasValidPayment: true })
         };
     }
@@ -120,13 +116,13 @@ async function checkPaymentStatus(body) {
 
         return {
             statusCode: 200,
-            headers: { 'Access-Control-Allow-Origin': '*' },
+            headers,
             body: JSON.stringify({ hasValidPayment })
         };
     } catch (error) {
         return {
             statusCode: 200,
-            headers: { 'Access-Control-Allow-Origin': '*' },
+            headers,
             body: JSON.stringify({ hasValidPayment: false })
         };
     }
