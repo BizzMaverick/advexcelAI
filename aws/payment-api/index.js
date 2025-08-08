@@ -21,6 +21,10 @@ exports.handler = async (event) => {
             return await verifyPayment(body);
         } else if (action === 'check-status') {
             return await checkPaymentStatus(body);
+        } else if (action === 'create-order') {
+            return await createOrder(body);
+        } else if (action === 'create-order') {
+            return await createOrder(body);
         }
 
         return {
@@ -73,6 +77,23 @@ async function verifyPayment(body) {
         statusCode: 200,
         headers: { 'Access-Control-Allow-Origin': '*' },
         body: JSON.stringify({ success: true })
+    };
+}
+
+async function createOrder(body) {
+    const { amount } = body;
+    
+    // Generate order ID
+    const orderId = 'order_' + Date.now() + Math.random().toString(36).substr(2, 9);
+    
+    return {
+        statusCode: 200,
+        headers: { 'Access-Control-Allow-Origin': '*' },
+        body: JSON.stringify({ 
+            success: true, 
+            orderId: orderId,
+            amount: amount
+        })
     };
 }
 

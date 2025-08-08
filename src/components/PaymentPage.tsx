@@ -58,12 +58,32 @@ export default function PaymentPage({ userEmail, onPaymentSuccess, onBackToLogin
     setIsProcessing(true);
     
     try {
+      // Create order first
+      const orderResponse = await fetch(process.env.REACT_APP_PAYMENT_API_URL!, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'create-order',
+          amount: 24900,
+          userEmail: userEmail
+        })
+      });
+      
+      const orderResult = await orderResponse.json();
+      
+      if (!orderResult.success) {
+        throw new Error('Failed to create order');
+      }
+      
       const options = {
         key: process.env.REACT_APP_RAZORPAY_KEY_ID,
         amount: 24900, // ₹249 in paise
         currency: 'INR',
         name: 'Excel AI Assistant',
         description: 'Monthly Subscription - ₹249/month',
+        order_id: orderResult.orderId,
         handler: async function (response: any) {
           console.log('Payment response:', response);
           

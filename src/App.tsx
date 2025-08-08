@@ -15,7 +15,10 @@ function App() {
     const savedUser = localStorage.getItem('advexcel_user');
     return savedUser ? JSON.parse(savedUser) : null;
   });
-  const [showPayment, setShowPayment] = useState(false);
+  const [showPayment, setShowPayment] = useState(() => {
+    const savedPaymentStatus = localStorage.getItem('advexcel_payment_required');
+    return savedPaymentStatus === 'true';
+  });
 
   const handleLogin = (userData: { name: string; email: string }) => {
     setUser(userData);
@@ -23,19 +26,23 @@ function App() {
     // Admin bypass
     if (userData.email === 'katragadda225@gmail.com') {
       setShowPayment(false);
+      localStorage.setItem('advexcel_payment_required', 'false');
     } else {
       setShowPayment(true);
+      localStorage.setItem('advexcel_payment_required', 'true');
     }
   };
 
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem('advexcel_user');
+    localStorage.removeItem('advexcel_payment_required');
     setShowPayment(false);
   };
 
   const handlePaymentSuccess = () => {
     setShowPayment(false);
+    localStorage.setItem('advexcel_payment_required', 'false');
   };
 
   return (
