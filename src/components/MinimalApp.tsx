@@ -379,37 +379,56 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
   return (
     <ErrorBoundary>
     <div style={{ minHeight: '100vh', fontFamily: 'Arial, sans-serif' }}>
-      <header style={{ background: '#0078d4', color: 'white', padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <img src={logo} alt="Logo" style={{ height: '32px' }} />
-          <h1 style={{ margin: 0, fontSize: '20px' }}>Excel AI Assistant</h1>
+      <header style={{ background: '#0078d4', color: 'white', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: '0' }}>
+          <img src={logo} alt="Logo" style={{ height: '28px' }} />
+          <h1 style={{ margin: 0, fontSize: '16px', whiteSpace: 'nowrap' }}>Excel AI Assistant</h1>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <span>Welcome, {user.name}</span>
-          <button onClick={onLogout} style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.3)', color: 'white', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}>
+          <span className="header-welcome" style={{ display: 'none' }}>Welcome, {user.name}</span>
+          <button onClick={onLogout} style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.3)', color: 'white', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '14px' }}>
             Logout
           </button>
         </div>
+        <style>
+          {`
+            @media (min-width: 768px) {
+              .header-welcome {
+                display: inline !important;
+              }
+            }
+          `}
+        </style>
       </header>
       
       <main style={{ 
-        padding: '40px 20px', 
+        padding: '20px 10px', 
         background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
-        minHeight: 'calc(100vh - 80px)'
+        minHeight: 'calc(100vh - 60px)'
       }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+        <style>
+          {`
+            @media (min-width: 768px) {
+              .main-content {
+                padding: 40px 20px !important;
+                min-height: calc(100vh - 80px) !important;
+              }
+            }
+          `}
+        </style>
+        <div className="main-content" style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
             <h2 style={{ 
               color: '#333', 
-              fontSize: '32px',
-              marginBottom: '10px',
+              fontSize: '24px',
+              marginBottom: '8px',
               fontWeight: 'bold'
             }}>
               Excel AI Assistant
             </h2>
             <p style={{ 
               color: '#666', 
-              fontSize: '18px',
+              fontSize: '16px',
               margin: 0
             }}>
               Upload Excel files and ask AI questions about your data
@@ -419,9 +438,9 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
           {/* File Upload Section */}
           <div style={{
             background: 'white',
-            borderRadius: '12px',
-            padding: '30px',
-            marginBottom: '30px',
+            borderRadius: '8px',
+            padding: '20px',
+            marginBottom: '20px',
             boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
             textAlign: 'center'
           }}>
@@ -523,14 +542,16 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 </div>
               </div>
               <div style={{ 
-                maxHeight: '500px', 
+                maxHeight: '400px', 
                 overflow: 'auto',
-                padding: '0'
+                padding: '0',
+                overflowX: 'auto'
               }}>
                 <table key={`${dataKey}-table`} style={{ 
+                  minWidth: '600px',
                   width: '100%', 
                   borderCollapse: 'collapse',
-                  fontSize: '14px'
+                  fontSize: '12px'
                 }}>
                   <tbody>
                     {displayData.map((row, i) => (
@@ -548,7 +569,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                               key={j} 
                               onClick={(e) => handleCellClick(i, j, e)}
                               style={{ 
-                                padding: '12px 16px', 
+                                padding: '8px 12px', 
                                 borderRight: '1px solid #eee',
                                 fontWeight: cellFormat.fontWeight || (i === 0 ? 'bold' : 'normal'),
                                 fontStyle: cellFormat.fontStyle || 'normal',
@@ -558,7 +579,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                                   : cellFormat.backgroundColor || 'transparent',
                                 textAlign: cellFormat.textAlign as any || 'left',
                                 fontSize: cellFormat.fontSize || '14px',
-                                minWidth: '120px',
+                                minWidth: '80px',
                                 whiteSpace: 'nowrap',
                                 cursor: 'pointer',
                                 userSelect: 'none',
@@ -602,15 +623,15 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 type="text"
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value.substring(0, 200))}
-                placeholder="Ask AI about your data... (e.g., 'Sort by age', 'Calculate average')"
+                placeholder="Ask AI about your data..."
                 maxLength={200}
                 onKeyPress={(e) => e.key === 'Enter' && !isProcessing && selectedFile && handleProcessAI()}
                 style={{ 
                   width: '100%',
-                  padding: '16px 60px 16px 20px',
+                  padding: '12px 50px 12px 16px',
                   border: '1px solid #dfe1e5',
-                  borderRadius: '24px',
-                  fontSize: '16px',
+                  borderRadius: '20px',
+                  fontSize: '14px',
                   outline: 'none',
                   boxShadow: '0 2px 5px 1px rgba(64,60,67,.16)',
                   transition: 'box-shadow 0.2s ease',
@@ -628,14 +649,14 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 disabled={isProcessing || !selectedFile || !prompt.trim()}
                 style={{ 
                   position: 'absolute',
-                  right: '8px',
+                  right: '6px',
                   background: isProcessing || !selectedFile || !prompt.trim() ? '#f8f9fa' : '#4285f4',
                   color: isProcessing || !selectedFile || !prompt.trim() ? '#9aa0a6' : 'white',
                   border: 'none',
-                  padding: '10px 16px',
-                  borderRadius: '18px',
+                  padding: '8px 12px',
+                  borderRadius: '16px',
                   cursor: isProcessing || !selectedFile || !prompt.trim() ? 'not-allowed' : 'pointer',
-                  fontSize: '14px',
+                  fontSize: '12px',
                   fontWeight: '500',
                   transition: 'all 0.2s ease'
                 }}
