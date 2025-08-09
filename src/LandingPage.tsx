@@ -99,8 +99,7 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
         // Register new user
         const user = await authService.register(email, password, name);
         
-        // Send verification email with the actual code from authService
-        await emailService.sendVerificationEmail(email, name, user.verificationCode);
+        // AWS Cognito sends verification email automatically - no need for EmailJS
         
         // Set pending user and show verification screen
         setPendingUser({ email, name: user?.name || name });
@@ -158,8 +157,7 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
       // Resend verification code using authService
       const newCode = await authService.resendVerificationCode(pendingUser.email);
       
-      // Send verification email with the actual new code
-      await emailService.sendVerificationEmail(pendingUser.email, pendingUser.name, newCode);
+      // AWS Cognito sends verification email automatically - no need for EmailJS
       
       alert('A new verification code has been sent to your email');
     } catch (err: any) {
@@ -183,8 +181,7 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
       // Generate reset code
       const code = Math.floor(100000 + Math.random() * 900000).toString();
       
-      // Send password reset email
-      await emailService.sendPasswordResetEmail(email, 'User', code);
+      // AWS Cognito sends password reset email automatically - no need for EmailJS
       
       // Store the reset code for verification
       await authService.forgotPassword(email);
