@@ -524,23 +524,35 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
       </div>
 
       {/* Split layout */}
-      <div style={{
+      <div className="landing-container" style={{
         display: 'flex',
         minHeight: 'calc(100vh - 140px)',
-        gap: '40px',
-        padding: '40px',
-        alignItems: 'center'
+        gap: '20px',
+        padding: '20px',
+        alignItems: 'center',
+        flexDirection: 'column'
       }}>
+        <style>
+          {`
+            @media (min-width: 768px) {
+              .landing-container {
+                flex-direction: row !important;
+                gap: 40px !important;
+                padding: 40px !important;
+              }
+            }
+          `}
+        </style>
         {/* Left side - Welcome message */}
         <div style={{
           flex: 1,
-          padding: '60px 40px',
+          padding: '20px',
           textAlign: 'center'
         }}>
           <div style={{ fontSize: '80px', marginBottom: '30px' }}>🎉</div>
           <h2 style={{
             color: '#333',
-            fontSize: '36px',
+            fontSize: '28px',
             marginBottom: '20px',
             fontWeight: 'bold'
           }}>
@@ -582,6 +594,7 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
         {/* Right side - Login form */}
         <div style={{
           flex: 1,
+          width: '100%',
           maxWidth: '450px',
           background: 'white',
           borderRadius: '12px',
@@ -611,7 +624,7 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
           </div>
         
         {/* Login/Signup Form */}
-        <div style={{ padding: '40px', textAlign: 'center' }}>
+        <div style={{ padding: '30px 20px', textAlign: 'center' }}>
           <div style={{ marginBottom: '20px' }}>
             <button 
               onClick={() => setIsSignup(false)}
