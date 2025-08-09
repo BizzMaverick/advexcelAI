@@ -4,9 +4,10 @@ interface PaymentPageProps {
   userEmail: string;
   onPaymentSuccess: () => void;
   onBackToLogin: () => void;
+  trialExpired?: boolean;
 }
 
-export default function PaymentPage({ userEmail, onPaymentSuccess, onBackToLogin }: PaymentPageProps) {
+export default function PaymentPage({ userEmail, onPaymentSuccess, onBackToLogin, trialExpired = false }: PaymentPageProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isCheckingStatus, setIsCheckingStatus] = useState(true);
   
@@ -173,10 +174,15 @@ export default function PaymentPage({ userEmail, onPaymentSuccess, onBackToLogin
         maxWidth: '400px',
         textAlign: 'center'
       }}>
-        <div style={{ fontSize: '48px', marginBottom: '20px' }}>💳</div>
-        <h1 style={{ color: '#333', fontSize: '28px', marginBottom: '10px' }}>Complete Payment</h1>
+        <div style={{ fontSize: '48px', marginBottom: '20px' }}>{trialExpired ? '⏰' : '💳'}</div>
+        <h1 style={{ color: '#333', fontSize: '28px', marginBottom: '10px' }}>
+          {trialExpired ? 'Trial Expired' : 'Complete Payment'}
+        </h1>
         <p style={{ color: '#666', fontSize: '16px', marginBottom: '30px' }}>
-          Welcome {userEmail}!
+          {trialExpired 
+            ? `Hi ${userEmail}! Your 3-day free trial has ended. Upgrade to continue using Excel AI Assistant.`
+            : `Welcome ${userEmail}! Complete payment to access Excel AI Assistant.`
+          }
         </p>
 
         <div style={{

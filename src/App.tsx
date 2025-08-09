@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import MinimalApp from './components/MinimalApp';
@@ -9,41 +9,95 @@ import CancellationRefund from './components/CancellationRefund';
 import ShippingDelivery from './components/ShippingDelivery';
 import ContactUs from './components/ContactUs';
 import PaymentPage from './components/PaymentPage';
+import TrialStatus from './components/TrialStatus';
+import PaymentService from './services/paymentService';
 
 function App() {
   const [user, setUser] = useState<{ name: string; email: string } | null>(() => {
     const savedUser = localStorage.getItem('advexcel_user');
     return savedUser ? JSON.parse(savedUser) : null;
   });
-  const [showPayment, setShowPayment] = useState(() => {
-    const savedPaymentStatus = localStorage.getItem('advexcel_payment_required');
-    return savedPaymentStatus === 'true';
-  });
+  
+  const [trialStatus, setTrialStatus] = useState<{
+    hasValidPayment: boolean;
+    inTrial?: boolean;
+    trialExpired?: boolean;
+    needsTrial?: boolean;
+    trialExpiryDate?: string;
+    promptsRemaining?: number;
+    promptsUsed?: number;
+    isAdmin?: boolean;
+  }>({ hasValidPayment: false });
+  
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (userData: { name: string; email: string }) => {
+  // Check trial/payment status when user logs in
+  useEffect(() => {
+    if (user) {
+      checkUserStatus();
+    }
+  }, [user]);
+
+  const checkUserStatus = async () => {
+    if (!user) return;
+    
+    setLoading(true);
+    try {
+      const status = await PaymentService.checkPaymentStatus(user.email);
+      setTrialStatus(status);
+      
+      // If user needs trial, start it automatically
+      if (status.needsTrial) {
+        const trialStarted = await PaymentService.startTrial(user.email);
+        if (trialStarted) {
+          // Recheck status after starting trial
+          const newStatus = await PaymentService.checkPaymentStatus(user.email);
+          setTrialStatus(newStatus);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to check user status:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogin = async (userData: { name: string; email: string }) => {
     setUser(userData);
     localStorage.setItem('advexcel_user', JSON.stringify(userData));
-    // Admin bypass
-    if (userData.email === 'katragadda225@gmail.com') {
-      setShowPayment(false);
-      localStorage.setItem('advexcel_payment_required', 'false');
-    } else {
-      setShowPayment(true);
-      localStorage.setItem('advexcel_payment_required', 'true');
-    }
   };
 
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem('advexcel_user');
-    localStorage.removeItem('advexcel_payment_required');
-    setShowPayment(false);
+    setTrialStatus({ hasValidPayment: false });
   };
 
   const handlePaymentSuccess = () => {
-    setShowPayment(false);
-    localStorage.setItem('advexcel_payment_required', 'false');
+    checkUserStatus(); // Refresh status after payment
   };
+
+  const handleTrialRefresh = () => {
+    checkUserStatus(); // Refresh trial status
+  };
+
+  // Show loading while checking status
+  if (user && loading) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        fontFamily: 'system-ui, -apple-system, sans-serif'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '24px', marginBottom: '16px' }}>🔄</div>
+          <div>Checking your account status...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Router>
@@ -59,14 +113,52 @@ function App() {
         <Route path="/" element={
           !user ? (
             <LandingPage onLogin={handleLogin} />
-          ) : showPayment ? (
+          ) : trialStatus.trialExpired ? (
             <PaymentPage 
               userEmail={user.email} 
               onPaymentSuccess={handlePaymentSuccess}
               onBackToLogin={handleLogout}
+              trialExpired={true}
+            />
+          ) : trialStatus.hasValidPayment ? (
+            <>
+              {trialStatus.inTrial && (
+                <TrialStatus 
+                  trialExpiryDate={trialStatus.trialExpiryDate}
+                  promptsRemaining={trialStatus.promptsRemaining || 0}
+                  promptsUsed={trialStatus.promptsUsed || 0}
+                  onUpgrade={() => window.location.href = '/payment'}
+                  onRefresh={handleTrialRefresh}
+                />
+              )}
+              <MinimalApp 
+                user={user} 
+                onLogout={handleLogout}
+                trialStatus={trialStatus}
+                onTrialRefresh={handleTrialRefresh}
+              />
+            </>
+          ) : (
+            <PaymentPage 
+              userEmail={user.email} 
+              onPaymentSuccess={handlePaymentSuccess}
+              onBackToLogin={handleLogout}
+              trialExpired={false}
+            />
+          )
+        } />
+        
+        {/* Direct payment page route */}
+        <Route path="/payment" element={
+          user ? (
+            <PaymentPage 
+              userEmail={user.email} 
+              onPaymentSuccess={handlePaymentSuccess}
+              onBackToLogin={handleLogout}
+              trialExpired={false}
             />
           ) : (
-            <MinimalApp user={user} onLogout={handleLogout} />
+            <LandingPage onLogin={handleLogin} />
           )
         } />
       </Routes>
