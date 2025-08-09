@@ -43,10 +43,17 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
     authService.init();
   }, []);
 
-  // Check if user is already logged in
+  // Only check current user if not explicitly logging out
   useEffect(() => {
     const checkCurrentUser = async () => {
       try {
+        // Don't auto-login if user just logged out
+        const justLoggedOut = sessionStorage.getItem('just_logged_out');
+        if (justLoggedOut) {
+          sessionStorage.removeItem('just_logged_out');
+          return;
+        }
+        
         const user = await authService.getCurrentUser();
         if (user) {
           onLogin({ email: user.email, name: user.name });

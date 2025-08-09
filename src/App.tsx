@@ -11,6 +11,7 @@ import ContactUs from './components/ContactUs';
 import PaymentPage from './components/PaymentPage';
 import TrialStatus from './components/TrialStatus';
 import PaymentService from './services/paymentService';
+import authService from './services/authService';
 
 function App() {
   const [user, setUser] = useState<{ name: string; email: string } | null>(() => {
@@ -67,7 +68,14 @@ function App() {
     localStorage.setItem('advexcel_user', JSON.stringify(userData));
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    // Sign out from Cognito
+    await authService.signOut();
+    
+    // Mark as logged out to prevent auto-login
+    sessionStorage.setItem('just_logged_out', 'true');
+    
+    // Clear local state
     setUser(null);
     localStorage.removeItem('advexcel_user');
     setTrialStatus({ hasValidPayment: false });
