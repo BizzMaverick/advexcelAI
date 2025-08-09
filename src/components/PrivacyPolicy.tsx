@@ -104,7 +104,7 @@ export default function PrivacyPolicy() {
         <section style={{ marginBottom: '30px' }}>
           <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#000', marginBottom: '15px' }}>8. Contact Us</h2>
           <p>
-            If you have any questions about this Privacy Policy, please contact us at contact@advexcel.online
+            If you have any questions about this Privacy Policy, please contact us at <a href="mailto:contact@advexcel.online?subject=Privacy Policy Question" style={{ color: '#007bff', textDecoration: 'none' }}>contact@advexcel.online</a>
           </p>
         </section>
       </div>

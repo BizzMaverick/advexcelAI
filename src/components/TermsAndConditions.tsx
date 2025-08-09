@@ -133,7 +133,7 @@ export default function TermsAndConditions() {
         <section style={{ marginBottom: '30px' }}>
           <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#000', marginBottom: '15px' }}>13. Contact Information</h2>
           <p style={{ marginBottom: '10px' }}>AdvExcel Online</p>
-          <p style={{ marginBottom: '5px' }}>Email: contact@advexcel.online</p>
+          <p style={{ marginBottom: '5px' }}>Email: <a href="mailto:contact@advexcel.online" style={{ color: '#007bff', textDecoration: 'none' }}>contact@advexcel.online</a></p>
           <p style={{ marginBottom: '5px' }}>Website: www.advexcel.online</p>
           <p>For support inquiries, please use the contact form on our website.</p>
         </section>

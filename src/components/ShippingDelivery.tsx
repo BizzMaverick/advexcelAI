@@ -83,7 +83,7 @@ export default function ShippingDelivery() {
         <section style={{ marginBottom: '30px' }}>
           <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#000', marginBottom: '15px' }}>7. Technical Support</h2>
           <p>
-            Technical support is provided via email at contact@advexcel.online. We aim to respond to all queries within 24 hours 
+            Technical support is provided via email at <a href="mailto:contact@advexcel.online?subject=Technical Support" style={{ color: '#007bff', textDecoration: 'none' }}>contact@advexcel.online</a>. We aim to respond to all queries within 24 hours 
             during business days. For urgent technical issues affecting service delivery, we provide priority support with faster response times.
           </p>
         </section>
@@ -91,7 +91,7 @@ export default function ShippingDelivery() {
         <section style={{ marginBottom: '30px' }}>
           <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#000', marginBottom: '15px' }}>8. Contact Information</h2>
           <p style={{ marginBottom: '10px' }}>For service delivery questions, contact us at:</p>
-          <p style={{ marginBottom: '5px' }}>Email: contact@advexcel.online</p>
+          <p style={{ marginBottom: '5px' }}>Email: <a href="mailto:contact@advexcel.online" style={{ color: '#007bff', textDecoration: 'none' }}>contact@advexcel.online</a></p>
           <p style={{ marginBottom: '5px' }}>Website: www.advexcel.online</p>
           <p>Response Time: Within 24 hours</p>
         </section>

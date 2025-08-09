@@ -54,7 +54,7 @@ export default function ContactUs() {
           <div style={{ backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '8px', border: '1px solid #e1e5e9' }}>
             <p style={{ marginBottom: '10px' }}><strong>Service Name:</strong> Excel AI Assistant</p>
             <p style={{ marginBottom: '10px' }}><strong>Website:</strong> www.advexcel.online</p>
-            <p style={{ marginBottom: '10px' }}><strong>Email:</strong> contact@advexcel.online</p>
+            <p style={{ marginBottom: '10px' }}><strong>Email:</strong> <a href="mailto:contact@advexcel.online" style={{ color: '#007bff', textDecoration: 'none' }}>contact@advexcel.online</a></p>
             <p style={{ marginBottom: '10px' }}><strong>Service Type:</strong> AI-powered Excel processing and analysis</p>
             <p style={{ marginBottom: '0' }}><strong>Pricing:</strong> ₹249 per month</p>
           </div>

@@ -34,7 +34,7 @@ export default function CancellationRefund() {
           <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#000', marginBottom: '15px' }}>2. Cancellation Policy</h2>
           <p style={{ marginBottom: '15px' }}>You can cancel your subscription at any time by:</p>
           <ul style={{ paddingLeft: '20px', marginBottom: '15px' }}>
-            <li>Contacting our support team at contact@advexcel.online</li>
+            <li>Contacting our support team at <a href="mailto:contact@advexcel.online" style={{ color: '#007bff', textDecoration: 'none' }}>contact@advexcel.online</a></li>
             <li>Using the account settings in your dashboard</li>
             <li>Sending a cancellation request with your registered email</li>
           </ul>
@@ -69,7 +69,7 @@ export default function CancellationRefund() {
           <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#000', marginBottom: '15px' }}>4. Refund Process</h2>
           <p style={{ marginBottom: '15px' }}>To request a refund, please:</p>
           <ol style={{ paddingLeft: '20px', marginBottom: '15px' }}>
-            <li>Email us at contact@advexcel.online with subject "Refund Request"</li>
+            <li>Email us at <a href="mailto:contact@advexcel.online?subject=Refund Request" style={{ color: '#007bff', textDecoration: 'none' }}>contact@advexcel.online</a> with subject "Refund Request"</li>
             <li>Include your registered email address and payment transaction ID</li>
             <li>Provide a detailed reason for the refund request</li>
             <li>Attach any relevant screenshots or documentation</li>
@@ -119,7 +119,7 @@ export default function CancellationRefund() {
         <section style={{ marginBottom: '30px' }}>
           <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#000', marginBottom: '15px' }}>8. Contact Information</h2>
           <p style={{ marginBottom: '10px' }}>Customer Support</p>
-          <p style={{ marginBottom: '5px' }}>Email: contact@advexcel.online</p>
+          <p style={{ marginBottom: '5px' }}>Email: <a href="mailto:contact@advexcel.online" style={{ color: '#007bff', textDecoration: 'none' }}>contact@advexcel.online</a></p>
           <p style={{ marginBottom: '5px' }}>Subject Line: "Cancellation" or "Refund Request"</p>
           <p style={{ marginBottom: '5px' }}>Response Time: Within 24 hours</p>
           <p>Website: www.advexcel.online</p>
