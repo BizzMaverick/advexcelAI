@@ -44,52 +44,22 @@ export default function TrialStatus({
       }}>
         <div className="trial-info" style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '16px' }}>🎯</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="2"/>
+              <polyline points="12,6 12,12 16,14" stroke="white" strokeWidth="2"/>
+            </svg>
             <span><strong>Free Trial:</strong> {daysRemaining} days remaining</span>
           </div>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '16px' }}>⚡</span>
-            <span><strong>Today:</strong> {promptsRemaining} prompts left ({promptsUsed}/25 used)</span>
-          </div>
-          
-          <div style={{
-            background: 'rgba(255,255,255,0.2)',
-            borderRadius: '10px',
-            padding: '4px',
-            width: '100px',
-            height: '8px',
-            position: 'relative'
-          }}>
-            <div style={{
-              background: promptsRemaining > 10 ? '#10b981' : promptsRemaining > 5 ? '#f59e0b' : '#ef4444',
-              borderRadius: '6px',
-              height: '100%',
-              width: `${(promptsRemaining / 25) * 100}%`,
-              transition: 'all 0.3s ease'
-            }} />
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2" stroke="white" strokeWidth="2" fill="white"/>
+            </svg>
+            <span><strong>Today:</strong> {promptsRemaining} prompts left</span>
           </div>
         </div>
 
         <div className="trial-buttons" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <button
-            onClick={onRefresh}
-            style={{
-              background: 'rgba(255,255,255,0.2)',
-              border: '1px solid rgba(255,255,255,0.3)',
-              color: 'white',
-              padding: '6px 12px',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '13px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px'
-            }}
-          >
-            🔄 Refresh
-          </button>
-          
           <button
             onClick={onUpgrade}
             style={{
@@ -97,7 +67,7 @@ export default function TrialStatus({
               border: 'none',
               color: 'white',
               padding: '8px 16px',
-              borderRadius: '4px',
+              borderRadius: '6px',
               cursor: 'pointer',
               fontSize: '13px',
               fontWeight: '600',
@@ -107,7 +77,34 @@ export default function TrialStatus({
               boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
             }}
           >
-            🚀 Upgrade to Pro - ₹249/month
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="white" strokeWidth="2" fill="white"/>
+              <path d="M2 17L12 22L22 17" stroke="white" strokeWidth="2"/>
+              <path d="M2 12L12 17L22 12" stroke="white" strokeWidth="2"/>
+            </svg>
+            Upgrade to Pro - ₹249/month
+          </button>
+          
+          <button
+            onClick={onRefresh}
+            style={{
+              background: 'rgba(255,255,255,0.2)',
+              border: '1px solid rgba(255,255,255,0.3)',
+              color: 'white',
+              padding: '6px 12px',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '13px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <polyline points="23,4 23,10 17,10" stroke="white" strokeWidth="2"/>
+              <path d="M20.49 15A9 9 0 1 1 5.64 5.64L23 10" stroke="white" strokeWidth="2"/>
+            </svg>
+            Refresh
           </button>
         </div>
       </div>
