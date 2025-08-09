@@ -1,263 +1,239 @@
-/**
- * Simple authentication service with mock user database
- */
+import { CognitoUserPool, CognitoUser, AuthenticationDetails, CognitoUserAttribute } from 'amazon-cognito-identity-js';
 
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  password: string;
-  verified: boolean;
-}
-
-// Load users from localStorage or use default users
-const loadUsers = (): User[] => {
-  try {
-    const stored = localStorage.getItem('advexcel_users');
-    if (stored) {
-      return JSON.parse(stored);
-    }
-  } catch (error) {
-    console.error('Error loading users from localStorage:', error);
-  }
-  
-  // Default users
-  return [
-    {
-      id: '1',
-      email: 'demo@example.com',
-      name: 'Demo User',
-      password: 'Password123!',
-      verified: true
-    },
-    {
-      id: '2',
-      email: 'admin@advexcel.com',
-      name: 'Admin User',
-      password: 'Admin123!',
-      verified: true
-    }
-  ];
+// AWS Cognito configuration
+const poolData = {
+  UserPoolId: process.env.REACT_APP_COGNITO_USER_POOL_ID || 'us-east-1_uEuByLejj',
+  ClientId: process.env.REACT_APP_COGNITO_CLIENT_ID || '6f3k8cq1bha2f7bnvo8enl978c'
 };
 
-// Save users to localStorage
-const saveUsers = (users: User[]) => {
-  try {
-    localStorage.setItem('advexcel_users', JSON.stringify(users));
-  } catch (error) {
-    console.error('Error saving users to localStorage:', error);
-  }
-};
-
-// Mock user database - in production, this would be a real database
-let users: User[] = loadUsers();
-
-// Store verification codes
-const verificationCodes: Record<string, string> = {};
-
-// Store password reset codes
-const resetCodes: Record<string, string> = {};
-
-// Generate a random 6-digit code
-const generateCode = (): string => {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-};
-
-// Simple password hashing - in production, use a proper hashing library like bcrypt
-const hashPassword = (password: string): string => {
-  return password; // This is just a placeholder - NEVER do this in production
-};
+const userPool = new CognitoUserPool(poolData);
 
 export const authService = {
   // Initialize
   init: () => {
-    // No initialization needed for the simplified version
+    console.log('AWS Cognito initialized');
   },
   
   // Login a user
   login: async (email: string, password: string): Promise<{ email: string; name: string }> => {
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
-    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-    
-    if (!user) {
-      throw new Error('User not found');
-    }
-    
-    if (user.password !== hashPassword(password)) {
-      throw new Error('Invalid password');
-    }
-    
-    if (!user.verified) {
-      throw new Error('Please verify your email before logging in');
-    }
-    
-    return { email: user.email, name: user.name };
+    return new Promise((resolve, reject) => {
+      const authenticationDetails = new AuthenticationDetails({
+        Username: email,
+        Password: password,
+      });
+
+      const cognitoUser = new CognitoUser({
+        Username: email,
+        Pool: userPool,
+      });
+
+      cognitoUser.authenticateUser(authenticationDetails, {
+        onSuccess: (result) => {
+          const accessToken = result.getAccessToken().getJwtToken();
+          const idToken = result.getIdToken().getJwtToken();
+          
+          // Get user attributes
+          cognitoUser.getUserAttributes((err, attributes) => {
+            if (err) {
+              reject(new Error(err.message));
+              return;
+            }
+            
+            const nameAttr = attributes?.find(attr => attr.getName() === 'name');
+            const emailAttr = attributes?.find(attr => attr.getName() === 'email');
+            
+            resolve({
+              email: emailAttr?.getValue() || email,
+              name: nameAttr?.getValue() || 'User'
+            });
+          });
+        },
+        onFailure: (err) => {
+          if (err.code === 'UserNotConfirmedException') {
+            reject(new Error('Please verify your email before logging in'));
+          } else if (err.code === 'NotAuthorizedException') {
+            reject(new Error('Invalid email or password'));
+          } else if (err.code === 'UserNotFoundException') {
+            reject(new Error('User not found'));
+          } else {
+            reject(new Error(err.message || 'Login failed'));
+          }
+        },
+      });
+    });
   },
   
   // Register a new user
   register: async (email: string, password: string, name: string): Promise<{ email: string; name: string; verificationCode: string }> => {
-    // Check if user already exists
-    const existingUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-    if (existingUser) {
-      throw new Error('Email already registered');
-    }
-    
-    // Password validation
-    if (password.length < 8) {
-      throw new Error('Password must be at least 8 characters long');
-    }
-    
-    if (!/[A-Z]/.test(password)) {
-      throw new Error('Password must contain at least one uppercase letter');
-    }
-    
-    if (!/[0-9]/.test(password)) {
-      throw new Error('Password must contain at least one number');
-    }
-    
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-      throw new Error('Password must contain at least one special character');
-    }
-    
-    // Create new user
-    const newUser: User = {
-      id: (users.length + 1).toString(),
-      email,
-      name,
-      password: hashPassword(password),
-      verified: false
-    };
-    
-    // Generate verification code
-    const verificationCode = generateCode();
-    verificationCodes[email.toLowerCase()] = verificationCode;
-    
-    // In a real app, send verification email here
-    console.log(`Verification code for ${email}: ${verificationCode}`);
-    
-    // Add to database
-    users.push(newUser);
-    saveUsers(users);
-    
-    return { email, name, verificationCode };
+    return new Promise((resolve, reject) => {
+      const attributeList = [
+        new CognitoUserAttribute({
+          Name: 'email',
+          Value: email,
+        }),
+        new CognitoUserAttribute({
+          Name: 'name',
+          Value: name,
+        }),
+      ];
+
+      userPool.signUp(email, password, attributeList, [], (err, result) => {
+        if (err) {
+          if (err.code === 'UsernameExistsException') {
+            reject(new Error('Email already registered'));
+          } else if (err.code === 'InvalidPasswordException') {
+            reject(new Error('Password must be at least 8 characters with uppercase, number, and special character'));
+          } else {
+            reject(new Error(err.message || 'Registration failed'));
+          }
+          return;
+        }
+
+        // Return success - verification code will be sent by Cognito
+        resolve({
+          email,
+          name,
+          verificationCode: 'sent-via-email' // Cognito sends this automatically
+        });
+      });
+    });
   },
   
   // Verify email with code
   verifyEmail: async (email: string, code: string): Promise<boolean> => {
-    const storedCode = verificationCodes[email.toLowerCase()];
-    
-    if (!storedCode) {
-      throw new Error('No verification code found for this email');
-    }
-    
-    if (storedCode !== code) {
-      throw new Error('Invalid verification code');
-    }
-    
-    // Mark user as verified
-    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-    if (user) {
-      user.verified = true;
-      saveUsers(users);
-    }
-    
-    // Remove verification code
-    delete verificationCodes[email.toLowerCase()];
-    
-    return true;
+    return new Promise((resolve, reject) => {
+      const cognitoUser = new CognitoUser({
+        Username: email,
+        Pool: userPool,
+      });
+
+      cognitoUser.confirmRegistration(code, true, (err, result) => {
+        if (err) {
+          if (err.code === 'CodeMismatchException') {
+            reject(new Error('Invalid verification code'));
+          } else if (err.code === 'ExpiredCodeException') {
+            reject(new Error('Verification code has expired'));
+          } else {
+            reject(new Error(err.message || 'Verification failed'));
+          }
+          return;
+        }
+        resolve(true);
+      });
+    });
   },
   
   // Resend verification code
   resendVerificationCode: async (email: string): Promise<string> => {
-    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-    
-    if (!user) {
-      throw new Error('User not found');
-    }
-    
-    if (user.verified) {
-      throw new Error('Email is already verified');
-    }
-    
-    // Generate new verification code
-    const verificationCode = generateCode();
-    verificationCodes[email.toLowerCase()] = verificationCode;
-    
-    // In a real app, send verification email here
-    console.log(`New verification code for ${email}: ${verificationCode}`);
-    
-    return verificationCode;
+    return new Promise((resolve, reject) => {
+      const cognitoUser = new CognitoUser({
+        Username: email,
+        Pool: userPool,
+      });
+
+      cognitoUser.resendConfirmationCode((err, result) => {
+        if (err) {
+          reject(new Error(err.message || 'Failed to resend verification code'));
+          return;
+        }
+        resolve('sent-via-email'); // Cognito sends this automatically
+      });
+    });
   },
   
   // Forgot password
   forgotPassword: async (email: string): Promise<void> => {
-    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-    
-    if (!user) {
-      throw new Error('No account found with this email');
-    }
-    
-    // Generate reset code
-    const resetCode = generateCode();
-    resetCodes[email.toLowerCase()] = resetCode;
-    
-    // In a real app, send password reset email here
-    console.log(`Password reset code for ${email}: ${resetCode}`);
+    return new Promise((resolve, reject) => {
+      const cognitoUser = new CognitoUser({
+        Username: email,
+        Pool: userPool,
+      });
+
+      cognitoUser.forgotPassword({
+        onSuccess: () => {
+          resolve();
+        },
+        onFailure: (err) => {
+          if (err.code === 'UserNotFoundException') {
+            reject(new Error('No account found with this email'));
+          } else {
+            reject(new Error(err.message || 'Failed to send reset code'));
+          }
+        },
+      });
+    });
   },
   
   // Reset password with code
   resetPassword: async (email: string, code: string, newPassword: string): Promise<void> => {
-    const storedCode = resetCodes[email.toLowerCase()];
-    
-    if (!storedCode) {
-      throw new Error('No reset code found for this email');
-    }
-    
-    if (storedCode !== code) {
-      throw new Error('Invalid reset code');
-    }
-    
-    // Password validation
-    if (newPassword.length < 8) {
-      throw new Error('Password must be at least 8 characters long');
-    }
-    
-    if (!/[A-Z]/.test(newPassword)) {
-      throw new Error('Password must contain at least one uppercase letter');
-    }
-    
-    if (!/[0-9]/.test(newPassword)) {
-      throw new Error('Password must contain at least one number');
-    }
-    
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(newPassword)) {
-      throw new Error('Password must contain at least one special character');
-    }
-    
-    // Update user password
-    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-    if (user) {
-      user.password = hashPassword(newPassword);
-      saveUsers(users);
-    }
-    
-    // Remove reset code
-    delete resetCodes[email.toLowerCase()];
+    return new Promise((resolve, reject) => {
+      const cognitoUser = new CognitoUser({
+        Username: email,
+        Pool: userPool,
+      });
+
+      cognitoUser.confirmPassword(code, newPassword, {
+        onSuccess: () => {
+          resolve();
+        },
+        onFailure: (err) => {
+          if (err.code === 'CodeMismatchException') {
+            reject(new Error('Invalid reset code'));
+          } else if (err.code === 'ExpiredCodeException') {
+            reject(new Error('Reset code has expired'));
+          } else if (err.code === 'InvalidPasswordException') {
+            reject(new Error('Password must be at least 8 characters with uppercase, number, and special character'));
+          } else {
+            reject(new Error(err.message || 'Failed to reset password'));
+          }
+        },
+      });
+    });
   },
   
-  // Get current authenticated user (simulated)
+  // Get current authenticated user
   getCurrentUser: async (): Promise<{ email: string; name: string } | null> => {
-    // In a real app, this would check for a valid session token
-    // For this demo, we'll just return null
-    return null;
+    return new Promise((resolve) => {
+      const cognitoUser = userPool.getCurrentUser();
+      
+      if (!cognitoUser) {
+        resolve(null);
+        return;
+      }
+
+      cognitoUser.getSession((err: any, session: any) => {
+        if (err || !session.isValid()) {
+          resolve(null);
+          return;
+        }
+
+        cognitoUser.getUserAttributes((err, attributes) => {
+          if (err) {
+            resolve(null);
+            return;
+          }
+          
+          const nameAttr = attributes?.find(attr => attr.getName() === 'name');
+          const emailAttr = attributes?.find(attr => attr.getName() === 'email');
+          
+          resolve({
+            email: emailAttr?.getValue() || '',
+            name: nameAttr?.getValue() || 'User'
+          });
+        });
+      });
+    });
   },
   
-  // Sign out (simulated)
+  // Sign out
   signOut: async (): Promise<void> => {
-    // In a real app, this would invalidate the session token
-    // For this demo, we'll just do nothing
+    return new Promise((resolve) => {
+      const cognitoUser = userPool.getCurrentUser();
+      if (cognitoUser) {
+        cognitoUser.signOut();
+      }
+      resolve();
+    });
   }
 };
 
