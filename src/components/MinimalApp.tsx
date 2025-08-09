@@ -416,8 +416,8 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
             }
           `}
         </style>
-        <div className="main-content" style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+        <div className="main-content" style={{ maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
+          <div style={{ textAlign: 'center', marginBottom: '20px', width: '100%' }}>
             <h2 style={{ 
               color: '#333', 
               fontSize: '24px',
@@ -442,7 +442,9 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
             padding: '20px',
             marginBottom: '20px',
             boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-            textAlign: 'center'
+            textAlign: 'center',
+            width: '100%',
+            boxSizing: 'border-box'
           }}>
             <div style={{ marginBottom: '20px' }}>
               <div style={{ fontSize: '48px', marginBottom: '15px' }}>📁</div>
