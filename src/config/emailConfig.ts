@@ -3,7 +3,7 @@ export const emailConfig = {
   serviceId: 'service_gyuegyb',
   verificationTemplateId: 'template_47ro7ih', // One-Time Password template
   passwordResetTemplateId: 'template_cn1z44j', // Password Reset template
-  userId: 'YOUR_EMAILJS_USER_ID', // Replace with your EmailJS user ID
+  userId: '3xCIlXaFmm79QkBaB', // EmailJS user ID
   
   // Google Workspace email configuration
   fromEmail: 'contact@advexcel.online',

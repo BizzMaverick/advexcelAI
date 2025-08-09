@@ -1,6 +1,5 @@
-const API_URL = import.meta.env.PROD 
-  ? '/.netlify/functions/upload'
-  : 'http://localhost:5001/api/upload';
+// AWS Lambda Function URL for Excel AI processing
+const API_URL = 'https://5tujnit25dyicr2k2f6s6f6bxi0gmqat.lambda-url.us-east-1.on.aws/';
 
 type SpreadsheetData = (string | number | boolean | null | undefined)[][];
 type SpreadsheetFormatting = ({ color?: string; background?: string; bold?: boolean; italic?: boolean } | undefined)[][];
