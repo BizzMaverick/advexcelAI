@@ -261,7 +261,10 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               borderRadius: '6px',
               background: '#f8f9ff',
               fontSize: '14px',
-              color: '#333'
+              color: '#333',
+              textAlign: 'center',
+              cursor: 'pointer',
+              boxSizing: 'border-box'
             }} 
           />
           {fileLoading && <div style={{ marginTop: '10px', color: '#0078d4', fontWeight: 'bold' }}>Loading...</div>}
