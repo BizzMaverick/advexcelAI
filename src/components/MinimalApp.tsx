@@ -301,7 +301,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                   <circle cx="11" cy="11" r="8" stroke="white" strokeWidth="2"/>
                   <path d="M21 21L16.65 16.65" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
-              )
+              )}
             </button>
           </div>
         </div>
