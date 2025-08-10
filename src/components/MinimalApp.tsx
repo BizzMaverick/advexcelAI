@@ -213,8 +213,8 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center', marginBottom: '15px' }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="#0078d4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <polyline points="14,2 14,8 20,8" stroke="#0078d4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <polyline points="14,2 14,8 20,8" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
             <h3 style={{ margin: 0, fontSize: '18px' }}>Upload File</h3>
           </div>
@@ -245,9 +245,9 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '15px' }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#0078d4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M2 17L12 22L22 17" stroke="#0078d4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M2 12L12 17L22 12" stroke="#0078d4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M2 17L12 22L22 17" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M2 12L12 17L22 12" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
             <h3 style={{ margin: 0, fontSize: '18px' }}>Ask AI</h3>
           </div>
@@ -381,15 +381,15 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '15px' }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="5" stroke="#0078d4" strokeWidth="2"/>
-                <line x1="12" y1="1" x2="12" y2="3" stroke="#0078d4" strokeWidth="2"/>
-                <line x1="12" y1="21" x2="12" y2="23" stroke="#0078d4" strokeWidth="2"/>
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="#0078d4" strokeWidth="2"/>
-                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="#0078d4" strokeWidth="2"/>
-                <line x1="1" y1="12" x2="3" y2="12" stroke="#0078d4" strokeWidth="2"/>
-                <line x1="21" y1="12" x2="23" y2="12" stroke="#0078d4" strokeWidth="2"/>
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="#0078d4" strokeWidth="2"/>
-                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="#0078d4" strokeWidth="2"/>
+                <circle cx="12" cy="12" r="5" stroke="#333" strokeWidth="2"/>
+                <line x1="12" y1="1" x2="12" y2="3" stroke="#333" strokeWidth="2"/>
+                <line x1="12" y1="21" x2="12" y2="23" stroke="#333" strokeWidth="2"/>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="#333" strokeWidth="2"/>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="#333" strokeWidth="2"/>
+                <line x1="1" y1="12" x2="3" y2="12" stroke="#333" strokeWidth="2"/>
+                <line x1="21" y1="12" x2="23" y2="12" stroke="#333" strokeWidth="2"/>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="#333" strokeWidth="2"/>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="#333" strokeWidth="2"/>
               </svg>
               <h4 style={{ margin: 0, fontSize: '16px' }}>AI Response</h4>
             </div>
