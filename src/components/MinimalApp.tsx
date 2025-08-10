@@ -355,7 +355,8 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                           maxWidth: '80px',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap'
+                          whiteSpace: 'nowrap',
+                          color: '#333'
                         }}>
                           {cell !== null && cell !== undefined ? String(cell) : ''}
                         </td>
