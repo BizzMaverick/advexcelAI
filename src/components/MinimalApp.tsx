@@ -104,7 +104,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
         }, 10000);
       } catch (error) {
         console.error('Error parsing file:', error);
-        setFileError('Error reading file. Please ensure it\'s a valid Excel or CSV file.');
+        setFileError('Error reading file. Please ensure it is a valid Excel or CSV file.');
       } finally {
         setFileLoading(false);
       }
@@ -400,7 +400,8 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               background: '#f8f9ff',
               padding: '15px',
               borderRadius: '6px',
-              border: '1px solid #e6f2fa'
+              border: '1px solid #e6f2fa',
+              color: '#333'
             }}>
               {aiResponse}
             </div>
