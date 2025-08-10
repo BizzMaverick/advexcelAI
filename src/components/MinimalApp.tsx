@@ -154,7 +154,29 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       );
       
       if (result.success) {
-        setAiResponse(String(result.response || 'Processing completed').substring(0, 2000));
+        console.log('AI Result:', result); // Debug log
+        
+        // Check if result has structured data (tables)
+        if (result.structured && result.structured.result && Array.isArray(result.structured.result)) {
+          const tableData = result.structured.result;
+          let tableHtml = '<div style="margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; overflow: auto;"><table style="width: 100%; border-collapse: collapse; font-size: 12px;">';
+          
+          tableData.forEach((row, i) => {
+            const isHeader = i === 0;
+            tableHtml += `<tr style="background: ${isHeader ? '#f0f8ff' : (i % 2 === 0 ? '#fafafa' : 'white')}; border-bottom: 1px solid #eee;">`;
+            row.forEach(cell => {
+              tableHtml += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: ${isHeader ? 'bold' : 'normal'}; color: #333;">${String(cell || '')}</td>`;
+            });
+            tableHtml += '</tr>';
+          });
+          
+          tableHtml += '</table></div>';
+          
+          const explanation = result.structured.explanation || 'Results found';
+          setAiResponse(`${explanation}\n\n${tableHtml}`);
+        } else {
+          setAiResponse(String(result.response || 'Processing completed').substring(0, 2000));
+        }
       } else {
         setAiResponse(`Error: ${result.error || 'Unknown error occurred'}`);
       }
@@ -403,7 +425,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               border: '1px solid #e6f2fa',
               color: '#333'
             }}>
-              {aiResponse}
+              <div dangerouslySetInnerHTML={{ __html: aiResponse.replace(/\n/g, '<br>') }} />
             </div>
           </div>
         )}
