@@ -143,6 +143,15 @@ class BedrockService {
       return `${prompt}. Use Excel ABS() function logic to get absolute values. Return the data with absolute values.`;
     }
     
+    // Filter function enhancements
+    if (lowerPrompt.includes('filter') || lowerPrompt.includes('show only') || lowerPrompt.includes('where')) {
+      return `${prompt}. Use Excel FILTER() function logic to filter data based on criteria. Return only the rows that match the specified conditions in a table format.`;
+    }
+    
+    if (lowerPrompt.includes('unique') || lowerPrompt.includes('distinct') || lowerPrompt.includes('remove duplicates')) {
+      return `${prompt}. Use Excel UNIQUE() function logic to remove duplicate rows. Return only unique/distinct records.`;
+    }
+    
     // Return original prompt if no enhancements needed
     return prompt;
   }
