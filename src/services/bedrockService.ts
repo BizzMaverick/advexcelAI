@@ -24,7 +24,8 @@ class BedrockService {
         fileName,
         originalPrompt: prompt,
         enhancedPrompt,
-        dataRows: fileData.length
+        dataRows: fileData.length,
+        dataColumns: fileData[0]?.length || 0
       });
 
       const response = await fetch(this.apiEndpoint, {
@@ -89,8 +90,8 @@ class BedrockService {
       return `${prompt}. Use Excel TRIM() function logic to remove extra spaces. Return the cleaned data.`;
     }
     
-    if (lowerPrompt.includes('find') || lowerPrompt.includes('search') || lowerPrompt.includes('contains')) {
-      return `${prompt}. Use Excel FIND() or SEARCH() function logic to locate text. Return matching rows or positions.`;
+    if (lowerPrompt.includes('find') || lowerPrompt.includes('search') || lowerPrompt.includes('contains') || lowerPrompt.includes('lookup')) {
+      return `${prompt}. Use Excel FIND() or SEARCH() function logic to locate ALL matching text patterns mentioned in the request. Return ALL rows that match ANY of the specified criteria. If multiple terms are mentioned (like 'somalia and yemen'), find rows containing ANY of these terms.`;
     }
     
     if (lowerPrompt.includes('replace') || lowerPrompt.includes('substitute')) {
@@ -145,7 +146,7 @@ class BedrockService {
     
     // Filter function enhancements
     if (lowerPrompt.includes('filter') || lowerPrompt.includes('show only') || lowerPrompt.includes('where')) {
-      return `${prompt}. Use Excel FILTER() function logic to filter data based on criteria. Return only the rows that match the specified conditions in a table format.`;
+      return `${prompt}. Use Excel FILTER() function logic to filter data based on ALL criteria mentioned. If multiple terms are specified (like 'somalia and yemen'), return rows that match ANY of these terms. Return all matching rows in a table format.`;
     }
     
     // Freeze functionality is now handled locally in the frontend
