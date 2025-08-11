@@ -148,9 +148,9 @@ class BedrockService {
       return `${prompt}. Use Excel FILTER() function logic to filter data based on criteria. Return only the rows that match the specified conditions in a table format.`;
     }
     
-    // Freeze functionality
+    // Freeze functionality - return immediate confirmation
     if (lowerPrompt.includes('freeze') || lowerPrompt.includes('freeze panes')) {
-      return `${prompt}. Note: Freeze panes functionality keeps headers visible while scrolling. The application will apply sticky header styling to keep the first row (headers) visible during vertical scrolling.`;
+      return 'FREEZE_APPLIED: The first row (headers) is now frozen and will remain visible while scrolling through the data.';
     }
     
     if (lowerPrompt.includes('unique') || lowerPrompt.includes('distinct') || lowerPrompt.includes('remove duplicates')) {

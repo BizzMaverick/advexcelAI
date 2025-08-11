@@ -156,6 +156,12 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       if (result.success) {
         console.log('AI Result:', result); // Debug log
         
+        // Handle special responses first
+        if (typeof result.response === 'string' && result.response.startsWith('FREEZE_APPLIED:')) {
+          setAiResponse('✅ **Freeze Applied Successfully!**<br><br>The first row (headers) is now frozen and will remain visible while scrolling through your data.');
+          return;
+        }
+        
         // Check if result has structured data (tables) for ANY operation
         if (result.structured && result.structured.result && Array.isArray(result.structured.result)) {
           const tableData = result.structured.result;
