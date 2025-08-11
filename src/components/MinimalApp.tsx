@@ -384,7 +384,10 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                   {displayData.map((row, i) => (
                     <tr key={i} style={{ 
                       background: i === 0 ? '#f0f8ff' : (i % 2 === 0 ? '#fafafa' : 'white'),
-                      borderBottom: '1px solid #eee'
+                      borderBottom: '1px solid #eee',
+                      position: i === 0 ? 'sticky' : 'static',
+                      top: i === 0 ? '0' : 'auto',
+                      zIndex: i === 0 ? 10 : 1
                     }}>
                       {Array.isArray(row) && row.length > 0 ? row.map((cell, j) => (
                         <td key={j} style={{ 
