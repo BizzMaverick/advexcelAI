@@ -38,6 +38,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
   const [showUseResultButton, setShowUseResultButton] = useState(false);
   const [lastAiResult, setLastAiResult] = useState<any[][]>([]);
   const [showFileInfo, setShowFileInfo] = useState(true);
+  const [originalFileData, setOriginalFileData] = useState<any[][]>([]);
 
   const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -96,6 +97,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
         );
 
         setFileData(sanitizedData);
+        setOriginalFileData([...sanitizedData]); // Store original data
         setShowFileInfo(true);
         
         // Auto-hide file info after 10 seconds
@@ -186,10 +188,12 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
           tableHtml += `<p style="color: #666; font-size: 12px; margin: 5px 0;">Showing ${tableData.length} rows</p>`;
           
           const explanation = result.structured.explanation || `${operation} completed`;
-          setAiResponse(`<strong>${explanation}</strong><br><br>${tableHtml}`);
+          const applyButton = '<br><br><button onclick="applyChanges()" style="background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">📋 Apply Changes to Main Sheet</button>';
+          setAiResponse(`<strong>${explanation}</strong><br><br>${tableHtml}${applyButton}`);
           
-          // Also update the main file data with the results so user can see it in the main table
-          setFileData([...tableData]);
+          // Store results for potential application, but don't modify original data
+          setLastAiResult([...tableData]);
+          setShowUseResultButton(true);
           
         } else {
           // Fallback for text-only responses
@@ -206,6 +210,28 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       setPrompt('');
     }
   }, [prompt, selectedFile, fileData]);
+
+  // Apply AI results to main sheet
+  const applyChangesToMainSheet = useCallback(() => {
+    if (lastAiResult.length > 0) {
+      setFileData([...lastAiResult]);
+      setShowUseResultButton(false);
+      setAiResponse(prev => prev.replace(/<button[^>]*>.*?<\/button>/g, '<p style="color: #10b981; font-weight: bold;">✅ Changes applied to main sheet!</p>'));
+    }
+  }, [lastAiResult]);
+
+  // Reset to original data
+  const resetToOriginal = useCallback(() => {
+    if (originalFileData.length > 0) {
+      setFileData([...originalFileData]);
+      setShowUseResultButton(false);
+      setAiResponse('');
+    }
+  }, [originalFileData]);
+
+  // Make functions available globally for button clicks
+  (window as any).applyChanges = applyChangesToMainSheet;
+  (window as any).resetData = resetToOriginal;
 
   // Memoize file display data for performance
   const displayData = useMemo(() => {
@@ -431,6 +457,44 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
             borderRadius: '8px',
             padding: '20px'
           }}>
+            {showUseResultButton && (
+              <div style={{ 
+                marginBottom: '15px', 
+                padding: '10px', 
+                background: '#f0f8ff', 
+                borderRadius: '4px',
+                border: '1px solid #0078d4'
+              }}>
+                <p style={{ margin: '0 0 10px 0', fontSize: '14px', color: '#333' }}>
+                  📊 <strong>Results ready!</strong> Choose an action:
+                </p>
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  <button onClick={applyChangesToMainSheet} style={{
+                    background: '#10b981',
+                    color: 'white',
+                    border: 'none',
+                    padding: '8px 16px',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '13px',
+                    fontWeight: 'bold'
+                  }}>
+                    📋 Apply to Main Sheet
+                  </button>
+                  <button onClick={resetToOriginal} style={{
+                    background: '#6c757d',
+                    color: 'white',
+                    border: 'none',
+                    padding: '8px 16px',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '13px'
+                  }}>
+                    🔄 Reset to Original
+                  </button>
+                </div>
+              </div>
+            )}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '15px' }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="12" cy="12" r="5" stroke="#333" strokeWidth="2"/>
