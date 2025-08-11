@@ -40,7 +40,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
   const [showFileInfo, setShowFileInfo] = useState(true);
   const [originalFileData, setOriginalFileData] = useState<any[][]>([]);
   const [frozenColumns, setFrozenColumns] = useState<number>(0);
-  const [frozenRows, setFrozenRows] = useState<number>(1); // First row already frozen by default
+  const [frozenRows, setFrozenRows] = useState<number>(0); // No freeze by default
 
   const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -206,8 +206,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
           tableHtml += `<p style="color: #666; font-size: 12px; margin: 5px 0;">Showing ${tableData.length} rows</p>`;
           
           const explanation = result.structured.explanation || `${operation} completed`;
-          const applyButton = '<br><br><button onclick="applyChanges()" style="background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">📋 Apply Changes to Main Sheet</button>';
-          setAiResponse(`<strong>${explanation}</strong><br><br>${tableHtml}${applyButton}`);
+          setAiResponse(`<strong>${explanation}</strong><br><br>${tableHtml}`);
           
           // Store results for potential application, but don't modify original data
           setLastAiResult([...tableData]);
