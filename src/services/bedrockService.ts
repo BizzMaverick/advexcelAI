@@ -57,9 +57,43 @@ class BedrockService {
     }
   }
 
-  // Enhance prompts with Excel function context
+  // Enhance prompts with intelligent context understanding
   private enhancePromptWithExcelFunctions(prompt: string): string {
     const lowerPrompt = prompt.toLowerCase();
+    
+    // Create comprehensive context for AI to understand mixed prompts
+    const contextualPrompt = `
+CONTEXT: You are an Excel AI assistant. The user's request may contain:
+1. GENERAL TERMS (please, can you, I need, show me, etc.) - These are conversational
+2. EXCEL FUNCTIONS (lookup, filter, sort, calculate, etc.) - These indicate the operation
+3. DATA TERMS (specific values from the dataset) - These are the targets
+
+USER REQUEST: "${prompt}"
+
+INSTRUCTIONS: Analyze the entire request intelligently. Identify the Excel operation needed and the data terms to work with. Return structured results that match what the user is asking for.
+
+`;
+    
+    // Intelligent operation detection with context
+    if (this.containsOperation(lowerPrompt, ['lookup', 'find', 'search', 'show', 'get', 'need', 'want'])) {
+      return `${contextualPrompt}OPERATION: LOOKUP/SEARCH - Find and return all rows that contain any of the data terms mentioned in the user's request. If multiple terms are mentioned, return ALL matching rows.`;
+    }
+    
+    if (this.containsOperation(lowerPrompt, ['filter', 'where', 'only', 'matching'])) {
+      return `${contextualPrompt}OPERATION: FILTER - Filter the data based on the criteria mentioned. Return only rows that match the specified conditions.`;
+    }
+    
+    if (this.containsOperation(lowerPrompt, ['sort', 'order', 'arrange', 'rank'])) {
+      return `${contextualPrompt}OPERATION: SORT - Sort the data based on the column or criteria mentioned in the request.`;
+    }
+    
+    if (this.containsOperation(lowerPrompt, ['calculate', 'sum', 'average', 'count', 'total', 'mean'])) {
+      return `${contextualPrompt}OPERATION: CALCULATE - Perform the mathematical operation mentioned on the relevant data.`;
+    }
+    
+    if (this.containsOperation(lowerPrompt, ['group', 'pivot', 'summarize', 'aggregate'])) {
+      return `${contextualPrompt}OPERATION: GROUP/PIVOT - Group or summarize the data as requested.`;
+    }
     
     // Text function enhancements
     if (lowerPrompt.includes('uppercase') || lowerPrompt.includes('upper case')) {
@@ -90,9 +124,7 @@ class BedrockService {
       return `${prompt}. Use Excel TRIM() function logic to remove extra spaces. Return the cleaned data.`;
     }
     
-    if (lowerPrompt.includes('find') || lowerPrompt.includes('search') || lowerPrompt.includes('contains') || lowerPrompt.includes('lookup')) {
-      return `${prompt}. Use Excel FIND() or SEARCH() function logic to locate ALL matching text patterns mentioned in the request. Return ALL rows that match ANY of the specified criteria. If multiple terms are mentioned (like 'somalia and yemen'), find rows containing ANY of these terms.`;
-    }
+    // This is now handled by intelligent operation detection above
     
     if (lowerPrompt.includes('replace') || lowerPrompt.includes('substitute')) {
       return `${prompt}. Use Excel SUBSTITUTE() or REPLACE() function logic to replace text. Return the data with replaced text.`;
@@ -144,10 +176,7 @@ class BedrockService {
       return `${prompt}. Use Excel ABS() function logic to get absolute values. Return the data with absolute values.`;
     }
     
-    // Filter function enhancements
-    if (lowerPrompt.includes('filter') || lowerPrompt.includes('show only') || lowerPrompt.includes('where')) {
-      return `${prompt}. Use Excel FILTER() function logic to filter data based on ALL criteria mentioned. If multiple terms are specified (like 'somalia and yemen'), return rows that match ANY of these terms. Return all matching rows in a table format.`;
-    }
+    // This is now handled by intelligent operation detection above
     
     // Freeze functionality is now handled locally in the frontend
     
@@ -155,8 +184,18 @@ class BedrockService {
       return `${prompt}. Use Excel UNIQUE() function logic to remove duplicate rows. Return only unique/distinct records.`;
     }
     
-    // Return original prompt if no enhancements needed
-    return prompt;
+    // If no specific operation detected, provide general intelligent context
+    return `${contextualPrompt}OPERATION: GENERAL - Analyze the user's request and determine the most appropriate action based on the context and data terms mentioned.`;
+  }
+  
+  // Helper method to detect operations in natural language
+  private containsOperation(prompt: string, keywords: string[]): boolean {
+    return keywords.some(keyword => {
+      // Check for exact word matches, not just substring matches
+      const regex = new RegExp(`\\b${keyword}\\b`, 'i');
+      return regex.test(prompt);
+    });
+  }
   }
 
   // Test connection to API
