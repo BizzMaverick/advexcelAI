@@ -39,6 +39,8 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
   const [lastAiResult, setLastAiResult] = useState<any[][]>([]);
   const [showFileInfo, setShowFileInfo] = useState(true);
   const [originalFileData, setOriginalFileData] = useState<any[][]>([]);
+  const [frozenColumns, setFrozenColumns] = useState<number>(0);
+  const [frozenRows, setFrozenRows] = useState<number>(1); // First row already frozen by default
 
   const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -141,13 +143,17 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       const lowerPrompt = trimmedPrompt.toLowerCase();
       
       if (lowerPrompt.includes('row') && lowerPrompt.includes('column')) {
-        // Combined request - apply row freeze, explain column limitation
-        setAiResponse('✅ <strong>Partial Freeze Applied!</strong><br><br>✅ <strong>First row (headers) frozen</strong> - Will remain visible while scrolling vertically.<br><br>❌ <strong>Column freeze not supported</strong> - Horizontal freeze is not yet implemented.<br><br>Only the row freeze has been applied.');
-      } else if (lowerPrompt.includes('column') && !lowerPrompt.includes('row')) {
-        // Column only request
-        setAiResponse('❌ <strong>Column Freeze Not Supported</strong><br><br>Currently, only row freezing is supported. The application can freeze the first row (headers) to keep them visible while scrolling vertically.<br><br>Column freezing (horizontal freeze) is not yet implemented.');
+        // Combined request - freeze both
+        setFrozenRows(1);
+        setFrozenColumns(1);
+        setAiResponse('✅ <strong>Freeze Applied Successfully!</strong><br><br>✅ <strong>First row frozen</strong> - Headers remain visible while scrolling vertically.<br><br>✅ <strong>First column frozen</strong> - First column remains visible while scrolling horizontally.');
+      } else if (lowerPrompt.includes('column')) {
+        // Column freeze request
+        setFrozenColumns(1);
+        setAiResponse('✅ <strong>Column Freeze Applied Successfully!</strong><br><br>The first column is now frozen and will remain visible while scrolling horizontally through your data.');
       } else {
         // Row request or generic freeze
+        setFrozenRows(1);
         setAiResponse('✅ <strong>Row Freeze Applied Successfully!</strong><br><br>The first row (headers) is now frozen and will remain visible while scrolling vertically through your data.');
       }
       
@@ -430,11 +436,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 <tbody>
                   {displayData.map((row, i) => (
                     <tr key={i} style={{ 
-                      background: i === 0 ? '#f0f8ff' : (i % 2 === 0 ? '#fafafa' : 'white'),
-                      borderBottom: '1px solid #eee',
-                      position: i === 0 ? 'sticky' : 'static',
-                      top: i === 0 ? '0' : 'auto',
-                      zIndex: i === 0 ? 10 : 1
+                      borderBottom: '1px solid #eee'
                     }}>
                       {Array.isArray(row) && row.length > 0 ? row.map((cell, j) => (
                         <td key={j} style={{ 
@@ -445,7 +447,11 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           whiteSpace: 'nowrap',
-                          color: '#333'
+                          color: '#333',
+                          position: j < frozenColumns ? 'sticky' : 'static',
+                          left: j < frozenColumns ? `${j * 100}px` : 'auto',
+                          zIndex: j < frozenColumns ? (i < frozenRows ? 20 : 15) : (i < frozenRows ? 10 : 1),
+                          backgroundColor: j < frozenColumns ? (i === 0 ? '#e6f2ff' : '#f8fbff') : (i === 0 ? '#f0f8ff' : (i % 2 === 0 ? '#fafafa' : 'white'))
                         }}>
                           {cell !== null && cell !== undefined ? String(cell) : ''}
                         </td>
