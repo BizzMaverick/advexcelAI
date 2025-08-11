@@ -148,10 +148,7 @@ class BedrockService {
       return `${prompt}. Use Excel FILTER() function logic to filter data based on criteria. Return only the rows that match the specified conditions in a table format.`;
     }
     
-    // Freeze functionality - return immediate confirmation
-    if (lowerPrompt.includes('freeze') || lowerPrompt.includes('freeze panes')) {
-      return 'FREEZE_APPLIED: The first row (headers) is now frozen and will remain visible while scrolling through the data.';
-    }
+    // Freeze functionality is now handled locally in the frontend
     
     if (lowerPrompt.includes('unique') || lowerPrompt.includes('distinct') || lowerPrompt.includes('remove duplicates')) {
       return `${prompt}. Use Excel UNIQUE() function logic to remove duplicate rows. Return only unique/distinct records.`;
