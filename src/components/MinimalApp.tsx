@@ -200,7 +200,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
 
   // Memoize file display data for performance
   const displayData = useMemo(() => {
-    return fileData.slice(0, 50); // Only display first 50 rows on mobile
+    return fileData; // Show all data
   }, [fileData, lastUpdate, dataKey]);
 
   return (
@@ -369,11 +369,13 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               </p>
             </div>
             <div style={{ 
-              maxHeight: '300px', 
+              maxHeight: '400px', 
               overflow: 'auto',
-              fontSize: '12px'
+              fontSize: '12px',
+              overflowX: 'auto'
             }}>
               <table style={{ 
+                minWidth: '800px',
                 width: '100%', 
                 borderCollapse: 'collapse'
               }}>
@@ -383,12 +385,12 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                       background: i === 0 ? '#f0f8ff' : (i % 2 === 0 ? '#fafafa' : 'white'),
                       borderBottom: '1px solid #eee'
                     }}>
-                      {Array.isArray(row) && row.length > 0 ? row.slice(0, 4).map((cell, j) => (
+                      {Array.isArray(row) && row.length > 0 ? row.map((cell, j) => (
                         <td key={j} style={{ 
                           padding: '8px', 
                           borderRight: '1px solid #eee',
                           fontWeight: i === 0 ? 'bold' : 'normal',
-                          maxWidth: '80px',
+                          minWidth: '100px',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           whiteSpace: 'nowrap',
