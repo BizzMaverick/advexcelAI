@@ -196,7 +196,6 @@ INSTRUCTIONS: Analyze the entire request intelligently. Identify the Excel opera
       return regex.test(prompt);
     });
   }
-  }
 
   // Test connection to API
   async testConnection(): Promise<boolean> {
