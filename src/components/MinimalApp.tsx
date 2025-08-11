@@ -448,10 +448,11 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                           textOverflow: 'ellipsis',
                           whiteSpace: 'nowrap',
                           color: '#333',
-                          position: j < frozenColumns ? 'sticky' : 'static',
+                          position: (i < frozenRows || j < frozenColumns) ? 'sticky' : 'static',
+                          top: i < frozenRows ? '0' : 'auto',
                           left: j < frozenColumns ? `${j * 100}px` : 'auto',
-                          zIndex: j < frozenColumns ? (i < frozenRows ? 20 : 15) : (i < frozenRows ? 10 : 1),
-                          backgroundColor: j < frozenColumns ? (i === 0 ? '#e6f2ff' : '#f8fbff') : (i === 0 ? '#f0f8ff' : (i % 2 === 0 ? '#fafafa' : 'white'))
+                          zIndex: (i < frozenRows && j < frozenColumns) ? 20 : (i < frozenRows ? 15 : (j < frozenColumns ? 10 : 1)),
+                          backgroundColor: (i < frozenRows && j < frozenColumns) ? '#d4edda' : (j < frozenColumns ? '#f8fbff' : (i < frozenRows ? '#f0f8ff' : (i % 2 === 0 ? '#fafafa' : 'white')))
                         }}>
                           {cell !== null && cell !== undefined ? String(cell) : ''}
                         </td>
