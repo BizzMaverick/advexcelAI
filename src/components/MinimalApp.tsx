@@ -138,7 +138,17 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
 
     // Handle freeze requests locally without backend call
     if (trimmedPrompt.toLowerCase().includes('freeze')) {
-      setAiResponse('✅ <strong>Freeze Applied Successfully!</strong><br><br>The first row (headers) is now frozen and will remain visible while scrolling through your data.');
+      const lowerPrompt = trimmedPrompt.toLowerCase();
+      
+      if (lowerPrompt.includes('column') || lowerPrompt.includes('first column')) {
+        setAiResponse('❌ <strong>Column Freeze Not Supported</strong><br><br>Currently, only row freezing is supported. The application can freeze the first row (headers) to keep them visible while scrolling vertically.<br><br>Column freezing (horizontal freeze) is not yet implemented.');
+      } else if (lowerPrompt.includes('row') || lowerPrompt.includes('first row') || lowerPrompt.includes('header')) {
+        setAiResponse('✅ <strong>Row Freeze Applied Successfully!</strong><br><br>The first row (headers) is now frozen and will remain visible while scrolling vertically through your data.');
+      } else {
+        // Generic freeze request - assume row freeze
+        setAiResponse('✅ <strong>Freeze Applied Successfully!</strong><br><br>The first row (headers) is now frozen and will remain visible while scrolling through your data.<br><br><em>Note: Only row freezing is currently supported. For column freezing, please specify "freeze first column" to see available options.</em>');
+      }
+      
       setPrompt('');
       return;
     }
