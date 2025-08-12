@@ -437,6 +437,11 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               type="text"
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !isProcessing && selectedFile && prompt.trim()) {
+                  handleProcessAI();
+                }
+              }}
               placeholder="Ask about your data..."
               style={{ 
                 flex: 1,
