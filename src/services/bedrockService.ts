@@ -38,6 +38,7 @@ class BedrockService {
           fileData,
           prompt: enhancedPrompt,
           fileName,
+          maxTokens: 4000, // Request longer response
           dataInfo: {
             totalRows: fileData.length,
             totalColumns: fileData[0]?.length || 0,
