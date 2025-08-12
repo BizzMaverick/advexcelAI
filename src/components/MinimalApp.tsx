@@ -196,12 +196,20 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               const headers = ['First Name', 'Last Name', 'Full Name'];
               const tableData = [headers, ...arrayData];
               
+              console.log('Parsed array data:', arrayData);
+              console.log('Table data with headers:', tableData);
+              
               let tableHtml = '<div style="margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; overflow: auto; max-height: 400px;"><table style="minWidth: 800px; width: 100%; border-collapse: collapse; font-size: 12px;">';
               
               tableData.forEach((row, i) => {
                 const isHeader = i === 0;
                 tableHtml += `<tr style="border-bottom: 1px solid #eee;">`;
-                row.forEach(cell => {
+                
+                // Ensure we have exactly 3 columns for concatenation results
+                const cellsToShow = Array.isArray(row) ? row : [row];
+                while (cellsToShow.length < 3) cellsToShow.push('');
+                
+                cellsToShow.slice(0, 3).forEach(cell => {
                   tableHtml += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: ${isHeader ? 'bold' : 'normal'}; color: #333; white-space: nowrap; background: ${isHeader ? '#f0f8ff' : 'white'};">${String(cell || '')}</td>`;
                 });
                 tableHtml += '</tr>';
