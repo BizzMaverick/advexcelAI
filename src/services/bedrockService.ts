@@ -68,9 +68,9 @@ class BedrockService {
   private enhancePromptWithExcelFunctions(prompt: string): string {
     const lowerPrompt = prompt.toLowerCase();
     
-    // Simple Excel referencing context
-    const hasColumnRef = /\b[A-Z]\b/.test(prompt) || /column [A-Z]/i.test(prompt);
-    const contextualPrompt = hasColumnRef ? `Excel columns: A=1st, B=2nd, C=3rd, etc. Rows: 1,2,3,etc. ${prompt}` : prompt;
+    // Only add Excel referencing for explicit column references (A, B, C) not data terms
+    const hasExplicitColumnRef = /\b[A-Z]\b(?!\w)/.test(prompt) && !/\b(rank|country|year|total|name|gender|data)\b/i.test(prompt);
+    const contextualPrompt = hasExplicitColumnRef ? `Excel columns: A=1st, B=2nd, C=3rd, etc. ${prompt}` : prompt;
     
     // Simple operation detection
     if (this.containsOperation(lowerPrompt, ['lookup', 'find', 'search', 'show', 'get', 'need', 'want'])) {
