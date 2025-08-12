@@ -69,9 +69,9 @@ class BedrockService {
   private enhancePromptWithExcelFunctions(prompt: string): string {
     const lowerPrompt = prompt.toLowerCase();
     
-    // Simple enhancements for specific operations
-    if (lowerPrompt.includes('lookup') || lowerPrompt.includes('find') || lowerPrompt.includes('search')) {
-      return `${prompt}. Return all rows that match the search term.`;
+    // Simple enhancements for specific operations - skip lookup to avoid confusion
+    if (lowerPrompt.includes('find') || lowerPrompt.includes('search')) {
+      return `${prompt}. Return matching data.`;
     }
     
     if (lowerPrompt.includes('sort') || lowerPrompt.includes('order') || lowerPrompt.includes('arrange')) {
