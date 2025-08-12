@@ -68,51 +68,29 @@ class BedrockService {
   private enhancePromptWithExcelFunctions(prompt: string): string {
     const lowerPrompt = prompt.toLowerCase();
     
-    // Create comprehensive context for AI to understand mixed prompts with Excel-style referencing
-    const contextualPrompt = `
-CONTEXT: You are an Excel AI assistant working with a spreadsheet. The data has:
-- COLUMNS labeled as A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P... (like Excel)
-- ROWS numbered as 1, 2, 3, 4, 5... (like Excel)
-- Row 1 contains headers
-- Data starts from Row 2
-
-The user's request may contain:
-1. GENERAL TERMS (please, can you, I need, show me, etc.) - These are conversational
-2. EXCEL FUNCTIONS (SUM, CONCATENATE, AVERAGE, etc.) - These indicate the operation
-3. COLUMN REFERENCES (A, B, C or column names) - These are the targets
-4. EXCEL FORMULAS (like SUM(A:A), CONCATENATE(A1,B1), AVERAGE(C2:C100))
-
-USER REQUEST: "${prompt}"
-
-INSTRUCTIONS: 
-- Treat this as a real Excel spreadsheet with column letters A, B, C, etc.
-- When user mentions columns by name, map them to letters (first column = A, second = B, etc.)
-- When user asks for formulas like "sum of A and B in C", apply =SUM(A2,B2) logic to all data rows
-- ACTUALLY PERFORM the operation on the data - DO NOT just explain how to do it
-- Return the complete modified dataset in structured table format
-- Show actual calculated results, not formulas
-
-`;
+    // Simple Excel referencing context
+    const hasColumnRef = /\b[A-Z]\b/.test(prompt) || /column [A-Z]/i.test(prompt);
+    const contextualPrompt = hasColumnRef ? `Excel columns: A=1st, B=2nd, C=3rd, etc. Rows: 1,2,3,etc. ${prompt}` : prompt;
     
-    // Intelligent operation detection with context
+    // Simple operation detection
     if (this.containsOperation(lowerPrompt, ['lookup', 'find', 'search', 'show', 'get', 'need', 'want'])) {
-      return `${contextualPrompt}OPERATION: LOOKUP/SEARCH - Find and return all rows that contain any of the data terms mentioned in the user's request. If multiple terms are mentioned, return ALL matching rows.`;
+      return `${contextualPrompt}. Find and return all matching rows.`;
     }
     
     if (this.containsOperation(lowerPrompt, ['filter', 'where', 'only', 'matching'])) {
-      return `${contextualPrompt}OPERATION: FILTER - Filter the data based on the criteria mentioned. Return only rows that match the specified conditions.`;
+      return `${contextualPrompt}. Filter and return matching rows.`;
     }
     
     if (this.containsOperation(lowerPrompt, ['sort', 'order', 'arrange', 'rank'])) {
-      return `${contextualPrompt}OPERATION: SORT - Sort the data based on the column or criteria mentioned in the request.`;
+      return `${contextualPrompt}. Sort the data as requested.`;
     }
     
     if (this.containsOperation(lowerPrompt, ['calculate', 'sum', 'average', 'count', 'total', 'mean'])) {
-      return `${contextualPrompt}OPERATION: CALCULATE - Apply Excel formulas like SUM(), AVERAGE(), COUNT() to the specified columns. If user says "sum A and B in C", create a new column C with =SUM(A2,B2) applied to all rows. Return the complete dataset with calculated values.`;
+      return `${contextualPrompt}. Perform the calculation and return results.`;
     }
     
     if (this.containsOperation(lowerPrompt, ['group', 'pivot', 'summarize', 'aggregate'])) {
-      return `${contextualPrompt}OPERATION: GROUP/PIVOT - Group or summarize the data as requested.`;
+      return `${contextualPrompt}. Group or summarize the data.`;
     }
     
     // Text function enhancements
@@ -204,8 +182,8 @@ INSTRUCTIONS:
       return `${prompt}. Use Excel UNIQUE() function logic to remove duplicate rows. Return only unique/distinct records.`;
     }
     
-    // If no specific operation detected, provide general intelligent context
-    return `${contextualPrompt}OPERATION: GENERAL - Analyze the user's request and determine the most appropriate action based on the context and data terms mentioned.`;
+    // If no specific operation detected, return simple prompt
+    return contextualPrompt;
   }
   
   // Helper method to detect operations in natural language
