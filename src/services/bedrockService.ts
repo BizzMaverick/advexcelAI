@@ -70,7 +70,7 @@ CONTEXT: You are an Excel AI assistant. The user's request may contain:
 
 USER REQUEST: "${prompt}"
 
-INSTRUCTIONS: Analyze the entire request intelligently. Identify the Excel operation needed and the data terms to work with. Return structured results that match what the user is asking for.
+INSTRUCTIONS: Analyze the entire request intelligently. Identify the Excel operation needed and the data terms to work with. ACTUALLY PERFORM the operation on the data - DO NOT just explain how to do it. Return the modified/processed data in a structured table format that shows the actual results.
 
 `;
     
@@ -97,7 +97,7 @@ INSTRUCTIONS: Analyze the entire request intelligently. Identify the Excel opera
     
     // Text function enhancements
     if (lowerPrompt.includes('uppercase') || lowerPrompt.includes('upper case')) {
-      return `${prompt}. Use Excel UPPER() function logic to convert text to uppercase. Return the modified data with uppercase text.`;
+      return `${contextualPrompt}OPERATION: UPPERCASE - ACTUALLY CONVERT the specified text to uppercase. DO NOT explain how to do it. MODIFY the data and return the complete dataset with uppercase text applied. Show actual results, not instructions.`;
     }
     
     if (lowerPrompt.includes('lowercase') || lowerPrompt.includes('lower case')) {
@@ -109,11 +109,11 @@ INSTRUCTIONS: Analyze the entire request intelligently. Identify the Excel opera
     }
     
     if (lowerPrompt.includes('concatenate') || lowerPrompt.includes('combine') || lowerPrompt.includes('merge')) {
-      return `${prompt}. Use Excel CONCATENATE() or & operator logic to combine text from multiple columns. Return the data with combined columns.`;
+      return `${contextualPrompt}OPERATION: CONCATENATE - ACTUALLY PERFORM the concatenation operation on the data. DO NOT explain how to do it. MODIFY the data by combining the specified columns and return the complete modified dataset with the new combined column. Show the actual results, not instructions.`;
     }
     
     if (lowerPrompt.includes('extract') || lowerPrompt.includes('substring') || lowerPrompt.includes('left') || lowerPrompt.includes('right') || lowerPrompt.includes('mid')) {
-      return `${prompt}. Use Excel LEFT(), RIGHT(), or MID() function logic to extract specific parts of text. Return the data with extracted text.`;
+      return `${contextualPrompt}OPERATION: TEXT EXTRACTION - ACTUALLY EXTRACT the specified parts of text from the data. DO NOT explain how to do it. MODIFY the data and return the complete dataset with extracted text. Show actual results, not instructions.`;
     }
     
     if (lowerPrompt.includes('length') || lowerPrompt.includes('len')) {
