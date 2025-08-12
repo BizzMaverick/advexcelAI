@@ -128,22 +128,18 @@ INSTRUCTIONS:
     }
     
     if (lowerPrompt.includes('concatenate') || lowerPrompt.includes('combine') || lowerPrompt.includes('merge') || lowerPrompt.includes('concat')) {
-      return `CRITICAL: The user wants to CONCATENATE/COMBINE text columns. This is TEXT CONCATENATION, NOT MATH.
+      return `DO NOT EXPLAIN. DO NOT LIST STEPS. JUST DO IT.
 
-You MUST:
-1. Process ALL rows of data provided
-2. Identify the columns to combine (A=column 1, B=column 2, etc.)
-3. Create a NEW column with CONCATENATED TEXT values
-4. For each data row, combine the TEXT values with a space between them
-5. Return the COMPLETE dataset with ALL rows
-6. DO NOT limit to 5 rows
-7. DO NOT treat this as numeric operation
+CONCATENATE columns A and B with a space between them. Return the data as JSON array format:
 
-Example: If column A has "prasad" and column B has "verma", the new column should show "prasad verma"
+[["First name", "Last name", "Full Name"],
+["prasad", "verma", "prasad verma"],
+["naveen", "kumar", "naveen kumar"],
+...and so on for ALL rows]
 
-Original request: ${prompt}
+Return ONLY the JSON array. No explanations. No steps. Just the concatenated data.
 
-ACTUALLY PERFORM THE TEXT CONCATENATION ON ALL ROWS PROVIDED.`;
+Original request: ${prompt}`;
     }
     
     if (lowerPrompt.includes('extract') || lowerPrompt.includes('substring') || lowerPrompt.includes('left') || lowerPrompt.includes('right') || lowerPrompt.includes('mid')) {
