@@ -68,29 +68,17 @@ class BedrockService {
   private enhancePromptWithExcelFunctions(prompt: string): string {
     const lowerPrompt = prompt.toLowerCase();
     
-    // Only add Excel referencing for explicit column references (A, B, C) not data terms
-    const hasExplicitColumnRef = /\b[A-Z]\b(?!\w)/.test(prompt) && !/\b(rank|country|year|total|name|gender|data)\b/i.test(prompt);
-    const contextualPrompt = hasExplicitColumnRef ? `Excel columns: A=1st, B=2nd, C=3rd, etc. ${prompt}` : prompt;
-    
-    // Simple operation detection
-    if (this.containsOperation(lowerPrompt, ['lookup', 'find', 'search', 'show', 'get', 'need', 'want'])) {
-      return `${contextualPrompt}. Find and return all matching rows.`;
+    // Simple enhancements for specific operations
+    if (lowerPrompt.includes('lookup') || lowerPrompt.includes('find') || lowerPrompt.includes('search')) {
+      return `${prompt}. Find and return all matching rows.`;
     }
     
-    if (this.containsOperation(lowerPrompt, ['filter', 'where', 'only', 'matching'])) {
-      return `${contextualPrompt}. Filter and return matching rows.`;
+    if (lowerPrompt.includes('sort') || lowerPrompt.includes('order') || lowerPrompt.includes('arrange')) {
+      return `${prompt}. Sort the data as requested.`;
     }
     
-    if (this.containsOperation(lowerPrompt, ['sort', 'order', 'arrange', 'rank'])) {
-      return `${contextualPrompt}. Sort the data as requested.`;
-    }
-    
-    if (this.containsOperation(lowerPrompt, ['calculate', 'sum', 'average', 'count', 'total', 'mean'])) {
-      return `${contextualPrompt}. Perform the calculation and return results.`;
-    }
-    
-    if (this.containsOperation(lowerPrompt, ['group', 'pivot', 'summarize', 'aggregate'])) {
-      return `${contextualPrompt}. Group or summarize the data.`;
+    if (lowerPrompt.includes('sum') || lowerPrompt.includes('average') || lowerPrompt.includes('total') || lowerPrompt.includes('mean')) {
+      return `${prompt}. Calculate the requested statistics.`;
     }
     
     // Text function enhancements
@@ -182,8 +170,8 @@ class BedrockService {
       return `${prompt}. Use Excel UNIQUE() function logic to remove duplicate rows. Return only unique/distinct records.`;
     }
     
-    // If no specific operation detected, return simple prompt
-    return contextualPrompt;
+    // Return original prompt for all other cases
+    return prompt;
   }
   
   // Helper method to detect operations in natural language
