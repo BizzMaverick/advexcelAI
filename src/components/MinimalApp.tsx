@@ -187,6 +187,8 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
         console.log('Full AI Response Length:', result.response?.length);
         console.log('Response contains Modi?', result.response?.includes('Modi'));
         console.log('Response contains theertha?', result.response?.includes('theertha'));
+        console.log('Structured data rows:', result.structured?.result?.length);
+        console.log('Structured data sample:', result.structured?.result?.slice(0, 3));
         
         // Special responses are now handled locally above
         
