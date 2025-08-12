@@ -467,11 +467,33 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 width: '100%', 
                 borderCollapse: 'collapse'
               }}>
+                {/* Excel-style column headers */}
+                <tr style={{ background: '#e6f3ff', borderBottom: '2px solid #0078d4' }}>
+                  <th style={{ padding: '4px 8px', fontSize: '11px', fontWeight: 'bold', color: '#0078d4', border: '1px solid #ddd', minWidth: '40px' }}>#</th>
+                  {displayData[0] && displayData[0].map((_, colIndex) => (
+                    <th key={colIndex} style={{ padding: '4px 8px', fontSize: '11px', fontWeight: 'bold', color: '#0078d4', border: '1px solid #ddd', minWidth: '100px' }}>
+                      {String.fromCharCode(65 + colIndex)}
+                    </th>
+                  ))}
+                </tr>
                 <tbody>
                   {displayData.map((row, i) => (
                     <tr key={i} style={{ 
                       borderBottom: '1px solid #eee'
                     }}>
+                      {/* Row number */}
+                      <td style={{ 
+                        padding: '8px', 
+                        borderRight: '1px solid #eee',
+                        fontWeight: 'bold',
+                        fontSize: '11px',
+                        color: '#0078d4',
+                        background: '#f8f9ff',
+                        textAlign: 'center',
+                        minWidth: '40px'
+                      }}>
+                        {i + 1}
+                      </td>
                       {Array.isArray(row) && row.length > 0 ? row.map((cell, j) => (
                         <td key={j} style={{ 
                           padding: '8px', 
