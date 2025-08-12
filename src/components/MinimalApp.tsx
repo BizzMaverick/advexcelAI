@@ -138,6 +138,14 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       return;
     }
 
+    // Handle Excel cell operations locally without backend call
+    const cellOperationResult = this.handleCellOperations(trimmedPrompt, fileData);
+    if (cellOperationResult) {
+      setAiResponse(cellOperationResult);
+      setPrompt('');
+      return;
+    }
+
     // Handle freeze requests locally without backend call
     if (trimmedPrompt.toLowerCase().includes('freeze')) {
       const lowerPrompt = trimmedPrompt.toLowerCase();
@@ -322,6 +330,103 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
     }
   }, [prompt, selectedFile, fileData]);
 
+  // Handle Excel cell operations locally
+  const handleCellOperations = useCallback((prompt: string, data: any[][]) => {
+    const lowerPrompt = prompt.toLowerCase();
+    
+    // Parse cell references like B2, A3:A10, B2+D5, etc.
+    const cellRangeMatch = prompt.match(/([A-Z])(\d+)\s+to\s+([A-Z])(\d+)/i);
+    const cellAddMatch = prompt.match(/(sum|add)\s+([A-Z])(\d+)\s+(and|\+)\s+([A-Z])(\d+)/i);
+    const cellAvgMatch = prompt.match(/average\s+([A-Z])(\d+)\s+to\s+([A-Z])(\d+)/i);
+    
+    if (!data || data.length === 0) return null;
+    
+    // Helper to get cell value
+    const getCellValue = (col: string, row: number) => {
+      const colIndex = col.charCodeAt(0) - 65; // A=0, B=1, C=2, etc.
+      const rowIndex = row - 1; // Convert to 0-based index
+      
+      if (rowIndex < 0 || rowIndex >= data.length || colIndex < 0 || colIndex >= (data[rowIndex]?.length || 0)) {
+        return null;
+      }
+      
+      const value = data[rowIndex][colIndex];
+      const numValue = parseFloat(String(value));
+      return isNaN(numValue) ? null : numValue;
+    };
+    
+    // Handle sum of two cells (B2 + D5)
+    if (cellAddMatch) {
+      const [, , col1, row1, , col2, row2] = cellAddMatch;
+      const val1 = getCellValue(col1, parseInt(row1));
+      const val2 = getCellValue(col2, parseInt(row2));
+      
+      if (val1 !== null && val2 !== null) {
+        const result = val1 + val2;
+        return `<strong>Cell Addition Result:</strong><br><br>` +
+               `${col1}${row1} (${val1}) + ${col2}${row2} (${val2}) = <strong>${result}</strong>`;
+      }
+      return `<strong>Error:</strong> Could not find numeric values in cells ${col1}${row1} and ${col2}${row2}`;
+    }
+    
+    // Handle range sum (C2 to C10)
+    if (cellRangeMatch && lowerPrompt.includes('sum')) {
+      const [, col1, row1, col2, row2] = cellRangeMatch;
+      
+      if (col1 === col2) { // Same column range
+        const startRow = parseInt(row1);
+        const endRow = parseInt(row2);
+        let sum = 0;
+        let count = 0;
+        
+        for (let row = startRow; row <= endRow; row++) {
+          const value = getCellValue(col1, row);
+          if (value !== null) {
+            sum += value;
+            count++;
+          }
+        }
+        
+        if (count > 0) {
+          return `<strong>Range Sum Result:</strong><br><br>` +
+                 `Sum of ${col1}${row1} to ${col1}${row2}: <strong>${sum}</strong><br>` +
+                 `Cells processed: ${count}`;
+        }
+      }
+      return `<strong>Error:</strong> Could not calculate sum for range ${col1}${row1} to ${col2}${row2}`;
+    }
+    
+    // Handle range average (A3 to A10)
+    if (cellAvgMatch) {
+      const [, col1, row1, col2, row2] = cellAvgMatch;
+      
+      if (col1 === col2) { // Same column range
+        const startRow = parseInt(row1);
+        const endRow = parseInt(row2);
+        let sum = 0;
+        let count = 0;
+        
+        for (let row = startRow; row <= endRow; row++) {
+          const value = getCellValue(col1, row);
+          if (value !== null) {
+            sum += value;
+            count++;
+          }
+        }
+        
+        if (count > 0) {
+          const average = sum / count;
+          return `<strong>Range Average Result:</strong><br><br>` +
+                 `Average of ${col1}${row1} to ${col1}${row2}: <strong>${average.toFixed(2)}</strong><br>` +
+                 `Sum: ${sum}, Count: ${count}`;
+        }
+      }
+      return `<strong>Error:</strong> Could not calculate average for range ${col1}${row1} to ${col2}${row2}`;
+    }
+    
+    return null; // Not a cell operation, let backend handle it
+  }, []);
+
   // Apply AI results to main sheet
   const applyChangesToMainSheet = useCallback(() => {
     if (lastAiResult.length > 0) {
@@ -348,6 +453,9 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
   const displayData = useMemo(() => {
     return fileData; // Show all data
   }, [fileData, lastUpdate, dataKey]);
+
+  // Add handleCellOperations to the component instance
+  (this as any).handleCellOperations = handleCellOperations;
 
   return (
     <ErrorBoundary>
