@@ -79,6 +79,13 @@ class BedrockService {
     }
     
     if (lowerPrompt.includes('sum') || lowerPrompt.includes('average') || lowerPrompt.includes('total') || lowerPrompt.includes('mean')) {
+      // Check if user is referencing specific columns or rows
+      const hasColumnRefs = /\b[A-Z]\b/.test(prompt);
+      const hasRowRefs = /\brow\s+\d+/.test(prompt) || /\brows\s+\d+/.test(prompt);
+      
+      if (hasColumnRefs || hasRowRefs) {
+        return `${prompt}. Excel reference: Columns A=1st, B=2nd, C=3rd, etc. Rows 1=headers, 2=first data, etc. Calculate as requested.`;
+      }
       return `${prompt}. Calculate the requested statistics.`;
     }
     
