@@ -61,16 +61,29 @@ class BedrockService {
   private enhancePromptWithExcelFunctions(prompt: string): string {
     const lowerPrompt = prompt.toLowerCase();
     
-    // Create comprehensive context for AI to understand mixed prompts
+    // Create comprehensive context for AI to understand mixed prompts with Excel-style referencing
     const contextualPrompt = `
-CONTEXT: You are an Excel AI assistant. The user's request may contain:
+CONTEXT: You are an Excel AI assistant working with a spreadsheet. The data has:
+- COLUMNS labeled as A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P... (like Excel)
+- ROWS numbered as 1, 2, 3, 4, 5... (like Excel)
+- Row 1 contains headers
+- Data starts from Row 2
+
+The user's request may contain:
 1. GENERAL TERMS (please, can you, I need, show me, etc.) - These are conversational
-2. EXCEL FUNCTIONS (lookup, filter, sort, calculate, etc.) - These indicate the operation
-3. DATA TERMS (specific values from the dataset) - These are the targets
+2. EXCEL FUNCTIONS (SUM, CONCATENATE, AVERAGE, etc.) - These indicate the operation
+3. COLUMN REFERENCES (A, B, C or column names) - These are the targets
+4. EXCEL FORMULAS (like SUM(A:A), CONCATENATE(A1,B1), AVERAGE(C2:C100))
 
 USER REQUEST: "${prompt}"
 
-INSTRUCTIONS: Analyze the entire request intelligently. Identify the Excel operation needed and the data terms to work with. ACTUALLY PERFORM the operation on the data - DO NOT just explain how to do it. Return the modified/processed data in a structured table format that shows the actual results.
+INSTRUCTIONS: 
+- Treat this as a real Excel spreadsheet with column letters A, B, C, etc.
+- When user mentions columns by name, map them to letters (first column = A, second = B, etc.)
+- When user asks for formulas like "sum of A and B in C", apply =SUM(A2,B2) logic to all data rows
+- ACTUALLY PERFORM the operation on the data - DO NOT just explain how to do it
+- Return the complete modified dataset in structured table format
+- Show actual calculated results, not formulas
 
 `;
     
@@ -88,7 +101,7 @@ INSTRUCTIONS: Analyze the entire request intelligently. Identify the Excel opera
     }
     
     if (this.containsOperation(lowerPrompt, ['calculate', 'sum', 'average', 'count', 'total', 'mean'])) {
-      return `${contextualPrompt}OPERATION: CALCULATE - Perform the mathematical operation mentioned on the relevant data.`;
+      return `${contextualPrompt}OPERATION: CALCULATE - Apply Excel formulas like SUM(), AVERAGE(), COUNT() to the specified columns. If user says "sum A and B in C", create a new column C with =SUM(A2,B2) applied to all rows. Return the complete dataset with calculated values.`;
     }
     
     if (this.containsOperation(lowerPrompt, ['group', 'pivot', 'summarize', 'aggregate'])) {
@@ -109,7 +122,7 @@ INSTRUCTIONS: Analyze the entire request intelligently. Identify the Excel opera
     }
     
     if (lowerPrompt.includes('concatenate') || lowerPrompt.includes('combine') || lowerPrompt.includes('merge')) {
-      return `${contextualPrompt}OPERATION: CONCATENATE - ACTUALLY PERFORM the concatenation operation on the data. DO NOT explain how to do it. MODIFY the data by combining the specified columns and return the complete modified dataset with the new combined column. Show the actual results, not instructions.`;
+      return `${contextualPrompt}OPERATION: CONCATENATE - Apply Excel CONCATENATE() formula like =CONCATENATE(A2," ",B2) to combine columns. If user says "combine A and B in C", create new column C with concatenated values from columns A and B for all data rows. Return the complete dataset with the new combined column.`;
     }
     
     if (lowerPrompt.includes('extract') || lowerPrompt.includes('substring') || lowerPrompt.includes('left') || lowerPrompt.includes('right') || lowerPrompt.includes('mid')) {
@@ -117,7 +130,7 @@ INSTRUCTIONS: Analyze the entire request intelligently. Identify the Excel opera
     }
     
     if (lowerPrompt.includes('length') || lowerPrompt.includes('len')) {
-      return `${prompt}. Use Excel LEN() function logic to calculate text length. Return the data with text lengths.`;
+      return `${contextualPrompt}OPERATION: LENGTH - Apply Excel LEN() formula like =LEN(A2) to calculate text length. If user says "length of A in B", create new column B with =LEN(A2) applied to all rows. Return the complete dataset with calculated lengths.`;
     }
     
     if (lowerPrompt.includes('trim') || lowerPrompt.includes('remove spaces')) {
