@@ -116,11 +116,11 @@ INSTRUCTIONS:
     
     // Text function enhancements
     if (lowerPrompt.includes('uppercase') || lowerPrompt.includes('upper case')) {
-      return `${contextualPrompt}OPERATION: UPPERCASE - ACTUALLY CONVERT the specified text to uppercase. DO NOT explain how to do it. MODIFY the data and return the complete dataset with uppercase text applied. Show actual results, not instructions.`;
+      return `${prompt}. Convert the specified text to uppercase and return the complete modified dataset.`;
     }
     
     if (lowerPrompt.includes('lowercase') || lowerPrompt.includes('lower case')) {
-      return `${prompt}. Use Excel LOWER() function logic to convert text to lowercase. Return the modified data with lowercase text.`;
+      return `${prompt}. Convert the specified text to lowercase and return the complete modified dataset.`;
     }
     
     if (lowerPrompt.includes('proper case') || lowerPrompt.includes('title case')) {
@@ -132,11 +132,11 @@ INSTRUCTIONS:
     }
     
     if (lowerPrompt.includes('extract') || lowerPrompt.includes('substring') || lowerPrompt.includes('left') || lowerPrompt.includes('right') || lowerPrompt.includes('mid')) {
-      return `${contextualPrompt}OPERATION: TEXT EXTRACTION - ACTUALLY EXTRACT the specified parts of text from the data. DO NOT explain how to do it. MODIFY the data and return the complete dataset with extracted text. Show actual results, not instructions.`;
+      return `${prompt}. Extract the specified parts of text and return the complete modified dataset.`;
     }
     
     if (lowerPrompt.includes('length') || lowerPrompt.includes('len')) {
-      return `${contextualPrompt}OPERATION: LENGTH - Apply Excel LEN() formula like =LEN(A2) to calculate text length. If user says "length of A in B", create new column B with =LEN(A2) applied to all rows. Return the complete dataset with calculated lengths.`;
+      return `${prompt}. Calculate text length and return the complete modified dataset with length values.`;
     }
     
     if (lowerPrompt.includes('trim') || lowerPrompt.includes('remove spaces')) {
@@ -151,7 +151,7 @@ INSTRUCTIONS:
     
     // Date/Time function enhancements
     if (lowerPrompt.includes('age') || lowerPrompt.includes('years old')) {
-      return `${prompt}. Calculate age using Excel DATEDIF() function logic (current date minus birth date). Return the data with calculated ages.`;
+      return `${prompt}. Calculate age from the date column and return the complete modified dataset with calculated ages.`;
     }
     
     if (lowerPrompt.includes('year') || lowerPrompt.includes('extract year')) {
