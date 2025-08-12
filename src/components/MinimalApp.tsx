@@ -139,7 +139,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
     }
 
     // Handle Excel cell operations locally without backend call
-    const cellOperationResult = this.handleCellOperations(trimmedPrompt, fileData);
+    const cellOperationResult = handleCellOperations(trimmedPrompt, fileData);
     if (cellOperationResult) {
       setAiResponse(cellOperationResult);
       setPrompt('');
@@ -453,9 +453,6 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
   const displayData = useMemo(() => {
     return fileData; // Show all data
   }, [fileData, lastUpdate, dataKey]);
-
-  // Add handleCellOperations to the component instance
-  (this as any).handleCellOperations = handleCellOperations;
 
   return (
     <ErrorBoundary>
