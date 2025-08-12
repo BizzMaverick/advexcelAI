@@ -24,6 +24,7 @@ class BedrockService {
         fileName,
         originalPrompt: prompt,
         enhancedPrompt,
+        promptChanged: prompt !== enhancedPrompt,
         dataRows: fileData.length,
         dataColumns: fileData[0]?.length || 0,
         sampleData: fileData.slice(0, 3) // Show first 3 rows for debugging
