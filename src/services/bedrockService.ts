@@ -86,13 +86,7 @@ class BedrockService {
       console.log('Sum operation detected:', { hasColumnRefs, hasRowRefs, prompt });
       
       if (hasColumnRefs || hasRowRefs) {
-        // Extract specific cells mentioned
-        const cellMatch = prompt.match(/([A-Z])(\d+)\s+(and|ad)\s+([A-Z])(\d+)/i);
-        if (cellMatch) {
-          const [, col1, row1, , col2, row2] = cellMatch;
-          return `Add the value from column ${col1} row ${row1} to the value from column ${col2} row ${row2}. Only these two specific cells. Column A=1st, B=2nd, C=3rd, etc. Row 1=headers, row 2=first data.`;
-        }
-        return `${prompt}. Work with the specific cells mentioned, not entire columns.`;
+        return `${prompt}. Return ONLY the final calculated result as a single number. No explanations, no tables, no verbose text. Just the answer.`;
       }
       return `${prompt}. Calculate the requested statistics.`;
     }
