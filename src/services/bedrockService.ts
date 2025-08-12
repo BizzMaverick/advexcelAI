@@ -128,18 +128,7 @@ INSTRUCTIONS:
     }
     
     if (lowerPrompt.includes('concatenate') || lowerPrompt.includes('combine') || lowerPrompt.includes('merge') || lowerPrompt.includes('concat')) {
-      return `DO NOT EXPLAIN. DO NOT LIST STEPS. JUST DO IT.
-
-CONCATENATE columns A and B with a space between them. Return the data as JSON array format:
-
-[["First name", "Last name", "Full Name"],
-["prasad", "verma", "prasad verma"],
-["naveen", "kumar", "naveen kumar"],
-...and so on for ALL rows]
-
-Return ONLY the JSON array. No explanations. No steps. Just the concatenated data.
-
-Original request: ${prompt}`;
+      return `${prompt}. Create a new column by combining the first two columns with a space between them. Return the complete modified dataset with all rows.`;
     }
     
     if (lowerPrompt.includes('extract') || lowerPrompt.includes('substring') || lowerPrompt.includes('left') || lowerPrompt.includes('right') || lowerPrompt.includes('mid')) {
