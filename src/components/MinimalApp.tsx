@@ -182,6 +182,8 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       
       if (result.success) {
         console.log('AI Result:', result); // Debug log
+        console.log('Original fileData rows:', fileData.length);
+        console.log('First 3 rows of fileData:', fileData.slice(0, 3));
         
         // Special responses are now handled locally above
         
@@ -196,6 +198,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               const headers = ['First Name', 'Last Name', 'Full Name'];
               const tableData = [headers, ...arrayData];
               
+              console.log('Parsed array data rows:', arrayData.length);
               console.log('Parsed array data:', arrayData);
               console.log('Table data with headers:', tableData);
               

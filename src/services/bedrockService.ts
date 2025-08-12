@@ -25,7 +25,8 @@ class BedrockService {
         originalPrompt: prompt,
         enhancedPrompt,
         dataRows: fileData.length,
-        dataColumns: fileData[0]?.length || 0
+        dataColumns: fileData[0]?.length || 0,
+        sampleData: fileData.slice(0, 3) // Show first 3 rows for debugging
       });
 
       const response = await fetch(this.apiEndpoint, {
@@ -36,7 +37,12 @@ class BedrockService {
         body: JSON.stringify({
           fileData,
           prompt: enhancedPrompt,
-          fileName
+          fileName,
+          dataInfo: {
+            totalRows: fileData.length,
+            totalColumns: fileData[0]?.length || 0,
+            headers: fileData[0] || []
+          }
         })
       });
 
@@ -124,24 +130,28 @@ INSTRUCTIONS:
     if (lowerPrompt.includes('concatenate') || lowerPrompt.includes('combine') || lowerPrompt.includes('merge') || lowerPrompt.includes('concat')) {
       return `CRITICAL: The user wants to CONCATENATE/COMBINE text columns. This is TEXT CONCATENATION, NOT MATH.
 
+DATA INFO: You have ${fileData.length} total rows and ${fileData[0]?.length || 0} columns.
+PROCESS ALL ${fileData.length} ROWS - DO NOT LIMIT TO 5 ROWS.
+
 If user says "concat A and B" or "combine A and B":
-- Column A = First column of data
-- Column B = Second column of data
-- Create a NEW third column with A + " " + B (text concatenation)
+- Column A = First column of data (${fileData[0]?.[0] || 'unknown'})
+- Column B = Second column of data (${fileData[0]?.[1] || 'unknown'})
+- Create a NEW column with A + " " + B (text concatenation)
 
 You MUST:
-1. Identify the columns to combine (A=column 1, B=column 2, etc.)
-2. Create a NEW column with CONCATENATED TEXT values
-3. For each data row, combine the TEXT values with a space between them
-4. Return the MODIFIED dataset with the new combined column
-5. DO NOT treat this as numeric operation
-6. DO NOT return the original data unchanged
+1. Process ALL ${fileData.length} rows of data
+2. Identify the columns to combine (A=column 1, B=column 2, etc.)
+3. Create a NEW column with CONCATENATED TEXT values
+4. For each data row, combine the TEXT values with a space between them
+5. Return the COMPLETE dataset with ALL ${fileData.length} rows
+6. DO NOT limit to 5 rows
+7. DO NOT treat this as numeric operation
 
 Example: If column A has "prasad" and column B has "verma", the new column should show "prasad verma"
 
 Original request: ${prompt}
 
-ACTUALLY PERFORM THE TEXT CONCATENATION - NOT MATH OPERATION.`;
+ACTUALLY PERFORM THE TEXT CONCATENATION ON ALL ${fileData.length} ROWS.`;
     }
     
     if (lowerPrompt.includes('extract') || lowerPrompt.includes('substring') || lowerPrompt.includes('left') || lowerPrompt.includes('right') || lowerPrompt.includes('mid')) {
