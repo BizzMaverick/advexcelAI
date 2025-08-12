@@ -71,7 +71,7 @@ class BedrockService {
     
     // Simple enhancements for specific operations
     if (lowerPrompt.includes('lookup') || lowerPrompt.includes('find') || lowerPrompt.includes('search')) {
-      return `${prompt}. Find and return all matching rows.`;
+      return `${prompt}. Return all rows that match the search term.`;
     }
     
     if (lowerPrompt.includes('sort') || lowerPrompt.includes('order') || lowerPrompt.includes('arrange')) {
