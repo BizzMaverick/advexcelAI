@@ -122,7 +122,18 @@ INSTRUCTIONS:
     }
     
     if (lowerPrompt.includes('concatenate') || lowerPrompt.includes('combine') || lowerPrompt.includes('merge')) {
-      return `${contextualPrompt}OPERATION: CONCATENATE - Apply Excel CONCATENATE() formula like =CONCATENATE(A2," ",B2) to combine columns. If user says "combine A and B in C", create new column C with concatenated values from columns A and B for all data rows. Return the complete dataset with the new combined column.`;
+      return `CRITICAL: The user wants to CONCATENATE/COMBINE columns. You MUST:
+1. Identify which columns to combine (usually first 2 columns for names)
+2. Create a NEW column with combined values
+3. For each data row, combine the values with a space between them
+4. Return the MODIFIED dataset with the new combined column
+5. DO NOT return the original data unchanged
+
+Example: If data has "prasad" in column 1 and "verma" in column 2, the new column should show "prasad verma"
+
+Original request: ${prompt}
+
+ACTUALLY PERFORM THE CONCATENATION - DO NOT JUST RETURN ORIGINAL DATA.`;
     }
     
     if (lowerPrompt.includes('extract') || lowerPrompt.includes('substring') || lowerPrompt.includes('left') || lowerPrompt.includes('right') || lowerPrompt.includes('mid')) {
