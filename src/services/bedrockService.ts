@@ -128,7 +128,7 @@ INSTRUCTIONS:
     }
     
     if (lowerPrompt.includes('concatenate') || lowerPrompt.includes('combine') || lowerPrompt.includes('merge') || lowerPrompt.includes('concat')) {
-      return `${prompt}. Create a new column by combining the first two columns with a space between them. Return the complete modified dataset with all rows.`;
+      return `${prompt}. Combine the first and last name columns and return the complete dataset with a new combined column.`;
     }
     
     if (lowerPrompt.includes('extract') || lowerPrompt.includes('substring') || lowerPrompt.includes('left') || lowerPrompt.includes('right') || lowerPrompt.includes('mid')) {

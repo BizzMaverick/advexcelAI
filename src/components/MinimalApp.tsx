@@ -184,6 +184,9 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
         console.log('AI Result:', result); // Debug log
         console.log('Original fileData rows:', fileData.length);
         console.log('First 3 rows of fileData:', fileData.slice(0, 3));
+        console.log('Full AI Response Length:', result.response?.length);
+        console.log('Response contains Modi?', result.response?.includes('Modi'));
+        console.log('Response contains theertha?', result.response?.includes('theertha'));
         
         // Special responses are now handled locally above
         
