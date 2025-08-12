@@ -191,10 +191,41 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
         // Special responses are now handled locally above
         
         // Check if response contains array data in text format
-        if (typeof result.response === 'string' && result.response.includes('[[') && result.response.includes(']]')) {
+        if (typeof result.response === 'string' && result.response.includes('[')) {
           try {
-            // Extract array data from response text
-            const arrayMatch = result.response.match(/\[\[.*?\]\]/s);
+            // Extract array data from response text - handle truncated responses
+            let arrayMatch = result.response.match(/\[\s*\[.*?\]\s*\]/s);
+            if (!arrayMatch) {
+              // Try to find incomplete array and reconstruct
+              const startMatch = result.response.match(/\[\s*\[.*$/s);
+              if (startMatch) {
+                // Response was truncated, use structured data if available
+                if (result.structured && result.structured.result) {
+                  const arrayData = result.structured.result;
+                  console.log('Using structured data due to truncation:', arrayData.length, 'rows');
+                  
+                  let tableHtml = '<div style="margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; overflow: auto; max-height: 400px;"><table style="minWidth: 800px; width: 100%; border-collapse: collapse; font-size: 12px;">';
+                  
+                  arrayData.forEach((row, i) => {
+                    const isHeader = i === 0;
+                    tableHtml += `<tr style="border-bottom: 1px solid #eee;">`;
+                    row.forEach(cell => {
+                      tableHtml += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: ${isHeader ? 'bold' : 'normal'}; color: #333; white-space: nowrap; background: ${isHeader ? '#f0f8ff' : 'white'};">${String(cell || '')}</td>`;
+                    });
+                    tableHtml += '</tr>';
+                  });
+                  
+                  tableHtml += '</table></div>';
+                  tableHtml += `<p style="color: #666; font-size: 12px; margin: 5px 0;">Showing ${arrayData.length - 1} rows</p>`;
+                  
+                  setAiResponse(`<strong>Concatenation completed successfully!</strong><br><br>${tableHtml}`);
+                  setLastAiResult([...arrayData]);
+                  setShowUseResultButton(true);
+                  return;
+                }
+              }
+            }
+            
             if (arrayMatch) {
               const arrayData = JSON.parse(arrayMatch[0]);
               // Add headers if missing
