@@ -86,7 +86,7 @@ class BedrockService {
       console.log('Sum operation detected:', { hasColumnRefs, hasRowRefs, prompt });
       
       if (hasColumnRefs || hasRowRefs) {
-        return `${prompt}. Excel reference: Columns A=1st, B=2nd, C=3rd, etc. Rows 1=headers, 2=first data, etc. Calculate as requested.`;
+        return `${prompt}. IMPORTANT: Only use the SPECIFIC cells/range mentioned. If user says "C2 to C6", only sum those 5 cells (column C, rows 2,3,4,5,6), NOT the entire column. Columns: A=1st, B=2nd, C=3rd, etc. Rows: 1=headers, 2=first data row, etc.`;
       }
       return `${prompt}. Calculate the requested statistics.`;
     }
