@@ -121,19 +121,27 @@ INSTRUCTIONS:
       return `${prompt}. Use Excel PROPER() function logic to convert text to proper case (first letter of each word capitalized). Return the modified data.`;
     }
     
-    if (lowerPrompt.includes('concatenate') || lowerPrompt.includes('combine') || lowerPrompt.includes('merge')) {
-      return `CRITICAL: The user wants to CONCATENATE/COMBINE columns. You MUST:
-1. Identify which columns to combine (usually first 2 columns for names)
-2. Create a NEW column with combined values
-3. For each data row, combine the values with a space between them
-4. Return the MODIFIED dataset with the new combined column
-5. DO NOT return the original data unchanged
+    if (lowerPrompt.includes('concatenate') || lowerPrompt.includes('combine') || lowerPrompt.includes('merge') || lowerPrompt.includes('concat')) {
+      return `CRITICAL: The user wants to CONCATENATE/COMBINE text columns. This is TEXT CONCATENATION, NOT MATH.
 
-Example: If data has "prasad" in column 1 and "verma" in column 2, the new column should show "prasad verma"
+If user says "concat A and B" or "combine A and B":
+- Column A = First column of data
+- Column B = Second column of data
+- Create a NEW third column with A + " " + B (text concatenation)
+
+You MUST:
+1. Identify the columns to combine (A=column 1, B=column 2, etc.)
+2. Create a NEW column with CONCATENATED TEXT values
+3. For each data row, combine the TEXT values with a space between them
+4. Return the MODIFIED dataset with the new combined column
+5. DO NOT treat this as numeric operation
+6. DO NOT return the original data unchanged
+
+Example: If column A has "prasad" and column B has "verma", the new column should show "prasad verma"
 
 Original request: ${prompt}
 
-ACTUALLY PERFORM THE CONCATENATION - DO NOT JUST RETURN ORIGINAL DATA.`;
+ACTUALLY PERFORM THE TEXT CONCATENATION - NOT MATH OPERATION.`;
     }
     
     if (lowerPrompt.includes('extract') || lowerPrompt.includes('substring') || lowerPrompt.includes('left') || lowerPrompt.includes('right') || lowerPrompt.includes('mid')) {
