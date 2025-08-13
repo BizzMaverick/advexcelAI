@@ -75,7 +75,11 @@ class BedrockService {
     }
     
     if (lowerPrompt.includes('lookup') || lowerPrompt.includes('find') || lowerPrompt.includes('search')) {
-      return prompt; // No enhancement for lookup
+      // Only enhance for multiple terms (contains 'and')
+      if (lowerPrompt.includes(' and ')) {
+        return `${prompt}. Search for ALL mentioned countries/terms and return matching rows.`;
+      }
+      return prompt; // No enhancement for single lookup
     }
     
     if (lowerPrompt.includes('sum') || lowerPrompt.includes('average') || lowerPrompt.includes('total') || lowerPrompt.includes('mean')) {
