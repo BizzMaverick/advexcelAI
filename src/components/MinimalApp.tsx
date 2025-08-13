@@ -337,6 +337,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
     // Parse cell references like B2, A3:A10, B2+D5, etc.
     const cellRangeMatch = prompt.match(/([A-Z])(\d+)\s+to\s+([A-Z])(\d+)/i);
     const cellAddMatch = prompt.match(/(sum|add)\s+([A-Z])(\d+)\s+(and|\+)\s+([A-Z])(\d+)/i);
+    const cellMultipleMatch = prompt.match(/(sum|add)\s+of\s+([A-Z]\d+(?:\s+[A-Z]\d+)*(?:\s+and\s+[A-Z]\d+)*)/i);
     const cellAvgMatch = prompt.match(/average\s+([A-Z])(\d+)\s+to\s+([A-Z])(\d+)/i);
     
     if (!data || data.length === 0) return null;
@@ -354,6 +355,36 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       const numValue = parseFloat(String(value));
       return isNaN(numValue) ? null : numValue;
     };
+    
+    // Handle sum of multiple cells (E2 E3 and E4)
+    if (cellMultipleMatch) {
+      const [, , cellsStr] = cellMultipleMatch;
+      const cells = cellsStr.match(/[A-Z]\d+/g);
+      
+      if (cells && cells.length > 0) {
+        let sum = 0;
+        let validCells = 0;
+        const cellValues = [];
+        
+        for (const cell of cells) {
+          const col = cell.charAt(0);
+          const row = parseInt(cell.substring(1));
+          const value = getCellValue(col, row);
+          
+          if (value !== null) {
+            sum += value;
+            validCells++;
+            cellValues.push(`${cell}(${value})`);
+          }
+        }
+        
+        if (validCells > 0) {
+          return `<strong>Sum Result:</strong><br><br>` +
+                 `${cellValues.join(' + ')} = <strong>${sum}</strong>`;
+        }
+      }
+      return `<strong>Error:</strong> Could not find numeric values in specified cells`;
+    }
     
     // Handle sum of two cells (B2 + D5)
     if (cellAddMatch) {
