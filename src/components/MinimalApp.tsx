@@ -928,7 +928,6 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
             </div>
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
               <button onClick={() => {
-                // Toggle bold on/off
                 if (selectedCells.length === 0) return;
                 const newFormatting = { ...cellFormatting };
                 const cellsToFormat = selectedCells;
@@ -945,91 +944,65 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                   }
                 });
                 setCellFormatting(newFormatting);
-              }} style={{
-                background: selectedCells.length > 0 && cellFormatting[selectedCells[0]]?.fontWeight === 'bold' 
-                  ? 'linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)' 
-                  : 'linear-gradient(135deg, #74b9ff 0%, #0984e3 100%)',
+              }} style={{ 
+                background: '#0078d4',
                 color: 'white',
                 border: 'none',
-                padding: '12px 20px',
-                borderRadius: '10px',
-                cursor: selectedCells.length > 0 ? 'pointer' : 'not-allowed',
+                padding: '12px 16px',
+                borderRadius: '6px',
+                cursor: 'pointer',
                 fontSize: '14px',
-                fontWeight: '600',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                transition: 'all 0.3s ease',
-                opacity: selectedCells.length > 0 ? 1 : 0.6,
-                transform: 'translateY(0)'
-              }}
-              onMouseEnter={(e) => {
-                if (selectedCells.length > 0) {
-                  e.target.style.transform = 'translateY(-2px)';
-                  e.target.style.boxShadow = '0 6px 20px rgba(0,0,0,0.2)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.transform = 'translateY(0)';
-                e.target.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                justifyContent: 'center'
               }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z" fill="white"/>
                   <path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z" fill="white"/>
                 </svg>
-                Bold
               </button>
               
               <button onClick={() => {
-                // Toggle italic on/off
-                if (selectedCells.length === 0) return; // Do nothing if no cells selected
+                if (selectedCells.length === 0) return;
                 const newFormatting = { ...cellFormatting };
                 const cellsToFormat = selectedCells;
                 
-                // Check if first cell is already italic
                 const firstCellId = cellsToFormat[0];
                 const isItalic = cellFormatting[firstCellId]?.fontStyle === 'italic';
                 
                 cellsToFormat.forEach(cellId => {
                   if (isItalic) {
-                    // Remove italic
                     const { fontStyle, ...rest } = newFormatting[cellId] || {};
                     newFormatting[cellId] = rest;
                   } else {
-                    // Apply italic
                     newFormatting[cellId] = { ...newFormatting[cellId], fontStyle: 'italic' };
                   }
                 });
                 setCellFormatting(newFormatting);
-              }} style={{
+              }} style={{ 
                 background: '#0078d4',
                 color: 'white',
                 border: 'none',
-                padding: '8px 16px',
+                padding: '12px 16px',
                 borderRadius: '6px',
                 cursor: 'pointer',
                 fontSize: '14px',
-                fontStyle: 'italic',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px'
+                justifyContent: 'center'
               }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <line x1="19" y1="4" x2="10" y2="4" stroke="white" strokeWidth="2"/>
                   <line x1="14" y1="20" x2="5" y2="20" stroke="white" strokeWidth="2"/>
                   <line x1="15" y1="4" x2="9" y2="20" stroke="white" strokeWidth="2"/>
                 </svg>
-                Italic
               </button>
               
               <button onClick={() => {
-                // Cycle through left → center → right alignment
-                if (selectedCells.length === 0) return; // Do nothing if no cells selected
+                if (selectedCells.length === 0) return;
                 const newFormatting = { ...cellFormatting };
                 const cellsToFormat = selectedCells;
                 
-                // Get current alignment of first cell (or default to left)
                 const firstCellId = cellsToFormat[0];
                 const currentAlign = cellFormatting[firstCellId]?.textAlign || 'left';
                 const nextAlign = currentAlign === 'left' ? 'center' : 
@@ -1039,45 +1012,32 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                   newFormatting[cellId] = { ...newFormatting[cellId], textAlign: nextAlign };
                 });
                 setCellFormatting(newFormatting);
-              }} style={{
+              }} style={{ 
                 background: '#0078d4',
                 color: 'white',
                 border: 'none',
-                padding: '8px 16px',
+                padding: '12px 16px',
                 borderRadius: '6px',
                 cursor: 'pointer',
                 fontSize: '14px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px'
+                justifyContent: 'center'
               }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <line x1="18" y1="10" x2="6" y2="10" stroke="white" strokeWidth="2"/>
                   <line x1="21" y1="6" x2="3" y2="6" stroke="white" strokeWidth="2"/>
                   <line x1="21" y1="14" x2="3" y2="14" stroke="white" strokeWidth="2"/>
                   <line x1="18" y1="18" x2="6" y2="18" stroke="white" strokeWidth="2"/>
                 </svg>
-                {(() => {
-                  if (selectedCells.length > 0) {
-                    const firstCellId = selectedCells[0];
-                    const currentAlign = cellFormatting[firstCellId]?.textAlign;
-                    if (currentAlign === 'center') return 'Center';
-                    if (currentAlign === 'right') return 'Right';
-                    if (currentAlign === 'left') return 'Left';
-                    return 'Left'; // Default state
-                  }
-                  return 'Align';
-                })()}
               </button>
               
               <button onClick={() => {
-                // Cycle through 10 standard colors like Word/PowerPoint
-                if (selectedCells.length === 0) return; // Do nothing if no cells selected
+                if (selectedCells.length === 0) return;
                 const colors = ['red', 'blue', 'green', 'orange', 'purple', 'yellow', 'brown', 'pink', 'gray', 'black'];
                 const newFormatting = { ...cellFormatting };
                 const cellsToFormat = selectedCells;
                 
-                // Get current color of first cell
                 const firstCellId = cellsToFormat[0];
                 const currentColor = cellFormatting[firstCellId]?.color || 'red';
                 const currentIndex = colors.indexOf(currentColor);
@@ -1088,34 +1048,22 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                   newFormatting[cellId] = { ...newFormatting[cellId], color: nextColor };
                 });
                 setCellFormatting(newFormatting);
-              }} style={{
+              }} style={{ 
                 background: '#0078d4',
                 color: 'white',
                 border: 'none',
-                padding: '8px 16px',
+                padding: '12px 16px',
                 borderRadius: '6px',
                 cursor: 'pointer',
                 fontSize: '14px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px'
+                justifyContent: 'center'
               }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="white"/>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" fill="white"/>
+                  <circle cx="12" cy="12" r="6" fill="#0078d4"/>
                 </svg>
-                {(() => {
-                  if (selectedCells.length > 0) {
-                    const firstCellId = selectedCells[0];
-                    const currentColor = cellFormatting[firstCellId]?.color || 'red';
-                    const colorNames = {
-                      'red': 'Red', 'blue': 'Blue', 'green': 'Green', 'orange': 'Orange',
-                      'purple': 'Purple', 'yellow': 'Yellow', 'brown': 'Brown', 
-                      'pink': 'Pink', 'gray': 'Gray', 'black': 'Black'
-                    };
-                    return colorNames[currentColor] || 'Red';
-                  }
-                  return 'Color';
-                })()}
               </button>
             </div>
           </div>
