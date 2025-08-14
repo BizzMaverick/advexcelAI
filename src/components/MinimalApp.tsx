@@ -146,6 +146,16 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       return;
     }
 
+    // Handle remove duplicates locally without backend call
+    const removeDuplicatesResult = handleRemoveDuplicates(trimmedPrompt, fileData);
+    if (removeDuplicatesResult) {
+      setAiResponse(removeDuplicatesResult.message);
+      setLastAiResult(removeDuplicatesResult.data);
+      setShowUseResultButton(true);
+      setPrompt('');
+      return;
+    }
+
     // Handle freeze requests locally without backend call
     if (trimmedPrompt.toLowerCase().includes('freeze')) {
       const lowerPrompt = trimmedPrompt.toLowerCase();
@@ -468,6 +478,72 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
     
     return null; // Not a cell operation, let backend handle it
   }, []);
+
+  // Handle remove duplicates locally
+  const handleRemoveDuplicates = useCallback((prompt: string, data: any[][]) => {
+    const lowerPrompt = prompt.toLowerCase();
+    
+    if (!lowerPrompt.includes('remove') || !lowerPrompt.includes('duplicate')) {
+      return null; // Not a remove duplicates operation
+    }
+    
+    if (!data || data.length <= 1) {
+      return { message: '<strong>Error:</strong> No data to process', data: [] };
+    }
+    
+    const headers = data[0];
+    const dataRows = data.slice(1);
+    
+    // Case 1: Specific column duplicates
+    const columnMatch = prompt.match(/column\s+([A-Z])/i) || prompt.match(/in\s+([A-Z])\b/i);
+    if (columnMatch) {
+      const colLetter = columnMatch[1].toUpperCase();
+      const colIndex = colLetter.charCodeAt(0) - 65; // A=0, B=1, etc.
+      
+      if (colIndex >= 0 && colIndex < headers.length) {
+        const seen = new Set();
+        const uniqueRows = [];
+        
+        for (const row of dataRows) {
+          const cellValue = String(row[colIndex] || '').toLowerCase().trim();
+          if (!seen.has(cellValue)) {
+            seen.add(cellValue);
+            uniqueRows.push(row);
+          }
+        }
+        
+        const result = [headers, ...uniqueRows];
+        const removedCount = dataRows.length - uniqueRows.length;
+        
+        return {
+          message: `<strong>Remove Duplicates completed successfully!</strong><br><br>Removed ${removedCount} duplicate rows based on column ${colLetter}.<br>Showing ${uniqueRows.length} unique rows.`,
+          data: result
+        };
+      }
+    }
+    
+    // Case 2: General remove duplicates (all columns)
+    const seen = new Set();
+    const uniqueRows = [];
+    
+    for (const row of dataRows) {
+      const rowKey = row.map(cell => String(cell || '').toLowerCase().trim()).join('|');
+      if (!seen.has(rowKey)) {
+        seen.add(rowKey);
+        uniqueRows.push(row);
+      }
+    }
+    
+    const result = [headers, ...uniqueRows];
+    const removedCount = dataRows.length - uniqueRows.length;
+    
+    return {
+      message: `<strong>Remove Duplicates completed successfully!</strong><br><br>Removed ${removedCount} duplicate rows from ${dataRows.length} total rows.<br>Showing ${uniqueRows.length} unique rows.`,
+      data: result
+    };
+  }, []);
+
+
 
   // Apply AI results to main sheet
   const applyChangesToMainSheet = useCallback(() => {
