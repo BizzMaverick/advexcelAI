@@ -992,21 +992,22 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               </button>
               
               <button onClick={() => {
-                // Apply center align to selected cells only
+                // Cycle through left → center → right alignment
                 const newFormatting = { ...cellFormatting };
-                if (selectedCells.length > 0) {
-                  selectedCells.forEach(cellId => {
-                    newFormatting[cellId] = { ...newFormatting[cellId], textAlign: 'center' };
-                  });
-                } else {
-                  // If no selection, apply to all data cells
-                  for (let i = 1; i < fileData.length; i++) {
-                    for (let j = 0; j < fileData[i].length; j++) {
-                      const cellId = `${i}-${j}`;
-                      newFormatting[cellId] = { ...newFormatting[cellId], textAlign: 'center' };
-                    }
-                  }
-                }
+                const cellsToFormat = selectedCells.length > 0 ? selectedCells : 
+                  Array.from({length: fileData.length - 1}, (_, i) => 
+                    Array.from({length: fileData[0]?.length || 0}, (_, j) => `${i+1}-${j}`)
+                  ).flat();
+                
+                // Get current alignment of first cell (or default to left)
+                const firstCellId = cellsToFormat[0];
+                const currentAlign = cellFormatting[firstCellId]?.textAlign || 'left';
+                const nextAlign = currentAlign === 'left' ? 'center' : 
+                                 currentAlign === 'center' ? 'right' : 'left';
+                
+                cellsToFormat.forEach(cellId => {
+                  newFormatting[cellId] = { ...newFormatting[cellId], textAlign: nextAlign };
+                });
                 setCellFormatting(newFormatting);
               }} style={{
                 background: '#0078d4',
@@ -1026,7 +1027,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                   <line x1="21" y1="14" x2="3" y2="14" stroke="white" strokeWidth="2"/>
                   <line x1="18" y1="18" x2="6" y2="18" stroke="white" strokeWidth="2"/>
                 </svg>
-                Center
+                Align
               </button>
               
               <button onClick={() => {
