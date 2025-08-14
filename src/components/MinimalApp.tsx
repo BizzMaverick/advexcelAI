@@ -916,7 +916,24 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               <h4 style={{ margin: 0, fontSize: '16px', color: '#333' }}>Format Text</h4>
             </div>
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              <button onClick={() => { setPrompt('make bold'); handleProcessAI(); }} style={{
+              <button onClick={() => {
+                // Apply bold to selected cells only
+                const newFormatting = { ...cellFormatting };
+                if (selectedCells.length > 0) {
+                  selectedCells.forEach(cellId => {
+                    newFormatting[cellId] = { ...newFormatting[cellId], fontWeight: 'bold' };
+                  });
+                } else {
+                  // If no selection, apply to all data cells
+                  for (let i = 1; i < fileData.length; i++) {
+                    for (let j = 0; j < fileData[i].length; j++) {
+                      const cellId = `${i}-${j}`;
+                      newFormatting[cellId] = { ...newFormatting[cellId], fontWeight: 'bold' };
+                    }
+                  }
+                }
+                setCellFormatting(newFormatting);
+              }} style={{
                 background: '#0078d4',
                 color: 'white',
                 border: 'none',
@@ -936,7 +953,24 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 Bold
               </button>
               
-              <button onClick={() => { setPrompt('make italic'); handleProcessAI(); }} style={{
+              <button onClick={() => {
+                // Apply italic to selected cells only
+                const newFormatting = { ...cellFormatting };
+                if (selectedCells.length > 0) {
+                  selectedCells.forEach(cellId => {
+                    newFormatting[cellId] = { ...newFormatting[cellId], fontStyle: 'italic' };
+                  });
+                } else {
+                  // If no selection, apply to all data cells
+                  for (let i = 1; i < fileData.length; i++) {
+                    for (let j = 0; j < fileData[i].length; j++) {
+                      const cellId = `${i}-${j}`;
+                      newFormatting[cellId] = { ...newFormatting[cellId], fontStyle: 'italic' };
+                    }
+                  }
+                }
+                setCellFormatting(newFormatting);
+              }} style={{
                 background: '#0078d4',
                 color: 'white',
                 border: 'none',
@@ -957,7 +991,24 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 Italic
               </button>
               
-              <button onClick={() => { setPrompt('center align'); handleProcessAI(); }} style={{
+              <button onClick={() => {
+                // Apply center align to selected cells only
+                const newFormatting = { ...cellFormatting };
+                if (selectedCells.length > 0) {
+                  selectedCells.forEach(cellId => {
+                    newFormatting[cellId] = { ...newFormatting[cellId], textAlign: 'center' };
+                  });
+                } else {
+                  // If no selection, apply to all data cells
+                  for (let i = 1; i < fileData.length; i++) {
+                    for (let j = 0; j < fileData[i].length; j++) {
+                      const cellId = `${i}-${j}`;
+                      newFormatting[cellId] = { ...newFormatting[cellId], textAlign: 'center' };
+                    }
+                  }
+                }
+                setCellFormatting(newFormatting);
+              }} style={{
                 background: '#0078d4',
                 color: 'white',
                 border: 'none',
@@ -978,7 +1029,24 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 Center
               </button>
               
-              <button onClick={() => { setPrompt('text color red'); handleProcessAI(); }} style={{
+              <button onClick={() => {
+                // Apply red color to selected cells only
+                const newFormatting = { ...cellFormatting };
+                if (selectedCells.length > 0) {
+                  selectedCells.forEach(cellId => {
+                    newFormatting[cellId] = { ...newFormatting[cellId], color: 'red' };
+                  });
+                } else {
+                  // If no selection, apply to all data cells
+                  for (let i = 1; i < fileData.length; i++) {
+                    for (let j = 0; j < fileData[i].length; j++) {
+                      const cellId = `${i}-${j}`;
+                      newFormatting[cellId] = { ...newFormatting[cellId], color: 'red' };
+                    }
+                  }
+                }
+                setCellFormatting(newFormatting);
+              }} style={{
                 background: '#0078d4',
                 color: 'white',
                 border: 'none',
@@ -1064,7 +1132,16 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                         {i + 1}
                       </td>
                       {Array.isArray(row) && row.length > 0 ? row.map((cell, j) => (
-                        <td key={j} style={{ 
+                        <td key={j} 
+                            onClick={() => {
+                              const cellId = `${i}-${j}`;
+                              if (selectedCells.includes(cellId)) {
+                                setSelectedCells(selectedCells.filter(id => id !== cellId));
+                              } else {
+                                setSelectedCells([...selectedCells, cellId]);
+                              }
+                            }}
+                            style={{ 
                           padding: '8px', 
                           borderRight: '1px solid #eee',
                           fontWeight: i === 0 ? 'bold' : 'normal',
@@ -1073,11 +1150,16 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                           textOverflow: 'ellipsis',
                           whiteSpace: 'nowrap',
                           color: '#333',
+                          cursor: 'pointer',
                           position: (i < frozenRows || j < frozenColumns) ? 'sticky' : 'static',
                           top: i < frozenRows ? '0' : 'auto',
                           left: j < frozenColumns ? `${j * 100}px` : 'auto',
                           zIndex: (i < frozenRows && j < frozenColumns) ? 20 : (i < frozenRows ? 15 : (j < frozenColumns ? 10 : 1)),
-                          backgroundColor: (i < frozenRows && j < frozenColumns) ? '#d4edda' : (j < frozenColumns ? '#f8fbff' : (i < frozenRows ? '#f0f8ff' : (i % 2 === 0 ? '#fafafa' : 'white'))),
+                          backgroundColor: selectedCells.includes(`${i}-${j}`) ? '#cce7ff' : 
+                                          (i < frozenRows && j < frozenColumns) ? '#d4edda' : 
+                                          (j < frozenColumns ? '#f8fbff' : 
+                                          (i < frozenRows ? '#f0f8ff' : 
+                                          (i % 2 === 0 ? '#fafafa' : 'white'))),
                           // Apply formatting from cellFormatting state
                           ...cellFormatting[`${i}-${j}`]
                         }}>
