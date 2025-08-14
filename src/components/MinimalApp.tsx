@@ -880,11 +880,105 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
 
 
 
+        {/* Authentic Microsoft Office Ribbon */}
+        {fileData.length > 0 && (
+          <div style={{
+            background: '#ffffff',
+            borderBottom: '1px solid #d4d4d4',
+            marginBottom: '0'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              padding: '8px 16px',
+              gap: '12px',
+              minHeight: '48px',
+              background: 'linear-gradient(to bottom, #ffffff 0%, #f5f5f5 100%)'
+            }}>
+              {/* Font Group */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <button onClick={() => { setPrompt('make bold'); handleProcessAI(); }} style={{
+                  width: '20px', height: '20px', border: 'none', background: 'transparent',
+                  cursor: 'pointer', fontSize: '11px', fontWeight: '700', color: '#444444',
+                  borderRadius: '1px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontFamily: 'Segoe UI, sans-serif'
+                }} onMouseEnter={(e) => { e.target.style.background = '#c7e0f4'; e.target.style.border = '1px solid #92c5f7'; }}
+                   onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.border = 'none'; }}
+                   title="Bold">B</button>
+                   
+                <button onClick={() => { setPrompt('make italic'); handleProcessAI(); }} style={{
+                  width: '20px', height: '20px', border: 'none', background: 'transparent',
+                  cursor: 'pointer', fontSize: '11px', fontStyle: 'italic', color: '#444444',
+                  borderRadius: '1px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontFamily: 'Segoe UI, sans-serif'
+                }} onMouseEnter={(e) => { e.target.style.background = '#c7e0f4'; e.target.style.border = '1px solid #92c5f7'; }}
+                   onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.border = 'none'; }}
+                   title="Italic">I</button>
+              </div>
+              
+              <div style={{ width: '1px', height: '16px', background: '#d4d4d4', margin: '0 4px' }} />
+              
+              {/* Paragraph Group */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <button onClick={() => { setPrompt('left align'); handleProcessAI(); }} style={{
+                  width: '20px', height: '20px', border: 'none', background: 'transparent',
+                  cursor: 'pointer', color: '#444444', borderRadius: '1px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px'
+                }} onMouseEnter={(e) => { e.target.style.background = '#c7e0f4'; e.target.style.border = '1px solid #92c5f7'; }}
+                   onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.border = 'none'; }}
+                   title="Align Text Left">≡</button>
+                   
+                <button onClick={() => { setPrompt('center align'); handleProcessAI(); }} style={{
+                  width: '20px', height: '20px', border: 'none', background: 'transparent',
+                  cursor: 'pointer', color: '#444444', borderRadius: '1px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px'
+                }} onMouseEnter={(e) => { e.target.style.background = '#c7e0f4'; e.target.style.border = '1px solid #92c5f7'; }}
+                   onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.border = 'none'; }}
+                   title="Center">☰</button>
+                   
+                <button onClick={() => { setPrompt('right align'); handleProcessAI(); }} style={{
+                  width: '20px', height: '20px', border: 'none', background: 'transparent',
+                  cursor: 'pointer', color: '#444444', borderRadius: '1px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px'
+                }} onMouseEnter={(e) => { e.target.style.background = '#c7e0f4'; e.target.style.border = '1px solid #92c5f7'; }}
+                   onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.border = 'none'; }}
+                   title="Align Text Right">☰</button>
+              </div>
+              
+              <div style={{ width: '1px', height: '16px', background: '#d4d4d4', margin: '0 4px' }} />
+              
+              {/* Font Color */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <div style={{ position: 'relative' }}>
+                  <button onClick={() => { setPrompt('text color red'); handleProcessAI(); }} style={{
+                    width: '20px', height: '20px', border: 'none', background: 'transparent',
+                    cursor: 'pointer', fontSize: '11px', color: '#444444', borderRadius: '1px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold',
+                    fontFamily: 'Segoe UI, sans-serif', position: 'relative'
+                  }} onMouseEnter={(e) => { e.target.style.background = '#c7e0f4'; e.target.style.border = '1px solid #92c5f7'; }}
+                     onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.border = 'none'; }}
+                     title="Font Color">A</button>
+                  <div style={{ position: 'absolute', bottom: '2px', left: '2px', width: '16px', height: '2px', background: '#ff0000' }} />
+                </div>
+                
+                <button onClick={() => { setPrompt('highlight yellow'); handleProcessAI(); }} style={{
+                  width: '20px', height: '20px', border: 'none', background: 'transparent',
+                  cursor: 'pointer', fontSize: '10px', color: '#444444', borderRadius: '1px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }} onMouseEnter={(e) => { e.target.style.background = '#c7e0f4'; e.target.style.border = '1px solid #92c5f7'; }}
+                   onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.border = 'none'; }}
+                   title="Text Highlight Color">🖍</button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* File Data */}
         {fileData.length > 0 && (
           <div style={{ 
             background: 'white',
-            borderRadius: '8px',
+            border: '1px solid #d4d4d4',
+            borderTop: 'none',
             marginBottom: '15px',
             overflow: 'hidden'
           }}>
