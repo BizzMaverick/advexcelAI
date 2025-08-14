@@ -74,9 +74,14 @@ class BedrockService {
       return prompt; // No enhancement for sort
     }
     
+    // Replace takes priority over find/lookup
+    if (lowerPrompt.includes('replace') || lowerPrompt.includes('substitute')) {
+      return `${prompt}. ACTUALLY replace the text and return the modified dataset. Do not explain how.`;
+    }
+    
     if (lowerPrompt.includes('lookup') || lowerPrompt.includes('find') || lowerPrompt.includes('search')) {
-      // Only enhance for multiple terms (contains 'and')
-      if (lowerPrompt.includes(' and ')) {
+      // Only enhance for multiple terms (contains 'and') and NOT replace operations
+      if (lowerPrompt.includes(' and ') && !lowerPrompt.includes('replace')) {
         return `${prompt}. Search for ALL mentioned countries/terms and return matching rows.`;
       }
       return prompt; // No enhancement for single lookup
@@ -122,10 +127,6 @@ class BedrockService {
     
     if (lowerPrompt.includes('trim') || lowerPrompt.includes('remove spaces')) {
       return `${prompt}. ACTUALLY remove extra spaces and return the cleaned dataset. Do not explain how.`;
-    }
-    
-    if (lowerPrompt.includes('replace') || lowerPrompt.includes('substitute')) {
-      return `${prompt}. ACTUALLY replace the text and return the modified dataset. Do not explain how.`;
     }
     
     // Date/Time function enhancements - ACTUALLY DO THE WORK
