@@ -918,11 +918,9 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               <button onClick={() => {
                 // Toggle bold on/off
+                if (selectedCells.length === 0) return; // Do nothing if no cells selected
                 const newFormatting = { ...cellFormatting };
-                const cellsToFormat = selectedCells.length > 0 ? selectedCells : 
-                  Array.from({length: fileData.length - 1}, (_, i) => 
-                    Array.from({length: fileData[0]?.length || 0}, (_, j) => `${i+1}-${j}`)
-                  ).flat();
+                const cellsToFormat = selectedCells;
                 
                 // Check if first cell is already bold
                 const firstCellId = cellsToFormat[0];
@@ -961,11 +959,9 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               
               <button onClick={() => {
                 // Toggle italic on/off
+                if (selectedCells.length === 0) return; // Do nothing if no cells selected
                 const newFormatting = { ...cellFormatting };
-                const cellsToFormat = selectedCells.length > 0 ? selectedCells : 
-                  Array.from({length: fileData.length - 1}, (_, i) => 
-                    Array.from({length: fileData[0]?.length || 0}, (_, j) => `${i+1}-${j}`)
-                  ).flat();
+                const cellsToFormat = selectedCells;
                 
                 // Check if first cell is already italic
                 const firstCellId = cellsToFormat[0];
@@ -1005,11 +1001,9 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               
               <button onClick={() => {
                 // Cycle through left → center → right alignment
+                if (selectedCells.length === 0) return; // Do nothing if no cells selected
                 const newFormatting = { ...cellFormatting };
-                const cellsToFormat = selectedCells.length > 0 ? selectedCells : 
-                  Array.from({length: fileData.length - 1}, (_, i) => 
-                    Array.from({length: fileData[0]?.length || 0}, (_, j) => `${i+1}-${j}`)
-                  ).flat();
+                const cellsToFormat = selectedCells;
                 
                 // Get current alignment of first cell (or default to left)
                 const firstCellId = cellsToFormat[0];
@@ -1054,12 +1048,10 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               
               <button onClick={() => {
                 // Cycle through 10 standard colors like Word/PowerPoint
+                if (selectedCells.length === 0) return; // Do nothing if no cells selected
                 const colors = ['red', 'blue', 'green', 'orange', 'purple', 'yellow', 'brown', 'pink', 'gray', 'black'];
                 const newFormatting = { ...cellFormatting };
-                const cellsToFormat = selectedCells.length > 0 ? selectedCells : 
-                  Array.from({length: fileData.length - 1}, (_, i) => 
-                    Array.from({length: fileData[0]?.length || 0}, (_, j) => `${i+1}-${j}`)
-                  ).flat();
+                const cellsToFormat = selectedCells;
                 
                 // Get current color of first cell
                 const firstCellId = cellsToFormat[0];
