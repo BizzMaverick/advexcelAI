@@ -95,85 +95,83 @@ class BedrockService {
       return `${prompt}. Calculate the requested statistics.`;
     }
     
-    // Text function enhancements
+    // Text function enhancements - ACTUALLY DO THE WORK
     if (lowerPrompt.includes('uppercase') || lowerPrompt.includes('upper case')) {
-      return `${prompt}. Convert the specified text to uppercase and return the complete modified dataset.`;
+      return `${prompt}. ACTUALLY convert the text to uppercase and return the modified dataset. Do not explain how.`;
     }
     
     if (lowerPrompt.includes('lowercase') || lowerPrompt.includes('lower case')) {
-      return `${prompt}. Convert the specified text to lowercase and return the complete modified dataset.`;
+      return `${prompt}. ACTUALLY convert the text to lowercase and return the modified dataset. Do not explain how.`;
     }
     
     if (lowerPrompt.includes('proper case') || lowerPrompt.includes('title case')) {
-      return `${prompt}. Use Excel PROPER() function logic to convert text to proper case (first letter of each word capitalized). Return the modified data.`;
+      return `${prompt}. ACTUALLY convert text to proper case and return the modified dataset. Do not explain how.`;
     }
     
     if (lowerPrompt.includes('concatenate') || lowerPrompt.includes('combine') || lowerPrompt.includes('merge') || lowerPrompt.includes('concat')) {
-      return `${prompt}. Combine the first and last name columns and return the complete dataset with a new combined column.`;
+      return `${prompt}. ACTUALLY combine the columns and return the complete dataset with new combined column. Do not explain how.`;
     }
     
     if (lowerPrompt.includes('extract') || lowerPrompt.includes('substring') || lowerPrompt.includes('left') || lowerPrompt.includes('right') || lowerPrompt.includes('mid')) {
-      return `${prompt}. Extract the specified parts of text and return the complete modified dataset.`;
+      return `${prompt}. ACTUALLY extract the specified text parts and return the modified dataset. Do not explain how.`;
     }
     
     if (lowerPrompt.includes('length') || lowerPrompt.includes('len')) {
-      return `${prompt}. Calculate text length and return the complete modified dataset with length values.`;
+      return `${prompt}. ACTUALLY calculate text length and return the modified dataset. Do not explain how.`;
     }
     
     if (lowerPrompt.includes('trim') || lowerPrompt.includes('remove spaces')) {
-      return `${prompt}. Use Excel TRIM() function logic to remove extra spaces. Return the cleaned data.`;
+      return `${prompt}. ACTUALLY remove extra spaces and return the cleaned dataset. Do not explain how.`;
     }
-    
-    // This is now handled by intelligent operation detection above
     
     if (lowerPrompt.includes('replace') || lowerPrompt.includes('substitute')) {
-      return `${prompt}. Use Excel SUBSTITUTE() or REPLACE() function logic to replace text. Return the data with replaced text.`;
+      return `${prompt}. ACTUALLY replace the text and return the modified dataset. Do not explain how.`;
     }
     
-    // Date/Time function enhancements
+    // Date/Time function enhancements - ACTUALLY DO THE WORK
     if (lowerPrompt.includes('age') || lowerPrompt.includes('years old')) {
-      return `${prompt}. Calculate age from the date column and return the complete modified dataset with calculated ages.`;
+      return `${prompt}. ACTUALLY calculate ages and return the modified dataset. Do not explain how.`;
     }
     
     if (lowerPrompt.includes('year') || lowerPrompt.includes('extract year')) {
-      return `${prompt}. Use Excel YEAR() function logic to extract year from dates. Return the data with extracted years.`;
+      return `${prompt}. ACTUALLY extract years from dates and return the modified dataset. Do not explain how.`;
     }
     
     if (lowerPrompt.includes('month') || lowerPrompt.includes('extract month')) {
-      return `${prompt}. Use Excel MONTH() function logic to extract month from dates. Return the data with extracted months.`;
+      return `${prompt}. ACTUALLY extract months from dates and return the modified dataset. Do not explain how.`;
     }
     
     if (lowerPrompt.includes('day') || lowerPrompt.includes('extract day')) {
-      return `${prompt}. Use Excel DAY() function logic to extract day from dates. Return the data with extracted days.`;
+      return `${prompt}. ACTUALLY extract days from dates and return the modified dataset. Do not explain how.`;
     }
     
     if (lowerPrompt.includes('weekday') || lowerPrompt.includes('day of week')) {
-      return `${prompt}. Use Excel WEEKDAY() function logic to get day of week. Return the data with weekday information.`;
+      return `${prompt}. ACTUALLY get day of week and return the modified dataset. Do not explain how.`;
     }
     
     if (lowerPrompt.includes('format date') || lowerPrompt.includes('date format')) {
-      return `${prompt}. Use Excel date formatting logic to change date display format. Return the data with formatted dates.`;
+      return `${prompt}. ACTUALLY format the dates and return the modified dataset. Do not explain how.`;
     }
     
     if (lowerPrompt.includes('days between') || lowerPrompt.includes('date difference')) {
-      return `${prompt}. Calculate difference between dates using Excel date arithmetic. Return the data with calculated differences.`;
+      return `${prompt}. ACTUALLY calculate date differences and return the modified dataset. Do not explain how.`;
     }
     
     if (lowerPrompt.includes('today') || lowerPrompt.includes('current date')) {
-      return `${prompt}. Use Excel TODAY() function logic to work with current date. Return relevant data based on today's date.`;
+      return `${prompt}. ACTUALLY work with current date and return relevant data. Do not explain how.`;
     }
     
     if (lowerPrompt.includes('now') || lowerPrompt.includes('current time')) {
-      return `${prompt}. Use Excel NOW() function logic to work with current date and time. Return relevant data.`;
+      return `${prompt}. ACTUALLY work with current date/time and return relevant data. Do not explain how.`;
     }
     
-    // Math function enhancements
+    // Math function enhancements - ACTUALLY DO THE WORK
     if (lowerPrompt.includes('round') || lowerPrompt.includes('rounding')) {
-      return `${prompt}. Use Excel ROUND() function logic to round numbers to specified decimal places. Return the data with rounded values.`;
+      return `${prompt}. ACTUALLY round the numbers and return the modified dataset. Do not explain how.`;
     }
     
     if (lowerPrompt.includes('absolute') || lowerPrompt.includes('abs')) {
-      return `${prompt}. Use Excel ABS() function logic to get absolute values. Return the data with absolute values.`;
+      return `${prompt}. ACTUALLY get absolute values and return the modified dataset. Do not explain how.`;
     }
     
     // This is now handled by intelligent operation detection above
