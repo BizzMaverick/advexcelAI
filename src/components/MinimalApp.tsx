@@ -149,7 +149,35 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
     // Handle remove duplicates locally without backend call
     const removeDuplicatesResult = handleRemoveDuplicates(trimmedPrompt, fileData);
     if (removeDuplicatesResult) {
-      setAiResponse(removeDuplicatesResult.message);
+      console.log('Remove duplicates processed:', removeDuplicatesResult.data.length, 'rows');
+      
+      // Build HTML table for the results
+      let tableHtml = '<div style="margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; overflow: auto; max-height: 400px;"><table style="width: 100%; border-collapse: collapse; font-size: 12px;">';
+      
+      // Add Excel-style column headers
+      tableHtml += '<tr style="background: #e6f3ff; border-bottom: 2px solid #0078d4;">';
+      tableHtml += '<th style="padding: 4px 8px; fontSize: 11px; font-weight: bold; color: #0078d4; border: 1px solid #ddd; min-width: 40px;">#</th>';
+      if (removeDuplicatesResult.data[0]) {
+        removeDuplicatesResult.data[0].forEach((_, colIndex) => {
+          tableHtml += `<th style="padding: 4px 8px; fontSize: 11px; font-weight: bold; color: #0078d4; border: 1px solid #ddd; min-width: 100px;">${String.fromCharCode(65 + colIndex)}</th>`;
+        });
+      }
+      tableHtml += '</tr>';
+      
+      removeDuplicatesResult.data.forEach((row, i) => {
+        const isHeader = i === 0;
+        tableHtml += `<tr style="background: ${isHeader ? '#f0f8ff' : (i % 2 === 0 ? '#fafafa' : 'white')}; border-bottom: 1px solid #eee;">`;
+        // Add row number
+        tableHtml += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; fontSize: 11px; color: #0078d4; background: #f8f9ff; text-align: center; min-width: 40px;">${i + 1}</td>`;
+        row.forEach(cell => {
+          tableHtml += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: ${isHeader ? 'bold' : 'normal'}; color: #333; white-space: nowrap;">${String(cell || '')}</td>`;
+        });
+        tableHtml += '</tr>';
+      });
+      
+      tableHtml += '</table></div>';
+      
+      setAiResponse(`${removeDuplicatesResult.message}<br><br>${tableHtml}`);
       setLastAiResult(removeDuplicatesResult.data);
       setShowUseResultButton(true);
       setPrompt('');
