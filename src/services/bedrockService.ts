@@ -101,6 +101,14 @@ class BedrockService {
     }
     
     // Text function enhancements - ACTUALLY DO THE WORK
+    if (lowerPrompt.includes('make bold') || lowerPrompt.includes('bold')) {
+      return `${prompt}. ACTUALLY make the text bold in the dataset and return the modified data with bold formatting applied. Do not explain how.`;
+    }
+    
+    if (lowerPrompt.includes('make italic') || lowerPrompt.includes('italic')) {
+      return `${prompt}. ACTUALLY make the text italic in the dataset and return the modified data with italic formatting applied. Do not explain how.`;
+    }
+    
     if (lowerPrompt.includes('uppercase') || lowerPrompt.includes('upper case')) {
       return `${prompt}. ACTUALLY convert the text to uppercase and return the modified dataset. Do not explain how.`;
     }
