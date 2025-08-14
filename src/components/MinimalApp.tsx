@@ -1053,8 +1053,8 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               </button>
               
               <button onClick={() => {
-                // Cycle through colors: black → red → blue → green → orange → back to black
-                const colors = ['black', 'red', 'blue', 'green', 'orange'];
+                // Cycle through 10 standard colors like Word/PowerPoint
+                const colors = ['red', 'blue', 'green', 'orange', 'purple', 'yellow', 'brown', 'pink', 'gray', 'black'];
                 const newFormatting = { ...cellFormatting };
                 const cellsToFormat = selectedCells.length > 0 ? selectedCells : 
                   Array.from({length: fileData.length - 1}, (_, i) => 
@@ -1063,20 +1063,13 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 
                 // Get current color of first cell
                 const firstCellId = cellsToFormat[0];
-                const currentColor = cellFormatting[firstCellId]?.color || 'black';
+                const currentColor = cellFormatting[firstCellId]?.color || 'red';
                 const currentIndex = colors.indexOf(currentColor);
                 const nextIndex = (currentIndex + 1) % colors.length;
                 const nextColor = colors[nextIndex];
                 
                 cellsToFormat.forEach(cellId => {
-                  if (nextColor === 'black') {
-                    // Remove color (back to default)
-                    const { color, ...rest } = newFormatting[cellId] || {};
-                    newFormatting[cellId] = rest;
-                  } else {
-                    // Apply next color
-                    newFormatting[cellId] = { ...newFormatting[cellId], color: nextColor };
-                  }
+                  newFormatting[cellId] = { ...newFormatting[cellId], color: nextColor };
                 });
                 setCellFormatting(newFormatting);
               }} style={{
@@ -1097,12 +1090,13 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 {(() => {
                   if (selectedCells.length > 0) {
                     const firstCellId = selectedCells[0];
-                    const currentColor = cellFormatting[firstCellId]?.color;
-                    if (currentColor === 'red') return 'Red';
-                    if (currentColor === 'blue') return 'Blue';
-                    if (currentColor === 'green') return 'Green';
-                    if (currentColor === 'orange') return 'Orange';
-                    return 'Black';
+                    const currentColor = cellFormatting[firstCellId]?.color || 'red';
+                    const colorNames = {
+                      'red': 'Red', 'blue': 'Blue', 'green': 'Green', 'orange': 'Orange',
+                      'purple': 'Purple', 'yellow': 'Yellow', 'brown': 'Brown', 
+                      'pink': 'Pink', 'gray': 'Gray', 'black': 'Black'
+                    };
+                    return colorNames[currentColor] || 'Red';
                   }
                   return 'Color';
                 })()}
