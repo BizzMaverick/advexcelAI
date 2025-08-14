@@ -907,7 +907,8 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 fontWeight: 'bold',
                 fontSize: '14px',
                 minWidth: '32px',
-                height: '32px'
+                height: '32px',
+                color: '#374151'
               }} title="Bold">
                 B
               </button>
@@ -925,7 +926,8 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 fontStyle: 'italic',
                 fontSize: '14px',
                 minWidth: '32px',
-                height: '32px'
+                height: '32px',
+                color: '#374151'
               }} title="Italic">
                 I
               </button>
@@ -942,9 +944,11 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 background: '#ffffff',
                 borderRadius: '4px',
                 cursor: 'pointer',
-                fontSize: '12px',
+                fontSize: '14px',
                 minWidth: '32px',
-                height: '32px'
+                height: '32px',
+                color: '#374151',
+                fontWeight: 'bold'
               }} title="Align Left">
                 ⬅
               </button>
@@ -958,11 +962,13 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 background: '#ffffff',
                 borderRadius: '4px',
                 cursor: 'pointer',
-                fontSize: '12px',
+                fontSize: '14px',
                 minWidth: '32px',
-                height: '32px'
+                height: '32px',
+                color: '#374151',
+                fontWeight: 'bold'
               }} title="Center">
-                ↔
+                ⬅➡
               </button>
               
               <button onClick={() => {
@@ -974,9 +980,11 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 background: '#ffffff',
                 borderRadius: '4px',
                 cursor: 'pointer',
-                fontSize: '12px',
+                fontSize: '14px',
                 minWidth: '32px',
-                height: '32px'
+                height: '32px',
+                color: '#374151',
+                fontWeight: 'bold'
               }} title="Align Right">
                 ➡
               </button>
@@ -993,13 +1001,15 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 background: '#ffffff',
                 borderRadius: '4px',
                 cursor: 'pointer',
-                fontSize: '12px',
+                fontSize: '14px',
                 minWidth: '32px',
                 height: '32px',
+                color: '#374151',
+                fontWeight: 'bold',
                 position: 'relative'
               }} title="Text Color">
                 A
-                <div style={{ position: 'absolute', bottom: '2px', left: '50%', transform: 'translateX(-50%)', width: '20px', height: '3px', background: '#000' }} />
+                <div style={{ position: 'absolute', bottom: '2px', left: '50%', transform: 'translateX(-50%)', width: '20px', height: '3px', background: '#ef4444' }} />
               </button>
               
               <button onClick={() => {
@@ -1011,9 +1021,10 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 background: '#ffffff',
                 borderRadius: '4px',
                 cursor: 'pointer',
-                fontSize: '12px',
+                fontSize: '14px',
                 minWidth: '32px',
-                height: '32px'
+                height: '32px',
+                color: '#374151'
               }} title="Highlight">
                 🎨
               </button>
