@@ -889,25 +889,26 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
             <div style={{
               display: 'flex',
               alignItems: 'center',
-              padding: '8px 12px',
+              padding: '6px 8px',
               borderBottom: '1px solid #e5e7eb',
-              gap: '4px',
-              flexWrap: 'wrap'
+              gap: '2px',
+              flexWrap: 'wrap',
+              overflowX: 'auto'
             }}>
               {/* Bold */}
               <button onClick={() => {
                 setPrompt('make bold');
                 handleProcessAI();
               }} style={{
-                padding: '6px 8px',
+                padding: '4px 6px',
                 border: '1px solid #d1d5db',
                 background: '#ffffff',
-                borderRadius: '4px',
+                borderRadius: '3px',
                 cursor: 'pointer',
                 fontWeight: 'bold',
-                fontSize: '14px',
-                minWidth: '32px',
-                height: '32px',
+                fontSize: '12px',
+                minWidth: '28px',
+                height: '28px',
                 color: '#374151'
               }} title="Bold">
                 B
@@ -918,15 +919,15 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 setPrompt('make italic');
                 handleProcessAI();
               }} style={{
-                padding: '6px 8px',
+                padding: '4px 6px',
                 border: '1px solid #d1d5db',
                 background: '#ffffff',
-                borderRadius: '4px',
+                borderRadius: '3px',
                 cursor: 'pointer',
                 fontStyle: 'italic',
-                fontSize: '14px',
-                minWidth: '32px',
-                height: '32px',
+                fontSize: '12px',
+                minWidth: '28px',
+                height: '28px',
                 color: '#374151'
               }} title="Italic">
                 I
