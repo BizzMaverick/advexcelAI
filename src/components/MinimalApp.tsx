@@ -1039,7 +1039,15 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                   <line x1="21" y1="14" x2="3" y2="14" stroke="white" strokeWidth="2"/>
                   <line x1="18" y1="18" x2="6" y2="18" stroke="white" strokeWidth="2"/>
                 </svg>
-                Align
+                {(() => {
+                  if (selectedCells.length > 0) {
+                    const firstCellId = selectedCells[0];
+                    const currentAlign = cellFormatting[firstCellId]?.textAlign || 'left';
+                    return currentAlign === 'left' ? 'Left' : 
+                           currentAlign === 'center' ? 'Center' : 'Right';
+                  }
+                  return 'Align';
+                })()}
               </button>
               
               <button onClick={() => {
