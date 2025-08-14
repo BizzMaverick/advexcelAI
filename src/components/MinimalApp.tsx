@@ -941,10 +941,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z" fill="white"/>
-                  <path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z" fill="white"/>
-                </svg>
+                <span style={{ fontSize: '16px', fontWeight: 'bold', fontFamily: 'Arial, sans-serif' }}>B</span>
               </button>
               
               <button onClick={() => {
