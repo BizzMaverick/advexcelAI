@@ -824,6 +824,30 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
           </div>
         </div>
         
+        {/* Formatting Toolbar */}
+        {fileData.length > 0 && (
+          <FormattingToolbar
+            onFormatChange={(format) => {
+              selectedCells.forEach(cellId => {
+                setCellFormatting(prev => ({
+                  ...prev,
+                  [cellId]: { ...prev[cellId], ...format }
+                }));
+              });
+            }}
+            onClearFormat={() => {
+              selectedCells.forEach(cellId => {
+                setCellFormatting(prev => {
+                  const newFormatting = { ...prev };
+                  delete newFormatting[cellId];
+                  return newFormatting;
+                });
+              });
+            }}
+            selectedCells={selectedCells}
+          />
+        )}
+
         {/* File Data */}
         {fileData.length > 0 && (
           <div style={{ 
