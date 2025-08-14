@@ -1042,9 +1042,11 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 {(() => {
                   if (selectedCells.length > 0) {
                     const firstCellId = selectedCells[0];
-                    const currentAlign = cellFormatting[firstCellId]?.textAlign || 'left';
-                    return currentAlign === 'left' ? 'Left' : 
-                           currentAlign === 'center' ? 'Center' : 'Right';
+                    const currentAlign = cellFormatting[firstCellId]?.textAlign;
+                    if (currentAlign === 'center') return 'Center';
+                    if (currentAlign === 'right') return 'Right';
+                    if (currentAlign === 'left') return 'Left';
+                    return 'Left'; // Default state
                   }
                   return 'Align';
                 })()}
