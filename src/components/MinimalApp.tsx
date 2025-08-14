@@ -146,6 +146,44 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       return;
     }
 
+    // Handle find and replace locally without backend call
+    const findReplaceResult = handleFindReplace(trimmedPrompt, fileData);
+    if (findReplaceResult) {
+      console.log('Find and replace processed:', findReplaceResult.data.length, 'rows');
+      
+      // Build HTML table for the results
+      let tableHtml = '<div style="margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; overflow: auto; max-height: 400px;"><table style="width: 100%; border-collapse: collapse; font-size: 12px;">';
+      
+      // Add Excel-style column headers
+      tableHtml += '<tr style="background: #e6f3ff; border-bottom: 2px solid #0078d4;">';
+      tableHtml += '<th style="padding: 4px 8px; fontSize: 11px; font-weight: bold; color: #0078d4; border: 1px solid #ddd; min-width: 40px;">#</th>';
+      if (findReplaceResult.data[0]) {
+        findReplaceResult.data[0].forEach((_, colIndex) => {
+          tableHtml += `<th style="padding: 4px 8px; fontSize: 11px; font-weight: bold; color: #0078d4; border: 1px solid #ddd; min-width: 100px;">${String.fromCharCode(65 + colIndex)}</th>`;
+        });
+      }
+      tableHtml += '</tr>';
+      
+      findReplaceResult.data.forEach((row, i) => {
+        const isHeader = i === 0;
+        tableHtml += `<tr style="background: ${isHeader ? '#f0f8ff' : (i % 2 === 0 ? '#fafafa' : 'white')}; border-bottom: 1px solid #eee;">`;
+        // Add row number
+        tableHtml += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; fontSize: 11px; color: #0078d4; background: #f8f9ff; text-align: center; min-width: 40px;">${i + 1}</td>`;
+        row.forEach(cell => {
+          tableHtml += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: ${isHeader ? 'bold' : 'normal'}; color: #333; white-space: nowrap;">${String(cell || '')}</td>`;
+        });
+        tableHtml += '</tr>';
+      });
+      
+      tableHtml += '</table></div>';
+      
+      setAiResponse(`${findReplaceResult.message}<br><br>${tableHtml}`);
+      setLastAiResult(findReplaceResult.data);
+      setShowUseResultButton(true);
+      setPrompt('');
+      return;
+    }
+
     // Handle remove duplicates locally without backend call
     const removeDuplicatesResult = handleRemoveDuplicates(trimmedPrompt, fileData);
     if (removeDuplicatesResult) {
@@ -568,6 +606,47 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
     return {
       message: `<strong>Remove Duplicates completed successfully!</strong><br><br>Removed ${removedCount} duplicate rows from ${dataRows.length} total rows.<br>Showing ${uniqueRows.length} unique rows.`,
       data: result
+    };
+  }, []);
+
+  // Handle find and replace locally
+  const handleFindReplace = useCallback((prompt: string, data: any[][]) => {
+    const lowerPrompt = prompt.toLowerCase();
+    
+    if (!lowerPrompt.includes('find') || !lowerPrompt.includes('replace')) {
+      return null; // Not a find and replace operation
+    }
+    
+    if (!data || data.length <= 1) {
+      return { message: '<strong>Error:</strong> No data to process', data: [] };
+    }
+    
+    // Parse "find X and replace with Y" or "replace X with Y"
+    const findReplaceMatch = prompt.match(/find\s+(.+?)\s+and\s+replace\s+with\s+(.+)/i) || 
+                            prompt.match(/replace\s+(.+?)\s+with\s+(.+)/i);
+    
+    if (!findReplaceMatch) {
+      return { message: '<strong>Error:</strong> Could not parse find and replace command', data: [] };
+    }
+    
+    const findText = findReplaceMatch[1].trim();
+    const replaceText = findReplaceMatch[2].trim();
+    
+    let replacementCount = 0;
+    const modifiedData = data.map(row => 
+      row.map(cell => {
+        const cellStr = String(cell || '');
+        if (cellStr.toLowerCase().includes(findText.toLowerCase())) {
+          replacementCount++;
+          return cellStr.replace(new RegExp(findText, 'gi'), replaceText);
+        }
+        return cell;
+      })
+    );
+    
+    return {
+      message: `<strong>Find and Replace completed successfully!</strong><br><br>Replaced "${findText}" with "${replaceText}" in ${replacementCount} cells.`,
+      data: modifiedData
     };
   }, []);
 
