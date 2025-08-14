@@ -449,10 +449,10 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
     const cellMultiplyMatch = prompt.match(/([A-Z])(\d+)\s*\*\s*([A-Z])(\d+)/i) || prompt.match(/([A-Z])(\d+)\s+multiplied\s+by\s+([A-Z])(\d+)/i);
     const cellMultipleMatch = prompt.match(/(sum|add)\s+of\s+([A-Z]\d+(?:\s+[A-Z]\d+)*(?:\s+and\s+[A-Z]\d+)*)/i);
     const cellAvgMatch = prompt.match(/average\s+([A-Z])(\d+)\s+to\s+([A-Z])(\d+)/i);
-    const cellCountMatch = prompt.match(/count\s+([A-Z])(\d+)\s+to\s+([A-Z])(\d+)/i);
-    const cellCountAMatch = prompt.match(/counta\s+([A-Z])(\d+)\s+to\s+([A-Z])(\d+)/i);
-    const cellMaxMatch = prompt.match(/max\s+([A-Z])(\d+)\s+to\s+([A-Z])(\d+)/i);
-    const cellMinMatch = prompt.match(/min\s+([A-Z])(\d+)\s+to\s+([A-Z])(\d+)/i);
+    const cellCountMatch = prompt.match(/count\s+([A-Z])(\d+)\s+to\s+([A-Z])(\d+)/i) || prompt.match(/count\s+(?:column\s+)?([A-Z])\b/i);
+    const cellCountAMatch = prompt.match(/counta\s+([A-Z])(\d+)\s+to\s+([A-Z])(\d+)/i) || prompt.match(/counta\s+(?:column\s+)?([A-Z])\b/i);
+    const cellMaxMatch = prompt.match(/max\s+([A-Z])(\d+)\s+to\s+([A-Z])(\d+)/i) || prompt.match(/max\s+(?:column\s+)?([A-Z])\b/i);
+    const cellMinMatch = prompt.match(/min\s+([A-Z])(\d+)\s+to\s+([A-Z])(\d+)/i) || prompt.match(/min\s+(?:column\s+)?([A-Z])\b/i);
     
     if (!data || data.length === 0) return null;
     
@@ -639,64 +639,111 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       return `<strong>Error:</strong> Could not calculate average for range ${col1}${row1} to ${col2}${row2}`;
     }
     
-    // Handle COUNT (count numbers in range)
+    // Handle COUNT (count numbers in range or entire column)
     if (cellCountMatch) {
-      const [, col1, row1, col2, row2] = cellCountMatch;
-      
-      if (col1 === col2) {
-        const startRow = parseInt(row1);
-        const endRow = parseInt(row2);
-        let count = 0;
+      if (cellCountMatch.length === 2) {
+        // "count column B" or "count B" - entire column
+        const col = cellCountMatch[1].toUpperCase();
+        const colIndex = col.charCodeAt(0) - 65;
         
-        for (let row = startRow; row <= endRow; row++) {
-          const value = getCellValue(col1, row);
+        if (colIndex < 0 || colIndex >= (data[0]?.length || 0)) {
+          return `<strong>Error:</strong> Column ${col} does not exist`;
+        }
+        
+        let count = 0;
+        for (let i = 1; i < data.length; i++) { // Skip header
+          const value = getCellValue(col, i + 1);
           if (value !== null) count++;
         }
         
+        const columnName = data[0][colIndex] || `Column ${col}`;
         return `<strong>COUNT Result:</strong><br><br>` +
-               `Numbers in ${col1}${row1} to ${col1}${row2}: <strong>${count}</strong>`;
+               `Numbers in ${columnName}: <strong>${count}</strong>`;
+      } else {
+        // Range format
+        const [, col1, row1, col2, row2] = cellCountMatch;
+        
+        if (col1 === col2) {
+          const startRow = parseInt(row1);
+          const endRow = parseInt(row2);
+          let count = 0;
+          
+          for (let row = startRow; row <= endRow; row++) {
+            const value = getCellValue(col1, row);
+            if (value !== null) count++;
+          }
+          
+          return `<strong>COUNT Result:</strong><br><br>` +
+                 `Numbers in ${col1}${row1} to ${col1}${row2}: <strong>${count}</strong>`;
+        }
+        return `<strong>Error:</strong> COUNT only works with same column ranges`;
       }
-      return `<strong>Error:</strong> COUNT only works with same column ranges`;
     }
     
     // Handle COUNTA (count non-empty cells)
     if (cellCountAMatch) {
-      const [, col1, row1, col2, row2] = cellCountAMatch;
-      
-      if (col1 === col2) {
-        const startRow = parseInt(row1);
-        const endRow = parseInt(row2);
-        let count = 0;
+      if (cellCountAMatch.length === 2) {
+        // "counta column B" or "counta B" - entire column
+        const col = cellCountAMatch[1].toUpperCase();
+        const colIndex = col.charCodeAt(0) - 65;
         
-        for (let row = startRow; row <= endRow; row++) {
-          const colIndex = col1.charCodeAt(0) - 65;
-          const rowIndex = row - 1;
-          if (rowIndex >= 0 && rowIndex < data.length && colIndex >= 0 && colIndex < (data[rowIndex]?.length || 0)) {
-            const value = data[rowIndex][colIndex];
-            if (value !== null && value !== undefined && String(value).trim() !== '') {
-              count++;
-            }
+        if (colIndex < 0 || colIndex >= (data[0]?.length || 0)) {
+          return `<strong>Error:</strong> Column ${col} does not exist`;
+        }
+        
+        let count = 0;
+        for (let i = 1; i < data.length; i++) { // Skip header
+          const value = data[i][colIndex];
+          if (value !== null && value !== undefined && String(value).trim() !== '') {
+            count++;
           }
         }
         
+        const columnName = data[0][colIndex] || `Column ${col}`;
         return `<strong>COUNTA Result:</strong><br><br>` +
-               `Non-empty cells in ${col1}${row1} to ${col1}${row2}: <strong>${count}</strong>`;
+               `Non-empty cells in ${columnName}: <strong>${count}</strong>`;
+      } else {
+        // Range format
+        const [, col1, row1, col2, row2] = cellCountAMatch;
+        
+        if (col1 === col2) {
+          const startRow = parseInt(row1);
+          const endRow = parseInt(row2);
+          let count = 0;
+          
+          for (let row = startRow; row <= endRow; row++) {
+            const colIndex = col1.charCodeAt(0) - 65;
+            const rowIndex = row - 1;
+            if (rowIndex >= 0 && rowIndex < data.length && colIndex >= 0 && colIndex < (data[rowIndex]?.length || 0)) {
+              const value = data[rowIndex][colIndex];
+              if (value !== null && value !== undefined && String(value).trim() !== '') {
+                count++;
+              }
+            }
+          }
+          
+          return `<strong>COUNTA Result:</strong><br><br>` +
+                 `Non-empty cells in ${col1}${row1} to ${col1}${row2}: <strong>${count}</strong>`;
+        }
+        return `<strong>Error:</strong> COUNTA only works with same column ranges`;
       }
-      return `<strong>Error:</strong> COUNTA only works with same column ranges`;
     }
     
     // Handle MAX (find maximum value)
     if (cellMaxMatch) {
-      const [, col1, row1, col2, row2] = cellMaxMatch;
-      
-      if (col1 === col2) {
-        const startRow = parseInt(row1);
-        const endRow = parseInt(row2);
+      if (cellMaxMatch.length === 2) {
+        // "max column B" or "max B" - entire column
+        const col = cellMaxMatch[1].toUpperCase();
+        const colIndex = col.charCodeAt(0) - 65;
+        
+        if (colIndex < 0 || colIndex >= (data[0]?.length || 0)) {
+          return `<strong>Error:</strong> Column ${col} does not exist`;
+        }
+        
         let max = -Infinity;
         let count = 0;
-        
-        for (let row = startRow; row <= endRow; row++) {
-          const value = getCellValue(col1, row);
+        for (let i = 1; i < data.length; i++) { // Skip header
+          const value = getCellValue(col, i + 1);
           if (value !== null) {
             max = Math.max(max, value);
             count++;
@@ -704,25 +751,53 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
         }
         
         if (count > 0) {
+          const columnName = data[0][colIndex] || `Column ${col}`;
           return `<strong>MAX Result:</strong><br><br>` +
-                 `Maximum value in ${col1}${row1} to ${col1}${row2}: <strong>${max}</strong>`;
+                 `Maximum value in ${columnName}: <strong>${max}</strong>`;
         }
+        return `<strong>Error:</strong> No numeric values found in column ${col}`;
+      } else {
+        // Range format
+        const [, col1, row1, col2, row2] = cellMaxMatch;
+        
+        if (col1 === col2) {
+          const startRow = parseInt(row1);
+          const endRow = parseInt(row2);
+          let max = -Infinity;
+          let count = 0;
+          
+          for (let row = startRow; row <= endRow; row++) {
+            const value = getCellValue(col1, row);
+            if (value !== null) {
+              max = Math.max(max, value);
+              count++;
+            }
+          }
+          
+          if (count > 0) {
+            return `<strong>MAX Result:</strong><br><br>` +
+                   `Maximum value in ${col1}${row1} to ${col1}${row2}: <strong>${max}</strong>`;
+          }
+        }
+        return `<strong>Error:</strong> Could not find numeric values for MAX`;
       }
-      return `<strong>Error:</strong> Could not find numeric values for MAX`;
     }
     
     // Handle MIN (find minimum value)
     if (cellMinMatch) {
-      const [, col1, row1, col2, row2] = cellMinMatch;
-      
-      if (col1 === col2) {
-        const startRow = parseInt(row1);
-        const endRow = parseInt(row2);
+      if (cellMinMatch.length === 2) {
+        // "min column B" or "min B" - entire column
+        const col = cellMinMatch[1].toUpperCase();
+        const colIndex = col.charCodeAt(0) - 65;
+        
+        if (colIndex < 0 || colIndex >= (data[0]?.length || 0)) {
+          return `<strong>Error:</strong> Column ${col} does not exist`;
+        }
+        
         let min = Infinity;
         let count = 0;
-        
-        for (let row = startRow; row <= endRow; row++) {
-          const value = getCellValue(col1, row);
+        for (let i = 1; i < data.length; i++) { // Skip header
+          const value = getCellValue(col, i + 1);
           if (value !== null) {
             min = Math.min(min, value);
             count++;
@@ -730,11 +805,36 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
         }
         
         if (count > 0) {
+          const columnName = data[0][colIndex] || `Column ${col}`;
           return `<strong>MIN Result:</strong><br><br>` +
-                 `Minimum value in ${col1}${row1} to ${col1}${row2}: <strong>${min}</strong>`;
+                 `Minimum value in ${columnName}: <strong>${min}</strong>`;
         }
+        return `<strong>Error:</strong> No numeric values found in column ${col}`;
+      } else {
+        // Range format
+        const [, col1, row1, col2, row2] = cellMinMatch;
+        
+        if (col1 === col2) {
+          const startRow = parseInt(row1);
+          const endRow = parseInt(row2);
+          let min = Infinity;
+          let count = 0;
+          
+          for (let row = startRow; row <= endRow; row++) {
+            const value = getCellValue(col1, row);
+            if (value !== null) {
+              min = Math.min(min, value);
+              count++;
+            }
+          }
+          
+          if (count > 0) {
+            return `<strong>MIN Result:</strong><br><br>` +
+                   `Minimum value in ${col1}${row1} to ${col1}${row2}: <strong>${min}</strong>`;
+          }
+        }
+        return `<strong>Error:</strong> Could not find numeric values for MIN`;
       }
-      return `<strong>Error:</strong> Could not find numeric values for MIN`;
     }
     
     return null; // Not a cell operation, let backend handle it
