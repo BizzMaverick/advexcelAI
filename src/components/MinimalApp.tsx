@@ -441,9 +441,10 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
   const handleCellOperations = useCallback((prompt: string, data: any[][]) => {
     const lowerPrompt = prompt.toLowerCase();
     
-    // Parse cell references like B2, A3:A10, B2+D5, etc.
+    // Parse cell references like B2, A3:A10, B2+D5, subtract D2 from B2, etc.
     const cellRangeMatch = prompt.match(/([A-Z])(\d+)\s+to\s+([A-Z])(\d+)/i);
     const cellAddMatch = prompt.match(/(sum|add)\s+([A-Z])(\d+)\s+(and|\+)\s+([A-Z])(\d+)/i);
+    const cellSubtractMatch = prompt.match(/subtract\s+([A-Z])(\d+)\s+from\s+([A-Z])(\d+)/i);
     const cellMultipleMatch = prompt.match(/(sum|add)\s+of\s+([A-Z]\d+(?:\s+[A-Z]\d+)*(?:\s+and\s+[A-Z]\d+)*)/i);
     const cellAvgMatch = prompt.match(/average\s+([A-Z])(\d+)\s+to\s+([A-Z])(\d+)/i);
     
@@ -503,6 +504,20 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
         const result = val1 + val2;
         return `<strong>Cell Addition Result:</strong><br><br>` +
                `${col1}${row1} (${val1}) + ${col2}${row2} (${val2}) = <strong>${result}</strong>`;
+      }
+      return `<strong>Error:</strong> Could not find numeric values in cells ${col1}${row1} and ${col2}${row2}`;
+    }
+    
+    // Handle subtraction (subtract D2 from B2)
+    if (cellSubtractMatch) {
+      const [, col1, row1, col2, row2] = cellSubtractMatch;
+      const val1 = getCellValue(col1, parseInt(row1)); // Value to subtract
+      const val2 = getCellValue(col2, parseInt(row2)); // Value to subtract from
+      
+      if (val1 !== null && val2 !== null) {
+        const result = val2 - val1;
+        return `<strong>Cell Subtraction Result:</strong><br><br>` +
+               `${col2}${row2} (${val2}) - ${col1}${row1} (${val1}) = <strong>${result}</strong>`;
       }
       return `<strong>Error:</strong> Could not find numeric values in cells ${col1}${row1} and ${col2}${row2}`;
     }
