@@ -179,6 +179,7 @@ class BedrockService {
     // Freeze functionality is now handled locally in the frontend
     
     if (lowerPrompt.includes('unique') || lowerPrompt.includes('distinct') || lowerPrompt.includes('remove duplicates')) {
+      console.log('REMOVE DUPLICATES DETECTED:', prompt);
       return `${prompt}. ACTUALLY remove duplicate rows from the data and return the cleaned dataset with only unique records. Do not explain how to do it.`;
     }
     
