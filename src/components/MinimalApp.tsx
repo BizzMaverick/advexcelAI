@@ -449,6 +449,10 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
     const cellMultiplyMatch = prompt.match(/([A-Z])(\d+)\s*\*\s*([A-Z])(\d+)/i) || prompt.match(/([A-Z])(\d+)\s+multiplied\s+by\s+([A-Z])(\d+)/i);
     const cellMultipleMatch = prompt.match(/(sum|add)\s+of\s+([A-Z]\d+(?:\s+[A-Z]\d+)*(?:\s+and\s+[A-Z]\d+)*)/i);
     const cellAvgMatch = prompt.match(/average\s+([A-Z])(\d+)\s+to\s+([A-Z])(\d+)/i);
+    const cellCountMatch = prompt.match(/count\s+([A-Z])(\d+)\s+to\s+([A-Z])(\d+)/i);
+    const cellCountAMatch = prompt.match(/counta\s+([A-Z])(\d+)\s+to\s+([A-Z])(\d+)/i);
+    const cellMaxMatch = prompt.match(/max\s+([A-Z])(\d+)\s+to\s+([A-Z])(\d+)/i);
+    const cellMinMatch = prompt.match(/min\s+([A-Z])(\d+)\s+to\s+([A-Z])(\d+)/i);
     
     if (!data || data.length === 0) return null;
     
@@ -633,6 +637,104 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
         }
       }
       return `<strong>Error:</strong> Could not calculate average for range ${col1}${row1} to ${col2}${row2}`;
+    }
+    
+    // Handle COUNT (count numbers in range)
+    if (cellCountMatch) {
+      const [, col1, row1, col2, row2] = cellCountMatch;
+      
+      if (col1 === col2) {
+        const startRow = parseInt(row1);
+        const endRow = parseInt(row2);
+        let count = 0;
+        
+        for (let row = startRow; row <= endRow; row++) {
+          const value = getCellValue(col1, row);
+          if (value !== null) count++;
+        }
+        
+        return `<strong>COUNT Result:</strong><br><br>` +
+               `Numbers in ${col1}${row1} to ${col1}${row2}: <strong>${count}</strong>`;
+      }
+      return `<strong>Error:</strong> COUNT only works with same column ranges`;
+    }
+    
+    // Handle COUNTA (count non-empty cells)
+    if (cellCountAMatch) {
+      const [, col1, row1, col2, row2] = cellCountAMatch;
+      
+      if (col1 === col2) {
+        const startRow = parseInt(row1);
+        const endRow = parseInt(row2);
+        let count = 0;
+        
+        for (let row = startRow; row <= endRow; row++) {
+          const colIndex = col1.charCodeAt(0) - 65;
+          const rowIndex = row - 1;
+          if (rowIndex >= 0 && rowIndex < data.length && colIndex >= 0 && colIndex < (data[rowIndex]?.length || 0)) {
+            const value = data[rowIndex][colIndex];
+            if (value !== null && value !== undefined && String(value).trim() !== '') {
+              count++;
+            }
+          }
+        }
+        
+        return `<strong>COUNTA Result:</strong><br><br>` +
+               `Non-empty cells in ${col1}${row1} to ${col1}${row2}: <strong>${count}</strong>`;
+      }
+      return `<strong>Error:</strong> COUNTA only works with same column ranges`;
+    }
+    
+    // Handle MAX (find maximum value)
+    if (cellMaxMatch) {
+      const [, col1, row1, col2, row2] = cellMaxMatch;
+      
+      if (col1 === col2) {
+        const startRow = parseInt(row1);
+        const endRow = parseInt(row2);
+        let max = -Infinity;
+        let count = 0;
+        
+        for (let row = startRow; row <= endRow; row++) {
+          const value = getCellValue(col1, row);
+          if (value !== null) {
+            max = Math.max(max, value);
+            count++;
+          }
+        }
+        
+        if (count > 0) {
+          return `<strong>MAX Result:</strong><br><br>` +
+                 `Maximum value in ${col1}${row1} to ${col1}${row2}: <strong>${max}</strong>`;
+        }
+      }
+      return `<strong>Error:</strong> Could not find numeric values for MAX`;
+    }
+    
+    // Handle MIN (find minimum value)
+    if (cellMinMatch) {
+      const [, col1, row1, col2, row2] = cellMinMatch;
+      
+      if (col1 === col2) {
+        const startRow = parseInt(row1);
+        const endRow = parseInt(row2);
+        let min = Infinity;
+        let count = 0;
+        
+        for (let row = startRow; row <= endRow; row++) {
+          const value = getCellValue(col1, row);
+          if (value !== null) {
+            min = Math.min(min, value);
+            count++;
+          }
+        }
+        
+        if (count > 0) {
+          return `<strong>MIN Result:</strong><br><br>` +
+                 `Minimum value in ${col1}${row1} to ${col1}${row2}: <strong>${min}</strong>`;
+        }
+      }
+      return `<strong>Error:</strong> Could not find numeric values for MIN`;
     }
     
     return null; // Not a cell operation, let backend handle it
