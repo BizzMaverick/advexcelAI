@@ -5,6 +5,7 @@ import bedrockService from '../services/bedrockService';
 import ErrorBoundary from './ErrorBoundary';
 import FormattingToolbar, { FormatStyle } from './FormattingToolbar';
 import { downloadFormattedExcel, downloadCSV } from '../utils/excelExport';
+import PaymentService from '../services/paymentService';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const MAX_ROWS = 1000;
@@ -22,7 +23,7 @@ interface MinimalAppProps {
   onTrialRefresh?: () => void;
 }
 
-export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
+export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh }: MinimalAppProps) {
   const [prompt, setPrompt] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileData, setFileData] = useState<any[][]>([]);
@@ -268,6 +269,14 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
     // Validate prompt length and content
     if (trimmedPrompt.length > 500) {
       setAiResponse('Error: Command too long. Maximum 500 characters.');
+      return;
+    }
+    
+    // Check if user can use a prompt
+    const promptCheck = await PaymentService.canUsePrompt(user.email);
+    if (!promptCheck.canUse) {
+      setAiResponse(`<strong>❌ Prompt Limit Reached</strong><br><br>${promptCheck.reason}<br><br>Prompts remaining: ${promptCheck.promptsRemaining || 0}`);
+      if (onTrialRefresh) onTrialRefresh(); // Refresh trial status
       return;
     }
     
