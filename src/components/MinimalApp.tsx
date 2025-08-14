@@ -444,7 +444,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
     // Parse cell references - all possible patterns
     const cellRangeMatch = prompt.match(/([A-Z])(\d+)\s+to\s+([A-Z])(\d+)/i);
     const cellAddMatch = prompt.match(/(sum|add)\s+([A-Z])(\d+)\s+(and|\+)\s+([A-Z])(\d+)/i) || prompt.match(/([A-Z])(\d+)\s*\+\s*([A-Z])(\d+)/i);
-    const cellSubtractMatch = prompt.match(/subtract\s+([A-Z])(\d+)\s+from\s+([A-Z])(\d+)/i);
+    const cellSubtractMatch = prompt.match(/subtract\s+([A-Z])(\d+)\s+from\s+([A-Z])(\d+)/i) || prompt.match(/([A-Z])(\d+)\s*-\s*([A-Z])(\d+)/i) || prompt.match(/([A-Z])(\d+)\s+minus\s+([A-Z])(\d+)/i);
     const cellDivideMatch = prompt.match(/([A-Z])(\d+)\s*\/\s*([A-Z])(\d+)/i) || prompt.match(/([A-Z])(\d+)\s+divided\s+by\s+([A-Z])(\d+)/i);
     const cellMultiplyMatch = prompt.match(/([A-Z])(\d+)\s*\*\s*([A-Z])(\d+)/i) || prompt.match(/([A-Z])(\d+)\s+multiplied\s+by\s+([A-Z])(\d+)/i);
     const cellMultipleMatch = prompt.match(/(sum|add)\s+of\s+([A-Z]\d+(?:\s+[A-Z]\d+)*(?:\s+and\s+[A-Z]\d+)*)/i);
@@ -518,17 +518,34 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       return `<strong>Error:</strong> Could not find numeric values in cells ${col1}${row1} and ${col2}${row2}`;
     }
     
-    // Handle subtraction (subtract D2 from B2)
+    // Handle subtraction (subtract D2 from B2, C2-D2, C2 minus D2)
     if (cellSubtractMatch) {
-      const [, col1, row1, col2, row2] = cellSubtractMatch;
-      const val1 = getCellValue(col1, parseInt(row1)); // Value to subtract
-      const val2 = getCellValue(col2, parseInt(row2)); // Value to subtract from
+      let col1, row1, col2, row2, val1, val2, result;
       
-      if (val1 !== null && val2 !== null) {
-        const result = val2 - val1;
-        return `<strong>Cell Subtraction Result:</strong><br><br>` +
-               `${col2}${row2} (${val2}) - ${col1}${row1} (${val1}) = <strong>${result}</strong>`;
+      if (cellSubtractMatch[0].toLowerCase().includes('subtract') && cellSubtractMatch[0].toLowerCase().includes('from')) {
+        // "subtract D2 from B2" pattern - D2 is subtracted from B2
+        [, col1, row1, col2, row2] = cellSubtractMatch;
+        val1 = getCellValue(col1, parseInt(row1)); // Value to subtract
+        val2 = getCellValue(col2, parseInt(row2)); // Value to subtract from
+        result = val2 - val1;
+        
+        if (val1 !== null && val2 !== null) {
+          return `<strong>Cell Subtraction Result:</strong><br><br>` +
+                 `${col2}${row2} (${val2}) - ${col1}${row1} (${val1}) = <strong>${result}</strong>`;
+        }
+      } else {
+        // "C2-D2" or "C2 minus D2" pattern - normal left to right
+        [, col1, row1, col2, row2] = cellSubtractMatch;
+        val1 = getCellValue(col1, parseInt(row1));
+        val2 = getCellValue(col2, parseInt(row2));
+        result = val1 - val2;
+        
+        if (val1 !== null && val2 !== null) {
+          return `<strong>Cell Subtraction Result:</strong><br><br>` +
+                 `${col1}${row1} (${val1}) - ${col2}${row2} (${val2}) = <strong>${result}</strong>`;
+        }
       }
+      
       return `<strong>Error:</strong> Could not find numeric values in cells ${col1}${row1} and ${col2}${row2}`;
     }
     
