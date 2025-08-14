@@ -880,35 +880,102 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
 
 
 
-        {/* Simple Clean Toolbar */}
+        {/* Professional Formatting Toolbar */}
         {fileData.length > 0 && (
           <div style={{
-            background: '#f8f9fa',
-            padding: '10px 15px',
-            borderBottom: '1px solid #dee2e6',
-            display: 'flex',
-            gap: '10px',
-            alignItems: 'center'
+            background: 'white',
+            borderRadius: '8px',
+            padding: '15px 20px',
+            marginBottom: '15px',
+            border: '1px solid #ddd'
           }}>
-            <button onClick={() => { setPrompt('make bold'); handleProcessAI(); }} style={{
-              padding: '5px 10px', background: '#fff', border: '1px solid #ccc',
-              borderRadius: '3px', cursor: 'pointer', fontWeight: 'bold'
-            }}>Bold</button>
-            
-            <button onClick={() => { setPrompt('make italic'); handleProcessAI(); }} style={{
-              padding: '5px 10px', background: '#fff', border: '1px solid #ccc',
-              borderRadius: '3px', cursor: 'pointer', fontStyle: 'italic'
-            }}>Italic</button>
-            
-            <button onClick={() => { setPrompt('center align'); handleProcessAI(); }} style={{
-              padding: '5px 10px', background: '#fff', border: '1px solid #ccc',
-              borderRadius: '3px', cursor: 'pointer'
-            }}>Center</button>
-            
-            <button onClick={() => { setPrompt('text color red'); handleProcessAI(); }} style={{
-              padding: '5px 10px', background: '#fff', border: '1px solid #ccc',
-              borderRadius: '3px', cursor: 'pointer'
-            }}>Color</button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="#333"/>
+              </svg>
+              <h4 style={{ margin: 0, fontSize: '16px', color: '#333' }}>Format Text</h4>
+            </div>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              <button onClick={() => { setPrompt('make bold'); handleProcessAI(); }} style={{
+                background: '#0078d4',
+                color: 'white',
+                border: 'none',
+                padding: '8px 16px',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: 'bold',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z" fill="white"/>
+                  <path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z" fill="white"/>
+                </svg>
+                Bold
+              </button>
+              
+              <button onClick={() => { setPrompt('make italic'); handleProcessAI(); }} style={{
+                background: '#0078d4',
+                color: 'white',
+                border: 'none',
+                padding: '8px 16px',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontStyle: 'italic',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <line x1="19" y1="4" x2="10" y2="4" stroke="white" strokeWidth="2"/>
+                  <line x1="14" y1="20" x2="5" y2="20" stroke="white" strokeWidth="2"/>
+                  <line x1="15" y1="4" x2="9" y2="20" stroke="white" strokeWidth="2"/>
+                </svg>
+                Italic
+              </button>
+              
+              <button onClick={() => { setPrompt('center align'); handleProcessAI(); }} style={{
+                background: '#0078d4',
+                color: 'white',
+                border: 'none',
+                padding: '8px 16px',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <line x1="18" y1="10" x2="6" y2="10" stroke="white" strokeWidth="2"/>
+                  <line x1="21" y1="6" x2="3" y2="6" stroke="white" strokeWidth="2"/>
+                  <line x1="21" y1="14" x2="3" y2="14" stroke="white" strokeWidth="2"/>
+                  <line x1="18" y1="18" x2="6" y2="18" stroke="white" strokeWidth="2"/>
+                </svg>
+                Center
+              </button>
+              
+              <button onClick={() => { setPrompt('text color red'); handleProcessAI(); }} style={{
+                background: '#0078d4',
+                color: 'white',
+                border: 'none',
+                padding: '8px 16px',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="white"/>
+                </svg>
+                Color
+              </button>
+            </div>
           </div>
         )}
 
@@ -916,7 +983,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
         {fileData.length > 0 && (
           <div style={{ 
             background: 'white',
-            borderRadius: '0 0 8px 8px',
+            borderRadius: '8px',
             marginBottom: '15px',
             overflow: 'hidden'
           }}>
