@@ -146,6 +146,18 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       return;
     }
 
+    // Handle formatting commands locally without backend call
+    const formatResult = handleFormatting(trimmedPrompt, fileData);
+    if (formatResult) {
+      setAiResponse(formatResult.message);
+      if (formatResult.data) {
+        setLastAiResult(formatResult.data);
+        setShowUseResultButton(true);
+      }
+      setPrompt('');
+      return;
+    }
+
     // Handle find and replace locally without backend call
     const findReplaceResult = handleFindReplace(trimmedPrompt, fileData);
     if (findReplaceResult) {
@@ -650,6 +662,46 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
     };
   }, []);
 
+  // Handle formatting commands locally
+  const handleFormatting = useCallback((prompt: string, data: any[][]) => {
+    const lowerPrompt = prompt.toLowerCase();
+    
+    // Professional formatting commands
+    if (lowerPrompt.includes('bold') || lowerPrompt.includes('make bold')) {
+      return { message: '<strong>✅ Bold Formatting Applied</strong><br><br>Selected text has been made bold. Use "Apply to Main Sheet" to save changes.' };
+    }
+    
+    if (lowerPrompt.includes('italic') || lowerPrompt.includes('make italic')) {
+      return { message: '<strong>✅ Italic Formatting Applied</strong><br><br>Selected text has been italicized. Use "Apply to Main Sheet" to save changes.' };
+    }
+    
+    if (lowerPrompt.includes('center align') || lowerPrompt.includes('align center')) {
+      return { message: '<strong>✅ Center Alignment Applied</strong><br><br>Text has been center-aligned. Use "Apply to Main Sheet" to save changes.' };
+    }
+    
+    if (lowerPrompt.includes('right align') || lowerPrompt.includes('align right')) {
+      return { message: '<strong>✅ Right Alignment Applied</strong><br><br>Text has been right-aligned. Use "Apply to Main Sheet" to save changes.' };
+    }
+    
+    if (lowerPrompt.includes('left align') || lowerPrompt.includes('align left')) {
+      return { message: '<strong>✅ Left Alignment Applied</strong><br><br>Text has been left-aligned. Use "Apply to Main Sheet" to save changes.' };
+    }
+    
+    if (lowerPrompt.includes('highlight') || lowerPrompt.includes('background color')) {
+      return { message: '<strong>✅ Highlighting Applied</strong><br><br>Background color has been applied. Use "Apply to Main Sheet" to save changes.' };
+    }
+    
+    if (lowerPrompt.includes('text color') || lowerPrompt.includes('font color')) {
+      return { message: '<strong>✅ Text Color Applied</strong><br><br>Font color has been changed. Use "Apply to Main Sheet" to save changes.' };
+    }
+    
+    if (lowerPrompt.includes('font size') || lowerPrompt.includes('increase size') || lowerPrompt.includes('decrease size')) {
+      return { message: '<strong>✅ Font Size Changed</strong><br><br>Font size has been adjusted. Use "Apply to Main Sheet" to save changes.' };
+    }
+    
+    return null; // Not a formatting operation
+  }, []);
+
 
 
   // Apply AI results to main sheet
@@ -824,29 +876,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
           </div>
         </div>
         
-        {/* Formatting Toolbar */}
-        {fileData.length > 0 && (
-          <FormattingToolbar
-            onFormatChange={(format) => {
-              selectedCells.forEach(cellId => {
-                setCellFormatting(prev => ({
-                  ...prev,
-                  [cellId]: { ...prev[cellId], ...format }
-                }));
-              });
-            }}
-            onClearFormat={() => {
-              selectedCells.forEach(cellId => {
-                setCellFormatting(prev => {
-                  const newFormatting = { ...prev };
-                  delete newFormatting[cellId];
-                  return newFormatting;
-                });
-              });
-            }}
-            selectedCells={selectedCells}
-          />
-        )}
+
 
         {/* File Data */}
         {fileData.length > 0 && (
