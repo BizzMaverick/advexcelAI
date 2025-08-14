@@ -200,6 +200,9 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
         
         // Special responses are now handled locally above
         
+        // Clear any previous responses first
+        setAiResponse('');
+        
         // Check if response contains array data in text format
         if (typeof result.response === 'string' && result.response.includes('[')) {
           try {
@@ -315,8 +318,10 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
           setShowUseResultButton(true);
           
         } else {
-          // Fallback for text-only responses
-          setAiResponse(String(result.response || 'Processing completed').substring(0, 2000));
+          // Fallback for text-only responses - ensure we show the current response
+          const currentResponse = String(result.response || 'Processing completed').substring(0, 2000);
+          console.log('Setting text response:', currentResponse);
+          setAiResponse(currentResponse);
         }
       } else {
         setAiResponse(`Error: ${result.error || 'Unknown error occurred'}`);
