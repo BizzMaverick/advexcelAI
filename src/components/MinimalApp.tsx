@@ -900,18 +900,16 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
 
 
 
-        {/* Modern Formatting Toolbar */}
+        {/* Compact Formatting Toolbar */}
         {fileData.length > 0 && (
           <div style={{
-            background: 'white',
-            borderRadius: '12px',
-            padding: '20px',
-            marginBottom: '15px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            border: '1px solid #e1e5e9'
+            background: '#f8f9fa',
+            borderBottom: '1px solid #dee2e6',
+            padding: '8px 15px',
+            display: 'flex',
+            gap: '8px',
+            alignItems: 'center'
           }}>
-
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
               <button onClick={() => {
                 if (selectedCells.length === 0) return;
                 const newFormatting = { ...cellFormatting };
@@ -1047,7 +1045,6 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                   <circle cx="12" cy="12" r="6" fill="#0078d4"/>
                 </svg>
               </button>
-            </div>
           </div>
         )}
 
