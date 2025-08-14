@@ -441,12 +441,12 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
   const handleCellOperations = useCallback((prompt: string, data: any[][]) => {
     const lowerPrompt = prompt.toLowerCase();
     
-    // Parse cell references like B2, A3:A10, B2+D5, B2/D2, B2*D2, subtract D2 from B2, etc.
+    // Parse cell references - all possible patterns
     const cellRangeMatch = prompt.match(/([A-Z])(\d+)\s+to\s+([A-Z])(\d+)/i);
-    const cellAddMatch = prompt.match(/(sum|add)\s+([A-Z])(\d+)\s+(and|\+)\s+([A-Z])(\d+)/i);
+    const cellAddMatch = prompt.match(/(sum|add)\s+([A-Z])(\d+)\s+(and|\+)\s+([A-Z])(\d+)/i) || prompt.match(/([A-Z])(\d+)\s*\+\s*([A-Z])(\d+)/i);
     const cellSubtractMatch = prompt.match(/subtract\s+([A-Z])(\d+)\s+from\s+([A-Z])(\d+)/i);
-    const cellDivideMatch = prompt.match(/([A-Z])(\d+)\s*\/\s*([A-Z])(\d+)/i);
-    const cellMultiplyMatch = prompt.match(/([A-Z])(\d+)\s*\*\s*([A-Z])(\d+)/i);
+    const cellDivideMatch = prompt.match(/([A-Z])(\d+)\s*\/\s*([A-Z])(\d+)/i) || prompt.match(/([A-Z])(\d+)\s+divided\s+by\s+([A-Z])(\d+)/i);
+    const cellMultiplyMatch = prompt.match(/([A-Z])(\d+)\s*\*\s*([A-Z])(\d+)/i) || prompt.match(/([A-Z])(\d+)\s+multiplied\s+by\s+([A-Z])(\d+)/i);
     const cellMultipleMatch = prompt.match(/(sum|add)\s+of\s+([A-Z]\d+(?:\s+[A-Z]\d+)*(?:\s+and\s+[A-Z]\d+)*)/i);
     const cellAvgMatch = prompt.match(/average\s+([A-Z])(\d+)\s+to\s+([A-Z])(\d+)/i);
     
@@ -496,9 +496,17 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       return `<strong>Error:</strong> Could not find numeric values in specified cells`;
     }
     
-    // Handle sum of two cells (B2 + D5)
+    // Handle addition (sum of C2 and D2, or C2+D2)
     if (cellAddMatch) {
-      const [, , col1, row1, , col2, row2] = cellAddMatch;
+      let col1, row1, col2, row2;
+      if (cellAddMatch[1] && cellAddMatch[1].toLowerCase().includes('sum')) {
+        // "sum of C2 and D2" pattern
+        [, , col1, row1, , col2, row2] = cellAddMatch;
+      } else {
+        // "C2+D2" pattern
+        [, col1, row1, col2, row2] = cellAddMatch;
+      }
+      
       const val1 = getCellValue(col1, parseInt(row1));
       const val2 = getCellValue(col2, parseInt(row2));
       
@@ -524,7 +532,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       return `<strong>Error:</strong> Could not find numeric values in cells ${col1}${row1} and ${col2}${row2}`;
     }
     
-    // Handle division (B2/D2)
+    // Handle division (D2/C2 or D2 divided by C2)
     if (cellDivideMatch) {
       const [, col1, row1, col2, row2] = cellDivideMatch;
       const val1 = getCellValue(col1, parseInt(row1));
@@ -541,7 +549,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       return `<strong>Error:</strong> Could not find numeric values in cells ${col1}${row1} and ${col2}${row2}`;
     }
     
-    // Handle multiplication (B2*D2)
+    // Handle multiplication (C2*D2 or C2 multiplied by D2)
     if (cellMultiplyMatch) {
       const [, col1, row1, col2, row2] = cellMultiplyMatch;
       const val1 = getCellValue(col1, parseInt(row1));
