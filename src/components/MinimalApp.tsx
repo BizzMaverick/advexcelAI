@@ -878,90 +878,89 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
         
 
 
-        {/* Excel-Style Professional Toolbar */}
+        {/* Microsoft Office Ribbon Style Toolbar */}
         {fileData.length > 0 && (
           <div style={{
-            background: '#f8f9fa',
-            border: '1px solid #dee2e6',
-            borderRadius: '0',
-            marginBottom: '0',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+            background: 'linear-gradient(180deg, #ffffff 0%, #f1f3f4 100%)',
+            border: '1px solid #c7c7c7',
+            borderBottom: '1px solid #ababab',
+            marginBottom: '0'
           }}>
             <div style={{
               display: 'flex',
               alignItems: 'center',
-              padding: '4px 8px',
-              gap: '1px',
-              minHeight: '32px',
-              borderBottom: '1px solid #dee2e6'
+              padding: '6px 12px',
+              gap: '8px',
+              minHeight: '40px'
             }}>
-              {/* Font Group */}
-              <div style={{ display: 'flex', marginRight: '8px' }}>
+              {/* Font Formatting */}
+              <div style={{ display: 'flex', gap: '2px' }}>
                 <button onClick={() => { setPrompt('make bold'); handleProcessAI(); }} style={{
-                  width: '24px', height: '24px', border: '1px solid #ced4da', background: '#fff',
-                  cursor: 'pointer', fontSize: '11px', fontWeight: 'bold', color: '#495057',
-                  borderRadius: '2px 0 0 2px', display: 'flex', alignItems: 'center', justifyContent: 'center'
-                }} title="Bold (Ctrl+B)">B</button>
+                  width: '32px', height: '24px', border: '1px solid transparent', background: 'transparent',
+                  cursor: 'pointer', fontSize: '14px', fontWeight: 'bold', color: '#323130',
+                  borderRadius: '2px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  ':hover': { background: '#deecf9', border: '1px solid #92c5f7' }
+                }} onMouseEnter={(e) => { e.target.style.background = '#deecf9'; e.target.style.border = '1px solid #92c5f7'; }}
+                   onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.border = '1px solid transparent'; }}
+                   title="Bold">B</button>
+                   
                 <button onClick={() => { setPrompt('make italic'); handleProcessAI(); }} style={{
-                  width: '24px', height: '24px', border: '1px solid #ced4da', borderLeft: 'none', background: '#fff',
-                  cursor: 'pointer', fontSize: '11px', fontStyle: 'italic', color: '#495057',
-                  borderRadius: '0 2px 2px 0', display: 'flex', alignItems: 'center', justifyContent: 'center'
-                }} title="Italic (Ctrl+I)">I</button>
+                  width: '32px', height: '24px', border: '1px solid transparent', background: 'transparent',
+                  cursor: 'pointer', fontSize: '14px', fontStyle: 'italic', color: '#323130',
+                  borderRadius: '2px', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }} onMouseEnter={(e) => { e.target.style.background = '#deecf9'; e.target.style.border = '1px solid #92c5f7'; }}
+                   onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.border = '1px solid transparent'; }}
+                   title="Italic">I</button>
               </div>
               
-              {/* Alignment Group */}
-              <div style={{ display: 'flex', marginRight: '8px' }}>
+              <div style={{ width: '1px', height: '20px', background: '#d1d1d1' }} />
+              
+              {/* Alignment */}
+              <div style={{ display: 'flex', gap: '2px' }}>
                 <button onClick={() => { setPrompt('left align'); handleProcessAI(); }} style={{
-                  width: '24px', height: '24px', border: '1px solid #ced4da', background: '#fff',
-                  cursor: 'pointer', fontSize: '10px', color: '#495057', borderRadius: '2px 0 0 2px',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center'
-                }} title="Align Left">
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
-                    <div style={{ width: '10px', height: '1px', background: '#495057' }} />
-                    <div style={{ width: '7px', height: '1px', background: '#495057' }} />
-                    <div style={{ width: '9px', height: '1px', background: '#495057' }} />
-                  </div>
-                </button>
+                  width: '32px', height: '24px', border: '1px solid transparent', background: 'transparent',
+                  cursor: 'pointer', color: '#323130', borderRadius: '2px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px'
+                }} onMouseEnter={(e) => { e.target.style.background = '#deecf9'; e.target.style.border = '1px solid #92c5f7'; }}
+                   onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.border = '1px solid transparent'; }}
+                   title="Align Left">⬅</button>
+                   
                 <button onClick={() => { setPrompt('center align'); handleProcessAI(); }} style={{
-                  width: '24px', height: '24px', border: '1px solid #ced4da', borderLeft: 'none', background: '#fff',
-                  cursor: 'pointer', fontSize: '10px', color: '#495057',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center'
-                }} title="Center">
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', alignItems: 'center' }}>
-                    <div style={{ width: '10px', height: '1px', background: '#495057' }} />
-                    <div style={{ width: '7px', height: '1px', background: '#495057' }} />
-                    <div style={{ width: '9px', height: '1px', background: '#495057' }} />
-                  </div>
-                </button>
+                  width: '32px', height: '24px', border: '1px solid transparent', background: 'transparent',
+                  cursor: 'pointer', color: '#323130', borderRadius: '2px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px'
+                }} onMouseEnter={(e) => { e.target.style.background = '#deecf9'; e.target.style.border = '1px solid #92c5f7'; }}
+                   onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.border = '1px solid transparent'; }}
+                   title="Center">⬌</button>
+                   
                 <button onClick={() => { setPrompt('right align'); handleProcessAI(); }} style={{
-                  width: '24px', height: '24px', border: '1px solid #ced4da', borderLeft: 'none', background: '#fff',
-                  cursor: 'pointer', fontSize: '10px', color: '#495057', borderRadius: '0 2px 2px 0',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center'
-                }} title="Align Right">
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', alignItems: 'flex-end' }}>
-                    <div style={{ width: '10px', height: '1px', background: '#495057' }} />
-                    <div style={{ width: '7px', height: '1px', background: '#495057' }} />
-                    <div style={{ width: '9px', height: '1px', background: '#495057' }} />
-                  </div>
-                </button>
+                  width: '32px', height: '24px', border: '1px solid transparent', background: 'transparent',
+                  cursor: 'pointer', color: '#323130', borderRadius: '2px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px'
+                }} onMouseEnter={(e) => { e.target.style.background = '#deecf9'; e.target.style.border = '1px solid #92c5f7'; }}
+                   onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.border = '1px solid transparent'; }}
+                   title="Align Right">➡</button>
               </div>
               
-              {/* Color Group */}
-              <div style={{ display: 'flex' }}>
+              <div style={{ width: '1px', height: '20px', background: '#d1d1d1' }} />
+              
+              {/* Colors */}
+              <div style={{ display: 'flex', gap: '2px' }}>
                 <button onClick={() => { setPrompt('text color red'); handleProcessAI(); }} style={{
-                  width: '24px', height: '24px', border: '1px solid #ced4da', background: '#fff',
-                  cursor: 'pointer', fontSize: '11px', color: '#495057', borderRadius: '2px 0 0 2px',
+                  width: '32px', height: '24px', border: '1px solid transparent', background: 'transparent',
+                  cursor: 'pointer', fontSize: '14px', color: '#323130', borderRadius: '2px',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', fontWeight: 'bold'
-                }} title="Font Color">
-                  A<div style={{ position: 'absolute', bottom: '2px', width: '16px', height: '2px', background: '#dc3545' }} />
-                </button>
+                }} onMouseEnter={(e) => { e.target.style.background = '#deecf9'; e.target.style.border = '1px solid #92c5f7'; }}
+                   onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.border = '1px solid transparent'; }}
+                   title="Font Color">A<div style={{ position: 'absolute', bottom: '3px', width: '20px', height: '3px', background: '#ff0000' }} /></button>
+                   
                 <button onClick={() => { setPrompt('highlight yellow'); handleProcessAI(); }} style={{
-                  width: '24px', height: '24px', border: '1px solid #ced4da', borderLeft: 'none', background: '#fff',
-                  cursor: 'pointer', fontSize: '11px', color: '#495057', borderRadius: '0 2px 2px 0',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative'
-                }} title="Highlight Color">
-                  <div style={{ width: '12px', height: '10px', background: '#fff3cd', border: '1px solid #ffeaa7', borderRadius: '1px' }} />
-                </button>
+                  width: '32px', height: '24px', border: '1px solid transparent', background: 'transparent',
+                  cursor: 'pointer', fontSize: '16px', color: '#323130', borderRadius: '2px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }} onMouseEnter={(e) => { e.target.style.background = '#deecf9'; e.target.style.border = '1px solid #92c5f7'; }}
+                   onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.border = '1px solid transparent'; }}
+                   title="Highlight">🖍</button>
               </div>
             </div>
           </div>
@@ -971,9 +970,8 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
         {fileData.length > 0 && (
           <div style={{ 
             background: 'white',
-            border: '1px solid #dee2e6',
+            border: '1px solid #c7c7c7',
             borderTop: 'none',
-            borderRadius: '0 0 4px 4px',
             marginBottom: '15px',
             overflow: 'hidden'
           }}>
