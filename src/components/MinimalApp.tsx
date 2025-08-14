@@ -878,6 +878,128 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
         
 
 
+        {/* Professional Formatting Toolbar */}
+        {fileData.length > 0 && (
+          <div style={{
+            background: 'white',
+            borderRadius: '8px',
+            marginBottom: '15px',
+            border: '1px solid #d1d5db'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              padding: '8px 12px',
+              borderBottom: '1px solid #e5e7eb',
+              gap: '4px',
+              flexWrap: 'wrap'
+            }}>
+              {/* Bold */}
+              <button style={{
+                padding: '6px 8px',
+                border: '1px solid #d1d5db',
+                background: '#ffffff',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                fontSize: '14px',
+                minWidth: '32px',
+                height: '32px'
+              }} title="Bold">
+                B
+              </button>
+              
+              {/* Italic */}
+              <button style={{
+                padding: '6px 8px',
+                border: '1px solid #d1d5db',
+                background: '#ffffff',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontStyle: 'italic',
+                fontSize: '14px',
+                minWidth: '32px',
+                height: '32px'
+              }} title="Italic">
+                I
+              </button>
+              
+              <div style={{ width: '1px', height: '24px', background: '#e5e7eb', margin: '0 4px' }} />
+              
+              {/* Alignment */}
+              <button style={{
+                padding: '6px 8px',
+                border: '1px solid #d1d5db',
+                background: '#ffffff',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '12px',
+                minWidth: '32px',
+                height: '32px'
+              }} title="Align Left">
+                ⬅
+              </button>
+              
+              <button style={{
+                padding: '6px 8px',
+                border: '1px solid #d1d5db',
+                background: '#ffffff',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '12px',
+                minWidth: '32px',
+                height: '32px'
+              }} title="Center">
+                ↔
+              </button>
+              
+              <button style={{
+                padding: '6px 8px',
+                border: '1px solid #d1d5db',
+                background: '#ffffff',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '12px',
+                minWidth: '32px',
+                height: '32px'
+              }} title="Align Right">
+                ➡
+              </button>
+              
+              <div style={{ width: '1px', height: '24px', background: '#e5e7eb', margin: '0 4px' }} />
+              
+              {/* Colors */}
+              <button style={{
+                padding: '6px 8px',
+                border: '1px solid #d1d5db',
+                background: '#ffffff',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '12px',
+                minWidth: '32px',
+                height: '32px',
+                position: 'relative'
+              }} title="Text Color">
+                A
+                <div style={{ position: 'absolute', bottom: '2px', left: '50%', transform: 'translateX(-50%)', width: '20px', height: '3px', background: '#000' }} />
+              </button>
+              
+              <button style={{
+                padding: '6px 8px',
+                border: '1px solid #d1d5db',
+                background: '#ffffff',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '12px',
+                minWidth: '32px',
+                height: '32px'
+              }} title="Highlight">
+                🎨
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* File Data */}
         {fileData.length > 0 && (
           <div style={{ 
