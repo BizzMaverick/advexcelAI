@@ -917,21 +917,27 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
             </div>
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               <button onClick={() => {
-                // Apply bold to selected cells only
+                // Toggle bold on/off
                 const newFormatting = { ...cellFormatting };
-                if (selectedCells.length > 0) {
-                  selectedCells.forEach(cellId => {
+                const cellsToFormat = selectedCells.length > 0 ? selectedCells : 
+                  Array.from({length: fileData.length - 1}, (_, i) => 
+                    Array.from({length: fileData[0]?.length || 0}, (_, j) => `${i+1}-${j}`)
+                  ).flat();
+                
+                // Check if first cell is already bold
+                const firstCellId = cellsToFormat[0];
+                const isBold = cellFormatting[firstCellId]?.fontWeight === 'bold';
+                
+                cellsToFormat.forEach(cellId => {
+                  if (isBold) {
+                    // Remove bold
+                    const { fontWeight, ...rest } = newFormatting[cellId] || {};
+                    newFormatting[cellId] = rest;
+                  } else {
+                    // Apply bold
                     newFormatting[cellId] = { ...newFormatting[cellId], fontWeight: 'bold' };
-                  });
-                } else {
-                  // If no selection, apply to all data cells
-                  for (let i = 1; i < fileData.length; i++) {
-                    for (let j = 0; j < fileData[i].length; j++) {
-                      const cellId = `${i}-${j}`;
-                      newFormatting[cellId] = { ...newFormatting[cellId], fontWeight: 'bold' };
-                    }
                   }
-                }
+                });
                 setCellFormatting(newFormatting);
               }} style={{
                 background: '#0078d4',
@@ -954,21 +960,27 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               </button>
               
               <button onClick={() => {
-                // Apply italic to selected cells only
+                // Toggle italic on/off
                 const newFormatting = { ...cellFormatting };
-                if (selectedCells.length > 0) {
-                  selectedCells.forEach(cellId => {
+                const cellsToFormat = selectedCells.length > 0 ? selectedCells : 
+                  Array.from({length: fileData.length - 1}, (_, i) => 
+                    Array.from({length: fileData[0]?.length || 0}, (_, j) => `${i+1}-${j}`)
+                  ).flat();
+                
+                // Check if first cell is already italic
+                const firstCellId = cellsToFormat[0];
+                const isItalic = cellFormatting[firstCellId]?.fontStyle === 'italic';
+                
+                cellsToFormat.forEach(cellId => {
+                  if (isItalic) {
+                    // Remove italic
+                    const { fontStyle, ...rest } = newFormatting[cellId] || {};
+                    newFormatting[cellId] = rest;
+                  } else {
+                    // Apply italic
                     newFormatting[cellId] = { ...newFormatting[cellId], fontStyle: 'italic' };
-                  });
-                } else {
-                  // If no selection, apply to all data cells
-                  for (let i = 1; i < fileData.length; i++) {
-                    for (let j = 0; j < fileData[i].length; j++) {
-                      const cellId = `${i}-${j}`;
-                      newFormatting[cellId] = { ...newFormatting[cellId], fontStyle: 'italic' };
-                    }
                   }
-                }
+                });
                 setCellFormatting(newFormatting);
               }} style={{
                 background: '#0078d4',
@@ -1031,21 +1043,27 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               </button>
               
               <button onClick={() => {
-                // Apply red color to selected cells only
+                // Toggle red color on/off
                 const newFormatting = { ...cellFormatting };
-                if (selectedCells.length > 0) {
-                  selectedCells.forEach(cellId => {
+                const cellsToFormat = selectedCells.length > 0 ? selectedCells : 
+                  Array.from({length: fileData.length - 1}, (_, i) => 
+                    Array.from({length: fileData[0]?.length || 0}, (_, j) => `${i+1}-${j}`)
+                  ).flat();
+                
+                // Check if first cell is already red
+                const firstCellId = cellsToFormat[0];
+                const isRed = cellFormatting[firstCellId]?.color === 'red';
+                
+                cellsToFormat.forEach(cellId => {
+                  if (isRed) {
+                    // Remove red color
+                    const { color, ...rest } = newFormatting[cellId] || {};
+                    newFormatting[cellId] = rest;
+                  } else {
+                    // Apply red color
                     newFormatting[cellId] = { ...newFormatting[cellId], color: 'red' };
-                  });
-                } else {
-                  // If no selection, apply to all data cells
-                  for (let i = 1; i < fileData.length; i++) {
-                    for (let j = 0; j < fileData[i].length; j++) {
-                      const cellId = `${i}-${j}`;
-                      newFormatting[cellId] = { ...newFormatting[cellId], color: 'red' };
-                    }
                   }
-                }
+                });
                 setCellFormatting(newFormatting);
               }} style={{
                 background: '#0078d4',
