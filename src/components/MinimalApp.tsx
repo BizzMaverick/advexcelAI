@@ -662,16 +662,65 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
     };
   }, []);
 
-  // Handle formatting commands locally
+  // Handle formatting commands locally with actual CSS styling
   const handleFormatting = useCallback((prompt: string, data: any[][]) => {
     const lowerPrompt = prompt.toLowerCase();
     
     if (!data || data.length === 0) return null;
     
-    // For now, formatting commands go to backend since we need actual formatting
-    // The frontend can't apply visual formatting to the data display
-    return null; // Let backend handle formatting
-  }, []);
+    // Apply actual CSS formatting to cells
+    if (lowerPrompt.includes('make bold') || lowerPrompt.includes('bold')) {
+      // Apply bold to all cells (or selected cells if we had selection)
+      const newFormatting = { ...cellFormatting };
+      // For now, apply to all data cells
+      for (let i = 1; i < data.length; i++) {
+        for (let j = 0; j < data[i].length; j++) {
+          const cellId = `${i}-${j}`;
+          newFormatting[cellId] = { ...newFormatting[cellId], fontWeight: 'bold' };
+        }
+      }
+      setCellFormatting(newFormatting);
+      return { message: '<strong>✅ Bold Applied</strong><br><br>Text formatting updated in the spreadsheet.' };
+    }
+    
+    if (lowerPrompt.includes('make italic') || lowerPrompt.includes('italic')) {
+      const newFormatting = { ...cellFormatting };
+      for (let i = 1; i < data.length; i++) {
+        for (let j = 0; j < data[i].length; j++) {
+          const cellId = `${i}-${j}`;
+          newFormatting[cellId] = { ...newFormatting[cellId], fontStyle: 'italic' };
+        }
+      }
+      setCellFormatting(newFormatting);
+      return { message: '<strong>✅ Italic Applied</strong><br><br>Text formatting updated in the spreadsheet.' };
+    }
+    
+    if (lowerPrompt.includes('center align') || lowerPrompt.includes('align center')) {
+      const newFormatting = { ...cellFormatting };
+      for (let i = 1; i < data.length; i++) {
+        for (let j = 0; j < data[i].length; j++) {
+          const cellId = `${i}-${j}`;
+          newFormatting[cellId] = { ...newFormatting[cellId], textAlign: 'center' };
+        }
+      }
+      setCellFormatting(newFormatting);
+      return { message: '<strong>✅ Center Alignment Applied</strong><br><br>Text alignment updated in the spreadsheet.' };
+    }
+    
+    if (lowerPrompt.includes('text color red') || lowerPrompt.includes('font color red')) {
+      const newFormatting = { ...cellFormatting };
+      for (let i = 1; i < data.length; i++) {
+        for (let j = 0; j < data[i].length; j++) {
+          const cellId = `${i}-${j}`;
+          newFormatting[cellId] = { ...newFormatting[cellId], color: 'red' };
+        }
+      }
+      setCellFormatting(newFormatting);
+      return { message: '<strong>✅ Red Text Color Applied</strong><br><br>Font color updated in the spreadsheet.' };
+    }
+    
+    return null;
+  }, [cellFormatting, setCellFormatting]);
 
 
 
@@ -1028,7 +1077,9 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                           top: i < frozenRows ? '0' : 'auto',
                           left: j < frozenColumns ? `${j * 100}px` : 'auto',
                           zIndex: (i < frozenRows && j < frozenColumns) ? 20 : (i < frozenRows ? 15 : (j < frozenColumns ? 10 : 1)),
-                          backgroundColor: (i < frozenRows && j < frozenColumns) ? '#d4edda' : (j < frozenColumns ? '#f8fbff' : (i < frozenRows ? '#f0f8ff' : (i % 2 === 0 ? '#fafafa' : 'white')))
+                          backgroundColor: (i < frozenRows && j < frozenColumns) ? '#d4edda' : (j < frozenColumns ? '#f8fbff' : (i < frozenRows ? '#f0f8ff' : (i % 2 === 0 ? '#fafafa' : 'white'))),
+                          // Apply formatting from cellFormatting state
+                          ...cellFormatting[`${i}-${j}`]
                         }}>
                           {cell !== null && cell !== undefined ? String(cell) : ''}
                         </td>
