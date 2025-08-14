@@ -231,7 +231,10 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                   tableHtml += '</table></div>';
                   tableHtml += `<p style="color: #666; font-size: 12px; margin: 5px 0;">Showing ${arrayData.length - 1} rows</p>`;
                   
-                  setAiResponse(`<strong>Concatenation completed successfully!</strong><br><br>${tableHtml}`);
+                  const lowerPrompt = trimmedPrompt.toLowerCase();
+                  const operationType = lowerPrompt.includes('remove') || lowerPrompt.includes('duplicate') ? 'Remove Duplicates' : 
+                                       lowerPrompt.includes('concat') ? 'Concatenation' : 'Operation';
+                  setAiResponse(`<strong>${operationType} completed successfully!</strong><br><br>${tableHtml}`);
                   setLastAiResult([...arrayData]);
                   setShowUseResultButton(true);
                   return;
@@ -268,7 +271,10 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               tableHtml += '</table></div>';
               tableHtml += `<p style="color: #666; font-size: 12px; margin: 5px 0;">Showing ${arrayData.length} rows</p>`;
               
-              setAiResponse(`<strong>Concatenation completed successfully!</strong><br><br>${tableHtml}`);
+              const lowerPrompt = trimmedPrompt.toLowerCase();
+              const operationType = lowerPrompt.includes('remove') || lowerPrompt.includes('duplicate') ? 'Remove Duplicates' : 
+                                   lowerPrompt.includes('concat') ? 'Concatenation' : 'Operation';
+              setAiResponse(`<strong>${operationType} completed successfully!</strong><br><br>${tableHtml}`);
               setLastAiResult([headers, ...arrayData]);
               setShowUseResultButton(true);
               return;
