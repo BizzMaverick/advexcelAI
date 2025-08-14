@@ -895,7 +895,10 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               flexWrap: 'wrap'
             }}>
               {/* Bold */}
-              <button style={{
+              <button onClick={() => {
+                setPrompt('make bold');
+                handleProcessAI();
+              }} style={{
                 padding: '6px 8px',
                 border: '1px solid #d1d5db',
                 background: '#ffffff',
@@ -910,7 +913,10 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               </button>
               
               {/* Italic */}
-              <button style={{
+              <button onClick={() => {
+                setPrompt('make italic');
+                handleProcessAI();
+              }} style={{
                 padding: '6px 8px',
                 border: '1px solid #d1d5db',
                 background: '#ffffff',
@@ -927,7 +933,10 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               <div style={{ width: '1px', height: '24px', background: '#e5e7eb', margin: '0 4px' }} />
               
               {/* Alignment */}
-              <button style={{
+              <button onClick={() => {
+                setPrompt('left align');
+                handleProcessAI();
+              }} style={{
                 padding: '6px 8px',
                 border: '1px solid #d1d5db',
                 background: '#ffffff',
@@ -940,7 +949,10 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 ⬅
               </button>
               
-              <button style={{
+              <button onClick={() => {
+                setPrompt('center align');
+                handleProcessAI();
+              }} style={{
                 padding: '6px 8px',
                 border: '1px solid #d1d5db',
                 background: '#ffffff',
@@ -953,7 +965,10 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 ↔
               </button>
               
-              <button style={{
+              <button onClick={() => {
+                setPrompt('right align');
+                handleProcessAI();
+              }} style={{
                 padding: '6px 8px',
                 border: '1px solid #d1d5db',
                 background: '#ffffff',
@@ -969,7 +984,10 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               <div style={{ width: '1px', height: '24px', background: '#e5e7eb', margin: '0 4px' }} />
               
               {/* Colors */}
-              <button style={{
+              <button onClick={() => {
+                setPrompt('text color red');
+                handleProcessAI();
+              }} style={{
                 padding: '6px 8px',
                 border: '1px solid #d1d5db',
                 background: '#ffffff',
@@ -984,7 +1002,10 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 <div style={{ position: 'absolute', bottom: '2px', left: '50%', transform: 'translateX(-50%)', width: '20px', height: '3px', background: '#000' }} />
               </button>
               
-              <button style={{
+              <button onClick={() => {
+                setPrompt('highlight yellow');
+                handleProcessAI();
+              }} style={{
                 padding: '6px 8px',
                 border: '1px solid #d1d5db',
                 background: '#ffffff',
