@@ -138,6 +138,14 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       return;
     }
 
+    // Handle column sum operations locally
+    const columnSumResult = handleColumnSum(trimmedPrompt, fileData);
+    if (columnSumResult) {
+      setAiResponse(columnSumResult);
+      setPrompt('');
+      return;
+    }
+
     // Handle Excel cell operations locally without backend call
     const cellOperationResult = handleCellOperations(trimmedPrompt, fileData);
     if (cellOperationResult) {
@@ -555,6 +563,48 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
     }
     
     return null; // Not a cell operation, let backend handle it
+  }, []);
+
+  // Handle column sum operations locally
+  const handleColumnSum = useCallback((prompt: string, data: any[][]) => {
+    const lowerPrompt = prompt.toLowerCase();
+    
+    // Match "sum of column X" or "sum column X"
+    const columnMatch = prompt.match(/sum\s+(?:of\s+)?column\s+([A-Z])/i);
+    if (!columnMatch) return null;
+    
+    if (!data || data.length <= 1) {
+      return '<strong>Error:</strong> No data to process';
+    }
+    
+    const colLetter = columnMatch[1].toUpperCase();
+    const colIndex = colLetter.charCodeAt(0) - 65; // A=0, B=1, etc.
+    
+    if (colIndex < 0 || colIndex >= (data[0]?.length || 0)) {
+      return `<strong>Error:</strong> Column ${colLetter} does not exist`;
+    }
+    
+    const columnName = data[0][colIndex] || `Column ${colLetter}`;
+    let sum = 0;
+    let count = 0;
+    
+    // Sum all numeric values in the column (skip header row)
+    for (let i = 1; i < data.length; i++) {
+      const cellValue = data[i][colIndex];
+      const numValue = parseFloat(String(cellValue));
+      if (!isNaN(numValue)) {
+        sum += numValue;
+        count++;
+      }
+    }
+    
+    if (count === 0) {
+      return `<strong>Column ${colLetter} Sum:</strong><br><br>No numeric values found in column ${colLetter} (${columnName})`;
+    }
+    
+    return `<strong>Column ${colLetter} Sum Result:</strong><br><br>` +
+           `Sum of ${columnName}: <strong>${sum.toLocaleString()}</strong><br>` +
+           `Cells processed: ${count}`;
   }, []);
 
   // Handle remove duplicates locally
