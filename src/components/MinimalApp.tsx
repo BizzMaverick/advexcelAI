@@ -900,57 +900,81 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
 
 
 
-        {/* Professional Formatting Toolbar */}
+        {/* Modern Formatting Toolbar */}
         {fileData.length > 0 && (
           <div style={{
             background: 'white',
-            borderRadius: '8px',
-            padding: '15px 20px',
+            borderRadius: '12px',
+            padding: '20px',
             marginBottom: '15px',
-            border: '1px solid #ddd'
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            border: '1px solid #e1e5e9'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="#333"/>
-              </svg>
-              <h4 style={{ margin: 0, fontSize: '16px', color: '#333' }}>Format Text</h4>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px' }}>
+              <div style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '8px',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="white"/>
+                </svg>
+              </div>
+              <h3 style={{ margin: 0, fontSize: '18px', color: '#2d3748', fontWeight: '600' }}>Format Text</h3>
             </div>
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
               <button onClick={() => {
                 // Toggle bold on/off
-                if (selectedCells.length === 0) return; // Do nothing if no cells selected
+                if (selectedCells.length === 0) return;
                 const newFormatting = { ...cellFormatting };
                 const cellsToFormat = selectedCells;
                 
-                // Check if first cell is already bold
                 const firstCellId = cellsToFormat[0];
                 const isBold = cellFormatting[firstCellId]?.fontWeight === 'bold';
                 
                 cellsToFormat.forEach(cellId => {
                   if (isBold) {
-                    // Remove bold
                     const { fontWeight, ...rest } = newFormatting[cellId] || {};
                     newFormatting[cellId] = rest;
                   } else {
-                    // Apply bold
                     newFormatting[cellId] = { ...newFormatting[cellId], fontWeight: 'bold' };
                   }
                 });
                 setCellFormatting(newFormatting);
               }} style={{
-                background: '#0078d4',
+                background: selectedCells.length > 0 && cellFormatting[selectedCells[0]]?.fontWeight === 'bold' 
+                  ? 'linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)' 
+                  : 'linear-gradient(135deg, #74b9ff 0%, #0984e3 100%)',
                 color: 'white',
                 border: 'none',
-                padding: '8px 16px',
-                borderRadius: '6px',
-                cursor: 'pointer',
+                padding: '12px 20px',
+                borderRadius: '10px',
+                cursor: selectedCells.length > 0 ? 'pointer' : 'not-allowed',
                 fontSize: '14px',
-                fontWeight: 'bold',
+                fontWeight: '600',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px'
+                gap: '8px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                transition: 'all 0.3s ease',
+                opacity: selectedCells.length > 0 ? 1 : 0.6,
+                transform: 'translateY(0)'
+              }}
+              onMouseEnter={(e) => {
+                if (selectedCells.length > 0) {
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = '0 6px 20px rgba(0,0,0,0.2)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
               }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z" fill="white"/>
                   <path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z" fill="white"/>
                 </svg>
