@@ -1053,25 +1053,29 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               </button>
               
               <button onClick={() => {
-                // Toggle red color on/off
+                // Cycle through colors: black → red → blue → green → orange → back to black
+                const colors = ['black', 'red', 'blue', 'green', 'orange'];
                 const newFormatting = { ...cellFormatting };
                 const cellsToFormat = selectedCells.length > 0 ? selectedCells : 
                   Array.from({length: fileData.length - 1}, (_, i) => 
                     Array.from({length: fileData[0]?.length || 0}, (_, j) => `${i+1}-${j}`)
                   ).flat();
                 
-                // Check if first cell is already red
+                // Get current color of first cell
                 const firstCellId = cellsToFormat[0];
-                const isRed = cellFormatting[firstCellId]?.color === 'red';
+                const currentColor = cellFormatting[firstCellId]?.color || 'black';
+                const currentIndex = colors.indexOf(currentColor);
+                const nextIndex = (currentIndex + 1) % colors.length;
+                const nextColor = colors[nextIndex];
                 
                 cellsToFormat.forEach(cellId => {
-                  if (isRed) {
-                    // Remove red color
+                  if (nextColor === 'black') {
+                    // Remove color (back to default)
                     const { color, ...rest } = newFormatting[cellId] || {};
                     newFormatting[cellId] = rest;
                   } else {
-                    // Apply red color
-                    newFormatting[cellId] = { ...newFormatting[cellId], color: 'red' };
+                    // Apply next color
+                    newFormatting[cellId] = { ...newFormatting[cellId], color: nextColor };
                   }
                 });
                 setCellFormatting(newFormatting);
@@ -1090,7 +1094,18 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="white"/>
                 </svg>
-                Color
+                {(() => {
+                  if (selectedCells.length > 0) {
+                    const firstCellId = selectedCells[0];
+                    const currentColor = cellFormatting[firstCellId]?.color;
+                    if (currentColor === 'red') return 'Red';
+                    if (currentColor === 'blue') return 'Blue';
+                    if (currentColor === 'green') return 'Green';
+                    if (currentColor === 'orange') return 'Orange';
+                    return 'Black';
+                  }
+                  return 'Color';
+                })()}
               </button>
             </div>
           </div>
