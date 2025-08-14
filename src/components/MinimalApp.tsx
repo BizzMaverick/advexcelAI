@@ -910,22 +910,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
             boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
             border: '1px solid #e1e5e9'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px' }}>
-              <div style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '8px',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="white"/>
-                </svg>
-              </div>
-              <h3 style={{ margin: 0, fontSize: '18px', color: '#2d3748', fontWeight: '600' }}>Format Text</h3>
-            </div>
+
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
               <button onClick={() => {
                 if (selectedCells.length === 0) return;
