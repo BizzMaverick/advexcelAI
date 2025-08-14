@@ -992,7 +992,7 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
               style={{ color: colors.primary, textDecoration: 'none' }}
               onClick={(e) => {
                 e.preventDefault();
-                window.open('/terms', '_blank');
+                window.open('/terms-conditions', '_blank');
               }}
             >
               Terms of Service
@@ -1003,7 +1003,7 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
               style={{ color: colors.primary, textDecoration: 'none' }}
               onClick={(e) => {
                 e.preventDefault();
-                window.open('/privacy', '_blank');
+                window.open('/privacy-policy', '_blank');
               }}
             >
               Privacy Policy
