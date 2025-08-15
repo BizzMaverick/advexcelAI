@@ -194,9 +194,12 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     setCurrentPromptId(promptId);
 
 
+    console.log('Checking local operations for prompt:', trimmedPrompt);
+    
     // Handle column sum operations locally
     const columnSumResult = handleColumnSum(trimmedPrompt, currentData);
     if (columnSumResult) {
+      console.log('Column sum result found');
       setAiResponse(columnSumResult);
       setPrompt('');
       return;
@@ -365,6 +368,8 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       return;
     }
     
+    console.log('Calling backend AI service...');
+    
     // Check if user can use a prompt
     const promptCheck = await PaymentService.canUsePrompt(user.email);
     if (!promptCheck.canUse) {
@@ -381,11 +386,13 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     await new Promise(resolve => setTimeout(resolve, 100));
     
     try {
+      console.log('Sending to AI:', { dataRows: currentData.length, prompt: trimmedPrompt, fileName: currentFile.name });
       const result = await bedrockService.processExcelData(
         currentData,
         trimmedPrompt,
         currentFile.name
       );
+      console.log('AI service returned:', result);
       
       if (result.success) {
 
@@ -536,8 +543,10 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     } catch (error) {
       console.error('AI processing error:', error);
       const errorMsg = `Error: ${error instanceof Error ? error.message : 'Failed to process request'}`;
+      console.log('Setting error response:', errorMsg);
       setAiResponse(errorMsg);
     } finally {
+      console.log('AI processing finished, setting isProcessing to false');
       setIsProcessing(false);
       setPrompt('');
     }
