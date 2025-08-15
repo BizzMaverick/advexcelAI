@@ -53,6 +53,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
   const [originalFileData, setOriginalFileData] = useState<any[][]>([]);
   const [frozenColumns, setFrozenColumns] = useState<number>(0);
   const [frozenRows, setFrozenRows] = useState<number>(0); // No freeze by default
+  
+  // Local trial status to prevent App.tsx remounting
+  const [localTrialStatus, setLocalTrialStatus] = useState(trialStatus);
+  
+  // Update local trial status when prop changes
+  useEffect(() => {
+    setLocalTrialStatus(trialStatus);
+  }, [trialStatus]);
 
   // Analytics removed to prevent page refresh issues
   
@@ -538,6 +546,15 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           const currentResponse = String(result.response || 'Processing completed').substring(0, 2000);
           console.log('Setting text response:', currentResponse);
           setAiResponse(currentResponse);
+        }
+        
+        // Update local trial status after successful AI processing
+        try {
+          const updatedStatus = await PaymentService.checkPaymentStatus(user.email);
+          setLocalTrialStatus(updatedStatus);
+          console.log('Trial status updated locally after AI processing');
+        } catch (error) {
+          console.log('Failed to update trial status:', error);
         }
       } else {
         const errorMsg = `Error: ${result.error || 'Unknown error occurred'}`;
@@ -1268,19 +1285,26 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           <img src={logo} alt="Logo" style={{ height: '24px' }} />
           <span style={{ fontSize: typography.sizes.base, fontWeight: typography.weights.semibold, fontFamily: typography.fontFamily }}>Excel AI</span>
         </div>
-        <button onClick={onLogout} style={{ 
-          background: 'rgba(255,255,255,0.2)', 
-          border: 'none', 
-          color: 'white', 
-          padding: '6px 12px', 
-          borderRadius: '4px', 
-          cursor: 'pointer',
-          fontSize: typography.sizes.xs,
-          fontFamily: typography.fontFamily,
-          fontWeight: typography.weights.medium
-        }}>
-          Logout
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {localTrialStatus.inTrial && (
+            <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.9)' }}>
+              {localTrialStatus.promptsRemaining || 0} prompts left
+            </div>
+          )}
+          <button onClick={onLogout} style={{ 
+            background: 'rgba(255,255,255,0.2)', 
+            border: 'none', 
+            color: 'white', 
+            padding: '6px 12px', 
+            borderRadius: '4px', 
+            cursor: 'pointer',
+            fontSize: typography.sizes.xs,
+            fontFamily: typography.fontFamily,
+            fontWeight: typography.weights.medium
+          }}>
+            Logout
+          </button>
+        </div>
       </header>
       
       {/* Main Content - Mobile First */}
