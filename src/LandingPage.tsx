@@ -298,7 +298,7 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
           }}>
             <img 
               src={logo} 
-              alt="Excel AI Assistant" 
+              alt="AdvExcel" 
               style={{ 
                 height: '70px',
                 marginBottom: '16px'
@@ -512,7 +512,7 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
       }}>
         <img 
           src={logo} 
-          alt="Excel AI Assistant" 
+          alt="AdvExcel" 
           style={{ 
             height: '80px',
             marginBottom: '10px'
@@ -524,7 +524,7 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
           fontSize: '24px',
           fontWeight: 'bold'
         }}>
-          Excel AI Assistant
+          AdvExcel
         </h1>
       </div>
 
