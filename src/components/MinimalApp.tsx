@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import * as XLSX from 'xlsx';
 import logo from '../assets/logo.png';
 import bedrockService from '../services/bedrockService';
@@ -32,6 +32,10 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
   const [prompt, setPrompt] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileData, setFileData] = useState<any[][]>([]);
+  
+  // Use refs to persist data across re-mounts
+  const fileDataRef = useRef<any[][]>([]);
+  const selectedFileRef = useRef<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [aiResponse, setAiResponse] = useState<string>('');
   const [lastUpdate, setLastUpdate] = useState<number>(Date.now());
@@ -120,7 +124,10 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
         setFileData(sanitizedData);
         setOriginalFileData([...sanitizedData]); // Store original data
         
-        // Data will be persisted by useEffect hooks
+        // Store in refs to survive re-mounts
+        fileDataRef.current = sanitizedData;
+        selectedFileRef.current = file;
+        
         console.log('File uploaded successfully:', sanitizedData.length, 'rows');
         setShowFileInfo(true);
         
@@ -154,8 +161,13 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
 
   const handleProcessAI = useCallback(async () => {
     console.log('handleProcessAI called');
-    console.log('selectedFile:', selectedFile);
-    console.log('fileData length:', fileData.length);
+    
+    // Use refs if state is lost due to re-mount
+    const currentFile = selectedFile || selectedFileRef.current;
+    const currentData = fileData.length > 0 ? fileData : fileDataRef.current;
+    
+    console.log('selectedFile:', currentFile);
+    console.log('fileData length:', currentData.length);
     
     const trimmedPrompt = prompt.trim();
     if (!trimmedPrompt) {
@@ -163,10 +175,18 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       return;
     }
     
-    if (!selectedFile || fileData.length === 0) {
+    if (!currentFile || currentData.length === 0) {
       console.log('ERROR: No file or data');
       setAiResponse('Error: Please select a file first');
       return;
+    }
+    
+    // Update state if it was lost
+    if (!selectedFile && selectedFileRef.current) {
+      setSelectedFile(selectedFileRef.current);
+    }
+    if (fileData.length === 0 && fileDataRef.current.length > 0) {
+      setFileData(fileDataRef.current);
     }
 
     // Generate unique prompt ID for tracking
@@ -175,7 +195,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
 
 
     // Handle column sum operations locally
-    const columnSumResult = handleColumnSum(trimmedPrompt, fileData);
+    const columnSumResult = handleColumnSum(trimmedPrompt, currentData);
     if (columnSumResult) {
       setAiResponse(columnSumResult);
       setPrompt('');
@@ -183,7 +203,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     }
 
     // Handle Excel cell operations locally without backend call
-    const cellOperationResult = handleCellOperations(trimmedPrompt, fileData);
+    const cellOperationResult = handleCellOperations(trimmedPrompt, currentData);
     if (cellOperationResult) {
       setAiResponse(cellOperationResult);
       setPrompt('');
@@ -191,7 +211,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     }
 
     // Handle formatting commands locally without backend call
-    const formatResult = handleFormatting(trimmedPrompt, fileData);
+    const formatResult = handleFormatting(trimmedPrompt, currentData);
     if (formatResult) {
       setAiResponse(formatResult.message);
       if (formatResult.data) {
@@ -203,7 +223,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     }
 
     // Handle pivot table operations locally
-    const pivotResult = handlePivotOperations(trimmedPrompt, fileData);
+    const pivotResult = handlePivotOperations(trimmedPrompt, currentData);
     if (pivotResult) {
       console.log('Pivot operation processed:', pivotResult.data.length, 'rows');
       
@@ -241,7 +261,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     }
 
     // Handle find and replace locally without backend call
-    const findReplaceResult = handleFindReplace(trimmedPrompt, fileData);
+    const findReplaceResult = handleFindReplace(trimmedPrompt, currentData);
     if (findReplaceResult) {
       console.log('Find and replace processed:', findReplaceResult.data.length, 'rows');
       
@@ -279,7 +299,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     }
 
     // Handle remove duplicates locally without backend call
-    const removeDuplicatesResult = handleRemoveDuplicates(trimmedPrompt, fileData);
+    const removeDuplicatesResult = handleRemoveDuplicates(trimmedPrompt, currentData);
     if (removeDuplicatesResult) {
       console.log('Remove duplicates processed:', removeDuplicatesResult.data.length, 'rows');
       
@@ -361,16 +381,16 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     
     try {
       const result = await bedrockService.processExcelData(
-        fileData,
+        currentData,
         trimmedPrompt,
-        selectedFile.name
+        currentFile.name
       );
       
       if (result.success) {
 
         console.log('AI Result:', result); // Debug log
-        console.log('Original fileData rows:', fileData.length);
-        console.log('First 3 rows of fileData:', fileData.slice(0, 3));
+        console.log('Original fileData rows:', currentData.length);
+        console.log('First 3 rows of fileData:', currentData.slice(0, 3));
         console.log('Full AI Response Length:', result.response?.length);
         console.log('Response contains Modi?', result.response?.includes('Modi'));
         console.log('Response contains theertha?', result.response?.includes('theertha'));
