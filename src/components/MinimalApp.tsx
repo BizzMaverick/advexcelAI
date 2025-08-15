@@ -1196,6 +1196,26 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
           )}
         </main>
         
+        {/* Footer with Legal Pages */}
+        <footer style={{
+          background: '#232f3e',
+          color: '#ffffff',
+          padding: '20px',
+          textAlign: 'center',
+          borderTop: '1px solid #e1e5e9'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', flexWrap: 'wrap', marginBottom: '12px' }}>
+            <a href="#" style={{ color: '#ffffff', textDecoration: 'none', fontSize: '14px' }}>Privacy Policy</a>
+            <a href="#" style={{ color: '#ffffff', textDecoration: 'none', fontSize: '14px' }}>Terms of Service</a>
+            <a href="#" style={{ color: '#ffffff', textDecoration: 'none', fontSize: '14px' }}>Cookie Policy</a>
+            <a href="#" style={{ color: '#ffffff', textDecoration: 'none', fontSize: '14px' }}>Support</a>
+            <a href="#" style={{ color: '#ffffff', textDecoration: 'none', fontSize: '14px' }}>Contact Us</a>
+          </div>
+          <p style={{ margin: 0, fontSize: '12px', color: '#cccccc' }}>
+            © 2024 Excel AI. All rights reserved. | Powered by AWS
+          </p>
+        </footer>
+        
         {/* Floating Feedback Button */}
         <div style={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 1000 }}>
           <div 
