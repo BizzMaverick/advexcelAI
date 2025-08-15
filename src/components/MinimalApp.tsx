@@ -7,7 +7,6 @@ import FormattingToolbar, { FormatStyle } from './FormattingToolbar';
 import { downloadFormattedExcel, downloadCSV } from '../utils/excelExport';
 import PaymentService from '../services/paymentService';
 import FeedbackWidget from './FeedbackWidget';
-import { useAnalytics } from '../hooks/useAnalytics';
 import { typography } from '../styles/typography';
 import { PivotOperations } from '../utils/pivotOperations';
 
@@ -48,17 +47,13 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
   const [frozenColumns, setFrozenColumns] = useState<number>(0);
   const [frozenRows, setFrozenRows] = useState<number>(0); // No freeze by default
 
-  // Analytics tracking - DISABLED to fix page refresh issue
-  const trackAction = () => {};
-  const trackError = () => {};
-  const trackAIInteraction = () => {};
-  // const { trackAction, trackError, trackAIInteraction } = useAnalytics(user.email);
+  // Analytics removed to prevent page refresh issues
 
   const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    trackAction('file_upload_started', { fileName: file.name, fileSize: file.size });
+
     setFileError('');
     setFileLoading(true);
 
@@ -66,7 +61,6 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     if (file.size > MAX_FILE_SIZE) {
       const error = `File too large. Maximum size: ${MAX_FILE_SIZE / 1024 / 1024}MB`;
       setFileError(error);
-      trackError(new Error(error), 'file_upload');
       setFileLoading(false);
       return;
     }
@@ -75,7 +69,6 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     if (!ALLOWED_TYPES.includes(fileExt)) {
       const error = `Invalid file type. Allowed: ${ALLOWED_TYPES.join(', ')}`;
       setFileError(error);
-      trackError(new Error(error), 'file_upload');
       setFileLoading(false);
       return;
     }
@@ -119,11 +112,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
         setOriginalFileData([...sanitizedData]); // Store original data
         setShowFileInfo(true);
         
-        trackAction('file_upload_success', { 
-          fileName: file.name, 
-          rows: sanitizedData.length, 
-          columns: sanitizedData[0]?.length || 0 
-        });
+
         
         // Auto-hide file info after 10 seconds
         setTimeout(() => {
@@ -133,7 +122,6 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
         console.error('Error parsing file:', error);
         const errorMsg = 'Error reading file. Please ensure it is a valid Excel or CSV file.';
         setFileError(errorMsg);
-        trackError(error as Error, 'file_parsing');
       } finally {
         setFileLoading(false);
       }
@@ -142,7 +130,6 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     reader.onerror = () => {
       const error = 'Error reading file';
       setFileError(error);
-      trackError(new Error(error), 'file_reader');
       setFileLoading(false);
     };
 
@@ -172,7 +159,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     // Generate unique prompt ID for tracking
     const promptId = `prompt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     setCurrentPromptId(promptId);
-    trackAction('ai_prompt_submitted', { prompt: trimmedPrompt, promptId });
+
 
     // Handle column sum operations locally
     const columnSumResult = handleColumnSum(trimmedPrompt, fileData);
@@ -367,8 +354,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       );
       
       if (result.success) {
-        // Track AI interaction for accuracy monitoring
-        trackAIInteraction(promptId, trimmedPrompt, result.response || '');
+
         console.log('AI Result:', result); // Debug log
         console.log('Original fileData rows:', fileData.length);
         console.log('First 3 rows of fileData:', fileData.slice(0, 3));
@@ -512,18 +498,16 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       } else {
         const errorMsg = `Error: ${result.error || 'Unknown error occurred'}`;
         setAiResponse(errorMsg);
-        trackError(new Error(result.error || 'Unknown error occurred'), 'ai_processing');
       }
     } catch (error) {
       console.error('AI processing error:', error);
       const errorMsg = `Error: ${error instanceof Error ? error.message : 'Failed to process request'}`;
       setAiResponse(errorMsg);
-      trackError(error as Error, 'ai_processing');
     } finally {
       setIsProcessing(false);
       setPrompt('');
     }
-  }, [prompt, selectedFile, fileData, trackAction, trackAIInteraction, trackError, user.email, onTrialRefresh]);
+  }, [prompt, selectedFile, fileData, user.email, onTrialRefresh]);
 
   // Handle Excel cell operations locally
   const handleCellOperations = useCallback((prompt: string, data: any[][]) => {
@@ -1200,9 +1184,8 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       setFileData([...lastAiResult]);
       setShowUseResultButton(false);
       setAiResponse(prev => prev.replace(/<button[^>]*>.*?<\/button>/g, '<p style="color: #10b981; font-weight: bold;">✅ Changes applied to main sheet!</p>'));
-      trackAction('ai_results_applied', { rows: lastAiResult.length });
     }
-  }, [lastAiResult, trackAction]);
+  }, [lastAiResult]);
 
   // Reset to original data
   const resetToOriginal = useCallback(() => {
@@ -1210,9 +1193,8 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       setFileData([...originalFileData]);
       setShowUseResultButton(false);
       setAiResponse('');
-      trackAction('data_reset_to_original');
     }
-  }, [originalFileData, trackAction]);
+  }, [originalFileData]);
 
   // Make functions available globally for button clicks
   (window as any).applyChanges = applyChangesToMainSheet;
