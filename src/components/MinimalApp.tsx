@@ -210,6 +210,28 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       return;
     }
 
+    // Handle remove duplicates
+    if (trimmedPrompt.toLowerCase().includes('remove') && trimmedPrompt.toLowerCase().includes('duplicate')) {
+      const headers = fileData[0];
+      const dataRows = fileData.slice(1);
+      
+      // Remove duplicates based on all columns
+      const uniqueRows = dataRows.filter((row, index) => {
+        return dataRows.findIndex(otherRow => 
+          JSON.stringify(row) === JSON.stringify(otherRow)
+        ) === index;
+      });
+      
+      const result = [headers, ...uniqueRows];
+      const removedCount = dataRows.length - uniqueRows.length;
+      
+      setLastAiResult(result);
+      setShowUseResultButton(true);
+      setAiResponse(`<strong>Duplicates removed successfully!</strong><br><br>Removed ${removedCount} duplicate rows. ${uniqueRows.length} unique rows remaining. Click "Apply to Main Sheet" to use the cleaned data.`);
+      setPrompt('');
+      return;
+    }
+
     // Handle data queries with flexible parsing
     const headers = fileData[0];
     const lowerPrompt = trimmedPrompt.toLowerCase();
