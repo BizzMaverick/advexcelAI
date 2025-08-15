@@ -133,7 +133,7 @@ export default function FeedbackWidget({ promptId, onClose }: FeedbackWidgetProp
           
           <div style={{ marginBottom: '16px' }}>
             <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#0f1111', fontWeight: '400' }}>Rate this response:</p>
-            <div style={{ display: 'flex', gap: '4px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
               {[1, 2, 3, 4, 5].map(star => (
                 <button
                   key={star}
@@ -141,18 +141,24 @@ export default function FeedbackWidget({ promptId, onClose }: FeedbackWidgetProp
                   style={{
                     background: 'none',
                     border: 'none',
-                    fontSize: '18px',
+                    fontSize: '28px',
                     cursor: 'pointer',
                     color: star <= rating ? '#ff9900' : '#ddd',
-                    padding: '2px',
-                    borderRadius: '2px',
-                    transition: 'all 0.15s ease'
+                    padding: '8px',
+                    borderRadius: '4px',
+                    transition: 'all 0.15s ease',
+                    flex: 1,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center'
                   }}
                   onMouseEnter={(e) => {
                     if (star > rating) e.currentTarget.style.color = '#ff9900';
+                    e.currentTarget.style.background = '#f7f8f8';
                   }}
                   onMouseLeave={(e) => {
                     if (star > rating) e.currentTarget.style.color = '#ddd';
+                    e.currentTarget.style.background = 'none';
                   }}
                 >
                   ★
