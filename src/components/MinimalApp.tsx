@@ -1240,19 +1240,239 @@ For privacy-related questions or requests, please use our feedback system or con
               setShowLegalModal(true);
             }} style={{ color: '#ffffff', textDecoration: 'none', fontSize: '14px', cursor: 'pointer' }}>Privacy Policy</a>
             <a onClick={() => {
-              setLegalContent({ title: 'Terms of Service', content: 'By using Excel AI, you agree to use the service responsibly. Do not upload sensitive personal data. The service is provided as-is. We reserve the right to modify or discontinue the service at any time.' });
+              setLegalContent({ 
+                title: 'Terms of Service', 
+                content: `Last updated on ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+
+1. Acceptance of Terms
+By accessing and using Excel AI, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
+
+2. Description of Service
+Excel AI is a web-based platform that provides AI-powered analysis and manipulation of Excel and CSV files. Our service includes data sorting, filtering, mathematical calculations, duplicate detection, and other spreadsheet operations powered by Amazon Web Services.
+
+3. User Responsibilities
+You are responsible for:
+• Ensuring you have the right to upload and process any files you submit
+• Not uploading files containing sensitive personal data, confidential information, or copyrighted material without proper authorization
+• Using the service in compliance with applicable laws and regulations
+• Maintaining the security of your account credentials
+• Not attempting to reverse engineer, hack, or compromise the service
+
+4. Prohibited Uses
+You may not use Excel AI to:
+• Process illegal, harmful, or malicious content
+• Upload files containing viruses, malware, or other harmful code
+• Attempt to gain unauthorized access to our systems or other users' accounts
+• Use the service for any commercial purpose without explicit permission
+• Violate any applicable laws or regulations
+
+5. Service Availability
+We strive to maintain high service availability but do not guarantee uninterrupted access. The service is provided "as-is" without warranties of any kind. We reserve the right to modify, suspend, or discontinue the service at any time with or without notice.
+
+6. Limitation of Liability
+Excel AI shall not be liable for any direct, indirect, incidental, special, or consequential damages resulting from your use of the service. Your sole remedy for dissatisfaction with the service is to stop using it.
+
+7. Modifications to Terms
+We reserve the right to modify these terms at any time. Continued use of the service after changes constitutes acceptance of the new terms.
+
+8. Governing Law
+These terms shall be governed by and construed in accordance with applicable laws, without regard to conflict of law principles.` 
+              });
               setShowLegalModal(true);
             }} style={{ color: '#ffffff', textDecoration: 'none', fontSize: '14px', cursor: 'pointer' }}>Terms of Service</a>
             <a onClick={() => {
-              setLegalContent({ title: 'Cookie Policy', content: 'We use cookies to enhance your experience and maintain your session. Essential cookies are required for the service to function. You can manage cookie preferences in your browser settings.' });
+              setLegalContent({ 
+                title: 'Cookie Policy', 
+                content: `Last updated on ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+
+1. What Are Cookies
+Cookies are small text files that are placed on your computer or mobile device when you visit a website. They are widely used to make websites work more efficiently and provide information to website owners.
+
+2. How We Use Cookies
+Excel AI uses cookies to:
+• Maintain your login session and authentication state
+• Remember your preferences and settings
+• Analyze how you use our service to improve functionality
+• Ensure security and prevent fraudulent activity
+• Provide personalized user experience
+
+3. Types of Cookies We Use
+
+Essential Cookies:
+• Authentication cookies from AWS Cognito to maintain your login session
+• Security cookies to protect against cross-site request forgery
+• Session cookies to maintain application state
+
+Analytical Cookies:
+• Usage analytics to understand how users interact with our platform
+• Performance monitoring to identify and fix issues
+• Feature usage tracking to improve our services
+
+4. Third-Party Cookies
+We use Amazon Web Services, which may set their own cookies for:
+• Authentication and session management (AWS Cognito)
+• Service monitoring and analytics
+• Security and fraud prevention
+
+5. Managing Cookies
+You can control cookies through your browser settings:
+• Most browsers allow you to view, delete, and block cookies
+• You can set your browser to notify you when cookies are being set
+• Disabling essential cookies may prevent the service from functioning properly
+
+6. Cookie Retention
+• Session cookies are deleted when you close your browser
+• Persistent cookies remain until they expire or you delete them
+• Authentication cookies typically expire after a set period for security
+
+7. Updates to This Policy
+We may update this Cookie Policy from time to time. Any changes will be posted on this page with an updated revision date.
+
+8. Contact Us
+If you have questions about our use of cookies, please contact us through our feedback system.` 
+              });
               setShowLegalModal(true);
             }} style={{ color: '#ffffff', textDecoration: 'none', fontSize: '14px', cursor: 'pointer' }}>Cookie Policy</a>
             <a onClick={() => {
-              setLegalContent({ title: 'Support', content: 'Need help with Excel AI? Use the feedback button for quick questions or contact our support team. We provide documentation and tutorials to help you get the most out of Excel AI.' });
+              setLegalContent({ 
+                title: 'Support & Help Center', 
+                content: `Welcome to Excel AI Support
+
+1. Getting Started
+Excel AI is designed to be intuitive and user-friendly. Here's how to get started:
+• Create an account using your email address
+• Upload your Excel (.xlsx, .xls) or CSV files
+• Use natural language commands to analyze your data
+• Apply AI-generated results to your spreadsheet or download new files
+
+2. Supported File Formats
+• Microsoft Excel files (.xlsx, .xls)
+• Comma-separated values (.csv)
+• Maximum file size: Large files are automatically truncated to 1000 rows for performance
+
+3. Available Features
+
+Data Analysis:
+• Sort data by any column
+• Find and remove duplicate entries
+• Mathematical operations (sum, average, count, min, max)
+• Cell-to-cell calculations
+• Data filtering and search
+
+Formatting Tools:
+• Bold and italic text formatting
+• Text and cell color customization
+• Text alignment options
+• Format painter for copying styles
+• Undo/redo functionality
+
+4. Common Commands
+• "Sort by column A" - Sorts data by the specified column
+• "Find duplicates" - Identifies duplicate rows
+• "Sum column B" - Calculates sum of numeric values
+• "Show data for [country/item]" - Filters and displays matching records
+• "Replace [old] with [new]" - Find and replace text
+
+5. Troubleshooting
+
+File Upload Issues:
+• Ensure your file is in supported format (.xlsx, .xls, .csv)
+• Check that the file is not corrupted
+• Try refreshing the page and uploading again
+
+AI Not Responding:
+• Make sure you've uploaded a file first
+• Use clear, specific commands
+• Try rephrasing your request
+
+Formatting Issues:
+• Select cells before applying formatting
+• Use Ctrl+click for multiple cell selection
+• Check that undo/redo buttons are enabled
+
+6. Best Practices
+• Use descriptive column headers in your data
+• Keep file sizes reasonable for better performance
+• Be specific in your AI commands
+• Review results before applying changes to your main sheet
+
+7. Contact Support
+For additional help:
+• Use the feedback button (👍) for quick questions
+• Report bugs or issues through the feedback system
+• Suggest new features via feedback
+
+8. System Requirements
+• Modern web browser (Chrome, Firefox, Safari, Edge)
+• Stable internet connection
+• JavaScript enabled
+• Cookies enabled for authentication` 
+              });
               setShowLegalModal(true);
             }} style={{ color: '#ffffff', textDecoration: 'none', fontSize: '14px', cursor: 'pointer' }}>Support</a>
             <a onClick={() => {
-              setLegalContent({ title: 'Contact Us', content: 'Get in touch with the Excel AI team. Email: support@excelai.com | For technical issues, use the feedback button. For business inquiries, contact our sales team.' });
+              setLegalContent({ 
+                title: 'Contact Us', 
+                content: `Get in Touch with Excel AI
+
+1. Quick Support
+For immediate assistance, use our in-app feedback system:
+• Click the thumbs up button (👍) in the bottom right corner
+• Describe your issue or question
+• Our team will review and respond promptly
+
+2. Contact Information
+
+General Inquiries:
+• Email: info@excelai.com
+• Response time: 24-48 hours
+
+Technical Support:
+• Use the feedback button for fastest response
+• Email: support@excelai.com
+• Include details about your browser, file type, and specific issue
+
+Business & Partnership Inquiries:
+• Email: business@excelai.com
+• For enterprise solutions and custom integrations
+
+3. Before Contacting Support
+To help us assist you better, please:
+• Try the troubleshooting steps in our Support section
+• Note your browser type and version
+• Describe the specific steps that led to the issue
+• Include any error messages you received
+
+4. Feature Requests
+We love hearing from our users! Submit feature requests through:
+• The feedback button with "Feature Request" in your message
+• Email: features@excelai.com
+• Include detailed descriptions of desired functionality
+
+5. Privacy & Security Concerns
+For privacy-related questions or security concerns:
+• Email: privacy@excelai.com
+• Reference our Privacy Policy for detailed information
+• Report security vulnerabilities responsibly
+
+6. Business Hours
+• Support team operates Monday-Friday, 9 AM - 6 PM EST
+• Feedback system monitored 24/7 for urgent issues
+• Response times may vary during weekends and holidays
+
+7. Social Media
+Stay updated with Excel AI:
+• Follow us for product updates and tips
+• Share your success stories and use cases
+• Connect with other Excel AI users
+
+8. Office Location
+Excel AI Development Team
+Powered by Amazon Web Services
+Cloud-based operations for global accessibility
+
+We're committed to providing excellent support and continuously improving Excel AI based on your feedback. Thank you for choosing our platform for your data analysis needs!` 
+              });
               setShowLegalModal(true);
             }} style={{ color: '#ffffff', textDecoration: 'none', fontSize: '14px', cursor: 'pointer' }}>Contact Us</a>
           </div>
