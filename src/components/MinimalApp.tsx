@@ -28,8 +28,16 @@ interface MinimalAppProps {
 
 export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh }: MinimalAppProps) {
   const [prompt, setPrompt] = useState('');
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [fileData, setFileData] = useState<any[][]>([]);
+  const [selectedFile, setSelectedFile] = useState<File | null>(() => {
+    // Try to restore from sessionStorage
+    const saved = sessionStorage.getItem('selectedFile');
+    return saved ? JSON.parse(saved) : null;
+  });
+  const [fileData, setFileData] = useState<any[][]>(() => {
+    // Try to restore from sessionStorage
+    const saved = sessionStorage.getItem('fileData');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [isProcessing, setIsProcessing] = useState(false);
   const [aiResponse, setAiResponse] = useState<string>('');
   const [lastUpdate, setLastUpdate] = useState<number>(Date.now());
@@ -110,6 +118,10 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
 
         setFileData(sanitizedData);
         setOriginalFileData([...sanitizedData]); // Store original data
+        
+        // Persist to sessionStorage
+        sessionStorage.setItem('fileData', JSON.stringify(sanitizedData));
+        sessionStorage.setItem('selectedFile', JSON.stringify({ name: file.name, size: file.size }));
         setShowFileInfo(true);
         
 
@@ -141,6 +153,10 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
   }, []);
 
   const handleProcessAI = useCallback(async () => {
+    console.log('handleProcessAI called');
+    console.log('selectedFile:', selectedFile);
+    console.log('fileData length:', fileData.length);
+    
     const trimmedPrompt = prompt.trim();
     if (!trimmedPrompt) {
       setAiResponse('Error: Please enter a command');
@@ -148,6 +164,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     }
     
     if (!selectedFile || fileData.length === 0) {
+      console.log('ERROR: No file or data');
       setAiResponse('Error: Please select a file first');
       return;
     }
@@ -503,7 +520,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       setIsProcessing(false);
       setPrompt('');
     }
-  }, [prompt, selectedFile, fileData, user.email, onTrialRefresh]);
+  }, []);  // Remove all dependencies to prevent recreation
 
   // Handle Excel cell operations locally
   const handleCellOperations = useCallback((prompt: string, data: any[][]) => {
