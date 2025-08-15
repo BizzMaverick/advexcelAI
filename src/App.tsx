@@ -12,6 +12,7 @@ import PaymentPage from './components/PaymentPage';
 import TrialStatus from './components/TrialStatus';
 import PaymentService from './services/paymentService';
 import authService from './services/authService';
+import AnalyticsDashboard from './components/AnalyticsDashboard';
 
 function App() {
   const [user, setUser] = useState<{ name: string; email: string } | null>(() => {
@@ -116,6 +117,9 @@ function App() {
         <Route path="/cancellation-refund" element={<CancellationRefund />} />
         <Route path="/shipping-delivery" element={<ShippingDelivery />} />
         <Route path="/contact-us" element={<ContactUs />} />
+        
+        {/* Analytics Dashboard - Admin only */}
+        <Route path="/analytics" element={<AnalyticsDashboard />} />
         
         {/* Main App Routes */}
         <Route path="/" element={
