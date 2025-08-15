@@ -78,12 +78,12 @@ class AnalyticsService {
 
   private sendToAnalytics(event: UserEvent) {
     // Send to your analytics service (Google Analytics, AWS CloudWatch, etc.)
-    console.log('Analytics Event:', event);
+    // console.log('Analytics Event:', event); // Disabled to prevent console spam
   }
 
   private sendAIMetric(metric: AIAccuracyMetric) {
     // Send to your monitoring service
-    console.log('AI Metric:', metric);
+    // console.log('AI Metric:', metric); // Disabled to prevent console spam
   }
 }
 
