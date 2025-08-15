@@ -149,7 +149,6 @@ function App() {
                 />
               )}
               <MinimalApp 
-                key={user.email}
                 user={user} 
                 onLogout={handleLogout}
                 trialStatus={trialStatus}
