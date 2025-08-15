@@ -1210,255 +1210,211 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
             <a onClick={() => {
               setLegalContent({ 
                 title: 'Privacy Policy', 
-                content: `Last updated on ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                content: `Last updated: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
 
-1. Introduction to Privacy Policy
-This Privacy Policy applies to your use of the Excel AI platform, including all services, features, and functionalities provided through our web application. The terms "we," "our," and "us" refer to Excel AI, and the terms "you," "your," and "User" refer to you as a user of our platform.
+What Information We Collect:
+• Your name and email address when you create an account
+• Excel/CSV files you upload for processing
+• Usage data to improve our service
 
-The term "Personal Information" means information that personally identifies you, such as your name, email address, and any data linked to such information. By using Excel AI, you agree to this Privacy Policy and consent to the collection, use, and processing of your information as described below.
+How We Use Your Information:
+• Process your files to provide AI-powered analysis
+• Maintain your account and authentication
+• Improve our services and user experience
 
-2. Information We Collect and How We Use It
-We collect Personal Information when you create an account, including your name, email address, and authentication credentials through AWS Cognito. We also temporarily process the Excel/CSV files you upload to provide AI-powered analysis and insights.
+Data Security:
+• We use Amazon Web Services (AWS) for secure processing
+• Your data is encrypted and protected with industry standards
+• Files are processed temporarily and not permanently stored
+• Account data is kept secure until you delete your account
 
-Your uploaded files are processed in real-time and are not permanently stored on our servers. File data is used solely to generate AI responses and perform requested operations like sorting, filtering, and mathematical calculations.
+Data Sharing:
+• We do not sell or share your personal information
+• We only use AWS services (Cognito, Bedrock) for processing
+• No third-party access to your data
 
-3. Data Security and Processing
-We use Amazon Web Services (AWS) infrastructure to ensure enterprise-grade security. Your data is encrypted in transit and processed using secure AWS services including Amazon Bedrock for AI functionality. We implement industry-standard security practices to protect your information.
+Your Rights:
+• Access, modify, or delete your personal information
+• Request account deletion at any time
+• Withdraw consent for data processing
 
-4. Data Retention and Deletion
-Uploaded files are processed temporarily and automatically deleted after your session ends. Account information is retained as long as your account remains active. You may request deletion of your account and associated data at any time through the feedback system.
-
-5. Third-Party Services
-We use AWS Cognito for authentication and AWS Bedrock for AI processing. These services are governed by Amazon's privacy policies and security standards. We do not share your personal information with any other third parties.
-
-6. Your Rights
-You have the right to access, modify, or delete your personal information. You can update your account details or request account deletion through our support channels. You also have the right to withdraw consent for data processing at any time.
-
-7. Contact Information
-For privacy-related questions or requests, please use our feedback system or contact us through the support channels provided in the application.` 
+Contact Us:
+For privacy questions, email: contact@advexcel.online` 
               });
               setShowLegalModal(true);
             }} style={{ color: '#ffffff', textDecoration: 'none', fontSize: '14px', cursor: 'pointer' }}>Privacy Policy</a>
             <a onClick={() => {
               setLegalContent({ 
                 title: 'Terms of Service', 
-                content: `Last updated on ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                content: `Last updated: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
 
-1. Acceptance of Terms
-By accessing and using Excel AI, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
+By using Excel AI, you agree to these terms.
 
-2. Description of Service
-Excel AI is a web-based platform that provides AI-powered analysis and manipulation of Excel and CSV files. Our service includes data sorting, filtering, mathematical calculations, duplicate detection, and other spreadsheet operations powered by Amazon Web Services.
+What Excel AI Does:
+• AI-powered analysis of Excel and CSV files
+• Data sorting, filtering, and mathematical calculations
+• Duplicate detection and data manipulation
+• Powered by Amazon Web Services
 
-3. User Responsibilities
-You are responsible for:
-• Ensuring you have the right to upload and process any files you submit
-• Not uploading files containing sensitive personal data, confidential information, or copyrighted material without proper authorization
-• Using the service in compliance with applicable laws and regulations
-• Maintaining the security of your account credentials
-• Not attempting to reverse engineer, hack, or compromise the service
+Your Responsibilities:
+• Only upload files you have permission to process
+• Don't upload sensitive personal data or confidential information
+• Use the service legally and responsibly
+• Keep your account credentials secure
+• Don't attempt to hack or compromise the service
 
-4. Prohibited Uses
-You may not use Excel AI to:
-• Process illegal, harmful, or malicious content
-• Upload files containing viruses, malware, or other harmful code
-• Attempt to gain unauthorized access to our systems or other users' accounts
-• Use the service for any commercial purpose without explicit permission
-• Violate any applicable laws or regulations
+Prohibited Uses:
+• Illegal, harmful, or malicious content
+• Files with viruses or malware
+• Unauthorized access attempts
+• Commercial use without permission
+• Violating applicable laws
 
-5. Service Availability
-We strive to maintain high service availability but do not guarantee uninterrupted access. The service is provided "as-is" without warranties of any kind. We reserve the right to modify, suspend, or discontinue the service at any time with or without notice.
+Service Terms:
+• Service provided "as-is" without warranties
+• We may modify or discontinue service anytime
+• No guarantee of uninterrupted access
+• Limited liability for service issues
 
-6. Limitation of Liability
-Excel AI shall not be liable for any direct, indirect, incidental, special, or consequential damages resulting from your use of the service. Your sole remedy for dissatisfaction with the service is to stop using it.
+Changes:
+• We may update these terms anytime
+• Continued use means you accept changes
 
-7. Modifications to Terms
-We reserve the right to modify these terms at any time. Continued use of the service after changes constitutes acceptance of the new terms.
-
-8. Governing Law
-These terms shall be governed by and construed in accordance with applicable laws, without regard to conflict of law principles.` 
+Contact: contact@advexcel.online` 
               });
               setShowLegalModal(true);
             }} style={{ color: '#ffffff', textDecoration: 'none', fontSize: '14px', cursor: 'pointer' }}>Terms of Service</a>
             <a onClick={() => {
               setLegalContent({ 
                 title: 'Cookie Policy', 
-                content: `Last updated on ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                content: `Last updated: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
 
-1. What Are Cookies
-Cookies are small text files that are placed on your computer or mobile device when you visit a website. They are widely used to make websites work more efficiently and provide information to website owners.
+What Are Cookies:
+Small text files stored on your device to make websites work better.
 
-2. How We Use Cookies
-Excel AI uses cookies to:
-• Maintain your login session and authentication state
-• Remember your preferences and settings
-• Analyze how you use our service to improve functionality
-• Ensure security and prevent fraudulent activity
-• Provide personalized user experience
+How We Use Cookies:
+• Keep you logged in (authentication)
+• Remember your preferences
+• Analyze usage to improve our service
+• Ensure security and prevent fraud
 
-3. Types of Cookies We Use
+Types of Cookies:
 
-Essential Cookies:
-• Authentication cookies from AWS Cognito to maintain your login session
-• Security cookies to protect against cross-site request forgery
-• Session cookies to maintain application state
+Essential Cookies (Required):
+• AWS Cognito authentication cookies
+• Security and session management
+• Application functionality
 
-Analytical Cookies:
-• Usage analytics to understand how users interact with our platform
-• Performance monitoring to identify and fix issues
-• Feature usage tracking to improve our services
+Analytical Cookies (Optional):
+• Usage analytics and performance monitoring
+• Feature tracking to improve services
 
-4. Third-Party Cookies
-We use Amazon Web Services, which may set their own cookies for:
-• Authentication and session management (AWS Cognito)
-• Service monitoring and analytics
-• Security and fraud prevention
+Third-Party Cookies:
+• Amazon Web Services for authentication and security
+• No other third-party cookies
 
-5. Managing Cookies
-You can control cookies through your browser settings:
-• Most browsers allow you to view, delete, and block cookies
-• You can set your browser to notify you when cookies are being set
-• Disabling essential cookies may prevent the service from functioning properly
+Managing Cookies:
+• Control cookies through your browser settings
+• View, delete, or block cookies as needed
+• Disabling essential cookies may break functionality
+• Session cookies deleted when browser closes
 
-6. Cookie Retention
-• Session cookies are deleted when you close your browser
-• Persistent cookies remain until they expire or you delete them
-• Authentication cookies typically expire after a set period for security
-
-7. Updates to This Policy
-We may update this Cookie Policy from time to time. Any changes will be posted on this page with an updated revision date.
-
-8. Contact Us
-If you have questions about our use of cookies, please contact us through our feedback system.` 
+Contact: contact@advexcel.online` 
               });
               setShowLegalModal(true);
             }} style={{ color: '#ffffff', textDecoration: 'none', fontSize: '14px', cursor: 'pointer' }}>Cookie Policy</a>
             <a onClick={() => {
               setLegalContent({ 
-                title: 'Support & Help Center', 
-                content: `Welcome to Excel AI Support
+                title: 'Support & Help', 
+                content: `Getting Started:
+• Create account with your email
+• Upload Excel (.xlsx, .xls) or CSV files
+• Use natural language commands
+• Apply results or download new files
 
-1. Getting Started
-Excel AI is designed to be intuitive and user-friendly. Here's how to get started:
-• Create an account using your email address
-• Upload your Excel (.xlsx, .xls) or CSV files
-• Use natural language commands to analyze your data
-• Apply AI-generated results to your spreadsheet or download new files
+Supported Files:
+• Excel files (.xlsx, .xls)
+• CSV files (.csv)
+• Large files truncated to 1000 rows
 
-2. Supported File Formats
-• Microsoft Excel files (.xlsx, .xls)
-• Comma-separated values (.csv)
-• Maximum file size: Large files are automatically truncated to 1000 rows for performance
-
-3. Available Features
-
-Data Analysis:
+Key Features:
 • Sort data by any column
-• Find and remove duplicate entries
-• Mathematical operations (sum, average, count, min, max)
-• Cell-to-cell calculations
+• Find and remove duplicates
+• Math operations (sum, average, count, min, max)
 • Data filtering and search
+• Text formatting (bold, italic, colors)
+• Format painter and undo/redo
 
-Formatting Tools:
-• Bold and italic text formatting
-• Text and cell color customization
-• Text alignment options
-• Format painter for copying styles
-• Undo/redo functionality
+Common Commands:
+• "Sort by column A"
+• "Find duplicates"
+• "Sum column B"
+• "Show data for [item]"
+• "Replace [old] with [new]"
 
-4. Common Commands
-• "Sort by column A" - Sorts data by the specified column
-• "Find duplicates" - Identifies duplicate rows
-• "Sum column B" - Calculates sum of numeric values
-• "Show data for [country/item]" - Filters and displays matching records
-• "Replace [old] with [new]" - Find and replace text
+Troubleshooting:
+• Upload issues: Check file format, refresh page
+• AI not responding: Upload file first, use clear commands
+• Formatting issues: Select cells first, use Ctrl+click
 
-5. Troubleshooting
+Best Practices:
+• Use descriptive column headers
+• Keep reasonable file sizes
+• Be specific in commands
+• Review results before applying
 
-File Upload Issues:
-• Ensure your file is in supported format (.xlsx, .xls, .csv)
-• Check that the file is not corrupted
-• Try refreshing the page and uploading again
+Need Help:
+• Use feedback button (👍) for quick questions
+• Email: contact@advexcel.online
+• Include browser type and specific issue details
 
-AI Not Responding:
-• Make sure you've uploaded a file first
-• Use clear, specific commands
-• Try rephrasing your request
-
-Formatting Issues:
-• Select cells before applying formatting
-• Use Ctrl+click for multiple cell selection
-• Check that undo/redo buttons are enabled
-
-6. Best Practices
-• Use descriptive column headers in your data
-• Keep file sizes reasonable for better performance
-• Be specific in your AI commands
-• Review results before applying changes to your main sheet
-
-7. Contact Support
-For additional help:
-• Use the feedback button (👍) for quick questions
-• Report bugs or issues through the feedback system
-• Suggest new features via feedback
-
-8. System Requirements
-• Modern web browser (Chrome, Firefox, Safari, Edge)
-• Stable internet connection
-• JavaScript enabled
-• Cookies enabled for authentication` 
+System Requirements:
+• Modern web browser
+• Internet connection
+• JavaScript and cookies enabled` 
               });
               setShowLegalModal(true);
             }} style={{ color: '#ffffff', textDecoration: 'none', fontSize: '14px', cursor: 'pointer' }}>Support</a>
             <a onClick={() => {
               setLegalContent({ 
                 title: 'Contact Us', 
-                content: `Get in Touch with Excel AI
-
-1. Quick Support
-For immediate assistance, use our in-app feedback system:
-• Click the thumbs up button (👍) in the bottom right corner
+                content: `Quick Support:
+• Click the feedback button (👍) in bottom right corner
 • Describe your issue or question
-• Our team will review and respond promptly
+• We'll respond promptly
 
-2. Contact Information
-
-All Inquiries:
-• Email: contact@advexcel.online
+Email Contact:
+• contact@advexcel.online
 • Response time: 24-48 hours
-• For technical support, general questions, business inquiries, and partnerships
-• Include details about your browser, file type, and specific issue when reporting problems
+• For all inquiries: technical support, questions, business, partnerships
 
-3. Before Contacting Support
-To help us assist you better, please:
-• Try the troubleshooting steps in our Support section
+Before Contacting:
+• Try troubleshooting steps in Support section
 • Note your browser type and version
-• Describe the specific steps that led to the issue
-• Include any error messages you received
+• Describe specific steps that caused the issue
+• Include any error messages
 
-4. Feature Requests
-We love hearing from our users! Submit feature requests through:
-• The feedback button with "Feature Request" in your message
-• Email: contact@advexcel.online with subject "Feature Request"
-• Include detailed descriptions of desired functionality
+Feature Requests:
+• Use feedback button with "Feature Request"
+• Email with subject "Feature Request"
+• Include detailed descriptions
 
-5. Privacy & Security Concerns
-For privacy-related questions or security concerns:
-• Email: contact@advexcel.online with subject "Privacy/Security"
-• Reference our Privacy Policy for detailed information
-• Report security vulnerabilities responsibly
+Privacy & Security:
+• Email with subject "Privacy/Security"
+• Reference our Privacy Policy
+• Report security issues responsibly
 
-6. Business Hours
-• Support team operates Monday-Friday, 9 AM - 6 PM EST
-• Feedback system monitored 24/7 for urgent issues
-• Response times may vary during weekends and holidays
+Business Hours:
+• Monday-Friday, 9 AM - 6 PM EST
+• Feedback monitored 24/7 for urgent issues
+• Weekend response times may vary
 
-7. Office Location
-Excel AI Development Team
-Powered by Amazon Web Services
-Cloud-based operations for global accessibility
+About Us:
+• Excel AI Development Team
+• Powered by Amazon Web Services
+• Cloud-based for global accessibility
 
-We're committed to providing excellent support and continuously improving Excel AI based on your feedback. Thank you for choosing our platform for your data analysis needs!` 
+We're committed to excellent support and continuous improvement based on your feedback!` 
               });
               setShowLegalModal(true);
             }} style={{ color: '#ffffff', textDecoration: 'none', fontSize: '14px', cursor: 'pointer' }}>Contact Us</a>
@@ -1486,7 +1442,7 @@ We're committed to providing excellent support and continuously improving Excel 
               background: 'white',
               borderRadius: '8px',
               padding: '24px',
-              maxWidth: '500px',
+              maxWidth: '600px',
               width: '90%',
               maxHeight: '70vh',
               overflow: 'auto'
