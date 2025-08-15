@@ -631,12 +631,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 color: 'white', 
                 padding: '6px 12px', 
                 borderRadius: '4px', 
-                cursor: 'pointer',
-                fontSize: '13px',
-                fontFamily: 'system-ui, -apple-system, sans-serif',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px'
+                cursor: 'pointer'
               }}
               onMouseEnter={(e) => e.target.style.background = 'rgba(255,255,255,0.3)'}
               onMouseLeave={(e) => e.target.style.background = 'rgba(255,255,255,0.2)'}
