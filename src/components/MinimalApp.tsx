@@ -33,6 +33,8 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
   const [redoStack, setRedoStack] = useState<{ [key: string]: any }[]>([]);
   const [showFeedbackBox, setShowFeedbackBox] = useState(false);
   const [feedbackText, setFeedbackText] = useState('');
+  const [showLegalModal, setShowLegalModal] = useState(false);
+  const [legalContent, setLegalContent] = useState({ title: '', content: '' });
 
   const saveToUndoStack = (currentFormatting: { [key: string]: any }) => {
     setUndoStack(prev => [...prev, { ...currentFormatting }]);
@@ -1205,16 +1207,89 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
           borderTop: '1px solid #e1e5e9'
         }}>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', flexWrap: 'wrap', marginBottom: '12px' }}>
-            <a href="#" style={{ color: '#ffffff', textDecoration: 'none', fontSize: '14px' }}>Privacy Policy</a>
-            <a href="#" style={{ color: '#ffffff', textDecoration: 'none', fontSize: '14px' }}>Terms of Service</a>
-            <a href="#" style={{ color: '#ffffff', textDecoration: 'none', fontSize: '14px' }}>Cookie Policy</a>
-            <a href="#" style={{ color: '#ffffff', textDecoration: 'none', fontSize: '14px' }}>Support</a>
-            <a href="#" style={{ color: '#ffffff', textDecoration: 'none', fontSize: '14px' }}>Contact Us</a>
+            <a onClick={() => {
+              setLegalContent({ title: 'Privacy Policy', content: 'We collect and process your data to provide Excel AI services. Your uploaded files are processed securely and not stored permanently. We use AWS services for data processing and follow industry-standard security practices.' });
+              setShowLegalModal(true);
+            }} style={{ color: '#ffffff', textDecoration: 'none', fontSize: '14px', cursor: 'pointer' }}>Privacy Policy</a>
+            <a onClick={() => {
+              setLegalContent({ title: 'Terms of Service', content: 'By using Excel AI, you agree to use the service responsibly. Do not upload sensitive personal data. The service is provided as-is. We reserve the right to modify or discontinue the service at any time.' });
+              setShowLegalModal(true);
+            }} style={{ color: '#ffffff', textDecoration: 'none', fontSize: '14px', cursor: 'pointer' }}>Terms of Service</a>
+            <a onClick={() => {
+              setLegalContent({ title: 'Cookie Policy', content: 'We use cookies to enhance your experience and maintain your session. Essential cookies are required for the service to function. You can manage cookie preferences in your browser settings.' });
+              setShowLegalModal(true);
+            }} style={{ color: '#ffffff', textDecoration: 'none', fontSize: '14px', cursor: 'pointer' }}>Cookie Policy</a>
+            <a onClick={() => {
+              setLegalContent({ title: 'Support', content: 'Need help with Excel AI? Use the feedback button for quick questions or contact our support team. We provide documentation and tutorials to help you get the most out of Excel AI.' });
+              setShowLegalModal(true);
+            }} style={{ color: '#ffffff', textDecoration: 'none', fontSize: '14px', cursor: 'pointer' }}>Support</a>
+            <a onClick={() => {
+              setLegalContent({ title: 'Contact Us', content: 'Get in touch with the Excel AI team. Email: support@excelai.com | For technical issues, use the feedback button. For business inquiries, contact our sales team.' });
+              setShowLegalModal(true);
+            }} style={{ color: '#ffffff', textDecoration: 'none', fontSize: '14px', cursor: 'pointer' }}>Contact Us</a>
           </div>
           <p style={{ margin: 0, fontSize: '12px', color: '#cccccc' }}>
             © 2024 Excel AI. All rights reserved. | Powered by AWS
           </p>
         </footer>
+        
+        {/* Legal Modal */}
+        {showLegalModal && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            background: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 2000
+          }}>
+            <div style={{
+              background: 'white',
+              borderRadius: '8px',
+              padding: '24px',
+              maxWidth: '500px',
+              width: '90%',
+              maxHeight: '70vh',
+              overflow: 'auto'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <h3 style={{ margin: 0, color: '#232f3e' }}>{legalContent.title}</h3>
+                <button
+                  onClick={() => setShowLegalModal(false)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '20px',
+                    cursor: 'pointer',
+                    color: '#666'
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+              <p style={{ color: '#333', lineHeight: '1.6', margin: 0 }}>{legalContent.content}</p>
+              <div style={{ marginTop: '20px', textAlign: 'right' }}>
+                <button
+                  onClick={() => setShowLegalModal(false)}
+                  style={{
+                    background: '#0078d4',
+                    color: 'white',
+                    border: 'none',
+                    padding: '8px 16px',
+                    borderRadius: '4px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         
         {/* Floating Feedback Button */}
         <div style={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 1000 }}>
