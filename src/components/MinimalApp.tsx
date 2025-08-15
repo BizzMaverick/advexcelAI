@@ -30,18 +30,8 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
   console.log('MinimalApp component mounting/re-mounting');
 
   const [prompt, setPrompt] = useState('');
-  const [selectedFile, setSelectedFile] = useState<File | null>(() => {
-    // Try to restore from sessionStorage
-    const saved = sessionStorage.getItem('selectedFile');
-    console.log('Restoring selectedFile from sessionStorage:', saved);
-    return saved ? JSON.parse(saved) : null;
-  });
-  const [fileData, setFileData] = useState<any[][]>(() => {
-    // Try to restore from sessionStorage
-    const saved = sessionStorage.getItem('fileData');
-    console.log('Restoring fileData from sessionStorage:', saved ? 'found data' : 'no data');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [fileData, setFileData] = useState<any[][]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [aiResponse, setAiResponse] = useState<string>('');
   const [lastUpdate, setLastUpdate] = useState<number>(Date.now());
@@ -61,26 +51,12 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
 
   // Analytics removed to prevent page refresh issues
   
-  // Persist state whenever it changes - moved after all state declarations
+  // Clear sessionStorage on component mount (page refresh)
   useEffect(() => {
-    try {
-      if (fileData && fileData.length > 0) {
-        sessionStorage.setItem('fileData', JSON.stringify(fileData));
-      }
-    } catch (error) {
-      console.error('Error saving fileData:', error);
-    }
-  }, [fileData]);
-  
-  useEffect(() => {
-    try {
-      if (selectedFile && selectedFile.name) {
-        sessionStorage.setItem('selectedFile', JSON.stringify({ name: selectedFile.name, size: selectedFile.size }));
-      }
-    } catch (error) {
-      console.error('Error saving selectedFile:', error);
-    }
-  }, [selectedFile]);
+    sessionStorage.removeItem('fileData');
+    sessionStorage.removeItem('selectedFile');
+    console.log('SessionStorage cleared - fresh start');
+  }, []);
 
   const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
