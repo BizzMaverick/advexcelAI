@@ -29,6 +29,19 @@ interface MinimalAppProps {
 export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh }: MinimalAppProps) {
   console.log('MinimalApp component mounting/re-mounting');
   
+  // Persist state whenever it changes
+  useEffect(() => {
+    if (fileData.length > 0) {
+      sessionStorage.setItem('fileData', JSON.stringify(fileData));
+    }
+  }, [fileData]);
+  
+  useEffect(() => {
+    if (selectedFile) {
+      sessionStorage.setItem('selectedFile', JSON.stringify({ name: selectedFile.name, size: selectedFile.size }));
+    }
+  }, [selectedFile]);
+  
   const [prompt, setPrompt] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(() => {
     // Try to restore from sessionStorage
@@ -123,11 +136,8 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
         setFileData(sanitizedData);
         setOriginalFileData([...sanitizedData]); // Store original data
         
-        // Persist to sessionStorage
-        console.log('Saving to sessionStorage:', sanitizedData.length, 'rows');
-        sessionStorage.setItem('fileData', JSON.stringify(sanitizedData));
-        sessionStorage.setItem('selectedFile', JSON.stringify({ name: file.name, size: file.size }));
-        console.log('Saved to sessionStorage successfully');
+        // Data will be persisted by useEffect hooks
+        console.log('File uploaded successfully:', sanitizedData.length, 'rows');
         setShowFileInfo(true);
         
 
