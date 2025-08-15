@@ -1308,6 +1308,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
               onChange={(e) => setPrompt(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !isProcessing && selectedFile && prompt.trim()) {
+                  e.preventDefault();
                   handleProcessAI();
                 }
               }}
@@ -1323,7 +1324,11 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
               }}
             />
             <button 
-              onClick={handleProcessAI}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                handleProcessAI();
+              }}
               disabled={isProcessing || !selectedFile || !prompt.trim()}
               style={{ 
                 background: '#0078d4',
@@ -1645,7 +1650,10 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                   📊 <strong>Results ready!</strong> Choose an action:
                 </p>
                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                  <button onClick={applyChangesToMainSheet} style={{
+                  <button type="button" onClick={(e) => {
+                    e.preventDefault();
+                    applyChangesToMainSheet();
+                  }} style={{
                     background: '#10b981',
                     color: 'white',
                     border: 'none',
@@ -1657,7 +1665,10 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                   }}>
                     📋 Apply to Main Sheet
                   </button>
-                  <button onClick={resetToOriginal} style={{
+                  <button type="button" onClick={(e) => {
+                    e.preventDefault();
+                    resetToOriginal();
+                  }} style={{
                     background: '#6c757d',
                     color: 'white',
                     border: 'none',
