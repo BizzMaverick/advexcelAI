@@ -200,14 +200,22 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
         
         if (matches.length > 0) {
           let response = `<strong>Results for ${searchTerms.join(', ')}:</strong><br><br>`;
-          matches.forEach((row, index) => {
-            const itemName = row[0] || `Item ${index + 1}`;
-            response += `<strong>${itemName}:</strong><br>`;
-            requestedColumns.forEach(colIndex => {
-              response += `${headers[colIndex]}: ${row[colIndex] || 'N/A'}<br>`;
-            });
-            response += '<br>';
+          response += '<table style="border-collapse: collapse; width: 100%; margin-top: 10px;">';
+          response += '<thead><tr style="background: #f0f8ff;">';
+          response += '<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Item</th>';
+          requestedColumns.forEach(colIndex => {
+            response += `<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">${headers[colIndex]}</th>`;
           });
+          response += '</tr></thead><tbody>';
+          matches.forEach((row, index) => {
+            response += `<tr style="${index % 2 === 0 ? 'background: #fafafa;' : ''}">`;
+            response += `<td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">${row[0] || `Item ${index + 1}`}</td>`;
+            requestedColumns.forEach(colIndex => {
+              response += `<td style="border: 1px solid #ddd; padding: 8px;">${row[colIndex] || 'N/A'}</td>`;
+            });
+            response += '</tr>';
+          });
+          response += '</tbody></table>';
           setAiResponse(response);
         } else {
           setAiResponse(`<strong>No matches found for ${searchTerms.join(', ')}</strong>`);
@@ -237,15 +245,22 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
         
         if (matches.length > 0) {
           let response = `<strong>Lookup results for '${searchTerm}' - Found ${matches.length} matches:</strong><br><br>`;
-          matches.slice(0, 10).forEach((row, index) => {
-            response += `<strong>Match ${index + 1}:</strong><br>`;
-            headers.forEach((header, i) => {
-              response += `${header}: ${row[i] || 'N/A'}<br>`;
-            });
-            response += '<br>';
+          response += '<table style="border-collapse: collapse; width: 100%; margin-top: 10px;">';
+          response += '<thead><tr style="background: #f0f8ff;">';
+          headers.forEach(header => {
+            response += `<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">${header}</th>`;
           });
+          response += '</tr></thead><tbody>';
+          matches.slice(0, 10).forEach((row, index) => {
+            response += `<tr style="${index % 2 === 0 ? 'background: #fafafa;' : ''}">`;
+            row.forEach(cell => {
+              response += `<td style="border: 1px solid #ddd; padding: 8px;">${cell || 'N/A'}</td>`;
+            });
+            response += '</tr>';
+          });
+          response += '</tbody></table>';
           if (matches.length > 10) {
-            response += `<em>... and ${matches.length - 10} more matches</em>`;
+            response += `<br><em>... and ${matches.length - 10} more matches</em>`;
           }
           setAiResponse(response);
         } else {
