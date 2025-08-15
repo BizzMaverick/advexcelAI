@@ -36,6 +36,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
   // Use refs to persist data across re-mounts
   const fileDataRef = useRef<any[][]>([]);
   const selectedFileRef = useRef<File | null>(null);
+  const processingRef = useRef<boolean>(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [aiResponse, setAiResponse] = useState<string>('');
   const [lastUpdate, setLastUpdate] = useState<number>(Date.now());
@@ -380,7 +381,9 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     }
     
     setIsProcessing(true);
+    processingRef.current = true;
     setAiResponse('');
+    console.log('AI processing started, blocking remounts');
     
     // Force a small delay to ensure state is clean
     await new Promise(resolve => setTimeout(resolve, 100));
@@ -547,10 +550,11 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       setAiResponse(errorMsg);
     } finally {
       console.log('AI processing finished, setting isProcessing to false');
+      processingRef.current = false;
       setIsProcessing(false);
       setPrompt('');
     }
-  }, []);  // Remove all dependencies to prevent recreation
+  }, []);  // No dependencies - use refs and current state values
 
   // Handle Excel cell operations locally
   const handleCellOperations = useCallback((prompt: string, data: any[][]) => {

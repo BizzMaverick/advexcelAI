@@ -89,7 +89,9 @@ function App() {
   };
 
   const handleTrialRefresh = () => {
-    checkUserStatus(); // Re-enabled: Refresh trial status
+    // Block trial refresh to prevent component remounting during AI processing
+    console.log('Trial refresh blocked to prevent remounting');
+    // checkUserStatus(); 
   };
 
   // Show loading while checking status
