@@ -27,15 +27,19 @@ interface MinimalAppProps {
 }
 
 export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh }: MinimalAppProps) {
+  console.log('MinimalApp component mounting/re-mounting');
+  
   const [prompt, setPrompt] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(() => {
     // Try to restore from sessionStorage
     const saved = sessionStorage.getItem('selectedFile');
+    console.log('Restoring selectedFile from sessionStorage:', saved);
     return saved ? JSON.parse(saved) : null;
   });
   const [fileData, setFileData] = useState<any[][]>(() => {
     // Try to restore from sessionStorage
     const saved = sessionStorage.getItem('fileData');
+    console.log('Restoring fileData from sessionStorage:', saved ? 'found data' : 'no data');
     return saved ? JSON.parse(saved) : [];
   });
   const [isProcessing, setIsProcessing] = useState(false);
@@ -120,8 +124,10 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
         setOriginalFileData([...sanitizedData]); // Store original data
         
         // Persist to sessionStorage
+        console.log('Saving to sessionStorage:', sanitizedData.length, 'rows');
         sessionStorage.setItem('fileData', JSON.stringify(sanitizedData));
         sessionStorage.setItem('selectedFile', JSON.stringify({ name: file.name, size: file.size }));
+        console.log('Saved to sessionStorage successfully');
         setShowFileInfo(true);
         
 

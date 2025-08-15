@@ -35,9 +35,10 @@ function App() {
   
   const [loading, setLoading] = useState(false);
 
-  // Check trial/payment status when user logs in
+  // Check trial/payment status when user logs in - DISABLED to prevent re-renders
   useEffect(() => {
-    if (user) {
+    if (user && !trialStatus.hasValidPayment) {
+      // Only check once, don't refresh during session
       checkUserStatus();
     }
   }, [user]);
@@ -89,7 +90,9 @@ function App() {
   };
 
   const handleTrialRefresh = () => {
-    checkUserStatus(); // Refresh trial status
+    // DISABLED: This was causing MinimalApp to unmount and lose file data
+    // checkUserStatus(); // Refresh trial status
+    console.log('Trial refresh disabled to prevent data loss');
   };
 
   // Show loading while checking status
