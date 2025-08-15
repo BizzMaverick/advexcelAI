@@ -634,7 +634,10 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
         <main style={{ padding: '20px', background: '#f5f5f5', minHeight: 'calc(100vh - 50px)' }}>
           {/* File Upload */}
           <div style={{ background: 'white', borderRadius: '8px', padding: '20px', marginBottom: '20px', color: '#333' }}>
-            <h3 style={{ margin: '0 0 15px 0', color: '#333' }}>Upload File</h3>
+            <h3 style={{ margin: '0 0 15px 0', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '18px' }}>📁</span>
+              Upload File
+            </h3>
             <input 
               type="file" 
               accept=".xlsx,.xls,.csv" 
@@ -655,7 +658,10 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
 
           {/* AI Command */}
           <div style={{ background: 'white', borderRadius: '8px', padding: '20px', marginBottom: '20px', color: '#333' }}>
-            <h3 style={{ margin: '0 0 15px 0', color: '#333' }}>Ask AI</h3>
+            <h3 style={{ margin: '0 0 15px 0', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '18px' }}>🤖</span>
+              Ask AI
+            </h3>
             <div style={{ display: 'flex', gap: '10px' }}>
               <input 
                 type="text"
@@ -1170,7 +1176,10 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                   </div>
                 </div>
               )}
-              <h4 style={{ margin: '0 0 15px 0', color: '#333' }}>AI Response</h4>
+              <h4 style={{ margin: '0 0 15px 0', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '16px' }}>💬</span>
+                AI Response
+              </h4>
               <div style={{ 
                 background: '#f8f9ff', 
                 padding: '15px', 
