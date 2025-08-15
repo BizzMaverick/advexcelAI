@@ -325,7 +325,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
         response += `<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">${header}</th>`;
       });
       response += '</tr></thead><tbody>';
-      dataRows.slice(0, 20).forEach((row, index) => {
+      dataRows.forEach((row, index) => {
         response += `<tr style="${index % 2 === 0 ? 'background: #fafafa;' : ''}">`;
         row.forEach(cell => {
           response += `<td style="border: 1px solid #ddd; padding: 8px;">${cell || 'N/A'}</td>`;
@@ -333,9 +333,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
         response += '</tr>';
       });
       response += '</tbody></table></div>';
-      if (dataRows.length > 20) {
-        response += `<br><em>Showing first 20 rows of ${dataRows.length} sorted rows</em>`;
-      }
+
       setAiResponse(response);
       setPrompt('');
       return;
