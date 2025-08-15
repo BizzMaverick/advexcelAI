@@ -723,12 +723,13 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
               onChange={handleFileUpload}
               disabled={fileLoading}
               style={{ 
-                width: '100%', 
                 padding: '12px', 
                 border: '2px dashed #0078d4', 
                 borderRadius: '6px', 
                 background: '#f8f9ff',
-                color: '#333'
+                color: '#333',
+                display: 'block',
+                maxWidth: '100%'
               }}
             />
             {fileLoading && <div style={{ marginTop: '10px', color: '#0078d4', fontWeight: 'bold' }}>Loading...</div>}
