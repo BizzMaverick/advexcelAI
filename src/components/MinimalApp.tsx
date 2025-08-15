@@ -1278,14 +1278,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                   {aiResponse.split('<br><br>')[0]?.replace(/<[^>]*>/g, '') || aiResponse.split('<table')[0]?.replace(/<[^>]*>/g, '') || 'Processing completed'}
                 </p>
               </div>
-              <div style={{ maxHeight: '400px', overflow: 'auto' }}>
-                <div style={{ 
-                  background: '#ffffff', 
-                  padding: '20px', 
-                  color: '#333'
-                }}>
-                  <div dangerouslySetInnerHTML={{ __html: aiResponse.includes('<table') ? aiResponse.split('<br><br>').slice(1).join('<br><br>') : aiResponse.split('<br><br>').slice(1).join('<br><br>') || aiResponse }} />
-                </div>
+              <div style={{ 
+                background: '#ffffff', 
+                padding: '20px', 
+                color: '#333',
+                maxHeight: '400px', 
+                overflow: 'auto'
+              }}>
+                <div dangerouslySetInnerHTML={{ __html: aiResponse.includes('<table') ? aiResponse.split('<br><br>').slice(1).join('<br><br>') : aiResponse.split('<br><br>').slice(1).join('<br><br>') || aiResponse }} />
               </div>
             </div>
           )}
