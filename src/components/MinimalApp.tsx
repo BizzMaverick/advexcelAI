@@ -29,6 +29,29 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
   const [cellFormatting, setCellFormatting] = useState<{ [key: string]: any }>({});
   const [copiedFormat, setCopiedFormat] = useState<any>(null);
   const [formatPainterActive, setFormatPainterActive] = useState(false);
+  const [undoStack, setUndoStack] = useState<{ [key: string]: any }[]>([]);
+  const [redoStack, setRedoStack] = useState<{ [key: string]: any }[]>([]);
+
+  const saveToUndoStack = (currentFormatting: { [key: string]: any }) => {
+    setUndoStack(prev => [...prev, { ...currentFormatting }]);
+    setRedoStack([]);
+  };
+
+  const handleUndo = () => {
+    if (undoStack.length === 0) return;
+    const previousState = undoStack[undoStack.length - 1];
+    setRedoStack(prev => [{ ...cellFormatting }, ...prev]);
+    setUndoStack(prev => prev.slice(0, -1));
+    setCellFormatting(previousState);
+  };
+
+  const handleRedo = () => {
+    if (redoStack.length === 0) return;
+    const nextState = redoStack[0];
+    setUndoStack(prev => [...prev, { ...cellFormatting }]);
+    setRedoStack(prev => prev.slice(1));
+    setCellFormatting(nextState);
+  };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
