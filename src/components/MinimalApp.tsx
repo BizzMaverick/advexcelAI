@@ -1273,13 +1273,10 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                 </div>
               )}
               <div style={{ padding: '15px', background: '#0078d4', color: 'white' }}>
-                <h4 style={{ margin: 0, fontSize: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '16px' }}>💬</span>
-                  AI Response
-                </h4>
-                <div style={{ marginTop: '5px', fontSize: '12px', opacity: 0.9 }} dangerouslySetInnerHTML={{ 
-                  __html: aiResponse.split('<br><br>')[0] || aiResponse.split('<table')[0] || 'Processing completed'
-                }} />
+                <h3 style={{ margin: 0, fontSize: '16px' }}>AI Response</h3>
+                <p style={{ margin: '5px 0 0 0', fontSize: '12px', opacity: 0.9 }}>
+                  {aiResponse.split('<br><br>')[0]?.replace(/<[^>]*>/g, '') || aiResponse.split('<table')[0]?.replace(/<[^>]*>/g, '') || 'Processing completed'}
+                </p>
               </div>
               <div style={{ 
                 background: '#ffffff', 
