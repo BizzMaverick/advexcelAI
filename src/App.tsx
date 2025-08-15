@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import './App.css';
+import './animations.css';
 import MinimalApp from './components/MinimalApp';
 import LandingPage from './LandingPage';
 import PrivacyPolicy from './components/PrivacyPolicy';
@@ -97,14 +98,14 @@ function App() {
   // Show loading while checking status
   if (user && loading) {
     return (
-      <div style={{
+      <div className="page-transition" style={{
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         height: '100vh',
         fontFamily: 'system-ui, -apple-system, sans-serif'
       }}>
-        <div style={{ textAlign: 'center' }}>
+        <div className="loading-pulse" style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '24px', marginBottom: '16px' }}>🔄</div>
           <div>Checking your account status...</div>
         </div>

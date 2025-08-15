@@ -685,7 +685,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
 
   return (
     <ErrorBoundary>
-      <div style={{ minHeight: '100vh', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+      <div className="page-transition" style={{ minHeight: '100vh', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
         <header style={{ 
           background: '#0078d4', 
           color: 'white', 
@@ -712,7 +712,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
         
         <main style={{ padding: '20px', background: '#f5f5f5', minHeight: 'calc(100vh - 50px)' }}>
           {/* File Upload */}
-          <div style={{ background: 'white', borderRadius: '8px', padding: '20px', marginBottom: '20px', color: '#333' }}>
+          <div className="section-animate card-animate" style={{ background: 'white', borderRadius: '8px', padding: '20px', marginBottom: '20px', color: '#333' }}>
             <h3 style={{ margin: '0 0 15px 0', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontSize: '18px' }}>📁</span>
               Upload File
@@ -736,7 +736,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           </div>
 
           {/* AI Command */}
-          <div style={{ background: 'white', borderRadius: '8px', padding: '20px', marginBottom: '20px', color: '#333' }}>
+          <div className="section-animate card-animate" style={{ background: 'white', borderRadius: '8px', padding: '20px', marginBottom: '20px', color: '#333' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
               <h3 style={{ margin: 0, color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ fontSize: '18px' }}>🤖</span>
@@ -779,6 +779,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                 }}
               />
               <button 
+                className="btn-animate"
                 onClick={handleProcessAI}
                 disabled={isProcessing || !selectedFile || !prompt.trim()}
                 style={{ 
