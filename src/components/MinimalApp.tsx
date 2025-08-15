@@ -720,6 +720,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                   <button 
                     onClick={() => {
                       if (selectedCells.length === 0) return;
+                      saveToUndoStack(cellFormatting);
                       const newFormatting = { ...cellFormatting };
                       selectedCells.forEach(cellId => {
                         const currentWeight = newFormatting[cellId]?.fontWeight;
@@ -758,6 +759,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                   <button 
                     onClick={() => {
                       if (selectedCells.length === 0) return;
+                      saveToUndoStack(cellFormatting);
                       const newFormatting = { ...cellFormatting };
                       selectedCells.forEach(cellId => {
                         const currentStyle = newFormatting[cellId]?.fontStyle;
@@ -895,6 +897,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                   <select
                     onChange={(e) => {
                       if (selectedCells.length === 0) return;
+                      saveToUndoStack(cellFormatting);
                       const color = e.target.value;
                       const newFormatting = { ...cellFormatting };
                       selectedCells.forEach(cellId => {
@@ -946,6 +949,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                   <select
                     onChange={(e) => {
                       if (selectedCells.length === 0) return;
+                      saveToUndoStack(cellFormatting);
                       const backgroundColor = e.target.value;
                       const newFormatting = { ...cellFormatting };
                       selectedCells.forEach(cellId => {
@@ -997,6 +1001,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                   <select
                     onChange={(e) => {
                       if (selectedCells.length === 0) return;
+                      saveToUndoStack(cellFormatting);
                       const align = e.target.value;
                       const newFormatting = { ...cellFormatting };
                       selectedCells.forEach(cellId => {
@@ -1079,11 +1084,12 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                         {Array.isArray(row) && row.length > 0 ? row.map((cell, j) => (
                           <td 
                             key={j}
-                            onClick={() => {
+                            onClick={(e) => {
                               const cellId = `${i}-${j}`;
                               
                               if (formatPainterActive && copiedFormat) {
                                 // Apply copied format to clicked cell
+                                saveToUndoStack(cellFormatting);
                                 const newFormatting = { ...cellFormatting };
                                 newFormatting[cellId] = { ...copiedFormat };
                                 setCellFormatting(newFormatting);
@@ -1092,11 +1098,16 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                                 return;
                               }
                               
-                              // Normal cell selection
-                              if (selectedCells.includes(cellId)) {
-                                setSelectedCells(selectedCells.filter(id => id !== cellId));
+                              // Multiple cell selection with Ctrl+click
+                              if (e.ctrlKey || e.metaKey) {
+                                if (selectedCells.includes(cellId)) {
+                                  setSelectedCells(selectedCells.filter(id => id !== cellId));
+                                } else {
+                                  setSelectedCells([...selectedCells, cellId]);
+                                }
                               } else {
-                                setSelectedCells([...selectedCells, cellId]);
+                                // Single cell selection
+                                setSelectedCells([cellId]);
                               }
                             }}
                             style={{ 
