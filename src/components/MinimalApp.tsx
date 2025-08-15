@@ -227,35 +227,72 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
 
     // Handle lookup
     if (trimmedPrompt.toLowerCase().includes('lookup') || trimmedPrompt.toLowerCase().includes('find')) {
-      const searchTerm = trimmedPrompt.replace(/lookup|find/gi, '').trim().replace(/['"`]/g, '');
-      if (searchTerm) {
+      const headers = fileData[0];
+      const lowerPrompt = trimmedPrompt.toLowerCase();
+      
+      // Find requested columns
+      const requestedColumns: number[] = [];
+      headers.forEach((header, index) => {
+        if (lowerPrompt.includes(String(header).toLowerCase())) {
+          requestedColumns.push(index);
+        }
+      });
+      
+      // Extract search terms (country names)
+      const searchTerms: string[] = [];
+      const words = trimmedPrompt.split(/\s+/);
+      let foundOf = false;
+      words.forEach(word => {
+        if (word.toLowerCase() === 'of') {
+          foundOf = true;
+        } else if (foundOf && word.length > 2 && !word.toLowerCase().includes('and')) {
+          searchTerms.push(word.replace(/[,\s]+$/, ''));
+        }
+      });
+      
+      if (searchTerms.length > 0) {
         const matches: any[][] = [];
-        const headers = fileData[0];
         
         for (let i = 1; i < fileData.length; i++) {
           const row = fileData[i];
-          for (let j = 0; j < row.length; j++) {
-            const cellValue = String(row[j] || '').toLowerCase();
-            if (cellValue.includes(searchTerm.toLowerCase())) {
-              matches.push(row);
-              break;
+          for (const searchTerm of searchTerms) {
+            for (let j = 0; j < row.length; j++) {
+              const cellValue = String(row[j] || '').toLowerCase();
+              if (cellValue.includes(searchTerm.toLowerCase())) {
+                matches.push(row);
+                break;
+              }
             }
           }
         }
         
         if (matches.length > 0) {
-          let response = `<strong>Lookup results for '${searchTerm}' - Found ${matches.length} matches:</strong><br><br>`;
+          let response = `<strong>Lookup results for ${searchTerms.join(', ')} - Found ${matches.length} matches:</strong><br><br>`;
           response += '<table style="border-collapse: collapse; width: 100%; margin-top: 10px;">';
           response += '<thead><tr style="background: #f0f8ff;">';
-          headers.forEach(header => {
-            response += `<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">${header}</th>`;
-          });
+          if (requestedColumns.length > 0) {
+            response += '<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Country</th>';
+            requestedColumns.forEach(colIndex => {
+              response += `<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">${headers[colIndex]}</th>`;
+            });
+          } else {
+            headers.forEach(header => {
+              response += `<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">${header}</th>`;
+            });
+          }
           response += '</tr></thead><tbody>';
           matches.slice(0, 10).forEach((row, index) => {
             response += `<tr style="${index % 2 === 0 ? 'background: #fafafa;' : ''}">`;
-            row.forEach(cell => {
-              response += `<td style="border: 1px solid #ddd; padding: 8px;">${cell || 'N/A'}</td>`;
-            });
+            if (requestedColumns.length > 0) {
+              response += `<td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">${row[0] || 'N/A'}</td>`;
+              requestedColumns.forEach(colIndex => {
+                response += `<td style="border: 1px solid #ddd; padding: 8px;">${row[colIndex] || 'N/A'}</td>`;
+              });
+            } else {
+              row.forEach(cell => {
+                response += `<td style="border: 1px solid #ddd; padding: 8px;">${cell || 'N/A'}</td>`;
+              });
+            }
             response += '</tr>';
           });
           response += '</tbody></table>';
@@ -264,7 +301,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
           }
           setAiResponse(response);
         } else {
-          setAiResponse(`<strong>No matches found for '${searchTerm}'</strong>`);
+          setAiResponse(`<strong>No matches found for ${searchTerms.join(', ')}</strong>`);
         }
         setPrompt('');
         return;
