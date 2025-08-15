@@ -774,14 +774,20 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                     minWidth: '70px'
                   }}>Text Color</span>
                   
-                  <div style={{ display: 'flex', gap: '6px' }}>
+                  <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', maxWidth: '280px' }}>
                     {[
-                      { color: '#232f3e', name: 'Black' },
-                      { color: '#cc0c39', name: 'Red' },
-                      { color: '#007185', name: 'Blue' },
-                      { color: '#007600', name: 'Green' },
-                      { color: '#b12704', name: 'Orange' },
-                      { color: '#565959', name: 'Gray' }
+                      { color: '#000000', name: 'Black' },
+                      { color: '#ffffff', name: 'White' },
+                      { color: '#e74c3c', name: 'Red' },
+                      { color: '#3498db', name: 'Blue' },
+                      { color: '#2ecc71', name: 'Green' },
+                      { color: '#f39c12', name: 'Orange' },
+                      { color: '#9b59b6', name: 'Purple' },
+                      { color: '#1abc9c', name: 'Teal' },
+                      { color: '#34495e', name: 'Dark Gray' },
+                      { color: '#95a5a6', name: 'Light Gray' },
+                      { color: '#c0392b', name: 'Dark Red' },
+                      { color: '#2980b9', name: 'Dark Blue' }
                     ].map(({ color, name }) => (
                       <button 
                         key={color}
@@ -795,12 +801,12 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                         }}
                         style={{ 
                           background: color,
-                          border: '2px solid #ffffff', 
-                          width: '28px',
-                          height: '28px',
-                          borderRadius: '6px', 
+                          border: color === '#ffffff' ? '2px solid #d5d9d9' : '2px solid #ffffff', 
+                          width: '24px',
+                          height: '24px',
+                          borderRadius: '4px', 
                           cursor: 'pointer',
-                          boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.08)',
+                          boxShadow: '0 1px 2px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.05)',
                           transition: 'transform 0.15s ease'
                         }}
                         onMouseEnter={(e) => e.target.style.transform = 'scale(1.1)'}
