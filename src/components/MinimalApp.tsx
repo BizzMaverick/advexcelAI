@@ -163,16 +163,39 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       const headers = sortedData[0];
       const dataRows = sortedData.slice(1);
       
+      // Find column to sort by
+      let sortColumnIndex = 0;
+      let sortColumnName = headers[0];
+      
+      // Check if specific column mentioned
+      for (let i = 0; i < headers.length; i++) {
+        const headerName = String(headers[i] || '').toLowerCase();
+        if (trimmedPrompt.toLowerCase().includes(headerName)) {
+          sortColumnIndex = i;
+          sortColumnName = headers[i];
+          break;
+        }
+      }
+      
       dataRows.sort((a, b) => {
-        const aVal = String(a[0] || '').toLowerCase();
-        const bVal = String(b[0] || '').toLowerCase();
+        const aVal = String(a[sortColumnIndex] || '').toLowerCase();
+        const bVal = String(b[sortColumnIndex] || '').toLowerCase();
+        
+        // Try numeric sort first
+        const aNum = parseFloat(aVal);
+        const bNum = parseFloat(bVal);
+        if (!isNaN(aNum) && !isNaN(bNum)) {
+          return aNum - bNum;
+        }
+        
+        // Fall back to alphabetical
         return aVal.localeCompare(bVal);
       });
       
       const result = [headers, ...dataRows];
       setLastAiResult(result);
       setShowUseResultButton(true);
-      setAiResponse('<strong>Data sorted successfully!</strong><br><br>Data has been sorted alphabetically by the first column. Click "Apply to Main Sheet" to use the sorted data.');
+      setAiResponse(`<strong>Data sorted successfully!</strong><br><br>Data has been sorted by ${sortColumnName}. Click "Apply to Main Sheet" to use the sorted data.`);
       setPrompt('');
       return;
     }
