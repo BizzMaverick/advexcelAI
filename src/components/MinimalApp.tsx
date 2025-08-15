@@ -317,6 +317,10 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       });
       
       if (duplicates.length > 0) {
+        const result = [headers, ...duplicates];
+        setLastAiResult(result);
+        setShowUseResultButton(true);
+        
         let response = `<strong>Found ${duplicates.length} duplicate rows:</strong><br><br>`;
         response += '<div style="max-height: 400px; overflow: auto;"><table style="border-collapse: collapse; width: 100%; margin-top: 10px;">';
         response += '<thead><tr style="background: #f0f8ff;">';
@@ -445,6 +449,18 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       }
       
       if (matches.length > 0) {
+        // Prepare result data for actions
+        let resultData;
+        if (requestedColumns.length > 0) {
+          const resultHeaders = ['Item', ...requestedColumns.map(i => headers[i])];
+          const resultRows = matches.map(row => [row[0], ...requestedColumns.map(i => row[i])]);
+          resultData = [resultHeaders, ...resultRows];
+        } else {
+          resultData = [headers, ...matches];
+        }
+        setLastAiResult(resultData);
+        setShowUseResultButton(true);
+        
         let response = `<strong>Results for ${searchTerms.join(', ')}:</strong><br><br>`;
         response += '<div style="max-height: 400px; overflow: auto;"><table style="border-collapse: collapse; width: 100%; margin-top: 10px;">';
         response += '<thead><tr style="background: #f0f8ff;">';
@@ -574,6 +590,28 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       setFileData([...originalFileData]);
       setShowUseResultButton(false);
       setAiResponse('');
+    }
+  };
+
+  const downloadAsExcel = (data: any[][], filename: string) => {
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+    XLSX.writeFile(wb, filename);
+  };
+
+  const createNewSheet = () => {
+    if (lastAiResult.length > 0) {
+      downloadAsExcel(lastAiResult, 'AI_Results.xlsx');
+      setAiResponse(prev => prev + '<br><br><p style="color: #10b981; font-weight: bold;">📥 New sheet downloaded as AI_Results.xlsx!</p>');
+    }
+  };
+
+  const downloadCurrentSheet = () => {
+    if (fileData.length > 0) {
+      const filename = selectedFile?.name.replace(/\.[^/.]+$/, '_updated.xlsx') || 'updated_data.xlsx';
+      downloadAsExcel(fileData, filename);
+      setAiResponse(prev => prev + '<br><br><p style="color: #10b981; font-weight: bold;">📥 Current sheet downloaded!</p>');
     }
   };
 
@@ -785,12 +823,24 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                   <p style={{ margin: '0 0 10px 0', fontSize: '14px', color: '#333' }}>
                     📊 <strong>Results ready!</strong> Choose an action:
                   </p>
-                  <div style={{ display: 'flex', gap: '10px' }}>
+                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                     <button 
                       onClick={applyChangesToMainSheet}
                       style={{ background: '#10b981', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}
                     >
                       📋 Apply to Main Sheet
+                    </button>
+                    <button 
+                      onClick={createNewSheet}
+                      style={{ background: '#0078d4', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}
+                    >
+                      📄 Download as New Sheet
+                    </button>
+                    <button 
+                      onClick={downloadCurrentSheet}
+                      style={{ background: '#f59e0b', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}
+                    >
+                      📥 Download Current Sheet
                     </button>
                     <button 
                       onClick={resetToOriginal}
