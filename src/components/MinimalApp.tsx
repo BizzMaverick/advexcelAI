@@ -1195,35 +1195,48 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
         </main>
         
         {/* Floating Feedback Button */}
-        <button 
+        <div 
           onClick={() => {
-            const feedback = prompt('We value your feedback! Please share your thoughts about Excel AI:');
+            const feedback = window.prompt('We value your feedback! Please share your thoughts about Excel AI:');
             if (feedback && feedback.trim()) {
-              alert('Thank you for your feedback! We appreciate your input and will use it to improve Excel AI.');
+              window.alert('Thank you for your feedback! We appreciate your input and will use it to improve Excel AI.');
             }
           }}
           style={{
             position: 'fixed',
             bottom: '20px',
             left: '20px',
-            width: '60px',
-            height: '60px',
-            borderRadius: '50%',
-            background: '#0078d4',
+            background: '#232f3e',
             color: 'white',
-            border: 'none',
-            fontSize: '24px',
+            padding: '12px 16px',
+            borderRadius: '6px',
             cursor: 'pointer',
-            boxShadow: '0 4px 12px rgba(0,120,212,0.3)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
             zIndex: 1000,
+            fontSize: '14px',
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            fontWeight: '500',
+            border: '1px solid #d5d9d9',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
+            gap: '6px',
+            transition: 'all 0.2s ease'
+          }}
+          onMouseEnter={(e) => {
+            const target = e.target as HTMLElement;
+            target.style.background = '#37475a';
+            target.style.transform = 'translateY(-1px)';
+          }}
+          onMouseLeave={(e) => {
+            const target = e.target as HTMLElement;
+            target.style.background = '#232f3e';
+            target.style.transform = 'translateY(0)';
           }}
           title="Send Feedback"
         >
-          💬
-        </button>
+          <span style={{ fontSize: '16px' }}>📝</span>
+          Feedback
+        </div>
       </div>
     </ErrorBoundary>
   );
