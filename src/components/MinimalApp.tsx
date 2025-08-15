@@ -1556,15 +1556,15 @@ We're committed to excellent support and continuous improvement based on your fe
                     if (feedbackText.trim()) {
                       try {
                         await emailjs.send(
-                          'YOUR_SERVICE_ID', // Replace with your EmailJS service ID
-                          'YOUR_TEMPLATE_ID', // Replace with your EmailJS template ID
+                          'service_gyuegyb',
+                          'template_8fdq5qr',
                           {
                             user_email: user.email,
                             user_name: user.name,
                             message: feedbackText,
                             to_email: 'contact@advexcel.online'
                           },
-                          'YOUR_PUBLIC_KEY' // Replace with your EmailJS public key
+                          '3xCIlXaFmm79QkBaB'
                         );
                         alert('Thank you for your feedback! We have received your message and will respond soon.');
                         setFeedbackText('');
