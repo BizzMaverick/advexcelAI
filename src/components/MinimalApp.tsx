@@ -823,6 +823,57 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 {/* Divider */}
                 <div style={{ width: '1px', height: '32px', background: '#e7e7e7' }}></div>
                 
+                {/* Cell Color Section */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ 
+                    fontSize: '14px', 
+                    fontWeight: '500', 
+                    color: '#232f3e', 
+                    fontFamily: 'system-ui, -apple-system, sans-serif',
+                    minWidth: '70px'
+                  }}>Cell Color</span>
+                  
+                  <select
+                    onChange={(e) => {
+                      if (selectedCells.length === 0) return;
+                      const backgroundColor = e.target.value;
+                      const newFormatting = { ...cellFormatting };
+                      selectedCells.forEach(cellId => {
+                        newFormatting[cellId] = { ...newFormatting[cellId], backgroundColor };
+                      });
+                      setCellFormatting(newFormatting);
+                    }}
+                    style={{
+                      background: '#ffffff',
+                      color: '#232f3e',
+                      border: '1px solid #d5d9d9',
+                      padding: '8px 12px',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontSize: '13px',
+                      fontFamily: 'system-ui, -apple-system, sans-serif',
+                      minWidth: '120px'
+                    }}
+                  >
+                    <option value="">Choose Color</option>
+                    <option value="#ffffff">White</option>
+                    <option value="#f8f9fa">Light Gray</option>
+                    <option value="#e3f2fd">Light Blue</option>
+                    <option value="#e8f5e8">Light Green</option>
+                    <option value="#fff3e0">Light Orange</option>
+                    <option value="#fce4ec">Light Pink</option>
+                    <option value="#f3e5f5">Light Purple</option>
+                    <option value="#e0f2f1">Light Teal</option>
+                    <option value="#ffebee">Light Red</option>
+                    <option value="#f1f8e9">Light Lime</option>
+                    <option value="#e8eaf6">Light Indigo</option>
+                    <option value="#fafafa">Very Light Gray</option>
+                  </select>
+                </div>
+                
+                {/* Divider */}
+                <div style={{ width: '1px', height: '32px', background: '#e7e7e7' }}></div>
+                
                 {/* Alignment Section */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span style={{ 
