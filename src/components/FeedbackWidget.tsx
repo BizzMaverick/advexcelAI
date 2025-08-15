@@ -1,6 +1,14 @@
 import { useState } from 'react';
 import analyticsService from '../services/analyticsService';
 
+// Add Amazon Ember font if not already loaded
+if (!document.querySelector('link[href*="amazon-ember"]')) {
+  const link = document.createElement('link');
+  link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap';
+  link.rel = 'stylesheet';
+  document.head.appendChild(link);
+}
+
 interface FeedbackWidgetProps {
   promptId?: string;
   onClose?: () => void;
@@ -39,18 +47,34 @@ export default function FeedbackWidget({ promptId, onClose }: FeedbackWidgetProp
           position: 'fixed',
           bottom: '20px',
           right: '20px',
-          background: '#0078d4',
+          background: '#232f3e',
           color: 'white',
-          border: 'none',
-          borderRadius: '50px',
-          padding: '12px 20px',
+          border: '1px solid #37475a',
+          borderRadius: '4px',
+          padding: '8px 16px',
           cursor: 'pointer',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-          fontSize: '14px',
-          fontWeight: '500'
+          boxShadow: '0 2px 5px rgba(15,17,17,.15)',
+          fontSize: '13px',
+          fontWeight: '400',
+          fontFamily: 'Amazon Ember, Arial, sans-serif',
+          transition: 'all 0.15s ease',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = '#37475a';
+          e.currentTarget.style.boxShadow = '0 4px 8px rgba(15,17,17,.25)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = '#232f3e';
+          e.currentTarget.style.boxShadow = '0 2px 5px rgba(15,17,17,.15)';
         }}
       >
-        💬 Feedback
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+        Feedback
       </button>
     );
   }
@@ -61,33 +85,55 @@ export default function FeedbackWidget({ promptId, onClose }: FeedbackWidgetProp
       bottom: '20px',
       right: '20px',
       background: 'white',
-      border: '1px solid #ddd',
-      borderRadius: '12px',
-      padding: '20px',
-      width: '300px',
-      boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-      zIndex: 1000
+      border: '1px solid #d5d9d9',
+      borderRadius: '4px',
+      padding: '16px',
+      width: '320px',
+      boxShadow: '0 4px 8px rgba(15,17,17,.15), 0 8px 16px rgba(15,17,17,.15)',
+      zIndex: 1000,
+      fontFamily: 'Amazon Ember, Arial, sans-serif'
     }}>
       {submitted ? (
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '24px', marginBottom: '10px' }}>✅</div>
-          <p style={{ margin: 0, color: '#107c10' }}>Thank you for your feedback!</p>
+          <div style={{ 
+            width: '40px', 
+            height: '40px', 
+            borderRadius: '50%', 
+            background: '#067d62', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            margin: '0 auto 12px',
+            color: 'white',
+            fontSize: '18px'
+          }}>✓</div>
+          <p style={{ margin: 0, color: '#0f1111', fontSize: '14px', fontWeight: '400' }}>Thank you for your feedback!</p>
         </div>
       ) : (
         <>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-            <h3 style={{ margin: 0, fontSize: '16px' }}>How was your experience?</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h3 style={{ margin: 0, fontSize: '16px', color: '#0f1111', fontWeight: '700' }}>How was your experience?</h3>
             <button
               onClick={() => setIsOpen(false)}
-              style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer' }}
+              style={{ 
+                background: 'none', 
+                border: 'none', 
+                fontSize: '16px', 
+                cursor: 'pointer',
+                color: '#565959',
+                padding: '4px',
+                borderRadius: '2px'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = '#f0f2f2'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
             >
               ×
             </button>
           </div>
           
-          <div style={{ marginBottom: '15px' }}>
-            <p style={{ margin: '0 0 10px 0', fontSize: '14px' }}>Rate this response:</p>
-            <div style={{ display: 'flex', gap: '5px' }}>
+          <div style={{ marginBottom: '16px' }}>
+            <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#0f1111', fontWeight: '400' }}>Rate this response:</p>
+            <div style={{ display: 'flex', gap: '4px' }}>
               {[1, 2, 3, 4, 5].map(star => (
                 <button
                   key={star}
@@ -95,12 +141,21 @@ export default function FeedbackWidget({ promptId, onClose }: FeedbackWidgetProp
                   style={{
                     background: 'none',
                     border: 'none',
-                    fontSize: '20px',
+                    fontSize: '18px',
                     cursor: 'pointer',
-                    color: star <= rating ? '#ffd700' : '#ddd'
+                    color: star <= rating ? '#ff9900' : '#ddd',
+                    padding: '2px',
+                    borderRadius: '2px',
+                    transition: 'all 0.15s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (star > rating) e.currentTarget.style.color = '#ff9900';
+                  }}
+                  onMouseLeave={(e) => {
+                    if (star > rating) e.currentTarget.style.color = '#ddd';
                   }}
                 >
-                  ⭐
+                  ★
                 </button>
               ))}
             </div>
@@ -112,14 +167,18 @@ export default function FeedbackWidget({ promptId, onClose }: FeedbackWidgetProp
             placeholder="Tell us more about your experience..."
             style={{
               width: '100%',
-              height: '80px',
-              padding: '10px',
-              border: '1px solid #ddd',
-              borderRadius: '6px',
-              fontSize: '14px',
+              height: '70px',
+              padding: '8px',
+              border: '1px solid #d5d9d9',
+              borderRadius: '4px',
+              fontSize: '13px',
               resize: 'none',
-              boxSizing: 'border-box'
+              boxSizing: 'border-box',
+              fontFamily: 'Amazon Ember, Arial, sans-serif',
+              outline: 'none'
             }}
+            onFocus={(e) => e.currentTarget.style.borderColor = '#007eb9'}
+            onBlur={(e) => e.currentTarget.style.borderColor = '#d5d9d9'}
           />
           
           <button
@@ -127,18 +186,32 @@ export default function FeedbackWidget({ promptId, onClose }: FeedbackWidgetProp
             disabled={rating === 0}
             style={{
               width: '100%',
-              padding: '10px',
-              background: rating > 0 ? '#0078d4' : '#ccc',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
+              padding: '8px 16px',
+              background: rating > 0 ? '#ff9900' : '#e7e9ec',
+              color: rating > 0 ? '#0f1111' : '#565959',
+              border: '1px solid ' + (rating > 0 ? '#ff9900' : '#d5d9d9'),
+              borderRadius: '4px',
               cursor: rating > 0 ? 'pointer' : 'not-allowed',
-              marginTop: '10px',
-              fontSize: '14px',
-              fontWeight: '500'
+              marginTop: '12px',
+              fontSize: '13px',
+              fontWeight: '400',
+              fontFamily: 'Amazon Ember, Arial, sans-serif',
+              transition: 'all 0.15s ease'
+            }}
+            onMouseEnter={(e) => {
+              if (rating > 0) {
+                e.currentTarget.style.background = '#e47911';
+                e.currentTarget.style.borderColor = '#e47911';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (rating > 0) {
+                e.currentTarget.style.background = '#ff9900';
+                e.currentTarget.style.borderColor = '#ff9900';
+              }
             }}
           >
-            Submit Feedback
+            Submit feedback
           </button>
         </>
       )}
