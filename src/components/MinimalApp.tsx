@@ -1208,7 +1208,35 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
         }}>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', flexWrap: 'wrap', marginBottom: '12px' }}>
             <a onClick={() => {
-              setLegalContent({ title: 'Privacy Policy', content: 'We collect and process your data to provide Excel AI services. Your uploaded files are processed securely and not stored permanently. We use AWS services for data processing and follow industry-standard security practices.' });
+              setLegalContent({ 
+                title: 'Privacy Policy', 
+                content: `Last updated on ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+
+1. Introduction to Privacy Policy
+This Privacy Policy applies to your use of the Excel AI platform, including all services, features, and functionalities provided through our web application. The terms "we," "our," and "us" refer to Excel AI, and the terms "you," "your," and "User" refer to you as a user of our platform.
+
+The term "Personal Information" means information that personally identifies you, such as your name, email address, and any data linked to such information. By using Excel AI, you agree to this Privacy Policy and consent to the collection, use, and processing of your information as described below.
+
+2. Information We Collect and How We Use It
+We collect Personal Information when you create an account, including your name, email address, and authentication credentials through AWS Cognito. We also temporarily process the Excel/CSV files you upload to provide AI-powered analysis and insights.
+
+Your uploaded files are processed in real-time and are not permanently stored on our servers. File data is used solely to generate AI responses and perform requested operations like sorting, filtering, and mathematical calculations.
+
+3. Data Security and Processing
+We use Amazon Web Services (AWS) infrastructure to ensure enterprise-grade security. Your data is encrypted in transit and processed using secure AWS services including Amazon Bedrock for AI functionality. We implement industry-standard security practices to protect your information.
+
+4. Data Retention and Deletion
+Uploaded files are processed temporarily and automatically deleted after your session ends. Account information is retained as long as your account remains active. You may request deletion of your account and associated data at any time through the feedback system.
+
+5. Third-Party Services
+We use AWS Cognito for authentication and AWS Bedrock for AI processing. These services are governed by Amazon's privacy policies and security standards. We do not share your personal information with any other third parties.
+
+6. Your Rights
+You have the right to access, modify, or delete your personal information. You can update your account details or request account deletion through our support channels. You also have the right to withdraw consent for data processing at any time.
+
+7. Contact Information
+For privacy-related questions or requests, please use our feedback system or contact us through the support channels provided in the application.` 
+              });
               setShowLegalModal(true);
             }} style={{ color: '#ffffff', textDecoration: 'none', fontSize: '14px', cursor: 'pointer' }}>Privacy Policy</a>
             <a onClick={() => {
@@ -1271,7 +1299,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                   ×
                 </button>
               </div>
-              <p style={{ color: '#333', lineHeight: '1.6', margin: 0 }}>{legalContent.content}</p>
+              <div style={{ color: '#333', lineHeight: '1.6', margin: 0, whiteSpace: 'pre-line', fontSize: '14px' }}>{legalContent.content}</div>
               <div style={{ marginTop: '20px', textAlign: 'right' }}>
                 <button
                   onClick={() => setShowLegalModal(false)}
