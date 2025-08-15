@@ -673,39 +673,184 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
 
           {/* Formatting Toolbar */}
           {fileData.length > 0 && (
-            <div style={{ background: '#f8f9fa', padding: '10px', marginBottom: '20px', borderRadius: '6px' }}>
-              <button 
-                onClick={() => {
-                  if (selectedCells.length === 0) return;
-                  const newFormatting = { ...cellFormatting };
-                  selectedCells.forEach(cellId => {
-                    newFormatting[cellId] = { ...newFormatting[cellId], fontWeight: 'bold' };
-                  });
-                  setCellFormatting(newFormatting);
-                }}
-                style={{ 
-                  background: '#0078d4', color: 'white', border: 'none', 
-                  padding: '8px 12px', borderRadius: '4px', marginRight: '10px', cursor: 'pointer'
-                }}
-              >
-                <strong>B</strong>
-              </button>
-              <button 
-                onClick={() => {
-                  if (selectedCells.length === 0) return;
-                  const newFormatting = { ...cellFormatting };
-                  selectedCells.forEach(cellId => {
-                    newFormatting[cellId] = { ...newFormatting[cellId], fontStyle: 'italic' };
-                  });
-                  setCellFormatting(newFormatting);
-                }}
-                style={{ 
-                  background: '#0078d4', color: 'white', border: 'none', 
-                  padding: '8px 12px', borderRadius: '4px', marginRight: '10px', cursor: 'pointer'
-                }}
-              >
-                <em>I</em>
-              </button>
+            <div style={{ 
+              background: 'white', 
+              padding: '16px', 
+              marginBottom: '20px', 
+              borderRadius: '8px',
+              border: '1px solid #e1e5e9',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '14px', fontWeight: '500', color: '#5f6368', marginRight: '12px' }}>Format:</span>
+                
+                {/* Bold */}
+                <button 
+                  onClick={() => {
+                    if (selectedCells.length === 0) return;
+                    const newFormatting = { ...cellFormatting };
+                    selectedCells.forEach(cellId => {
+                      newFormatting[cellId] = { ...newFormatting[cellId], fontWeight: 'bold' };
+                    });
+                    setCellFormatting(newFormatting);
+                  }}
+                  style={{ 
+                    background: '#f8f9fa', 
+                    color: '#3c4043', 
+                    border: '1px solid #dadce0', 
+                    padding: '8px 12px', 
+                    borderRadius: '4px', 
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: 'bold',
+                    transition: 'all 0.2s',
+                    ':hover': { background: '#e8f0fe' }
+                  }}
+                  onMouseEnter={(e) => e.target.style.background = '#e8f0fe'}
+                  onMouseLeave={(e) => e.target.style.background = '#f8f9fa'}
+                >
+                  B
+                </button>
+                
+                {/* Italic */}
+                <button 
+                  onClick={() => {
+                    if (selectedCells.length === 0) return;
+                    const newFormatting = { ...cellFormatting };
+                    selectedCells.forEach(cellId => {
+                      newFormatting[cellId] = { ...newFormatting[cellId], fontStyle: 'italic' };
+                    });
+                    setCellFormatting(newFormatting);
+                  }}
+                  style={{ 
+                    background: '#f8f9fa', 
+                    color: '#3c4043', 
+                    border: '1px solid #dadce0', 
+                    padding: '8px 12px', 
+                    borderRadius: '4px', 
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontStyle: 'italic',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.target.style.background = '#e8f0fe'}
+                  onMouseLeave={(e) => e.target.style.background = '#f8f9fa'}
+                >
+                  I
+                </button>
+                
+                <div style={{ width: '1px', height: '24px', background: '#dadce0', margin: '0 8px' }}></div>
+                
+                {/* Text Colors */}
+                {['#000000', '#d93025', '#1a73e8', '#137333', '#f9ab00', '#9c27b0'].map(color => (
+                  <button 
+                    key={color}
+                    onClick={() => {
+                      if (selectedCells.length === 0) return;
+                      const newFormatting = { ...cellFormatting };
+                      selectedCells.forEach(cellId => {
+                        newFormatting[cellId] = { ...newFormatting[cellId], color };
+                      });
+                      setCellFormatting(newFormatting);
+                    }}
+                    style={{ 
+                      background: color,
+                      border: '1px solid #dadce0', 
+                      width: '24px',
+                      height: '24px',
+                      borderRadius: '4px', 
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
+                    title={`Text color: ${color}`}
+                  />
+                ))}
+                
+                <div style={{ width: '1px', height: '24px', background: '#dadce0', margin: '0 8px' }}></div>
+                
+                {/* Alignment */}
+                <button 
+                  onClick={() => {
+                    if (selectedCells.length === 0) return;
+                    const newFormatting = { ...cellFormatting };
+                    selectedCells.forEach(cellId => {
+                      newFormatting[cellId] = { ...newFormatting[cellId], textAlign: 'left' };
+                    });
+                    setCellFormatting(newFormatting);
+                  }}
+                  style={{ 
+                    background: '#f8f9fa', 
+                    color: '#3c4043', 
+                    border: '1px solid #dadce0', 
+                    padding: '8px 12px', 
+                    borderRadius: '4px', 
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.target.style.background = '#e8f0fe'}
+                  onMouseLeave={(e) => e.target.style.background = '#f8f9fa'}
+                  title="Align left"
+                >
+                  ⬅
+                </button>
+                
+                <button 
+                  onClick={() => {
+                    if (selectedCells.length === 0) return;
+                    const newFormatting = { ...cellFormatting };
+                    selectedCells.forEach(cellId => {
+                      newFormatting[cellId] = { ...newFormatting[cellId], textAlign: 'center' };
+                    });
+                    setCellFormatting(newFormatting);
+                  }}
+                  style={{ 
+                    background: '#f8f9fa', 
+                    color: '#3c4043', 
+                    border: '1px solid #dadce0', 
+                    padding: '8px 12px', 
+                    borderRadius: '4px', 
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.target.style.background = '#e8f0fe'}
+                  onMouseLeave={(e) => e.target.style.background = '#f8f9fa'}
+                  title="Align center"
+                >
+                  ↔
+                </button>
+                
+                <button 
+                  onClick={() => {
+                    if (selectedCells.length === 0) return;
+                    const newFormatting = { ...cellFormatting };
+                    selectedCells.forEach(cellId => {
+                      newFormatting[cellId] = { ...newFormatting[cellId], textAlign: 'right' };
+                    });
+                    setCellFormatting(newFormatting);
+                  }}
+                  style={{ 
+                    background: '#f8f9fa', 
+                    color: '#3c4043', 
+                    border: '1px solid #dadce0', 
+                    padding: '8px 12px', 
+                    borderRadius: '4px', 
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.target.style.background = '#e8f0fe'}
+                  onMouseLeave={(e) => e.target.style.background = '#f8f9fa'}
+                  title="Align right"
+                >
+                  ➡
+                </button>
+                
+                <div style={{ marginLeft: '12px', fontSize: '12px', color: '#5f6368' }}>
+                  {selectedCells.length > 0 ? `${selectedCells.length} cell(s) selected` : 'Select cells to format'}
+                </div>
+              </div>
             </div>
           )}
 
