@@ -675,75 +675,108 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
           {fileData.length > 0 && (
             <div style={{ 
               background: '#ffffff', 
-              padding: '12px 20px', 
-              marginBottom: '16px', 
-              border: '1px solid #d5d9d9',
+              padding: '16px 24px', 
+              marginBottom: '20px', 
+              border: '1px solid #e7e7e7',
               borderRadius: '8px',
-              boxShadow: '0 2px 5px 0 rgba(213,217,217,.5)'
+              boxShadow: '0 1px 3px rgba(0,0,0,0.08)'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
-                  {/* Text Formatting Group */}
-                  <div style={{ display: 'flex', border: '1px solid #d5d9d9', borderRadius: '4px', overflow: 'hidden' }}>
-                    <button 
-                      onClick={() => {
-                        if (selectedCells.length === 0) return;
-                        const newFormatting = { ...cellFormatting };
-                        selectedCells.forEach(cellId => {
-                          newFormatting[cellId] = { ...newFormatting[cellId], fontWeight: 'bold' };
-                        });
-                        setCellFormatting(newFormatting);
-                      }}
-                      style={{ 
-                        background: '#fafafa', 
-                        color: '#0f1111', 
-                        border: 'none',
-                        borderRight: '1px solid #d5d9d9',
-                        padding: '8px 12px', 
-                        cursor: 'pointer',
-                        fontSize: '14px',
-                        fontWeight: 'bold',
-                        fontFamily: 'Amazon Ember, Arial, sans-serif'
-                      }}
-                      onMouseEnter={(e) => e.target.style.background = '#e3e6e6'}
-                      onMouseLeave={(e) => e.target.style.background = '#fafafa'}
-                      title="Bold"
-                    >
-                      B
-                    </button>
-                    
-                    <button 
-                      onClick={() => {
-                        if (selectedCells.length === 0) return;
-                        const newFormatting = { ...cellFormatting };
-                        selectedCells.forEach(cellId => {
-                          newFormatting[cellId] = { ...newFormatting[cellId], fontStyle: 'italic' };
-                        });
-                        setCellFormatting(newFormatting);
-                      }}
-                      style={{ 
-                        background: '#fafafa', 
-                        color: '#0f1111', 
-                        border: 'none',
-                        padding: '8px 12px', 
-                        cursor: 'pointer',
-                        fontSize: '14px',
-                        fontStyle: 'italic',
-                        fontFamily: 'Amazon Ember, Arial, sans-serif'
-                      }}
-                      onMouseEnter={(e) => e.target.style.background = '#e3e6e6'}
-                      onMouseLeave={(e) => e.target.style.background = '#fafafa'}
-                      title="Italic"
-                    >
-                      I
-                    </button>
-                  </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
+                {/* Text Style Section */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ 
+                    fontSize: '14px', 
+                    fontWeight: '500', 
+                    color: '#232f3e', 
+                    fontFamily: 'system-ui, -apple-system, sans-serif',
+                    minWidth: '70px'
+                  }}>Text Style</span>
                   
-                  {/* Color Palette */}
-                  <div style={{ display: 'flex', alignItems: 'center', marginLeft: '12px', gap: '4px' }}>
-                    <span style={{ fontSize: '13px', color: '#565959', marginRight: '6px', fontFamily: 'Amazon Ember, Arial, sans-serif' }}>Color:</span>
+                  <button 
+                    onClick={() => {
+                      if (selectedCells.length === 0) return;
+                      const newFormatting = { ...cellFormatting };
+                      selectedCells.forEach(cellId => {
+                        newFormatting[cellId] = { ...newFormatting[cellId], fontWeight: 'bold' };
+                      });
+                      setCellFormatting(newFormatting);
+                    }}
+                    style={{ 
+                      background: '#ffffff', 
+                      color: '#232f3e', 
+                      border: '1px solid #d5d9d9',
+                      padding: '8px 16px', 
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontSize: '13px',
+                      fontWeight: '500',
+                      fontFamily: 'system-ui, -apple-system, sans-serif',
+                      transition: 'all 0.15s ease',
+                      boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.background = '#f7f8f8';
+                      e.target.style.borderColor = '#007185';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.background = '#ffffff';
+                      e.target.style.borderColor = '#d5d9d9';
+                    }}
+                  >
+                    Bold
+                  </button>
+                  
+                  <button 
+                    onClick={() => {
+                      if (selectedCells.length === 0) return;
+                      const newFormatting = { ...cellFormatting };
+                      selectedCells.forEach(cellId => {
+                        newFormatting[cellId] = { ...newFormatting[cellId], fontStyle: 'italic' };
+                      });
+                      setCellFormatting(newFormatting);
+                    }}
+                    style={{ 
+                      background: '#ffffff', 
+                      color: '#232f3e', 
+                      border: '1px solid #d5d9d9',
+                      padding: '8px 16px', 
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontSize: '13px',
+                      fontWeight: '500',
+                      fontFamily: 'system-ui, -apple-system, sans-serif',
+                      transition: 'all 0.15s ease',
+                      boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.background = '#f7f8f8';
+                      e.target.style.borderColor = '#007185';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.background = '#ffffff';
+                      e.target.style.borderColor = '#d5d9d9';
+                    }}
+                  >
+                    Italic
+                  </button>
+                </div>
+                
+                {/* Divider */}
+                <div style={{ width: '1px', height: '32px', background: '#e7e7e7' }}></div>
+                
+                {/* Text Color Section */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ 
+                    fontSize: '14px', 
+                    fontWeight: '500', 
+                    color: '#232f3e', 
+                    fontFamily: 'system-ui, -apple-system, sans-serif',
+                    minWidth: '70px'
+                  }}>Text Color</span>
+                  
+                  <div style={{ display: 'flex', gap: '6px' }}>
                     {[
-                      { color: '#0f1111', name: 'Black' },
+                      { color: '#232f3e', name: 'Black' },
                       { color: '#cc0c39', name: 'Red' },
                       { color: '#007185', name: 'Blue' },
                       { color: '#007600', name: 'Green' },
@@ -762,65 +795,90 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                         }}
                         style={{ 
                           background: color,
-                          border: '1px solid #d5d9d9', 
-                          width: '20px',
-                          height: '20px',
-                          borderRadius: '3px', 
+                          border: '2px solid #ffffff', 
+                          width: '28px',
+                          height: '28px',
+                          borderRadius: '6px', 
                           cursor: 'pointer',
-                          boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
+                          boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.08)',
+                          transition: 'transform 0.15s ease'
                         }}
-                        title={name}
+                        onMouseEnter={(e) => e.target.style.transform = 'scale(1.1)'}
+                        onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                        title={`${name} text`}
                       />
-                    ))}
-                  </div>
-                  
-                  {/* Alignment Group */}
-                  <div style={{ display: 'flex', border: '1px solid #d5d9d9', borderRadius: '4px', overflow: 'hidden', marginLeft: '12px' }}>
-                    {[
-                      { align: 'left', icon: '◀', title: 'Align Left' },
-                      { align: 'center', icon: '▬', title: 'Center' },
-                      { align: 'right', icon: '▶', title: 'Align Right' }
-                    ].map(({ align, icon, title }, index) => (
-                      <button 
-                        key={align}
-                        onClick={() => {
-                          if (selectedCells.length === 0) return;
-                          const newFormatting = { ...cellFormatting };
-                          selectedCells.forEach(cellId => {
-                            newFormatting[cellId] = { ...newFormatting[cellId], textAlign: align };
-                          });
-                          setCellFormatting(newFormatting);
-                        }}
-                        style={{ 
-                          background: '#fafafa', 
-                          color: '#0f1111', 
-                          border: 'none',
-                          borderRight: index < 2 ? '1px solid #d5d9d9' : 'none',
-                          padding: '8px 10px', 
-                          cursor: 'pointer',
-                          fontSize: '12px',
-                          fontFamily: 'Amazon Ember, Arial, sans-serif'
-                        }}
-                        onMouseEnter={(e) => e.target.style.background = '#e3e6e6'}
-                        onMouseLeave={(e) => e.target.style.background = '#fafafa'}
-                        title={title}
-                      >
-                        {icon}
-                      </button>
                     ))}
                   </div>
                 </div>
                 
+                {/* Divider */}
+                <div style={{ width: '1px', height: '32px', background: '#e7e7e7' }}></div>
+                
+                {/* Alignment Section */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ 
+                    fontSize: '14px', 
+                    fontWeight: '500', 
+                    color: '#232f3e', 
+                    fontFamily: 'system-ui, -apple-system, sans-serif',
+                    minWidth: '70px'
+                  }}>Alignment</span>
+                  
+                  {[
+                    { align: 'left', text: 'Left' },
+                    { align: 'center', text: 'Center' },
+                    { align: 'right', text: 'Right' }
+                  ].map(({ align, text }) => (
+                    <button 
+                      key={align}
+                      onClick={() => {
+                        if (selectedCells.length === 0) return;
+                        const newFormatting = { ...cellFormatting };
+                        selectedCells.forEach(cellId => {
+                          newFormatting[cellId] = { ...newFormatting[cellId], textAlign: align };
+                        });
+                        setCellFormatting(newFormatting);
+                      }}
+                      style={{ 
+                        background: '#ffffff', 
+                        color: '#232f3e', 
+                        border: '1px solid #d5d9d9',
+                        padding: '8px 16px', 
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontSize: '13px',
+                        fontWeight: '500',
+                        fontFamily: 'system-ui, -apple-system, sans-serif',
+                        transition: 'all 0.15s ease',
+                        boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.background = '#f7f8f8';
+                        e.target.style.borderColor = '#007185';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.background = '#ffffff';
+                        e.target.style.borderColor = '#d5d9d9';
+                      }}
+                    >
+                      {text}
+                    </button>
+                  ))}
+                </div>
+                
+                {/* Selection Status */}
                 <div style={{ 
-                  fontSize: '12px', 
+                  marginLeft: 'auto',
+                  fontSize: '13px', 
                   color: '#565959', 
-                  fontFamily: 'Amazon Ember, Arial, sans-serif',
+                  fontFamily: 'system-ui, -apple-system, sans-serif',
                   background: selectedCells.length > 0 ? '#e7f3ff' : '#f7f8f8',
-                  padding: '4px 8px',
-                  borderRadius: '4px',
-                  border: '1px solid #d5d9d9'
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  border: '1px solid ' + (selectedCells.length > 0 ? '#007185' : '#e7e7e7'),
+                  fontWeight: '500'
                 }}>
-                  {selectedCells.length > 0 ? `${selectedCells.length} selected` : 'Select cells'}
+                  {selectedCells.length > 0 ? `${selectedCells.length} cell${selectedCells.length > 1 ? 's' : ''} selected` : 'Select cells to format'}
                 </div>
               </div>
             </div>
