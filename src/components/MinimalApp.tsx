@@ -1448,7 +1448,7 @@ We're committed to excellent support and continuous improvement based on your fe
               overflow: 'auto'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <h3 style={{ margin: 0, color: '#232f3e' }}>{legalContent.title}</h3>
+                <h3 style={{ margin: 0, color: '#232f3e', textAlign: 'center', flex: 1 }}>{legalContent.title}</h3>
                 <button
                   onClick={() => setShowLegalModal(false)}
                   style={{
