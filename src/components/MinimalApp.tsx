@@ -9,6 +9,7 @@ import PaymentService from '../services/paymentService';
 import FeedbackWidget from './FeedbackWidget';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { typography } from '../styles/typography';
+import { PivotOperations } from '../utils/pivotOperations';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const MAX_ROWS = 1000;
@@ -190,6 +191,44 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
         setLastAiResult(formatResult.data);
         setShowUseResultButton(true);
       }
+      setPrompt('');
+      return;
+    }
+
+    // Handle pivot table operations locally
+    const pivotResult = handlePivotOperations(trimmedPrompt, fileData);
+    if (pivotResult) {
+      console.log('Pivot operation processed:', pivotResult.data.length, 'rows');
+      
+      // Build HTML table for the results
+      let tableHtml = '<div style="margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; overflow: auto; max-height: 400px;"><table style="width: 100%; border-collapse: collapse; font-size: 12px;">';
+      
+      // Add Excel-style column headers
+      tableHtml += '<tr style="background: #e6f3ff; border-bottom: 2px solid #0078d4;">';
+      tableHtml += '<th style="padding: 4px 8px; fontSize: 11px; font-weight: bold; color: #0078d4; border: 1px solid #ddd; min-width: 40px;">#</th>';
+      if (pivotResult.data[0]) {
+        pivotResult.data[0].forEach((_, colIndex) => {
+          tableHtml += `<th style="padding: 4px 8px; fontSize: 11px; font-weight: bold; color: #0078d4; border: 1px solid #ddd; min-width: 100px;">${String.fromCharCode(65 + colIndex)}</th>`;
+        });
+      }
+      tableHtml += '</tr>';
+      
+      pivotResult.data.forEach((row, i) => {
+        const isHeader = i === 0;
+        tableHtml += `<tr style="background: ${isHeader ? '#f0f8ff' : (i % 2 === 0 ? '#fafafa' : 'white')}; border-bottom: 1px solid #eee;">`;
+        // Add row number
+        tableHtml += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; fontSize: 11px; color: #0078d4; background: #f8f9ff; text-align: center; min-width: 40px;">${i + 1}</td>`;
+        row.forEach(cell => {
+          tableHtml += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: ${isHeader ? 'bold' : 'normal'}; color: #333; white-space: nowrap;">${String(cell || '')}</td>`;
+        });
+        tableHtml += '</tr>';
+      });
+      
+      tableHtml += '</table></div>';
+      
+      setAiResponse(`${pivotResult.message}<br><br>${tableHtml}`);
+      setLastAiResult(pivotResult.data);
+      setShowUseResultButton(true);
       setPrompt('');
       return;
     }
@@ -1027,6 +1066,63 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       message: `<strong>Find and Replace completed successfully!</strong><br><br>Replaced "${findText}" with "${replaceText}" in ${replacementCount} cells.`,
       data: modifiedData
     };
+  }, []);
+
+  // Handle pivot table operations locally
+  const handlePivotOperations = useCallback((prompt: string, data: any[][]) => {
+    const lowerPrompt = prompt.toLowerCase();
+    
+    // "Group sales by region and month, show totals"
+    if (lowerPrompt.includes('group') && lowerPrompt.includes('by') && lowerPrompt.includes('and')) {
+      const groupMatch = prompt.match(/group\s+(.+?)\s+by\s+(.+?)\s+and\s+(.+?)(?:,|$)/i);
+      if (groupMatch) {
+        const [, valueCol, col1, col2] = groupMatch;
+        const operation = lowerPrompt.includes('total') || lowerPrompt.includes('sum') ? 'sum' : 
+                         lowerPrompt.includes('count') ? 'count' : 'sum';
+        return PivotOperations.groupByTwo(data, col1.trim(), col2.trim(), valueCol.trim(), operation);
+      }
+    }
+    
+    // "Create summary by category with average prices"
+    if (lowerPrompt.includes('summary') && lowerPrompt.includes('by') && lowerPrompt.includes('average')) {
+      const summaryMatch = prompt.match(/summary\s+by\s+(.+?)\s+with\s+average\s+(.+)/i);
+      if (summaryMatch) {
+        const [, groupCol, valueCol] = summaryMatch;
+        return PivotOperations.groupBy(data, groupCol.trim(), valueCol.trim(), 'average');
+      }
+    }
+    
+    // "Show count of items by department and status"
+    if (lowerPrompt.includes('count') && lowerPrompt.includes('by') && lowerPrompt.includes('and')) {
+      const countMatch = prompt.match(/count\s+(?:of\s+)?(.+?)\s+by\s+(.+?)\s+and\s+(.+)/i);
+      if (countMatch) {
+        const [, , col1, col2] = countMatch;
+        return PivotOperations.groupByTwo(data, col1.trim(), col2.trim(), '', 'count');
+      }
+    }
+    
+    // "Calculate percentage breakdown by product type"
+    if (lowerPrompt.includes('percentage') && lowerPrompt.includes('breakdown') && lowerPrompt.includes('by')) {
+      const percentMatch = prompt.match(/percentage\s+breakdown\s+by\s+(.+)/i);
+      if (percentMatch) {
+        const [, groupCol] = percentMatch;
+        return PivotOperations.percentageBreakdown(data, groupCol.trim());
+      }
+    }
+    
+    // Generic "group by" operations
+    if (lowerPrompt.includes('group') && lowerPrompt.includes('by')) {
+      const genericMatch = prompt.match(/group\s+(?:by\s+)?(.+?)(?:\s+(?:show|with|and)\s+(.+?))?(?:,|$)/i);
+      if (genericMatch) {
+        const [, groupCol, operation] = genericMatch;
+        const op = operation && operation.includes('sum') ? 'sum' : 
+                  operation && operation.includes('count') ? 'count' : 
+                  operation && operation.includes('average') ? 'average' : 'count';
+        return PivotOperations.groupBy(data, groupCol.trim(), '', op);
+      }
+    }
+    
+    return null;
   }, []);
 
   // Handle formatting commands locally with actual CSS styling
