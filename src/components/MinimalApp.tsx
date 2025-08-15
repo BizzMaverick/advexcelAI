@@ -230,7 +230,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       
       if (duplicates.length > 0) {
         let response = `<strong>Found ${duplicates.length} duplicate rows:</strong><br><br>`;
-        response += '<table style="border-collapse: collapse; width: 100%; margin-top: 10px;">';
+        response += '<div style="max-height: 400px; overflow: auto;"><table style="border-collapse: collapse; width: 100%; margin-top: 10px;">';
         response += '<thead><tr style="background: #f0f8ff;">';
         headers.forEach(header => {
           response += `<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">${header}</th>`;
@@ -243,7 +243,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
           });
           response += '</tr>';
         });
-        response += '</tbody></table>';
+        response += '</tbody></table></div>';
         setAiResponse(response);
       } else {
         setAiResponse('<strong>No duplicate rows found!</strong>');
@@ -358,7 +358,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       
       if (matches.length > 0) {
         let response = `<strong>Results for ${searchTerms.join(', ')}:</strong><br><br>`;
-        response += '<table style="border-collapse: collapse; width: 100%; margin-top: 10px;">';
+        response += '<div style="max-height: 400px; overflow: auto;"><table style="border-collapse: collapse; width: 100%; margin-top: 10px;">';
         response += '<thead><tr style="background: #f0f8ff;">';
         
         if (requestedColumns.length > 0) {
@@ -389,7 +389,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
           
           response += '</tr>';
         });
-        response += '</tbody></table>';
+        response += '</tbody></table></div>';
         setAiResponse(response);
         setPrompt('');
         return;
