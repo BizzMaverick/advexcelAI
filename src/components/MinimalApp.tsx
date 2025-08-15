@@ -157,6 +157,66 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       return;
     }
 
+    // Handle specific data queries (show X for Y)
+    if (trimmedPrompt.toLowerCase().includes('show') && (trimmedPrompt.toLowerCase().includes('for') || trimmedPrompt.toLowerCase().includes('of'))) {
+      const headers = fileData[0];
+      const lowerPrompt = trimmedPrompt.toLowerCase();
+      
+      // Find requested columns
+      const requestedColumns: number[] = [];
+      headers.forEach((header, index) => {
+        if (lowerPrompt.includes(String(header).toLowerCase())) {
+          requestedColumns.push(index);
+        }
+      });
+      
+      // Find items to search for
+      const searchTerms: string[] = [];
+      const words = trimmedPrompt.split(/\s+/);
+      let foundFor = false;
+      words.forEach(word => {
+        if (word.toLowerCase() === 'for' || word.toLowerCase() === 'of') {
+          foundFor = true;
+        } else if (foundFor && word.length > 2) {
+          searchTerms.push(word.replace(/[,\s]+$/, ''));
+        }
+      });
+      
+      if (requestedColumns.length > 0 && searchTerms.length > 0) {
+        const matches: any[][] = [];
+        
+        for (let i = 1; i < fileData.length; i++) {
+          const row = fileData[i];
+          for (const searchTerm of searchTerms) {
+            for (let j = 0; j < row.length; j++) {
+              const cellValue = String(row[j] || '').toLowerCase();
+              if (cellValue.includes(searchTerm.toLowerCase())) {
+                matches.push(row);
+                break;
+              }
+            }
+          }
+        }
+        
+        if (matches.length > 0) {
+          let response = `<strong>Results for ${searchTerms.join(', ')}:</strong><br><br>`;
+          matches.forEach((row, index) => {
+            const itemName = row[0] || `Item ${index + 1}`;
+            response += `<strong>${itemName}:</strong><br>`;
+            requestedColumns.forEach(colIndex => {
+              response += `${headers[colIndex]}: ${row[colIndex] || 'N/A'}<br>`;
+            });
+            response += '<br>';
+          });
+          setAiResponse(response);
+        } else {
+          setAiResponse(`<strong>No matches found for ${searchTerms.join(', ')}</strong>`);
+        }
+        setPrompt('');
+        return;
+      }
+    }
+
     // Handle lookup
     if (trimmedPrompt.toLowerCase().includes('lookup') || trimmedPrompt.toLowerCase().includes('find')) {
       const searchTerm = trimmedPrompt.replace(/lookup|find/gi, '').trim().replace(/['"`]/g, '');
