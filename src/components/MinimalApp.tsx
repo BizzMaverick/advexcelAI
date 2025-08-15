@@ -697,7 +697,11 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                       if (selectedCells.length === 0) return;
                       const newFormatting = { ...cellFormatting };
                       selectedCells.forEach(cellId => {
-                        newFormatting[cellId] = { ...newFormatting[cellId], fontWeight: 'bold' };
+                        const currentWeight = newFormatting[cellId]?.fontWeight;
+                        newFormatting[cellId] = { 
+                          ...newFormatting[cellId], 
+                          fontWeight: currentWeight === 'bold' ? 'normal' : 'bold' 
+                        };
                       });
                       setCellFormatting(newFormatting);
                     }}
@@ -731,7 +735,11 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                       if (selectedCells.length === 0) return;
                       const newFormatting = { ...cellFormatting };
                       selectedCells.forEach(cellId => {
-                        newFormatting[cellId] = { ...newFormatting[cellId], fontStyle: 'italic' };
+                        const currentStyle = newFormatting[cellId]?.fontStyle;
+                        newFormatting[cellId] = { 
+                          ...newFormatting[cellId], 
+                          fontStyle: currentStyle === 'italic' ? 'normal' : 'italic' 
+                        };
                       });
                       setCellFormatting(newFormatting);
                     }}
@@ -774,47 +782,42 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                     minWidth: '70px'
                   }}>Text Color</span>
                   
-                  <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', maxWidth: '280px' }}>
-                    {[
-                      { color: '#000000', name: 'Black' },
-                      { color: '#ffffff', name: 'White' },
-                      { color: '#e74c3c', name: 'Red' },
-                      { color: '#3498db', name: 'Blue' },
-                      { color: '#2ecc71', name: 'Green' },
-                      { color: '#f39c12', name: 'Orange' },
-                      { color: '#9b59b6', name: 'Purple' },
-                      { color: '#1abc9c', name: 'Teal' },
-                      { color: '#34495e', name: 'Dark Gray' },
-                      { color: '#95a5a6', name: 'Light Gray' },
-                      { color: '#c0392b', name: 'Dark Red' },
-                      { color: '#2980b9', name: 'Dark Blue' }
-                    ].map(({ color, name }) => (
-                      <button 
-                        key={color}
-                        onClick={() => {
-                          if (selectedCells.length === 0) return;
-                          const newFormatting = { ...cellFormatting };
-                          selectedCells.forEach(cellId => {
-                            newFormatting[cellId] = { ...newFormatting[cellId], color };
-                          });
-                          setCellFormatting(newFormatting);
-                        }}
-                        style={{ 
-                          background: color,
-                          border: color === '#ffffff' ? '2px solid #d5d9d9' : '2px solid #ffffff', 
-                          width: '24px',
-                          height: '24px',
-                          borderRadius: '4px', 
-                          cursor: 'pointer',
-                          boxShadow: '0 1px 2px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.05)',
-                          transition: 'transform 0.15s ease'
-                        }}
-                        onMouseEnter={(e) => e.target.style.transform = 'scale(1.1)'}
-                        onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
-                        title={`${name} text`}
-                      />
-                    ))}
-                  </div>
+                  <select
+                    onChange={(e) => {
+                      if (selectedCells.length === 0) return;
+                      const color = e.target.value;
+                      const newFormatting = { ...cellFormatting };
+                      selectedCells.forEach(cellId => {
+                        newFormatting[cellId] = { ...newFormatting[cellId], color };
+                      });
+                      setCellFormatting(newFormatting);
+                    }}
+                    style={{
+                      background: '#ffffff',
+                      color: '#232f3e',
+                      border: '1px solid #d5d9d9',
+                      padding: '8px 12px',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontSize: '13px',
+                      fontFamily: 'system-ui, -apple-system, sans-serif',
+                      minWidth: '120px'
+                    }}
+                  >
+                    <option value="">Choose Color</option>
+                    <option value="#000000">Black</option>
+                    <option value="#ffffff">White</option>
+                    <option value="#e74c3c">Red</option>
+                    <option value="#3498db">Blue</option>
+                    <option value="#2ecc71">Green</option>
+                    <option value="#f39c12">Orange</option>
+                    <option value="#9b59b6">Purple</option>
+                    <option value="#1abc9c">Teal</option>
+                    <option value="#34495e">Dark Gray</option>
+                    <option value="#95a5a6">Light Gray</option>
+                    <option value="#c0392b">Dark Red</option>
+                    <option value="#2980b9">Dark Blue</option>
+                  </select>
                 </div>
                 
                 {/* Divider */}
@@ -830,46 +833,33 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                     minWidth: '70px'
                   }}>Alignment</span>
                   
-                  {[
-                    { align: 'left', text: 'Left' },
-                    { align: 'center', text: 'Center' },
-                    { align: 'right', text: 'Right' }
-                  ].map(({ align, text }) => (
-                    <button 
-                      key={align}
-                      onClick={() => {
-                        if (selectedCells.length === 0) return;
-                        const newFormatting = { ...cellFormatting };
-                        selectedCells.forEach(cellId => {
-                          newFormatting[cellId] = { ...newFormatting[cellId], textAlign: align };
-                        });
-                        setCellFormatting(newFormatting);
-                      }}
-                      style={{ 
-                        background: '#ffffff', 
-                        color: '#232f3e', 
-                        border: '1px solid #d5d9d9',
-                        padding: '8px 16px', 
-                        borderRadius: '6px',
-                        cursor: 'pointer',
-                        fontSize: '13px',
-                        fontWeight: '500',
-                        fontFamily: 'system-ui, -apple-system, sans-serif',
-                        transition: 'all 0.15s ease',
-                        boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.target.style.background = '#f7f8f8';
-                        e.target.style.borderColor = '#007185';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.background = '#ffffff';
-                        e.target.style.borderColor = '#d5d9d9';
-                      }}
-                    >
-                      {text}
-                    </button>
-                  ))}
+                  <select
+                    onChange={(e) => {
+                      if (selectedCells.length === 0) return;
+                      const align = e.target.value;
+                      const newFormatting = { ...cellFormatting };
+                      selectedCells.forEach(cellId => {
+                        newFormatting[cellId] = { ...newFormatting[cellId], textAlign: align };
+                      });
+                      setCellFormatting(newFormatting);
+                    }}
+                    style={{
+                      background: '#ffffff',
+                      color: '#232f3e',
+                      border: '1px solid #d5d9d9',
+                      padding: '8px 12px',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontSize: '13px',
+                      fontFamily: 'system-ui, -apple-system, sans-serif',
+                      minWidth: '120px'
+                    }}
+                  >
+                    <option value="">Choose Align</option>
+                    <option value="left">Left</option>
+                    <option value="center">Center</option>
+                    <option value="right">Right</option>
+                  </select>
                 </div>
                 
                 {/* Selection Status */}
