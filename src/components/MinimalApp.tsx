@@ -805,18 +805,18 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                     }}
                   >
                     <option value="">Choose Color</option>
-                    <option value="#000000">Black</option>
-                    <option value="#ffffff">White</option>
-                    <option value="#e74c3c">Red</option>
-                    <option value="#3498db">Blue</option>
-                    <option value="#2ecc71">Green</option>
-                    <option value="#f39c12">Orange</option>
-                    <option value="#9b59b6">Purple</option>
-                    <option value="#1abc9c">Teal</option>
-                    <option value="#34495e">Dark Gray</option>
-                    <option value="#95a5a6">Light Gray</option>
-                    <option value="#c0392b">Dark Red</option>
-                    <option value="#2980b9">Dark Blue</option>
+                    <option value="#000000">■ Black</option>
+                    <option value="#ffffff">□ White</option>
+                    <option value="#e74c3c">■ Red</option>
+                    <option value="#3498db">■ Blue</option>
+                    <option value="#2ecc71">■ Green</option>
+                    <option value="#f39c12">■ Orange</option>
+                    <option value="#9b59b6">■ Purple</option>
+                    <option value="#1abc9c">■ Teal</option>
+                    <option value="#34495e">■ Dark Gray</option>
+                    <option value="#95a5a6">■ Light Gray</option>
+                    <option value="#c0392b">■ Dark Red</option>
+                    <option value="#2980b9">■ Dark Blue</option>
                   </select>
                 </div>
                 
@@ -856,18 +856,18 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                     }}
                   >
                     <option value="">Choose Color</option>
-                    <option value="#ffffff">White</option>
-                    <option value="#f8f9fa">Light Gray</option>
-                    <option value="#e3f2fd">Light Blue</option>
-                    <option value="#e8f5e8">Light Green</option>
-                    <option value="#fff3e0">Light Orange</option>
-                    <option value="#fce4ec">Light Pink</option>
-                    <option value="#f3e5f5">Light Purple</option>
-                    <option value="#e0f2f1">Light Teal</option>
-                    <option value="#ffebee">Light Red</option>
-                    <option value="#f1f8e9">Light Lime</option>
-                    <option value="#e8eaf6">Light Indigo</option>
-                    <option value="#fafafa">Very Light Gray</option>
+                    <option value="#ffffff">□ White</option>
+                    <option value="#f8f9fa">■ Light Gray</option>
+                    <option value="#e3f2fd">■ Light Blue</option>
+                    <option value="#e8f5e8">■ Light Green</option>
+                    <option value="#fff3e0">■ Light Orange</option>
+                    <option value="#fce4ec">■ Light Pink</option>
+                    <option value="#f3e5f5">■ Light Purple</option>
+                    <option value="#e0f2f1">■ Light Teal</option>
+                    <option value="#ffebee">■ Light Red</option>
+                    <option value="#f1f8e9">■ Light Lime</option>
+                    <option value="#e8eaf6">■ Light Indigo</option>
+                    <option value="#fafafa">■ Very Light Gray</option>
                   </select>
                 </div>
                 
