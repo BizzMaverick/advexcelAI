@@ -1142,7 +1142,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
           
           {/* AI Response */}
           {aiResponse && (
-            <div style={{ background: 'white', borderRadius: '8px', padding: '20px', color: '#333' }}>
+            <div style={{ background: 'white', borderRadius: '8px', marginBottom: '20px', overflow: 'hidden' }}>
               {showUseResultButton && (
                 <div style={{ marginBottom: '15px', padding: '10px', background: '#f0f8ff', borderRadius: '4px', border: '1px solid #0078d4' }}>
                   <p style={{ margin: '0 0 10px 0', fontSize: '14px', color: '#333' }}>
@@ -1176,14 +1176,15 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                   </div>
                 </div>
               )}
-              <h4 style={{ margin: '0 0 15px 0', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '16px' }}>💬</span>
-                AI Response
-              </h4>
+              <div style={{ padding: '15px', background: '#0078d4', color: 'white' }}>
+                <h4 style={{ margin: 0, fontSize: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '16px' }}>💬</span>
+                  AI Response
+                </h4>
+              </div>
               <div style={{ 
                 background: '#f8f9ff', 
-                padding: '15px', 
-                borderRadius: '6px', 
+                padding: '20px', 
                 border: '1px solid #e6f2fa',
                 color: '#333'
               }}>
