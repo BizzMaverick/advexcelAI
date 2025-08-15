@@ -157,6 +157,45 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       return;
     }
 
+    // Handle lookup
+    if (trimmedPrompt.toLowerCase().includes('lookup') || trimmedPrompt.toLowerCase().includes('find')) {
+      const searchTerm = trimmedPrompt.replace(/lookup|find/gi, '').trim().replace(/['"`]/g, '');
+      if (searchTerm) {
+        const matches: any[][] = [];
+        const headers = fileData[0];
+        
+        for (let i = 1; i < fileData.length; i++) {
+          const row = fileData[i];
+          for (let j = 0; j < row.length; j++) {
+            const cellValue = String(row[j] || '').toLowerCase();
+            if (cellValue.includes(searchTerm.toLowerCase())) {
+              matches.push(row);
+              break;
+            }
+          }
+        }
+        
+        if (matches.length > 0) {
+          let response = `<strong>Lookup results for '${searchTerm}' - Found ${matches.length} matches:</strong><br><br>`;
+          matches.slice(0, 10).forEach((row, index) => {
+            response += `<strong>Match ${index + 1}:</strong><br>`;
+            headers.forEach((header, i) => {
+              response += `${header}: ${row[i] || 'N/A'}<br>`;
+            });
+            response += '<br>';
+          });
+          if (matches.length > 10) {
+            response += `<em>... and ${matches.length - 10} more matches</em>`;
+          }
+          setAiResponse(response);
+        } else {
+          setAiResponse(`<strong>No matches found for '${searchTerm}'</strong>`);
+        }
+        setPrompt('');
+        return;
+      }
+    }
+
     // Handle sorting
     if (trimmedPrompt.toLowerCase().includes('sort')) {
       const sortedData = [...fileData];
