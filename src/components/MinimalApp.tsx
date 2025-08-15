@@ -369,7 +369,8 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     const promptCheck = await PaymentService.canUsePrompt(user.email);
     if (!promptCheck.canUse) {
       setAiResponse(`<strong>❌ Prompt Limit Reached</strong><br><br>${promptCheck.reason}<br><br>Prompts remaining: ${promptCheck.promptsRemaining || 0}`);
-      if (onTrialRefresh) onTrialRefresh(); // Refresh trial status
+      // Don't refresh trial status to prevent component remount
+      // if (onTrialRefresh) onTrialRefresh(); 
       return;
     }
     
