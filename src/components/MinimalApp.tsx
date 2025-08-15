@@ -683,7 +683,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
               borderRadius: '8px',
               boxShadow: '0 1px 3px rgba(0,0,0,0.08)'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'nowrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
                 {/* Text Style Section */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span style={{ 
@@ -772,19 +772,16 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                   
                   <button 
                     onClick={() => {
-                      if (!formatPainterActive && selectedCells.length === 1) {
-                        // Copy format from selected cell
-                        const cellId = selectedCells[0];
-                        const format = cellFormatting[cellId] || {};
-                        setCopiedFormat(format);
-                        setFormatPainterActive(true);
-                      } else if (formatPainterActive && selectedCells.length > 0) {
-                        // Apply format to selected cells
-                        const newFormatting = { ...cellFormatting };
-                        selectedCells.forEach(cellId => {
-                          newFormatting[cellId] = { ...copiedFormat };
-                        });
-                        setCellFormatting(newFormatting);
+                      if (!formatPainterActive) {
+                        // Activate format painter mode
+                        if (selectedCells.length === 1) {
+                          const cellId = selectedCells[0];
+                          const format = cellFormatting[cellId] || {};
+                          setCopiedFormat(format);
+                          setFormatPainterActive(true);
+                        }
+                      } else {
+                        // Deactivate format painter mode
                         setFormatPainterActive(false);
                         setCopiedFormat(null);
                       }
@@ -1021,6 +1018,18 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                             key={j}
                             onClick={() => {
                               const cellId = `${i}-${j}`;
+                              
+                              if (formatPainterActive && copiedFormat) {
+                                // Apply copied format to clicked cell
+                                const newFormatting = { ...cellFormatting };
+                                newFormatting[cellId] = { ...copiedFormat };
+                                setCellFormatting(newFormatting);
+                                setFormatPainterActive(false);
+                                setCopiedFormat(null);
+                                return;
+                              }
+                              
+                              // Normal cell selection
                               if (selectedCells.includes(cellId)) {
                                 setSelectedCells(selectedCells.filter(id => id !== cellId));
                               } else {
