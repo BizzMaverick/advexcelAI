@@ -798,13 +798,13 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                       onClick={createNewSheet}
                       style={{ background: '#0078d4', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}
                     >
-                      📄 Download as New Sheet
+                      📄 Download Results Only
                     </button>
                     <button 
                       onClick={downloadCurrentSheet}
                       style={{ background: '#f59e0b', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}
                     >
-                      📥 Download Current Sheet
+                      📥 Download Full Data
                     </button>
                     <button 
                       onClick={resetToOriginal}
