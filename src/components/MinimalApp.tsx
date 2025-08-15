@@ -110,29 +110,117 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
     return `<strong>Column ${colLetter} Sum Result:</strong><br><br>Sum of ${columnName}: <strong>${sum.toLocaleString()}</strong><br>Cells processed: ${count}`;
   };
 
-  const handleCellOperations = (prompt: string, data: any[][]) => {
-    const cellAddMatch = prompt.match(/([A-Z])(\d+)\s*\+\s*([A-Z])(\d+)/i);
-    if (!cellAddMatch || !data || data.length === 0) return null;
+  const handleMathOperations = (prompt: string, data: any[][]) => {
+    if (!data || data.length <= 1) return null;
     
-    const [, col1, row1, col2, row2] = cellAddMatch;
-    const colIndex1 = col1.charCodeAt(0) - 65;
-    const colIndex2 = col2.charCodeAt(0) - 65;
-    const rowIndex1 = parseInt(row1) - 1;
-    const rowIndex2 = parseInt(row2) - 1;
+    const lowerPrompt = prompt.toLowerCase();
+    const headers = data[0];
     
-    if (rowIndex1 >= 0 && rowIndex1 < data.length && colIndex1 >= 0 && colIndex1 < (data[rowIndex1]?.length || 0) &&
-        rowIndex2 >= 0 && rowIndex2 < data.length && colIndex2 >= 0 && colIndex2 < (data[rowIndex2]?.length || 0)) {
-      
-      const val1 = parseFloat(String(data[rowIndex1][colIndex1]));
-      const val2 = parseFloat(String(data[rowIndex2][colIndex2]));
-      
-      if (!isNaN(val1) && !isNaN(val2)) {
-        const result = val1 + val2;
-        return `<strong>Cell Addition Result:</strong><br><br>${col1}${row1} (${val1}) + ${col2}${row2} (${val2}) = <strong>${result}</strong>`;
+    // Find column by name or letter
+    const getColumnIndex = (columnRef: string) => {
+      // Check if it's a letter (A, B, C)
+      if (/^[A-Z]$/i.test(columnRef)) {
+        return columnRef.toUpperCase().charCodeAt(0) - 65;
+      }
+      // Check if it's a column name
+      return headers.findIndex(h => String(h).toLowerCase().includes(columnRef.toLowerCase()));
+    };
+    
+    // Get numeric values from column
+    const getColumnValues = (colIndex: number) => {
+      if (colIndex < 0 || colIndex >= headers.length) return [];
+      return data.slice(1).map(row => parseFloat(String(row[colIndex] || ''))).filter(n => !isNaN(n));
+    };
+    
+    // Basic math operations
+    if (lowerPrompt.includes('average')) {
+      const colMatch = lowerPrompt.match(/average\s+(?:of\s+)?(?:column\s+)?([a-z0-9:]+)/i);
+      if (colMatch) {
+        const colIndex = getColumnIndex(colMatch[1]);
+        const values = getColumnValues(colIndex);
+        if (values.length > 0) {
+          const avg = values.reduce((a, b) => a + b, 0) / values.length;
+          return `<strong>Average Result:</strong><br><br>Average of ${headers[colIndex]}: <strong>${avg.toFixed(2)}</strong><br>Values processed: ${values.length}`;
+        }
       }
     }
     
-    return `<strong>Error:</strong> Could not find numeric values in specified cells`;
+    if (lowerPrompt.includes('count')) {
+      const colMatch = lowerPrompt.match(/count\s+(?:of\s+)?(?:column\s+)?([a-z0-9:]+)/i);
+      if (colMatch) {
+        const colIndex = getColumnIndex(colMatch[1]);
+        const values = getColumnValues(colIndex);
+        return `<strong>Count Result:</strong><br><br>Count of numeric values in ${headers[colIndex]}: <strong>${values.length}</strong>`;
+      }
+    }
+    
+    if (lowerPrompt.includes('max')) {
+      const colMatch = lowerPrompt.match(/max\s+(?:of\s+)?(?:column\s+)?([a-z0-9:]+)/i);
+      if (colMatch) {
+        const colIndex = getColumnIndex(colMatch[1]);
+        const values = getColumnValues(colIndex);
+        if (values.length > 0) {
+          const max = Math.max(...values);
+          return `<strong>Maximum Result:</strong><br><br>Maximum value in ${headers[colIndex]}: <strong>${max}</strong>`;
+        }
+      }
+    }
+    
+    if (lowerPrompt.includes('min')) {
+      const colMatch = lowerPrompt.match(/min\s+(?:of\s+)?(?:column\s+)?([a-z0-9:]+)/i);
+      if (colMatch) {
+        const colIndex = getColumnIndex(colMatch[1]);
+        const values = getColumnValues(colIndex);
+        if (values.length > 0) {
+          const min = Math.min(...values);
+          return `<strong>Minimum Result:</strong><br><br>Minimum value in ${headers[colIndex]}: <strong>${min}</strong>`;
+        }
+      }
+    }
+    
+    // Cell operations
+    const cellAddMatch = prompt.match(/([A-Z])(\d+)\s*\+\s*([A-Z])(\d+)/i);
+    const cellSubMatch = prompt.match(/([A-Z])(\d+)\s*-\s*([A-Z])(\d+)/i);
+    const cellMulMatch = prompt.match(/([A-Z])(\d+)\s*\*\s*([A-Z])(\d+)/i);
+    const cellDivMatch = prompt.match(/([A-Z])(\d+)\s*\/\s*([A-Z])(\d+)/i);
+    
+    const performCellOperation = (match: RegExpMatchArray, operation: string, symbol: string) => {
+      const [, col1, row1, col2, row2] = match;
+      const colIndex1 = col1.charCodeAt(0) - 65;
+      const colIndex2 = col2.charCodeAt(0) - 65;
+      const rowIndex1 = parseInt(row1) - 1;
+      const rowIndex2 = parseInt(row2) - 1;
+      
+      if (rowIndex1 >= 0 && rowIndex1 < data.length && colIndex1 >= 0 && colIndex1 < (data[rowIndex1]?.length || 0) &&
+          rowIndex2 >= 0 && rowIndex2 < data.length && colIndex2 >= 0 && colIndex2 < (data[rowIndex2]?.length || 0)) {
+        
+        const val1 = parseFloat(String(data[rowIndex1][colIndex1]));
+        const val2 = parseFloat(String(data[rowIndex2][colIndex2]));
+        
+        if (!isNaN(val1) && !isNaN(val2)) {
+          let result;
+          switch (operation) {
+            case 'add': result = val1 + val2; break;
+            case 'subtract': result = val1 - val2; break;
+            case 'multiply': result = val1 * val2; break;
+            case 'divide': result = val2 !== 0 ? val1 / val2 : 'Error: Division by zero'; break;
+          }
+          return `<strong>Cell ${operation} Result:</strong><br><br>${col1}${row1} (${val1}) ${symbol} ${col2}${row2} (${val2}) = <strong>${result}</strong>`;
+        }
+      }
+      return `<strong>Error:</strong> Could not find numeric values in specified cells`;
+    };
+    
+    if (cellAddMatch) return performCellOperation(cellAddMatch, 'add', '+');
+    if (cellSubMatch) return performCellOperation(cellSubMatch, 'subtract', '-');
+    if (cellMulMatch) return performCellOperation(cellMulMatch, 'multiply', '*');
+    if (cellDivMatch) return performCellOperation(cellDivMatch, 'divide', '/');
+    
+    return null;
+  };
+
+  const handleCellOperations = (prompt: string, data: any[][]) => {
+    return handleMathOperations(prompt, data);
   };
 
   const handleProcessAI = async () => {
