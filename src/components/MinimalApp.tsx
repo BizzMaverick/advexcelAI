@@ -167,13 +167,23 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       let sortColumnIndex = 0;
       let sortColumnName = headers[0];
       
-      // Check if specific column mentioned
-      for (let i = 0; i < headers.length; i++) {
-        const headerName = String(headers[i] || '').toLowerCase();
-        if (trimmedPrompt.toLowerCase().includes(headerName)) {
-          sortColumnIndex = i;
-          sortColumnName = headers[i];
-          break;
+      // Check for column letter (A, B, C) or column reference (A1, B1, C1)
+      const colLetterMatch = trimmedPrompt.match(/\b([A-Z])(?:1)?\b/i);
+      if (colLetterMatch) {
+        const colIndex = colLetterMatch[1].toUpperCase().charCodeAt(0) - 65;
+        if (colIndex >= 0 && colIndex < headers.length) {
+          sortColumnIndex = colIndex;
+          sortColumnName = headers[colIndex];
+        }
+      } else {
+        // Check if specific column name mentioned
+        for (let i = 0; i < headers.length; i++) {
+          const headerName = String(headers[i] || '').toLowerCase();
+          if (trimmedPrompt.toLowerCase().includes(headerName)) {
+            sortColumnIndex = i;
+            sortColumnName = headers[i];
+            break;
+          }
         }
       }
       
