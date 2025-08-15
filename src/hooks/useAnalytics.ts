@@ -3,23 +3,14 @@ import analyticsService from '../services/analyticsService';
 
 export function useAnalytics(userId: string) {
   useEffect(() => {
-    // Track page view
+    if (!userId) return;
+    
+    // Track page view only once
     analyticsService.trackEvent('page_view', userId, {
       page: window.location.pathname,
       timestamp: Date.now()
     });
-
-    // Track page abandon on beforeunload
-    const handleBeforeUnload = () => {
-      analyticsService.trackEvent('page_abandon', userId, {
-        page: window.location.pathname,
-        timeSpent: Date.now() - performance.now()
-      });
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [userId]);
+  }, []); // Remove userId dependency to prevent re-running
 
   const trackAction = (action: string, data?: any) => {
     analyticsService.trackEvent(action, userId, data);
