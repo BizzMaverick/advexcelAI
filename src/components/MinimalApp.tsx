@@ -31,6 +31,8 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
   const [formatPainterActive, setFormatPainterActive] = useState(false);
   const [undoStack, setUndoStack] = useState<{ [key: string]: any }[]>([]);
   const [redoStack, setRedoStack] = useState<{ [key: string]: any }[]>([]);
+  const [showFeedbackBox, setShowFeedbackBox] = useState(false);
+  const [feedbackText, setFeedbackText] = useState('');
 
   const saveToUndoStack = (currentFormatting: { [key: string]: any }) => {
     setUndoStack(prev => [...prev, { ...currentFormatting }]);
@@ -1195,50 +1197,119 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
         </main>
         
         {/* Floating Feedback Button */}
-        <div 
-          onClick={() => {
-            const feedback = window.prompt('We value your feedback! Please share your thoughts about Excel AI:');
-            if (feedback && feedback.trim()) {
-              window.alert('Thank you for your feedback! We appreciate your input and will use it to improve Excel AI.');
-            }
-          }}
-          style={{
-            position: 'fixed',
-            bottom: '20px',
-            right: '20px',
-            background: '#ff6b35',
-            color: 'white',
-            padding: '14px 18px',
-            borderRadius: '25px',
-            cursor: 'pointer',
-            boxShadow: '0 4px 16px rgba(255,107,53,0.3)',
-            zIndex: 1000,
-            fontSize: '14px',
-            fontFamily: 'system-ui, -apple-system, sans-serif',
-            fontWeight: '600',
-            border: 'none',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            transition: 'all 0.3s ease'
-          }}
-          onMouseEnter={(e) => {
-            const target = e.target as HTMLElement;
-            target.style.background = '#e55a2b';
-            target.style.transform = 'translateY(-2px)';
-            target.style.boxShadow = '0 6px 20px rgba(255,107,53,0.4)';
-          }}
-          onMouseLeave={(e) => {
-            const target = e.target as HTMLElement;
-            target.style.background = '#ff6b35';
-            target.style.transform = 'translateY(0)';
-            target.style.boxShadow = '0 4px 16px rgba(255,107,53,0.3)';
-          }}
-          title="Send Feedback"
-        >
-          <span style={{ fontSize: '18px' }}>💬</span>
-          Feedback
+        <div style={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 1000 }}>
+          <div 
+            onClick={() => setShowFeedbackBox(!showFeedbackBox)}
+            style={{
+              width: '60px',
+              height: '60px',
+              borderRadius: '50%',
+              background: 'linear-gradient(145deg, #4CAF50, #45a049)',
+              color: 'white',
+              cursor: 'pointer',
+              boxShadow: '0 8px 16px rgba(76,175,80,0.3), inset 0 2px 4px rgba(255,255,255,0.2)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '24px',
+              border: 'none',
+              transition: 'all 0.3s ease',
+              animation: 'spin3d 2s infinite linear'
+            }}
+            onMouseEnter={(e) => {
+              const target = e.target as HTMLElement;
+              target.style.transform = 'scale(1.1)';
+              target.style.boxShadow = '0 12px 24px rgba(76,175,80,0.4), inset 0 2px 4px rgba(255,255,255,0.3)';
+            }}
+            onMouseLeave={(e) => {
+              const target = e.target as HTMLElement;
+              target.style.transform = 'scale(1)';
+              target.style.boxShadow = '0 8px 16px rgba(76,175,80,0.3), inset 0 2px 4px rgba(255,255,255,0.2)';
+            }}
+            title="Give Feedback"
+          >
+            👍
+          </div>
+          
+          {showFeedbackBox && (
+            <div style={{
+              position: 'absolute',
+              bottom: '70px',
+              right: '0',
+              width: '300px',
+              background: 'white',
+              borderRadius: '12px',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+              padding: '20px',
+              border: '1px solid #e1e5e9'
+            }}>
+              <h4 style={{ margin: '0 0 12px 0', color: '#232f3e', fontSize: '16px' }}>Send Feedback</h4>
+              <textarea
+                value={feedbackText}
+                onChange={(e) => setFeedbackText(e.target.value)}
+                placeholder="Share your thoughts about Excel AI..."
+                style={{
+                  width: '100%',
+                  height: '80px',
+                  border: '1px solid #d5d9d9',
+                  borderRadius: '6px',
+                  padding: '8px',
+                  fontSize: '14px',
+                  fontFamily: 'system-ui, -apple-system, sans-serif',
+                  resize: 'none',
+                  outline: 'none'
+                }}
+              />
+              <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                <button
+                  onClick={() => {
+                    if (feedbackText.trim()) {
+                      alert('Thank you for your feedback! We appreciate your input.');
+                      setFeedbackText('');
+                      setShowFeedbackBox(false);
+                    }
+                  }}
+                  style={{
+                    background: '#4CAF50',
+                    color: 'white',
+                    border: 'none',
+                    padding: '8px 16px',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '500'
+                  }}
+                >
+                  Send
+                </button>
+                <button
+                  onClick={() => {
+                    setShowFeedbackBox(false);
+                    setFeedbackText('');
+                  }}
+                  style={{
+                    background: '#f5f5f5',
+                    color: '#333',
+                    border: '1px solid #d5d9d9',
+                    padding: '8px 16px',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '14px'
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
         </div>
+        
+        <style>{`
+          @keyframes spin3d {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(360deg); }
+          }
+        `}</style>
       </div>
     </ErrorBoundary>
   );
