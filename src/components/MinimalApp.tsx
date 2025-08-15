@@ -150,7 +150,11 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     }
   }, []);
 
-  const handleProcessAI = useCallback(async () => {
+  const handleProcessAI = useCallback(async (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     const trimmedPrompt = prompt.trim();
     if (!trimmedPrompt) {
       setAiResponse('Error: Please enter a command');
@@ -516,7 +520,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       setIsProcessing(false);
       setPrompt('');
     }
-  }, [prompt, selectedFile, fileData]);
+  }, [prompt, selectedFile, fileData, trackAction, trackAIInteraction, trackError, user.email, onTrialRefresh]);
 
   // Handle Excel cell operations locally
   const handleCellOperations = useCallback((prompt: string, data: any[][]) => {
@@ -1301,17 +1305,17 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             </svg>
             <h3 style={{ margin: 0, fontSize: typography.sizes.xl, color: '#333', fontFamily: typography.fontFamily, fontWeight: typography.weights.semibold }}>Ask AI</h3>
           </div>
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!isProcessing && selectedFile && prompt.trim()) {
+              handleProcessAI(e);
+            }
+          }} style={{ display: 'flex', gap: '8px' }}>
             <input 
               type="text"
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !isProcessing && selectedFile && prompt.trim()) {
-                  e.preventDefault();
-                  handleProcessAI();
-                }
-              }}
               placeholder="Ask about your data..."
               style={{ 
                 flex: 1,
@@ -1324,11 +1328,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
               }}
             />
             <button 
-              type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                handleProcessAI();
-              }}
+              type="submit"
               disabled={isProcessing || !selectedFile || !prompt.trim()}
               style={{ 
                 background: '#0078d4',
@@ -1365,7 +1365,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                 </svg>
               )}
             </button>
-          </div>
+          </form>
         </div>
         
 
