@@ -140,11 +140,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     }
   }, []);
 
-  const handleProcessAI = useCallback(async (e?: React.FormEvent) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
+  const handleProcessAI = useCallback(async () => {
     const trimmedPrompt = prompt.trim();
     if (!trimmedPrompt) {
       setAiResponse('Error: Please enter a command');
@@ -1290,17 +1286,19 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             </svg>
             <h3 style={{ margin: 0, fontSize: typography.sizes.xl, color: '#333', fontFamily: typography.fontFamily, fontWeight: typography.weights.semibold }}>Ask AI</h3>
           </div>
-          <form onSubmit={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (!isProcessing && selectedFile && prompt.trim()) {
-              handleProcessAI(e);
-            }
-          }} style={{ display: 'flex', gap: '8px' }}>
+          <div style={{ display: 'flex', gap: '8px' }}>
             <input 
               type="text"
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  if (!isProcessing && selectedFile && prompt.trim()) {
+                    handleProcessAI();
+                  }
+                }
+              }}
               placeholder="Ask about your data..."
               style={{ 
                 flex: 1,
@@ -1313,7 +1311,12 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
               }}
             />
             <button 
-              type="submit"
+              type="button"
+              onClick={() => {
+                if (!isProcessing && selectedFile && prompt.trim()) {
+                  handleProcessAI();
+                }
+              }}
               disabled={isProcessing || !selectedFile || !prompt.trim()}
               style={{ 
                 background: '#0078d4',
@@ -1350,7 +1353,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                 </svg>
               )}
             </button>
-          </form>
+          </div>
         </div>
         
 
@@ -1635,8 +1638,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                   📊 <strong>Results ready!</strong> Choose an action:
                 </p>
                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                  <button type="button" onClick={(e) => {
-                    e.preventDefault();
+                  <button type="button" onClick={() => {
                     applyChangesToMainSheet();
                   }} style={{
                     background: '#10b981',
@@ -1650,8 +1652,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                   }}>
                     📋 Apply to Main Sheet
                   </button>
-                  <button type="button" onClick={(e) => {
-                    e.preventDefault();
+                  <button type="button" onClick={() => {
                     resetToOriginal();
                   }} style={{
                     background: '#6c757d',
