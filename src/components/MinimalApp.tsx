@@ -293,7 +293,25 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       const result = [headers, ...dataRows];
       setLastAiResult(result);
       setShowUseResultButton(true);
-      setAiResponse(`<strong>Data sorted successfully!</strong><br><br>Data has been sorted by ${sortColumnName}. Click "Apply to Main Sheet" to use the sorted data.`);
+      let response = `<strong>Data sorted by ${sortColumnName}:</strong><br><br>`;
+      response += '<div style="max-height: 400px; overflow: auto;"><table style="border-collapse: collapse; width: 100%; margin-top: 10px;">';
+      response += '<thead><tr style="background: #f0f8ff;">';
+      headers.forEach(header => {
+        response += `<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">${header}</th>`;
+      });
+      response += '</tr></thead><tbody>';
+      dataRows.slice(0, 20).forEach((row, index) => {
+        response += `<tr style="${index % 2 === 0 ? 'background: #fafafa;' : ''}">`;
+        row.forEach(cell => {
+          response += `<td style="border: 1px solid #ddd; padding: 8px;">${cell || 'N/A'}</td>`;
+        });
+        response += '</tr>';
+      });
+      response += '</tbody></table></div>';
+      if (dataRows.length > 20) {
+        response += `<br><em>Showing first 20 rows of ${dataRows.length} sorted rows</em>`;
+      }
+      setAiResponse(response);
       setPrompt('');
       return;
     }
@@ -504,60 +522,6 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       }
     }
 
-
-
-    // Handle sorting
-    if (trimmedPrompt.toLowerCase().includes('sort')) {
-      const sortedData = [...fileData];
-      const headers = sortedData[0];
-      const dataRows = sortedData.slice(1);
-      
-      // Find column to sort by
-      let sortColumnIndex = 0;
-      let sortColumnName = headers[0];
-      
-      // Check for column letter (A, B, C) or column reference (A1, B1, C1)
-      const colLetterMatch = trimmedPrompt.match(/\b([A-Z])(?:1)?\b/i);
-      if (colLetterMatch) {
-        const colIndex = colLetterMatch[1].toUpperCase().charCodeAt(0) - 65;
-        if (colIndex >= 0 && colIndex < headers.length) {
-          sortColumnIndex = colIndex;
-          sortColumnName = headers[colIndex];
-        }
-      } else {
-        // Check if specific column name mentioned
-        for (let i = 0; i < headers.length; i++) {
-          const headerName = String(headers[i] || '').toLowerCase();
-          if (trimmedPrompt.toLowerCase().includes(headerName)) {
-            sortColumnIndex = i;
-            sortColumnName = headers[i];
-            break;
-          }
-        }
-      }
-      
-      dataRows.sort((a, b) => {
-        const aVal = String(a[sortColumnIndex] || '').toLowerCase();
-        const bVal = String(b[sortColumnIndex] || '').toLowerCase();
-        
-        // Try numeric sort first
-        const aNum = parseFloat(aVal);
-        const bNum = parseFloat(bVal);
-        if (!isNaN(aNum) && !isNaN(bNum)) {
-          return aNum - bNum;
-        }
-        
-        // Fall back to alphabetical
-        return aVal.localeCompare(bVal);
-      });
-      
-      const result = [headers, ...dataRows];
-      setLastAiResult(result);
-      setShowUseResultButton(true);
-      setAiResponse(`<strong>Data sorted successfully!</strong><br><br>Data has been sorted by ${sortColumnName}. Click "Apply to Main Sheet" to use the sorted data.`);
-      setPrompt('');
-      return;
-    }
     
     setIsProcessing(true);
     setAiResponse('');
