@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import analyticsService from '../services/analyticsService';
+import { typography } from '../styles/typography';
 
 export default function AnalyticsDashboard() {
   const [painPoints, setPainPoints] = useState<any>(null);
@@ -27,8 +28,8 @@ export default function AnalyticsDashboard() {
   }
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'system-ui, sans-serif' }}>
-      <h2 style={{ marginBottom: '20px', color: '#333' }}>Analytics Dashboard</h2>
+    <div style={{ padding: '20px', fontFamily: typography.fontFamily }}>
+      <h2 style={{ marginBottom: '20px', color: '#333', fontFamily: typography.fontFamily, fontSize: typography.sizes['3xl'], fontWeight: typography.weights.bold }}>Analytics Dashboard</h2>
       
       <div style={{ display: 'grid', gap: '20px', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
         {/* Pain Points */}

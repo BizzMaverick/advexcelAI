@@ -1,13 +1,6 @@
 import { useState } from 'react';
 import analyticsService from '../services/analyticsService';
-
-// Add Amazon Ember font if not already loaded
-if (!document.querySelector('link[href*="amazon-ember"]')) {
-  const link = document.createElement('link');
-  link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap';
-  link.rel = 'stylesheet';
-  document.head.appendChild(link);
-}
+import { typography } from '../styles/typography';
 
 interface FeedbackWidgetProps {
   promptId?: string;
@@ -54,9 +47,9 @@ export default function FeedbackWidget({ promptId, onClose }: FeedbackWidgetProp
           padding: '8px 16px',
           cursor: 'pointer',
           boxShadow: '0 2px 5px rgba(15,17,17,.15)',
-          fontSize: '13px',
-          fontWeight: '400',
-          fontFamily: 'Amazon Ember, Arial, sans-serif',
+          fontSize: typography.sizes.sm,
+          fontWeight: typography.weights.normal,
+          fontFamily: typography.fontFamily,
           transition: 'all 0.15s ease',
           display: 'flex',
           alignItems: 'center',
@@ -91,7 +84,7 @@ export default function FeedbackWidget({ promptId, onClose }: FeedbackWidgetProp
       width: '320px',
       boxShadow: '0 4px 8px rgba(15,17,17,.15), 0 8px 16px rgba(15,17,17,.15)',
       zIndex: 1000,
-      fontFamily: 'Amazon Ember, Arial, sans-serif'
+      fontFamily: typography.fontFamily
     }}>
       {submitted ? (
         <div style={{ textAlign: 'center' }}>
@@ -107,12 +100,12 @@ export default function FeedbackWidget({ promptId, onClose }: FeedbackWidgetProp
             color: 'white',
             fontSize: '18px'
           }}>✓</div>
-          <p style={{ margin: 0, color: '#0f1111', fontSize: '14px', fontWeight: '400' }}>Thank you for your feedback!</p>
+          <p style={{ margin: 0, color: '#0f1111', fontSize: typography.sizes.base, fontWeight: typography.weights.normal, fontFamily: typography.fontFamily }}>Thank you for your feedback!</p>
         </div>
       ) : (
         <>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <h3 style={{ margin: 0, fontSize: '16px', color: '#0f1111', fontWeight: '700' }}>How was your experience?</h3>
+            <h3 style={{ margin: 0, fontSize: typography.sizes.lg, color: '#0f1111', fontWeight: typography.weights.bold, fontFamily: typography.fontFamily }}>How was your experience?</h3>
             <button
               onClick={() => setIsOpen(false)}
               style={{ 
@@ -132,7 +125,7 @@ export default function FeedbackWidget({ promptId, onClose }: FeedbackWidgetProp
           </div>
           
           <div style={{ marginBottom: '16px' }}>
-            <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#0f1111', fontWeight: '400' }}>Rate this response:</p>
+            <p style={{ margin: '0 0 8px 0', fontSize: typography.sizes.sm, color: '#0f1111', fontWeight: typography.weights.normal, fontFamily: typography.fontFamily }}>Rate this response:</p>
             <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
               {[1, 2, 3, 4, 5].map(star => (
                 <button
@@ -177,10 +170,10 @@ export default function FeedbackWidget({ promptId, onClose }: FeedbackWidgetProp
               padding: '8px',
               border: '1px solid #d5d9d9',
               borderRadius: '4px',
-              fontSize: '13px',
+              fontSize: typography.sizes.sm,
               resize: 'none',
               boxSizing: 'border-box',
-              fontFamily: 'Amazon Ember, Arial, sans-serif',
+              fontFamily: typography.fontFamily,
               outline: 'none'
             }}
             onFocus={(e) => e.currentTarget.style.borderColor = '#007eb9'}
@@ -199,9 +192,9 @@ export default function FeedbackWidget({ promptId, onClose }: FeedbackWidgetProp
               borderRadius: '4px',
               cursor: rating > 0 ? 'pointer' : 'not-allowed',
               marginTop: '12px',
-              fontSize: '13px',
-              fontWeight: '400',
-              fontFamily: 'Amazon Ember, Arial, sans-serif',
+              fontSize: typography.sizes.sm,
+              fontWeight: typography.weights.normal,
+              fontFamily: typography.fontFamily,
               transition: 'all 0.15s ease'
             }}
             onMouseEnter={(e) => {

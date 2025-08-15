@@ -3,6 +3,7 @@ import logo from './assets/logo.png';
 import authService from './services/authService';
 import emailService from './services/emailService';
 import VerificationScreen from './components/VerificationScreen';
+import { typography } from './styles/typography';
 
 interface LandingPageProps {
   onLogin: (userData: { email: string; name: string }) => void;
@@ -501,7 +502,7 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
     <div style={{
       minHeight: '100vh',
       background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
-      fontFamily: '"Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif',
+      fontFamily: typography.fontFamily,
     }}>
       {/* Logo at top center */}
       <div style={{

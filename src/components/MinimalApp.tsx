@@ -8,6 +8,7 @@ import { downloadFormattedExcel, downloadCSV } from '../utils/excelExport';
 import PaymentService from '../services/paymentService';
 import FeedbackWidget from './FeedbackWidget';
 import { useAnalytics } from '../hooks/useAnalytics';
+import { typography } from '../styles/typography';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const MAX_ROWS = 1000;
@@ -1121,7 +1122,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
 
   return (
     <ErrorBoundary>
-    <div style={{ minHeight: '100vh', fontFamily: 'Arial, sans-serif' }}>
+    <div style={{ minHeight: '100vh', fontFamily: typography.fontFamily }}>
       {/* Simple Mobile Header */}
       <header style={{ 
         background: '#0078d4', 
@@ -1133,7 +1134,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <img src={logo} alt="Logo" style={{ height: '24px' }} />
-          <span style={{ fontSize: '14px', fontWeight: 'bold' }}>Excel AI</span>
+          <span style={{ fontSize: typography.sizes.base, fontWeight: typography.weights.semibold, fontFamily: typography.fontFamily }}>Excel AI</span>
         </div>
         <button onClick={onLogout} style={{ 
           background: 'rgba(255,255,255,0.2)', 
@@ -1142,7 +1143,9 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           padding: '6px 12px', 
           borderRadius: '4px', 
           cursor: 'pointer',
-          fontSize: '12px'
+          fontSize: typography.sizes.xs,
+          fontFamily: typography.fontFamily,
+          fontWeight: typography.weights.medium
         }}>
           Logout
         </button>
@@ -1163,7 +1166,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
               <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               <polyline points="14,2 14,8 20,8" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-            <h3 style={{ margin: 0, fontSize: '18px', color: '#333' }}>Upload File</h3>
+            <h3 style={{ margin: 0, fontSize: typography.sizes.xl, color: '#333', fontFamily: typography.fontFamily, fontWeight: typography.weights.semibold }}>Upload File</h3>
           </div>
           <input 
             type="file" 
@@ -1200,7 +1203,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
               <path d="M2 17L12 22L22 17" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M2 12L12 17L22 12" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-            <h3 style={{ margin: 0, fontSize: '18px', color: '#333' }}>Ask AI</h3>
+            <h3 style={{ margin: 0, fontSize: typography.sizes.xl, color: '#333', fontFamily: typography.fontFamily, fontWeight: typography.weights.semibold }}>Ask AI</h3>
           </div>
           <div style={{ display: 'flex', gap: '8px' }}>
             <input 
