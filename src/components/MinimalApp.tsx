@@ -48,8 +48,11 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
   const [frozenColumns, setFrozenColumns] = useState<number>(0);
   const [frozenRows, setFrozenRows] = useState<number>(0); // No freeze by default
 
-  // Analytics tracking
-  const { trackAction, trackError, trackAIInteraction } = useAnalytics(user.email);
+  // Analytics tracking - DISABLED to fix page refresh issue
+  const trackAction = () => {};
+  const trackError = () => {};
+  const trackAIInteraction = () => {};
+  // const { trackAction, trackError, trackAIInteraction } = useAnalytics(user.email);
 
   const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
