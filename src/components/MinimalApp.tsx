@@ -274,6 +274,39 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       return;
     }
 
+    // Handle find and replace
+    if (trimmedPrompt.toLowerCase().includes('replace')) {
+      const replaceMatch = trimmedPrompt.match(/replace\s+['"]?([^'"]+)['"]?\s+with\s+['"]?([^'"]*)['"]?/i);
+      if (replaceMatch) {
+        const [, findText, replaceText] = replaceMatch;
+        const headers = fileData[0];
+        const newData = fileData.map(row => 
+          row.map(cell => 
+            String(cell || '').replace(new RegExp(findText.trim(), 'gi'), replaceText.trim())
+          )
+        );
+        
+        // Count replacements
+        let replacementCount = 0;
+        fileData.forEach(row => {
+          row.forEach(cell => {
+            const matches = String(cell || '').match(new RegExp(findText.trim(), 'gi'));
+            if (matches) replacementCount += matches.length;
+          });
+        });
+        
+        if (replacementCount > 0) {
+          setLastAiResult(newData);
+          setShowUseResultButton(true);
+          setAiResponse(`<strong>Find and Replace completed!</strong><br><br>Replaced "${findText.trim()}" with "${replaceText.trim()}" in ${replacementCount} locations. Click "Apply to Main Sheet" to use the updated data.`);
+        } else {
+          setAiResponse(`<strong>No matches found for "${findText.trim()}"</strong>`);
+        }
+        setPrompt('');
+        return;
+      }
+    }
+
     // Handle data queries with flexible parsing
     const headers = fileData[0];
     const lowerPrompt = trimmedPrompt.toLowerCase();
