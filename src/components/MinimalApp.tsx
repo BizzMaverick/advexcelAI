@@ -1423,18 +1423,11 @@ For immediate assistance, use our in-app feedback system:
 
 2. Contact Information
 
-General Inquiries:
-• Email: info@excelai.com
+All Inquiries:
+• Email: contact@advexcel.online
 • Response time: 24-48 hours
-
-Technical Support:
-• Use the feedback button for fastest response
-• Email: support@excelai.com
-• Include details about your browser, file type, and specific issue
-
-Business & Partnership Inquiries:
-• Email: business@excelai.com
-• For enterprise solutions and custom integrations
+• For technical support, general questions, business inquiries, and partnerships
+• Include details about your browser, file type, and specific issue when reporting problems
 
 3. Before Contacting Support
 To help us assist you better, please:
@@ -1446,12 +1439,12 @@ To help us assist you better, please:
 4. Feature Requests
 We love hearing from our users! Submit feature requests through:
 • The feedback button with "Feature Request" in your message
-• Email: features@excelai.com
+• Email: contact@advexcel.online with subject "Feature Request"
 • Include detailed descriptions of desired functionality
 
 5. Privacy & Security Concerns
 For privacy-related questions or security concerns:
-• Email: privacy@excelai.com
+• Email: contact@advexcel.online with subject "Privacy/Security"
 • Reference our Privacy Policy for detailed information
 • Report security vulnerabilities responsibly
 
