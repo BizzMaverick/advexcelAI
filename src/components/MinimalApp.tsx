@@ -210,6 +210,48 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       return;
     }
 
+    // Handle find duplicates
+    if (trimmedPrompt.toLowerCase().includes('find') && trimmedPrompt.toLowerCase().includes('duplicate')) {
+      const headers = fileData[0];
+      const dataRows = fileData.slice(1);
+      
+      // Find duplicate rows
+      const duplicates: any[][] = [];
+      const seen = new Set();
+      
+      dataRows.forEach(row => {
+        const rowStr = JSON.stringify(row);
+        if (seen.has(rowStr)) {
+          duplicates.push(row);
+        } else {
+          seen.add(rowStr);
+        }
+      });
+      
+      if (duplicates.length > 0) {
+        let response = `<strong>Found ${duplicates.length} duplicate rows:</strong><br><br>`;
+        response += '<table style="border-collapse: collapse; width: 100%; margin-top: 10px;">';
+        response += '<thead><tr style="background: #f0f8ff;">';
+        headers.forEach(header => {
+          response += `<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">${header}</th>`;
+        });
+        response += '</tr></thead><tbody>';
+        duplicates.forEach((row, index) => {
+          response += `<tr style="${index % 2 === 0 ? 'background: #fafafa;' : ''}">`;
+          row.forEach(cell => {
+            response += `<td style="border: 1px solid #ddd; padding: 8px;">${cell || 'N/A'}</td>`;
+          });
+          response += '</tr>';
+        });
+        response += '</tbody></table>';
+        setAiResponse(response);
+      } else {
+        setAiResponse('<strong>No duplicate rows found!</strong>');
+      }
+      setPrompt('');
+      return;
+    }
+
     // Handle remove duplicates
     if (trimmedPrompt.toLowerCase().includes('remove') && trimmedPrompt.toLowerCase().includes('duplicate')) {
       const headers = fileData[0];
