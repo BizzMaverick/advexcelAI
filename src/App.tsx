@@ -13,13 +13,9 @@ import TrialStatus from './components/TrialStatus';
 import PaymentService from './services/paymentService';
 import authService from './services/authService';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
-import { injectInterFont } from './styles/typography';
 
 function App() {
-  // Inject Inter font for uniform typography
-  useEffect(() => {
-    injectInterFont();
-  }, []);
+  // Font injection removed to prevent potential refresh issues
 
   const [user, setUser] = useState<{ name: string; email: string } | null>(() => {
     const savedUser = localStorage.getItem('advexcel_user');

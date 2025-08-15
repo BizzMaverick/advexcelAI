@@ -6,7 +6,7 @@ import ErrorBoundary from './ErrorBoundary';
 import FormattingToolbar, { FormatStyle } from './FormattingToolbar';
 import { downloadFormattedExcel, downloadCSV } from '../utils/excelExport';
 import PaymentService from '../services/paymentService';
-import FeedbackWidget from './FeedbackWidget';
+
 import { typography } from '../styles/typography';
 import { PivotOperations } from '../utils/pivotOperations';
 
@@ -1696,8 +1696,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
         )}
       </main>
       
-      {/* Feedback Widget */}
-      <FeedbackWidget promptId={currentPromptId} />
+
       
       {/* Footer with Legal Links */}
       <footer style={{
