@@ -633,8 +633,8 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                 borderRadius: '4px', 
                 cursor: 'pointer'
               }}
-              onMouseEnter={(e) => e.target.style.background = 'rgba(255,255,255,0.3)'}
-              onMouseLeave={(e) => e.target.style.background = 'rgba(255,255,255,0.2)'}
+              onMouseEnter={(e) => (e.target as HTMLElement).style.background = 'rgba(255,255,255,0.3)'}
+              onMouseLeave={(e) => (e.target as HTMLElement).style.background = 'rgba(255,255,255,0.2)'}
             >
               💬 Feedback
             </button>
