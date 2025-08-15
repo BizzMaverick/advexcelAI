@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import React from 'react';
 import * as XLSX from 'xlsx';
 import emailjs from '@emailjs/browser';
 import logo from '../assets/logo.png';
 import bedrockService from '../services/bedrockService';
+import PaymentService from '../services/paymentService';
 import ErrorBoundary from './ErrorBoundary';
 
 interface User {
@@ -13,9 +15,18 @@ interface User {
 interface MinimalAppProps {
   user: User;
   onLogout: () => void;
+  trialStatus?: {
+    hasValidPayment: boolean;
+    inTrial?: boolean;
+    trialExpired?: boolean;
+    promptsRemaining?: number;
+    promptsUsed?: number;
+    isAdmin?: boolean;
+  };
+  onTrialRefresh?: () => void;
 }
 
-export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
+export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh }: MinimalAppProps) {
   const [prompt, setPrompt] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileData, setFileData] = useState<any[][]>([]);
@@ -36,6 +47,41 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
   const [feedbackText, setFeedbackText] = useState('');
   const [showLegalModal, setShowLegalModal] = useState(false);
   const [legalContent, setLegalContent] = useState({ title: '', content: '' });
+
+  // Generate device fingerprint for single device login
+  const getDeviceFingerprint = () => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    ctx!.textBaseline = 'top';
+    ctx!.font = '14px Arial';
+    ctx!.fillText('Device fingerprint', 2, 2);
+    
+    const fingerprint = [
+      navigator.userAgent,
+      navigator.language,
+      screen.width + 'x' + screen.height,
+      new Date().getTimezoneOffset(),
+      canvas.toDataURL()
+    ].join('|');
+    
+    // Create a simple hash
+    let hash = 0;
+    for (let i = 0; i < fingerprint.length; i++) {
+      const char = fingerprint.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    return Math.abs(hash).toString(36);
+  };
+
+  // Check device on component mount
+  React.useEffect(() => {
+    const deviceId = getDeviceFingerprint();
+    localStorage.setItem('device_id', deviceId);
+    
+    // Send device info with first API call for validation
+    console.log('Device ID:', deviceId);
+  }, []);
 
   const saveToUndoStack = (currentFormatting: { [key: string]: any }) => {
     setUndoStack(prev => [...prev, { ...currentFormatting }]);
@@ -258,6 +304,36 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
     if (!trimmedPrompt || !selectedFile || fileData.length === 0) {
       setAiResponse('Error: Please enter a command and select a file first');
       return;
+    }
+
+    // Check if user can use a prompt (trial/payment limits)
+    if (!trialStatus?.isAdmin) {
+      const deviceId = localStorage.getItem('device_id') || getDeviceFingerprint();
+      const promptCheck = await PaymentService.canUsePrompt(user.email);
+      
+      // Note: Device validation should be handled in the backend PaymentService
+      // For now, we'll add device info to future API calls
+      
+      if (!promptCheck.canUse) {
+        if (promptCheck.reason === 'trial_expired') {
+          setAiResponse('⏰ <strong>Trial Expired!</strong><br><br>Your 3-day free trial has ended. Please upgrade to continue using Excel AI Assistant.');
+          return;
+        } else if (promptCheck.reason === 'daily_limit_reached') {
+          setAiResponse('📊 <strong>Daily Limit Reached!</strong><br><br>You have used all 25 prompts for today. Your limit will reset tomorrow, or upgrade for unlimited access.');
+          return;
+        } else if (promptCheck.reason === 'no_payment') {
+          setAiResponse('💳 <strong>Payment Required!</strong><br><br>Please complete payment to access Excel AI Assistant.');
+          return;
+        } else {
+          setAiResponse(`❌ <strong>Access Denied:</strong><br><br>${promptCheck.reason || 'Please check your subscription status.'}`);
+          return;
+        }
+      }
+      
+      // Show remaining prompts for trial users
+      if (trialStatus?.inTrial && promptCheck.promptsRemaining !== undefined) {
+        console.log(`Prompts remaining today: ${promptCheck.promptsRemaining}`);
+      }
     }
     
     // Handle local operations first
@@ -661,10 +737,24 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
 
           {/* AI Command */}
           <div style={{ background: 'white', borderRadius: '8px', padding: '20px', marginBottom: '20px', color: '#333' }}>
-            <h3 style={{ margin: '0 0 15px 0', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '18px' }}>🤖</span>
-              Ask AI
-            </h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+              <h3 style={{ margin: 0, color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '18px' }}>🤖</span>
+                Ask AI
+              </h3>
+              {trialStatus?.inTrial && (
+                <div style={{ 
+                  background: '#e7f3ff', 
+                  color: '#0078d4', 
+                  padding: '4px 12px', 
+                  borderRadius: '12px', 
+                  fontSize: '12px', 
+                  fontWeight: '500'
+                }}>
+                  Trial: {trialStatus.promptsRemaining || 0} prompts left today
+                </div>
+              )}
+            </div>
             <div style={{ display: 'flex', gap: '10px' }}>
               <input 
                 type="text"
