@@ -157,156 +157,102 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       return;
     }
 
-    // Handle specific data queries (show X for Y)
-    if (trimmedPrompt.toLowerCase().includes('show') && (trimmedPrompt.toLowerCase().includes('for') || trimmedPrompt.toLowerCase().includes('of'))) {
-      const headers = fileData[0];
-      const lowerPrompt = trimmedPrompt.toLowerCase();
+    // Handle data queries with flexible parsing
+    const headers = fileData[0];
+    const lowerPrompt = trimmedPrompt.toLowerCase();
+    
+    // Find requested columns (flexible matching)
+    const requestedColumns: number[] = [];
+    headers.forEach((header, index) => {
+      const headerWords = String(header).toLowerCase().split(/[\s:]+/);
+      const promptWords = lowerPrompt.split(/\s+/);
       
-      // Find requested columns
-      const requestedColumns: number[] = [];
-      headers.forEach((header, index) => {
-        if (lowerPrompt.includes(String(header).toLowerCase())) {
-          requestedColumns.push(index);
-        }
-      });
+      // Check if any header words match prompt words
+      const hasMatch = headerWords.some(hw => 
+        promptWords.some(pw => hw.includes(pw) || pw.includes(hw))
+      );
       
-      // Find items to search for
-      const searchTerms: string[] = [];
-      const words = trimmedPrompt.split(/\s+/);
-      let foundFor = false;
-      words.forEach(word => {
-        if (word.toLowerCase() === 'for' || word.toLowerCase() === 'of') {
-          foundFor = true;
-        } else if (foundFor && word.length > 2) {
-          searchTerms.push(word.replace(/[,\s]+$/, ''));
-        }
-      });
+      if (hasMatch || lowerPrompt.includes(String(header).toLowerCase())) {
+        requestedColumns.push(index);
+      }
+    });
+    
+    // Find search terms (countries/items) - flexible extraction
+    const searchTerms: string[] = [];
+    const words = trimmedPrompt.split(/\s+/);
+    const stopWords = ['show', 'lookup', 'find', 'get', 'for', 'of', 'and', 'the', 'in', 'with', 'by'];
+    
+    // Extract potential country/item names (capitalized words or known patterns)
+    words.forEach(word => {
+      const cleanWord = word.replace(/[,\s]+$/, '');
+      if (cleanWord.length > 2 && 
+          !stopWords.includes(cleanWord.toLowerCase()) &&
+          !headers.some(h => String(h).toLowerCase().includes(cleanWord.toLowerCase()))) {
+        searchTerms.push(cleanWord);
+      }
+    });
+    
+    if (searchTerms.length > 0) {
+      const matches: any[][] = [];
       
-      if (requestedColumns.length > 0 && searchTerms.length > 0) {
-        const matches: any[][] = [];
-        
-        for (let i = 1; i < fileData.length; i++) {
-          const row = fileData[i];
-          for (const searchTerm of searchTerms) {
-            for (let j = 0; j < row.length; j++) {
-              const cellValue = String(row[j] || '').toLowerCase();
-              if (cellValue.includes(searchTerm.toLowerCase())) {
-                matches.push(row);
-                break;
-              }
+      for (let i = 1; i < fileData.length; i++) {
+        const row = fileData[i];
+        for (const searchTerm of searchTerms) {
+          for (let j = 0; j < row.length; j++) {
+            const cellValue = String(row[j] || '').toLowerCase();
+            if (cellValue.includes(searchTerm.toLowerCase())) {
+              matches.push(row);
+              break;
             }
           }
         }
+      }
+      
+      if (matches.length > 0) {
+        let response = `<strong>Results for ${searchTerms.join(', ')}:</strong><br><br>`;
+        response += '<table style="border-collapse: collapse; width: 100%; margin-top: 10px;">';
+        response += '<thead><tr style="background: #f0f8ff;">';
         
-        if (matches.length > 0) {
-          let response = `<strong>Results for ${searchTerms.join(', ')}:</strong><br><br>`;
-          response += '<table style="border-collapse: collapse; width: 100%; margin-top: 10px;">';
-          response += '<thead><tr style="background: #f0f8ff;">';
+        if (requestedColumns.length > 0) {
           response += '<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Item</th>';
           requestedColumns.forEach(colIndex => {
             response += `<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">${headers[colIndex]}</th>`;
           });
-          response += '</tr></thead><tbody>';
-          matches.forEach((row, index) => {
-            response += `<tr style="${index % 2 === 0 ? 'background: #fafafa;' : ''}">`;
-            response += `<td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">${row[0] || `Item ${index + 1}`}</td>`;
+        } else {
+          headers.forEach(header => {
+            response += `<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">${header}</th>`;
+          });
+        }
+        
+        response += '</tr></thead><tbody>';
+        matches.forEach((row, index) => {
+          response += `<tr style="${index % 2 === 0 ? 'background: #fafafa;' : ''}">`;
+          
+          if (requestedColumns.length > 0) {
+            response += `<td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">${row[0] || 'N/A'}</td>`;
             requestedColumns.forEach(colIndex => {
               response += `<td style="border: 1px solid #ddd; padding: 8px;">${row[colIndex] || 'N/A'}</td>`;
             });
-            response += '</tr>';
-          });
-          response += '</tbody></table>';
-          setAiResponse(response);
-        } else {
-          setAiResponse(`<strong>No matches found for ${searchTerms.join(', ')}</strong>`);
-        }
+          } else {
+            row.forEach(cell => {
+              response += `<td style="border: 1px solid #ddd; padding: 8px;">${cell || 'N/A'}</td>`;
+            });
+          }
+          
+          response += '</tr>';
+        });
+        response += '</tbody></table>';
+        setAiResponse(response);
+        setPrompt('');
+        return;
+      } else {
+        setAiResponse(`<strong>No matches found for ${searchTerms.join(', ')}</strong>`);
         setPrompt('');
         return;
       }
     }
 
-    // Handle lookup
-    if (trimmedPrompt.toLowerCase().includes('lookup') || trimmedPrompt.toLowerCase().includes('find')) {
-      const headers = fileData[0];
-      const lowerPrompt = trimmedPrompt.toLowerCase();
-      
-      // Find requested columns
-      const requestedColumns: number[] = [];
-      headers.forEach((header, index) => {
-        if (lowerPrompt.includes(String(header).toLowerCase())) {
-          requestedColumns.push(index);
-        }
-      });
-      
-      // Extract search terms (country names)
-      const searchTerms: string[] = [];
-      const words = trimmedPrompt.split(/\s+/);
-      let foundOf = false;
-      words.forEach(word => {
-        if (word.toLowerCase() === 'of') {
-          foundOf = true;
-        } else if (foundOf && word.length > 2 && !word.toLowerCase().includes('and')) {
-          searchTerms.push(word.replace(/[,\s]+$/, ''));
-        }
-      });
-      
-      if (searchTerms.length > 0) {
-        const matches: any[][] = [];
-        
-        for (let i = 1; i < fileData.length; i++) {
-          const row = fileData[i];
-          for (const searchTerm of searchTerms) {
-            for (let j = 0; j < row.length; j++) {
-              const cellValue = String(row[j] || '').toLowerCase();
-              if (cellValue.includes(searchTerm.toLowerCase())) {
-                matches.push(row);
-                break;
-              }
-            }
-          }
-        }
-        
-        if (matches.length > 0) {
-          let response = `<strong>Lookup results for ${searchTerms.join(', ')} - Found ${matches.length} matches:</strong><br><br>`;
-          response += '<table style="border-collapse: collapse; width: 100%; margin-top: 10px;">';
-          response += '<thead><tr style="background: #f0f8ff;">';
-          if (requestedColumns.length > 0) {
-            response += '<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Country</th>';
-            requestedColumns.forEach(colIndex => {
-              response += `<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">${headers[colIndex]}</th>`;
-            });
-          } else {
-            headers.forEach(header => {
-              response += `<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">${header}</th>`;
-            });
-          }
-          response += '</tr></thead><tbody>';
-          matches.slice(0, 10).forEach((row, index) => {
-            response += `<tr style="${index % 2 === 0 ? 'background: #fafafa;' : ''}">`;
-            if (requestedColumns.length > 0) {
-              response += `<td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">${row[0] || 'N/A'}</td>`;
-              requestedColumns.forEach(colIndex => {
-                response += `<td style="border: 1px solid #ddd; padding: 8px;">${row[colIndex] || 'N/A'}</td>`;
-              });
-            } else {
-              row.forEach(cell => {
-                response += `<td style="border: 1px solid #ddd; padding: 8px;">${cell || 'N/A'}</td>`;
-              });
-            }
-            response += '</tr>';
-          });
-          response += '</tbody></table>';
-          if (matches.length > 10) {
-            response += `<br><em>... and ${matches.length - 10} more matches</em>`;
-          }
-          setAiResponse(response);
-        } else {
-          setAiResponse(`<strong>No matches found for ${searchTerms.join(', ')}</strong>`);
-        }
-        setPrompt('');
-        return;
-      }
-    }
+
 
     // Handle sorting
     if (trimmedPrompt.toLowerCase().includes('sort')) {
