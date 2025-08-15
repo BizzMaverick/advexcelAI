@@ -274,12 +274,16 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
       return;
     }
 
-    // Handle find and replace
-    if (trimmedPrompt.toLowerCase().includes('replace')) {
-      const replaceMatch = trimmedPrompt.match(/replace\s+['"]?([^'"]+)['"]?\s+with\s+['"]?([^'"]*)['"]?/i);
+    // Handle find and replace (improved pattern matching)
+    const replacePatterns = [
+      /(?:find|replace)\s+([^\s]+)\s+(?:and\s+)?replace\s+(?:with\s+)?([^\s]+)/i,
+      /replace\s+([^\s]+)\s+with\s+([^\s]+)/i
+    ];
+    
+    for (const pattern of replacePatterns) {
+      const replaceMatch = trimmedPrompt.match(pattern);
       if (replaceMatch) {
         const [, findText, replaceText] = replaceMatch;
-        const headers = fileData[0];
         const newData = fileData.map(row => 
           row.map(cell => 
             String(cell || '').replace(new RegExp(findText.trim(), 'gi'), replaceText.trim())
