@@ -1453,13 +1453,7 @@ For privacy-related questions or security concerns:
 • Feedback system monitored 24/7 for urgent issues
 • Response times may vary during weekends and holidays
 
-7. Social Media
-Stay updated with Excel AI:
-• Follow us for product updates and tips
-• Share your success stories and use cases
-• Connect with other Excel AI users
-
-8. Office Location
+7. Office Location
 Excel AI Development Team
 Powered by Amazon Web Services
 Cloud-based operations for global accessibility
