@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import './App.css';
 import MinimalApp from './components/MinimalApp';
 import LandingPage from './LandingPage';
@@ -145,7 +145,10 @@ function App() {
                   trialExpiryDate={trialStatus.trialExpiryDate}
                   promptsRemaining={trialStatus.promptsRemaining || 0}
                   promptsUsed={trialStatus.promptsUsed || 0}
-                  onUpgrade={() => window.location.href = '/payment'}
+                  onUpgrade={() => {
+                    // Prevent page refresh - just show alert for now
+                    alert('Upgrade feature temporarily disabled to prevent data loss. Please contact support.');
+                  }}
                   onRefresh={handleTrialRefresh}
                 />
               )}
