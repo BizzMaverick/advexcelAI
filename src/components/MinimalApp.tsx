@@ -1447,11 +1447,14 @@ We're committed to excellent support and continuous improvement based on your fe
               maxHeight: '70vh',
               overflow: 'auto'
             }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <h3 style={{ margin: 0, color: '#232f3e', textAlign: 'center', flex: 1 }}>{legalContent.title}</h3>
+              <div style={{ position: 'relative', marginBottom: '16px', textAlign: 'center' }}>
+                <h3 style={{ margin: 0, color: '#232f3e' }}>{legalContent.title}</h3>
                 <button
                   onClick={() => setShowLegalModal(false)}
                   style={{
+                    position: 'absolute',
+                    top: 0,
+                    right: 0,
                     background: 'none',
                     border: 'none',
                     fontSize: '20px',
