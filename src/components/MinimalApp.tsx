@@ -814,6 +814,46 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                   >
                     🖌️
                   </button>
+                  
+                  <button 
+                    onClick={handleUndo}
+                    disabled={undoStack.length === 0}
+                    style={{ 
+                      background: undoStack.length > 0 ? '#ffffff' : '#f5f5f5', 
+                      color: undoStack.length > 0 ? '#232f3e' : '#999', 
+                      border: '1px solid #d5d9d9',
+                      padding: '8px 12px', 
+                      borderRadius: '6px',
+                      cursor: undoStack.length > 0 ? 'pointer' : 'not-allowed',
+                      fontSize: '16px',
+                      fontFamily: 'system-ui, -apple-system, sans-serif',
+                      transition: 'all 0.15s ease',
+                      boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                    }}
+                    title="Undo"
+                  >
+                    ↶
+                  </button>
+                  
+                  <button 
+                    onClick={handleRedo}
+                    disabled={redoStack.length === 0}
+                    style={{ 
+                      background: redoStack.length > 0 ? '#ffffff' : '#f5f5f5', 
+                      color: redoStack.length > 0 ? '#232f3e' : '#999', 
+                      border: '1px solid #d5d9d9',
+                      padding: '8px 12px', 
+                      borderRadius: '6px',
+                      cursor: redoStack.length > 0 ? 'pointer' : 'not-allowed',
+                      fontSize: '16px',
+                      fontFamily: 'system-ui, -apple-system, sans-serif',
+                      transition: 'all 0.15s ease',
+                      boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                    }}
+                    title="Redo"
+                  >
+                    ↷
+                  </button>
                 </div>
                 
                 {/* Divider */}
