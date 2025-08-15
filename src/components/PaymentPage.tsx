@@ -82,7 +82,7 @@ export default function PaymentPage({ userEmail, onPaymentSuccess, onBackToLogin
         key: process.env.REACT_APP_RAZORPAY_KEY_ID,
         amount: 24900, // ₹249 in paise
         currency: 'INR',
-        name: 'Excel AI Assistant',
+        name: 'AdvExcel',
         description: 'Monthly Subscription - ₹249/month',
         order_id: orderResult.orderId,
         handler: async function (response: any) {
@@ -107,7 +107,7 @@ export default function PaymentPage({ userEmail, onPaymentSuccess, onBackToLogin
             const verifyResult = await verifyResponse.json();
             
             if (verifyResult.success) {
-              alert('Payment verified successfully! Welcome to Excel AI Assistant.');
+              alert('Payment verified successfully! Welcome to AdvExcel.');
               onPaymentSuccess();
             } else {
               alert('Payment verification failed. Please contact support.');
@@ -180,8 +180,8 @@ export default function PaymentPage({ userEmail, onPaymentSuccess, onBackToLogin
         </h1>
         <p style={{ color: '#666', fontSize: '16px', marginBottom: '30px' }}>
           {trialExpired 
-            ? `Hi ${userEmail}! Your 3-day free trial has ended. Upgrade to continue using Excel AI Assistant.`
-            : `Welcome ${userEmail}! Complete payment to access Excel AI Assistant.`
+            ? `Hi ${userEmail}! Your 3-day free trial has ended. Upgrade to continue using AdvExcel.`
+            : `Welcome ${userEmail}! Complete payment to access AdvExcel.`
           }
         </p>
 
@@ -195,7 +195,7 @@ export default function PaymentPage({ userEmail, onPaymentSuccess, onBackToLogin
           <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#667eea', marginBottom: '10px' }}>
             ₹249<span style={{ fontSize: '16px', fontWeight: 'normal' }}>/month</span>
           </div>
-          <p style={{ color: '#666', fontSize: '14px' }}>Excel AI Assistant Subscription</p>
+          <p style={{ color: '#666', fontSize: '14px' }}>AdvExcel Subscription</p>
         </div>
 
         <button

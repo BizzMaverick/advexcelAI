@@ -316,13 +316,13 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       
       if (!promptCheck.canUse) {
         if (promptCheck.reason === 'trial_expired') {
-          setAiResponse('⏰ <strong>Trial Expired!</strong><br><br>Your 3-day free trial has ended. Please upgrade to continue using Excel AI Assistant.');
+          setAiResponse('⏰ <strong>Trial Expired!</strong><br><br>Your 3-day free trial has ended. Please upgrade to continue using AdvExcel.');
           return;
         } else if (promptCheck.reason === 'daily_limit_reached') {
           setAiResponse('📊 <strong>Daily Limit Reached!</strong><br><br>You have used all 25 prompts for today. Your limit will reset tomorrow, or upgrade for unlimited access.');
           return;
         } else if (promptCheck.reason === 'no_payment') {
-          setAiResponse('💳 <strong>Payment Required!</strong><br><br>Please complete payment to access Excel AI Assistant.');
+          setAiResponse('💳 <strong>Payment Required!</strong><br><br>Please complete payment to access AdvExcel.');
           return;
         } else {
           setAiResponse(`❌ <strong>Access Denied:</strong><br><br>${promptCheck.reason || 'Please check your subscription status.'}`);
@@ -696,7 +696,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <img src={logo} alt="Logo" style={{ height: '24px' }} />
-            <span style={{ fontSize: '16px', fontWeight: '600' }}>Excel AI</span>
+            <span style={{ fontSize: '16px', fontWeight: '600' }}>AdvExcel</span>
           </div>
           <button onClick={onLogout} style={{ 
             background: 'rgba(255,255,255,0.2)', 
