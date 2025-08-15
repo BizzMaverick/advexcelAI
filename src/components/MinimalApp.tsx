@@ -1315,7 +1315,8 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           borderRadius: '8px',
           padding: '20px',
           marginBottom: '15px',
-          textAlign: 'center'
+          textAlign: 'center',
+          color: '#333'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center', marginBottom: '15px' }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1351,7 +1352,8 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           background: 'white',
           borderRadius: '8px',
           padding: '20px',
-          marginBottom: '15px'
+          marginBottom: '15px',
+          color: '#333'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '15px' }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1589,7 +1591,8 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             background: 'white',
             borderRadius: '8px',
             marginBottom: '15px',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            color: '#333'
           }}>
             <div style={{ 
               padding: '15px', 
@@ -1699,7 +1702,8 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           <div style={{ 
             background: 'white',
             borderRadius: '8px',
-            padding: '20px'
+            padding: '20px',
+            color: '#333'
           }}>
             {showUseResultButton && (
               <div style={{ 
