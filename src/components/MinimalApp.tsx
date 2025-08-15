@@ -805,18 +805,18 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                     }}
                   >
                     <option value="">Text Color</option>
-                    <option value="#000000" style={{color: '#000000'}}>Black</option>
-                    <option value="#ffffff" style={{color: '#ffffff', backgroundColor: '#f0f0f0'}}>White</option>
-                    <option value="#e74c3c" style={{color: '#e74c3c'}}>Red</option>
-                    <option value="#3498db" style={{color: '#3498db'}}>Blue</option>
-                    <option value="#2ecc71" style={{color: '#2ecc71'}}>Green</option>
-                    <option value="#f39c12" style={{color: '#f39c12'}}>Orange</option>
-                    <option value="#9b59b6" style={{color: '#9b59b6'}}>Purple</option>
-                    <option value="#1abc9c" style={{color: '#1abc9c'}}>Teal</option>
-                    <option value="#34495e" style={{color: '#34495e'}}>Dark Gray</option>
-                    <option value="#95a5a6" style={{color: '#95a5a6'}}>Light Gray</option>
-                    <option value="#c0392b" style={{color: '#c0392b'}}>Dark Red</option>
-                    <option value="#2980b9" style={{color: '#2980b9'}}>Dark Blue</option>
+                    <option value="#000000" style={{backgroundColor: '#000000', color: '#ffffff'}}>■</option>
+                    <option value="#ffffff" style={{backgroundColor: '#ffffff', color: '#000000', border: '1px solid #ccc'}}>■</option>
+                    <option value="#e74c3c" style={{backgroundColor: '#e74c3c', color: '#ffffff'}}>■</option>
+                    <option value="#3498db" style={{backgroundColor: '#3498db', color: '#ffffff'}}>■</option>
+                    <option value="#2ecc71" style={{backgroundColor: '#2ecc71', color: '#ffffff'}}>■</option>
+                    <option value="#f39c12" style={{backgroundColor: '#f39c12', color: '#ffffff'}}>■</option>
+                    <option value="#9b59b6" style={{backgroundColor: '#9b59b6', color: '#ffffff'}}>■</option>
+                    <option value="#1abc9c" style={{backgroundColor: '#1abc9c', color: '#ffffff'}}>■</option>
+                    <option value="#34495e" style={{backgroundColor: '#34495e', color: '#ffffff'}}>■</option>
+                    <option value="#95a5a6" style={{backgroundColor: '#95a5a6', color: '#ffffff'}}>■</option>
+                    <option value="#c0392b" style={{backgroundColor: '#c0392b', color: '#ffffff'}}>■</option>
+                    <option value="#2980b9" style={{backgroundColor: '#2980b9', color: '#ffffff'}}>■</option>
                   </select>
                 </div>
                 
@@ -856,18 +856,18 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                     }}
                   >
                     <option value="">Cell Color</option>
-                    <option value="#ffffff" style={{backgroundColor: '#ffffff'}}>White</option>
-                    <option value="#f8f9fa" style={{backgroundColor: '#f8f9fa'}}>Light Gray</option>
-                    <option value="#e3f2fd" style={{backgroundColor: '#e3f2fd'}}>Light Blue</option>
-                    <option value="#e8f5e8" style={{backgroundColor: '#e8f5e8'}}>Light Green</option>
-                    <option value="#fff3e0" style={{backgroundColor: '#fff3e0'}}>Light Orange</option>
-                    <option value="#fce4ec" style={{backgroundColor: '#fce4ec'}}>Light Pink</option>
-                    <option value="#f3e5f5" style={{backgroundColor: '#f3e5f5'}}>Light Purple</option>
-                    <option value="#e0f2f1" style={{backgroundColor: '#e0f2f1'}}>Light Teal</option>
-                    <option value="#ffebee" style={{backgroundColor: '#ffebee'}}>Light Red</option>
-                    <option value="#f1f8e9" style={{backgroundColor: '#f1f8e9'}}>Light Lime</option>
-                    <option value="#e8eaf6" style={{backgroundColor: '#e8eaf6'}}>Light Indigo</option>
-                    <option value="#fafafa" style={{backgroundColor: '#fafafa'}}>Very Light Gray</option>
+                    <option value="#000000" style={{backgroundColor: '#000000', color: '#ffffff'}}>■</option>
+                    <option value="#ffffff" style={{backgroundColor: '#ffffff', color: '#000000', border: '1px solid #ccc'}}>■</option>
+                    <option value="#e74c3c" style={{backgroundColor: '#e74c3c', color: '#ffffff'}}>■</option>
+                    <option value="#3498db" style={{backgroundColor: '#3498db', color: '#ffffff'}}>■</option>
+                    <option value="#2ecc71" style={{backgroundColor: '#2ecc71', color: '#ffffff'}}>■</option>
+                    <option value="#f39c12" style={{backgroundColor: '#f39c12', color: '#ffffff'}}>■</option>
+                    <option value="#9b59b6" style={{backgroundColor: '#9b59b6', color: '#ffffff'}}>■</option>
+                    <option value="#1abc9c" style={{backgroundColor: '#1abc9c', color: '#ffffff'}}>■</option>
+                    <option value="#34495e" style={{backgroundColor: '#34495e', color: '#ffffff'}}>■</option>
+                    <option value="#95a5a6" style={{backgroundColor: '#95a5a6', color: '#ffffff'}}>■</option>
+                    <option value="#c0392b" style={{backgroundColor: '#c0392b', color: '#ffffff'}}>■</option>
+                    <option value="#2980b9" style={{backgroundColor: '#2980b9', color: '#ffffff'}}>■</option>
                   </select>
                 </div>
                 
