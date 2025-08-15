@@ -28,20 +28,7 @@ interface MinimalAppProps {
 
 export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh }: MinimalAppProps) {
   console.log('MinimalApp component mounting/re-mounting');
-  
-  // Persist state whenever it changes
-  useEffect(() => {
-    if (fileData.length > 0) {
-      sessionStorage.setItem('fileData', JSON.stringify(fileData));
-    }
-  }, [fileData]);
-  
-  useEffect(() => {
-    if (selectedFile) {
-      sessionStorage.setItem('selectedFile', JSON.stringify({ name: selectedFile.name, size: selectedFile.size }));
-    }
-  }, [selectedFile]);
-  
+
   const [prompt, setPrompt] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(() => {
     // Try to restore from sessionStorage
@@ -73,6 +60,27 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
   const [frozenRows, setFrozenRows] = useState<number>(0); // No freeze by default
 
   // Analytics removed to prevent page refresh issues
+  
+  // Persist state whenever it changes - moved after all state declarations
+  useEffect(() => {
+    try {
+      if (fileData && fileData.length > 0) {
+        sessionStorage.setItem('fileData', JSON.stringify(fileData));
+      }
+    } catch (error) {
+      console.error('Error saving fileData:', error);
+    }
+  }, [fileData]);
+  
+  useEffect(() => {
+    try {
+      if (selectedFile && selectedFile.name) {
+        sessionStorage.setItem('selectedFile', JSON.stringify({ name: selectedFile.name, size: selectedFile.size }));
+      }
+    } catch (error) {
+      console.error('Error saving selectedFile:', error);
+    }
+  }, [selectedFile]);
 
   const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
