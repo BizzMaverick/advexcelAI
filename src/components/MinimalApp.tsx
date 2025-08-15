@@ -617,16 +617,43 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
             <img src={logo} alt="Logo" style={{ height: '24px' }} />
             <span style={{ fontSize: '16px', fontWeight: '600' }}>Excel AI</span>
           </div>
-          <button onClick={onLogout} style={{ 
-            background: 'rgba(255,255,255,0.2)', 
-            border: 'none', 
-            color: 'white', 
-            padding: '6px 12px', 
-            borderRadius: '4px', 
-            cursor: 'pointer'
-          }}>
-            Logout
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button 
+              onClick={() => {
+                const feedback = prompt('We value your feedback! Please share your thoughts about Excel AI:');
+                if (feedback && feedback.trim()) {
+                  alert('Thank you for your feedback! We appreciate your input and will use it to improve Excel AI.');
+                }
+              }}
+              style={{ 
+                background: 'rgba(255,255,255,0.2)', 
+                border: 'none', 
+                color: 'white', 
+                padding: '6px 12px', 
+                borderRadius: '4px', 
+                cursor: 'pointer',
+                fontSize: '13px',
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+              onMouseEnter={(e) => e.target.style.background = 'rgba(255,255,255,0.3)'}
+              onMouseLeave={(e) => e.target.style.background = 'rgba(255,255,255,0.2)'}
+            >
+              💬 Feedback
+            </button>
+            <button onClick={onLogout} style={{ 
+              background: 'rgba(255,255,255,0.2)', 
+              border: 'none', 
+              color: 'white', 
+              padding: '6px 12px', 
+              borderRadius: '4px', 
+              cursor: 'pointer'
+            }}>
+              Logout
+            </button>
+          </div>
         </header>
         
         <main style={{ padding: '20px', background: '#f5f5f5', minHeight: 'calc(100vh - 50px)' }}>
