@@ -282,7 +282,8 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                   padding: '12px', 
                   border: '1px solid #ddd', 
                   borderRadius: '6px',
-                  color: '#333'
+                  color: '#333',
+                  backgroundColor: '#ffffff'
                 }}
               />
               <button 
