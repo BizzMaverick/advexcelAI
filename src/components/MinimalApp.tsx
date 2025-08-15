@@ -677,13 +677,13 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
           {fileData.length > 0 && (
             <div style={{ 
               background: '#ffffff', 
-              padding: '16px 24px', 
+              padding: '12px 16px', 
               marginBottom: '20px', 
               border: '1px solid #e7e7e7',
               borderRadius: '8px',
               boxShadow: '0 1px 3px rgba(0,0,0,0.08)'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'nowrap' }}>
                 {/* Text Style Section */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span style={{ 
