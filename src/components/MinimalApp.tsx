@@ -1205,36 +1205,38 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
           style={{
             position: 'fixed',
             bottom: '20px',
-            left: '20px',
-            background: '#232f3e',
+            right: '20px',
+            background: '#ff6b35',
             color: 'white',
-            padding: '12px 16px',
-            borderRadius: '6px',
+            padding: '14px 18px',
+            borderRadius: '25px',
             cursor: 'pointer',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+            boxShadow: '0 4px 16px rgba(255,107,53,0.3)',
             zIndex: 1000,
             fontSize: '14px',
             fontFamily: 'system-ui, -apple-system, sans-serif',
-            fontWeight: '500',
-            border: '1px solid #d5d9d9',
+            fontWeight: '600',
+            border: 'none',
             display: 'flex',
             alignItems: 'center',
-            gap: '6px',
-            transition: 'all 0.2s ease'
+            gap: '8px',
+            transition: 'all 0.3s ease'
           }}
           onMouseEnter={(e) => {
             const target = e.target as HTMLElement;
-            target.style.background = '#37475a';
-            target.style.transform = 'translateY(-1px)';
+            target.style.background = '#e55a2b';
+            target.style.transform = 'translateY(-2px)';
+            target.style.boxShadow = '0 6px 20px rgba(255,107,53,0.4)';
           }}
           onMouseLeave={(e) => {
             const target = e.target as HTMLElement;
-            target.style.background = '#232f3e';
+            target.style.background = '#ff6b35';
             target.style.transform = 'translateY(0)';
+            target.style.boxShadow = '0 4px 16px rgba(255,107,53,0.3)';
           }}
           title="Send Feedback"
         >
-          <span style={{ fontSize: '16px' }}>📝</span>
+          <span style={{ fontSize: '18px' }}>💬</span>
           Feedback
         </div>
       </div>
