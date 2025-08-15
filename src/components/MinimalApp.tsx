@@ -1279,7 +1279,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                 </p>
               </div>
               <div style={{ maxHeight: '400px', overflow: 'auto' }}>
-                <div dangerouslySetInnerHTML={{ __html: aiResponse.includes('<table') ? aiResponse.split('<br><br>').slice(1).join('<br><br>') : aiResponse.split('<br><br>').slice(1).join('<br><br>') || aiResponse }} />
+                <div style={{ color: '#333', padding: '20px' }} dangerouslySetInnerHTML={{ __html: aiResponse.includes('<table') ? aiResponse.split('<br><br>').slice(1).join('<br><br>') : aiResponse.split('<br><br>').slice(1).join('<br><br>') || aiResponse }} />
               </div>
             </div>
           )}
