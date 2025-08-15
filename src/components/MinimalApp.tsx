@@ -27,6 +27,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
   const [originalFileData, setOriginalFileData] = useState<any[][]>([]);
   const [selectedCells, setSelectedCells] = useState<string[]>([]);
   const [cellFormatting, setCellFormatting] = useState<{ [key: string]: any }>({});
+  const [copiedFormat, setCopiedFormat] = useState<any>(null);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -766,6 +767,84 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                     }}
                   >
                     Italic
+                  </button>
+                  
+                  <button 
+                    onClick={() => {
+                      if (selectedCells.length !== 1) return;
+                      const cellId = selectedCells[0];
+                      const format = cellFormatting[cellId] || {};
+                      setCopiedFormat(format);
+                    }}
+                    disabled={selectedCells.length !== 1}
+                    style={{ 
+                      background: selectedCells.length === 1 ? '#ffffff' : '#f5f5f5', 
+                      color: selectedCells.length === 1 ? '#232f3e' : '#999', 
+                      border: '1px solid #d5d9d9',
+                      padding: '8px 16px', 
+                      borderRadius: '6px',
+                      cursor: selectedCells.length === 1 ? 'pointer' : 'not-allowed',
+                      fontSize: '13px',
+                      fontWeight: '500',
+                      fontFamily: 'system-ui, -apple-system, sans-serif',
+                      transition: 'all 0.15s ease',
+                      boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (selectedCells.length === 1) {
+                        e.target.style.background = '#f7f8f8';
+                        e.target.style.borderColor = '#007185';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (selectedCells.length === 1) {
+                        e.target.style.background = '#ffffff';
+                        e.target.style.borderColor = '#d5d9d9';
+                      }
+                    }}
+                    title="Copy Format (select 1 cell)"
+                  >
+                    Copy Format
+                  </button>
+                  
+                  <button 
+                    onClick={() => {
+                      if (selectedCells.length === 0 || !copiedFormat) return;
+                      const newFormatting = { ...cellFormatting };
+                      selectedCells.forEach(cellId => {
+                        newFormatting[cellId] = { ...copiedFormat };
+                      });
+                      setCellFormatting(newFormatting);
+                    }}
+                    disabled={selectedCells.length === 0 || !copiedFormat}
+                    style={{ 
+                      background: (selectedCells.length > 0 && copiedFormat) ? '#ffffff' : '#f5f5f5', 
+                      color: (selectedCells.length > 0 && copiedFormat) ? '#232f3e' : '#999', 
+                      border: '1px solid #d5d9d9',
+                      padding: '8px 16px', 
+                      borderRadius: '6px',
+                      cursor: (selectedCells.length > 0 && copiedFormat) ? 'pointer' : 'not-allowed',
+                      fontSize: '13px',
+                      fontWeight: '500',
+                      fontFamily: 'system-ui, -apple-system, sans-serif',
+                      transition: 'all 0.15s ease',
+                      boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (selectedCells.length > 0 && copiedFormat) {
+                        e.target.style.background = '#f7f8f8';
+                        e.target.style.borderColor = '#007185';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (selectedCells.length > 0 && copiedFormat) {
+                        e.target.style.background = '#ffffff';
+                        e.target.style.borderColor = '#d5d9d9';
+                      }
+                    }}
+                    title="Paste Format (select cells to apply)"
+                  >
+                    Paste Format
                   </button>
                 </div>
                 
