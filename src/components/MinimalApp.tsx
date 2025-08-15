@@ -812,7 +812,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                     <option value="#2ecc71">🟩 Green</option>
                     <option value="#f39c12">🟧 Orange</option>
                     <option value="#9b59b6">🟪 Purple</option>
-                    <option value="#1abc9c">🟫 Teal</option>
+                    <option value="#1abc9c">🟩 Teal</option>
                     <option value="#34495e">⬛ Dark Gray</option>
                     <option value="#95a5a6">⬜ Light Gray</option>
                     <option value="#c0392b">🟥 Dark Red</option>
@@ -863,7 +863,7 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                     <option value="#2ecc71">🟩 Green</option>
                     <option value="#f39c12">🟧 Orange</option>
                     <option value="#9b59b6">🟪 Purple</option>
-                    <option value="#1abc9c">🟫 Teal</option>
+                    <option value="#1abc9c">🟩 Teal</option>
                     <option value="#34495e">⬛ Dark Gray</option>
                     <option value="#95a5a6">⬜ Light Gray</option>
                     <option value="#c0392b">🟥 Dark Red</option>
