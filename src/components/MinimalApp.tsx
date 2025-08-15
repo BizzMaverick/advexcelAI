@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import * as XLSX from 'xlsx';
+import emailjs from '@emailjs/browser';
 import logo from '../assets/logo.png';
 import bedrockService from '../services/bedrockService';
 import ErrorBoundary from './ErrorBoundary';
@@ -1551,11 +1552,27 @@ We're committed to excellent support and continuous improvement based on your fe
               />
               <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
                 <button
-                  onClick={() => {
+                  onClick={async () => {
                     if (feedbackText.trim()) {
-                      alert('Thank you for your feedback! We appreciate your input.');
-                      setFeedbackText('');
-                      setShowFeedbackBox(false);
+                      try {
+                        await emailjs.send(
+                          'YOUR_SERVICE_ID', // Replace with your EmailJS service ID
+                          'YOUR_TEMPLATE_ID', // Replace with your EmailJS template ID
+                          {
+                            user_email: user.email,
+                            user_name: user.name,
+                            message: feedbackText,
+                            to_email: 'contact@advexcel.online'
+                          },
+                          'YOUR_PUBLIC_KEY' // Replace with your EmailJS public key
+                        );
+                        alert('Thank you for your feedback! We have received your message and will respond soon.');
+                        setFeedbackText('');
+                        setShowFeedbackBox(false);
+                      } catch (error) {
+                        console.error('Failed to send feedback:', error);
+                        alert('Sorry, there was an error sending your feedback. Please try again or email us directly at contact@advexcel.online');
+                      }
                     }
                   }}
                   style={{
