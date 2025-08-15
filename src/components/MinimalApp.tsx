@@ -1181,14 +1181,16 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
                   <span style={{ fontSize: '16px' }}>💬</span>
                   AI Response
                 </h4>
+                <div style={{ marginTop: '5px', fontSize: '12px', opacity: 0.9 }} dangerouslySetInnerHTML={{ 
+                  __html: aiResponse.split('<br><br>')[0] || aiResponse.split('<table')[0] || 'Processing completed'
+                }} />
               </div>
               <div style={{ 
-                background: '#f8f9ff', 
+                background: '#ffffff', 
                 padding: '20px', 
-                border: '1px solid #e6f2fa',
                 color: '#333'
               }}>
-                <div dangerouslySetInnerHTML={{ __html: aiResponse.replace(/\n/g, '<br>') }} />
+                <div dangerouslySetInnerHTML={{ __html: aiResponse.includes('<table') ? aiResponse.split('<br><br>').slice(1).join('<br><br>') : aiResponse.split('<br><br>').slice(1).join('<br><br>') || aiResponse }} />
               </div>
             </div>
           )}
