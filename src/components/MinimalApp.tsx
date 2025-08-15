@@ -161,18 +161,12 @@ export default function MinimalApp({ user, onLogout }: MinimalAppProps) {
     const headers = fileData[0];
     const lowerPrompt = trimmedPrompt.toLowerCase();
     
-    // Find requested columns (flexible matching)
+    // Find requested columns (exact matching)
     const requestedColumns: number[] = [];
     headers.forEach((header, index) => {
-      const headerWords = String(header).toLowerCase().split(/[\s:]+/);
-      const promptWords = lowerPrompt.split(/\s+/);
-      
-      // Check if any header words match prompt words
-      const hasMatch = headerWords.some(hw => 
-        promptWords.some(pw => hw.includes(pw) || pw.includes(hw))
-      );
-      
-      if (hasMatch || lowerPrompt.includes(String(header).toLowerCase())) {
+      const headerStr = String(header).toLowerCase();
+      // Only match if the full column name is mentioned
+      if (lowerPrompt.includes(headerStr)) {
         requestedColumns.push(index);
       }
     });
