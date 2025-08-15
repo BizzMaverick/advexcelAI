@@ -1557,7 +1557,7 @@ We're committed to excellent support and continuous improvement based on your fe
                       try {
                         await emailjs.send(
                           'service_gyuegyb',
-                          'template_8fdq5qr',
+                          'template_16urb42',
                           {
                             user_email: user.email,
                             user_name: user.name,
