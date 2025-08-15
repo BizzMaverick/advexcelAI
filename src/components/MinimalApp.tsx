@@ -717,21 +717,22 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
               <span style={{ fontSize: '18px' }}>📁</span>
               Upload File
             </h3>
-            <input 
-              type="file" 
-              accept=".xlsx,.xls,.csv" 
-              onChange={handleFileUpload}
-              disabled={fileLoading}
-              style={{ 
-                padding: '12px', 
-                border: '2px dashed #0078d4', 
-                borderRadius: '6px', 
-                background: '#f8f9ff',
-                color: '#333',
-                display: 'block',
-                maxWidth: '100%'
-              }}
-            />
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <input 
+                type="file" 
+                accept=".xlsx,.xls,.csv" 
+                onChange={handleFileUpload}
+                disabled={fileLoading}
+                style={{ 
+                  flex: 1,
+                  padding: '12px', 
+                  border: '1px solid #ddd', 
+                  borderRadius: '6px',
+                  color: '#333',
+                  backgroundColor: '#ffffff'
+                }}
+              />
+            </div>
             {fileLoading && <div style={{ marginTop: '10px', color: '#0078d4', fontWeight: 'bold' }}>Loading...</div>}
             {fileError && <div style={{ marginTop: '10px', color: '#e53e3e', fontSize: '12px', fontWeight: 'bold' }}>{fileError}</div>}
           </div>
