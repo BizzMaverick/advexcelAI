@@ -1648,7 +1648,7 @@ We're committed to excellent support and continuous improvement based on your fe
               <textarea
                 value={feedbackText}
                 onChange={(e) => setFeedbackText(e.target.value)}
-                placeholder="Share your thoughts about Excel AI..."
+                placeholder="Share your thoughts about AdvExcel..."
                 style={{
                   width: '100%',
                   height: '80px',
@@ -1658,7 +1658,8 @@ We're committed to excellent support and continuous improvement based on your fe
                   fontSize: '14px',
                   fontFamily: 'system-ui, -apple-system, sans-serif',
                   resize: 'none',
-                  outline: 'none'
+                  outline: 'none',
+                  boxSizing: 'border-box'
                 }}
               />
               <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
