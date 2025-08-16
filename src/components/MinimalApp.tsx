@@ -400,20 +400,30 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       setLastAiResult(result);
       setShowUseResultButton(true);
       let response = `<strong>Data sorted by ${sortColumnName}:</strong><br><br>`;
-      response += '<div style="max-height: 400px; overflow: auto;"><table style="border-collapse: collapse; width: 100%; margin-top: 10px;">';
-      response += '<thead><tr style="background: #f0f8ff;">';
-      headers.forEach(header => {
-        response += `<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">${header}</th>`;
+      response += '<table style="width: 100%; border-collapse: collapse;">';
+      response += '<thead>';
+      response += '<tr style="background: #e6f3ff; border-bottom: 2px solid #0078d4;">';
+      response += '<th style="padding: 8px; font-size: 11px; font-weight: bold; color: #0078d4; border: 1px solid #ddd;">#</th>';
+      headers.forEach((header, index) => {
+        const colLetter = String.fromCharCode(65 + index);
+        response += `<th style="padding: 8px; font-size: 11px; font-weight: bold; color: #0078d4; border: 1px solid #ddd;">${colLetter}</th>`;
       });
       response += '</tr></thead><tbody>';
+      response += '<tr>';
+      response += '<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; font-size: 11px; color: #0078d4; background: #f8f9ff; text-align: center;">1</td>';
+      headers.forEach(header => {
+        response += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; color: #333;">${header}</td>`;
+      });
+      response += '</tr>';
       dataRows.forEach((row, index) => {
-        response += `<tr style="${index % 2 === 0 ? 'background: #fafafa;' : ''}">`;
+        response += '<tr>';
+        response += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; font-size: 11px; color: #0078d4; background: #f8f9ff; text-align: center;">${index + 2}</td>`;
         row.forEach(cell => {
-          response += `<td style="border: 1px solid #ddd; padding: 8px;">${cell || 'N/A'}</td>`;
+          response += `<td style="padding: 8px; border-right: 1px solid #eee; color: #333;">${cell || 'N/A'}</td>`;
         });
         response += '</tr>';
       });
-      response += '</tbody></table></div>';
+      response += '</tbody></table>';
 
       setAiResponse(response);
       setPrompt('');
@@ -444,20 +454,30 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
         setShowUseResultButton(true);
         
         let response = `<strong>Found ${duplicates.length} duplicate rows:</strong><br><br>`;
-        response += '<div style="max-height: 400px; overflow: auto;"><table style="border-collapse: collapse; width: 100%; margin-top: 10px;">';
-        response += '<thead><tr style="background: #f0f8ff;">';
-        headers.forEach(header => {
-          response += `<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">${header}</th>`;
+        response += '<table style="width: 100%; border-collapse: collapse;">';
+        response += '<thead>';
+        response += '<tr style="background: #e6f3ff; border-bottom: 2px solid #0078d4;">';
+        response += '<th style="padding: 8px; font-size: 11px; font-weight: bold; color: #0078d4; border: 1px solid #ddd;">#</th>';
+        headers.forEach((header, index) => {
+          const colLetter = String.fromCharCode(65 + index);
+          response += `<th style="padding: 8px; font-size: 11px; font-weight: bold; color: #0078d4; border: 1px solid #ddd;">${colLetter}</th>`;
         });
         response += '</tr></thead><tbody>';
+        response += '<tr>';
+        response += '<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; font-size: 11px; color: #0078d4; background: #f8f9ff; text-align: center;">1</td>';
+        headers.forEach(header => {
+          response += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; color: #333;">${header}</td>`;
+        });
+        response += '</tr>';
         duplicates.forEach((row, index) => {
-          response += `<tr style="${index % 2 === 0 ? 'background: #fafafa;' : ''}">`;
+          response += '<tr>';
+          response += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; font-size: 11px; color: #0078d4; background: #f8f9ff; text-align: center;">${index + 2}</td>`;
           row.forEach(cell => {
-            response += `<td style="border: 1px solid #ddd; padding: 8px;">${cell || 'N/A'}</td>`;
+            response += `<td style="padding: 8px; border-right: 1px solid #eee; color: #333;">${cell || 'N/A'}</td>`;
           });
           response += '</tr>';
         });
-        response += '</tbody></table></div>';
+        response += '</tbody></table>';
         setAiResponse(response);
       } else {
         setAiResponse('<strong>No duplicate rows found!</strong>');
