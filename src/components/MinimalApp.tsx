@@ -549,6 +549,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
 
     
     // Handle simple lookup
+    const lowerPrompt = trimmedPrompt.toLowerCase();
     if (lowerPrompt.includes('lookup') || lowerPrompt.includes('find')) {
       const headers = fileData[0];
       const dataRows = fileData.slice(1);
