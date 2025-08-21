@@ -555,8 +555,8 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       const dataRows = fileData.slice(1);
       let searchText = trimmedPrompt.replace(/lookup|find|show|e1:|economy|for/gi, '').trim();
       
-      // Extract country names
-      const countries = searchText.split(/,|and/).map(c => c.trim()).filter(c => c.length > 0);
+      // Extract country names - split by comma, 'and', or spaces
+      const countries = searchText.split(/,|\s+and\s+|\s+/).map(c => c.trim()).filter(c => c.length > 2);
       
       if (countries.length > 0) {
         const matches = [];
