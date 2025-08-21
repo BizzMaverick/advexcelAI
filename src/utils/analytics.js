@@ -7,8 +7,35 @@ export const generateChart = (data, prompt) => {
   }
 
   const headers = data[0];
-  const dataRows = data.slice(1);
+  let dataRows = data.slice(1);
   const lowerPrompt = prompt.toLowerCase();
+  
+  // Check if user specified specific countries
+  const countries = [];
+  const words = prompt.split(/[\s,]+/);
+  for (const word of words) {
+    if (word.length > 3 && !['chart', 'graph', 'plot', 'bar', 'pie', 'line', 'create', 'show', 'make', 'of', 'for', 'and'].includes(word.toLowerCase())) {
+      countries.push(word);
+    }
+  }
+  
+  // Filter data for specific countries if requested
+  if (countries.length > 0) {
+    const filteredRows = [];
+    for (const row of dataRows) {
+      for (const country of countries) {
+        for (const cell of row) {
+          if (String(cell).toLowerCase().includes(country.toLowerCase())) {
+            filteredRows.push(row);
+            break;
+          }
+        }
+      }
+    }
+    if (filteredRows.length > 0) {
+      dataRows = filteredRows;
+    }
+  }
 
   // Detect chart type
   let chartType = 'bar';
@@ -47,9 +74,9 @@ export const generateChart = (data, prompt) => {
     }
   }
 
-  // Get chart data (limit to 10 items for readability)
+  // Get chart data (use filtered data or limit to 10 items)
   const chartData = [];
-  const maxItems = Math.min(10, dataRows.length);
+  const maxItems = countries.length > 0 ? dataRows.length : Math.min(10, dataRows.length);
   
   for (let i = 0; i < maxItems; i++) {
     const label = String(dataRows[i][labelColumn] || `Item ${i + 1}`);
