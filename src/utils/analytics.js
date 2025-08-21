@@ -15,22 +15,35 @@ export const generateChart = (data, prompt) => {
   if (lowerPrompt.includes('line')) chartType = 'line';
   if (lowerPrompt.includes('pie')) chartType = 'pie';
 
-  // Find data column (look for numeric data)
+  // Find data column (look for meaningful numeric data, skip year columns)
   let dataColumn = 1; // Default to second column
   let labelColumn = 0; // Default to first column
 
-  // Try to find a column with numbers
+  // Try to find a column with varied numeric data (not just years)
   for (let col = 1; col < headers.length; col++) {
-    let hasNumbers = false;
-    for (let row = 1; row < Math.min(6, dataRows.length); row++) {
-      if (!isNaN(parseFloat(dataRows[row][col]))) {
-        hasNumbers = true;
-        break;
+    const headerName = String(headers[col]).toLowerCase();
+    
+    // Skip year columns
+    if (headerName.includes('year') || headerName.includes('date')) {
+      continue;
+    }
+    
+    // Check if column has numeric data with variation
+    const values = [];
+    for (let row = 0; row < Math.min(10, dataRows.length); row++) {
+      const val = parseFloat(dataRows[row][col]);
+      if (!isNaN(val)) {
+        values.push(val);
       }
     }
-    if (hasNumbers) {
-      dataColumn = col;
-      break;
+    
+    // Use this column if it has numbers and they're not all the same
+    if (values.length > 0) {
+      const hasVariation = values.some(v => v !== values[0]);
+      if (hasVariation || values[0] !== 2023) { // Avoid year columns
+        dataColumn = col;
+        break;
+      }
     }
   }
 
@@ -41,11 +54,13 @@ export const generateChart = (data, prompt) => {
   for (let i = 0; i < maxItems; i++) {
     const label = String(dataRows[i][labelColumn] || `Item ${i + 1}`);
     const value = parseFloat(dataRows[i][dataColumn]) || 0;
-    chartData.push({ label, value });
+    if (value > 0) { // Only include rows with meaningful values
+      chartData.push({ label, value });
+    }
   }
 
   if (chartData.length === 0) {
-    return '<strong>Error:</strong> No valid data found for chart generation.';
+    return `<strong>Chart Info:</strong><br><br>No meaningful numeric data found for visualization.<br><br>Available columns: ${headers.join(', ')}<br><br>Try specifying a column with numeric data for better charts.`;
   }
 
   // Generate chart based on type
