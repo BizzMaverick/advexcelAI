@@ -74,15 +74,41 @@ export const generateChart = (data, prompt) => {
     }
   }
 
-  // Get chart data (use filtered data or limit to 10 items)
+  // Get chart data
   const chartData = [];
-  const maxItems = countries.length > 0 ? dataRows.length : Math.min(10, dataRows.length);
   
-  for (let i = 0; i < maxItems; i++) {
-    const label = String(dataRows[i][labelColumn] || `Item ${i + 1}`);
-    const value = parseFloat(dataRows[i][dataColumn]) || 0;
-    if (value > 0) { // Only include rows with meaningful values
-      chartData.push({ label, value });
+  // Special handling for single country pie chart - show multiple columns
+  if (chartType === 'pie' && countries.length > 0 && dataRows.length === 1) {
+    const row = dataRows[0];
+    const countryName = String(row[labelColumn]);
+    
+    // Show multiple numeric columns as pie slices
+    for (let col = 1; col < headers.length; col++) {
+      const value = parseFloat(row[col]);
+      const headerName = String(headers[col]);
+      
+      // Skip year columns and include meaningful data
+      if (!isNaN(value) && value > 0 && !headerName.toLowerCase().includes('year')) {
+        chartData.push({ 
+          label: headerName, 
+          value: value 
+        });
+      }
+    }
+    
+    if (chartData.length === 0) {
+      return `<strong>Pie Chart Info:</strong><br><br>${countryName} data doesn't have multiple numeric values suitable for pie chart.<br><br>Try: "bar chart of ${countryName}" or "chart ${countryName}" instead.`;
+    }
+  } else {
+    // Normal chart data processing
+    const maxItems = countries.length > 0 ? dataRows.length : Math.min(10, dataRows.length);
+    
+    for (let i = 0; i < maxItems; i++) {
+      const label = String(dataRows[i][labelColumn] || `Item ${i + 1}`);
+      const value = parseFloat(dataRows[i][dataColumn]) || 0;
+      if (value > 0) {
+        chartData.push({ label, value });
+      }
     }
   }
 
