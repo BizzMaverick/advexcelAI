@@ -553,18 +553,23 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     if (lowerPrompt.includes('lookup') || lowerPrompt.includes('find')) {
       const headers = fileData[0];
       const dataRows = fileData.slice(1);
-      const searchTerm = trimmedPrompt.replace(/lookup|find|show/gi, '').trim();
+      let searchText = trimmedPrompt.replace(/lookup|find|show|e1:|economy|for/gi, '').trim();
       
-      if (searchTerm.length > 0) {
+      // Extract country names
+      const countries = searchText.split(/,|and/).map(c => c.trim()).filter(c => c.length > 0);
+      
+      if (countries.length > 0) {
         const matches = [];
         
         for (let i = 0; i < dataRows.length; i++) {
           const row = dataRows[i];
-          for (let j = 0; j < row.length; j++) {
-            const cellValue = String(row[j] || '').toLowerCase();
-            if (cellValue.includes(searchTerm.toLowerCase())) {
-              matches.push(row);
-              break;
+          for (const country of countries) {
+            for (let j = 0; j < row.length; j++) {
+              const cellValue = String(row[j] || '').toLowerCase();
+              if (cellValue.includes(country.toLowerCase())) {
+                matches.push(row);
+                break;
+              }
             }
           }
         }
@@ -574,7 +579,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           setLastAiResult(result);
           setShowUseResultButton(true);
           
-          let response = `<strong>Results for '${searchTerm}':</strong><br><br>`;
+          let response = `<strong>Results for ${countries.join(', ')}:</strong><br><br>`;
           response += '<table style="width: 100%; border-collapse: collapse;">';
           response += '<thead>';
           response += '<tr style="background: #e6f3ff; border-bottom: 2px solid #0078d4;">';
@@ -604,7 +609,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           setPrompt('');
           return;
         } else {
-          setAiResponse(`<strong>No matches found for '${searchTerm}'</strong>`);
+          setAiResponse(`<strong>No matches found for ${countries.join(', ')}</strong>`);
           setPrompt('');
           return;
         }
