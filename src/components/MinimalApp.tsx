@@ -6,6 +6,7 @@ import logo from '../assets/logo.png';
 import bedrockService from '../services/bedrockService';
 import PaymentService from '../services/paymentService';
 import ErrorBoundary from './ErrorBoundary';
+import { generateChart } from '../utils/analytics';
 
 interface User {
   email: string;
@@ -553,10 +554,11 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     if (lowerPrompt.includes('lookup') || lowerPrompt.includes('find')) {
       const headers = fileData[0];
       const dataRows = fileData.slice(1);
-      let searchText = trimmedPrompt.replace(/lookup|find|show|e1:|economy|for/gi, '').trim();
+      let searchText = trimmedPrompt.replace(/lookup|find|show|e1:|economy|for|data|of|the/gi, '').trim();
       
-      // Extract country names - split by comma, 'and', or spaces
-      const countries = searchText.split(/,|\s+and\s+|\s+/).map(c => c.trim()).filter(c => c.length > 2);
+      // Split by any combination of comma, 'and', or spaces and filter meaningful words
+      const words = searchText.split(/[,\s]+|\s+and\s+/).map(w => w.trim()).filter(w => w.length > 2);
+      const countries = words.filter(w => !['and', 'or', 'with'].includes(w.toLowerCase()));
       
       if (countries.length > 0) {
         const matches = [];
@@ -614,6 +616,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           return;
         }
       }
+    }
+
+    // Handle chart generation (Phase 1 Analytics)
+    if (lowerPrompt.includes('chart') || lowerPrompt.includes('graph') || lowerPrompt.includes('plot')) {
+      const chartHtml = generateChart(fileData, trimmedPrompt);
+      setAiResponse(chartHtml);
+      setPrompt('');
+      return;
     }
 
     setIsProcessing(true);
