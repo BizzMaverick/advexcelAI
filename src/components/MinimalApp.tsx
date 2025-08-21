@@ -548,6 +548,68 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
 
 
     
+    // Handle simple lookup
+    if (lowerPrompt.includes('lookup') || lowerPrompt.includes('find')) {
+      const headers = fileData[0];
+      const dataRows = fileData.slice(1);
+      const searchTerm = trimmedPrompt.replace(/lookup|find|show/gi, '').trim();
+      
+      if (searchTerm.length > 0) {
+        const matches = [];
+        
+        for (let i = 0; i < dataRows.length; i++) {
+          const row = dataRows[i];
+          for (let j = 0; j < row.length; j++) {
+            const cellValue = String(row[j] || '').toLowerCase();
+            if (cellValue.includes(searchTerm.toLowerCase())) {
+              matches.push(row);
+              break;
+            }
+          }
+        }
+        
+        if (matches.length > 0) {
+          const result = [headers, ...matches];
+          setLastAiResult(result);
+          setShowUseResultButton(true);
+          
+          let response = `<strong>Results for '${searchTerm}':</strong><br><br>`;
+          response += '<table style="width: 100%; border-collapse: collapse;">';
+          response += '<thead>';
+          response += '<tr style="background: #e6f3ff; border-bottom: 2px solid #0078d4;">';
+          response += '<th style="padding: 8px; font-size: 11px; font-weight: bold; color: #0078d4; border: 1px solid #ddd;">#</th>';
+          headers.forEach((header, index) => {
+            const colLetter = String.fromCharCode(65 + index);
+            response += `<th style="padding: 8px; font-size: 11px; font-weight: bold; color: #0078d4; border: 1px solid #ddd;">${colLetter}</th>`;
+          });
+          response += '</tr></thead><tbody>';
+          response += '<tr>';
+          response += '<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; font-size: 11px; color: #0078d4; background: #f8f9ff; text-align: center;">1</td>';
+          headers.forEach(header => {
+            response += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; color: #333;">${header}</td>`;
+          });
+          response += '</tr>';
+          matches.forEach((row, index) => {
+            response += '<tr>';
+            response += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; font-size: 11px; color: #0078d4; background: #f8f9ff; text-align: center;">${index + 2}</td>`;
+            row.forEach(cell => {
+              response += `<td style="padding: 8px; border-right: 1px solid #eee; color: #333;">${cell || 'N/A'}</td>`;
+            });
+            response += '</tr>';
+          });
+          response += '</tbody></table>';
+          
+          setAiResponse(response);
+          setPrompt('');
+          return;
+        } else {
+          setAiResponse(`<strong>No matches found for '${searchTerm}'</strong>`);
+          setPrompt('');
+          return;
+        }
+      }
+    }
+
     setIsProcessing(true);
     setAiResponse('');
     
