@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import ExcelToolbar from './ExcelToolbar';
 import SimpleTable from './SimpleTable';
 import ShortcutsHelp from './ShortcutsHelp';
+import ChartComponent from './ChartComponent';
 import { AWSService } from '../services/awsService.js';
 import * as XLSX from 'xlsx';
 
@@ -45,6 +46,8 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [showShortcuts, setShowShortcuts] = useState(false);
+  const [showChart, setShowChart] = useState(false);
+  const [chartType, setChartType] = useState<'bar' | 'line' | 'pie'>('bar');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Keyboard shortcuts
@@ -205,7 +208,11 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
         setPrompt('convert data to formatted table with headers and filters');
         break;
       case 'insert-chart':
-        setPrompt('create a bar chart from the first 3 columns of data');
+        if (spreadsheetData.length > 0) {
+          setShowChart(true);
+        } else {
+          alert('📊 Please load data first to create a chart');
+        }
         break;
       case 'insert-pivot':
         setPrompt('create pivot table summarizing data by first column');
@@ -550,6 +557,56 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
           
           {/* AI Command section will be below */}
 
+          {/* Quick Chart Actions */}
+          {spreadsheetData.length > 0 && (
+            <div style={{ marginBottom: '20px' }}>
+              <h4 style={{ 
+                margin: '0 0 12px 0', 
+                color: colors.text, 
+                fontSize: '16px', 
+                fontWeight: '500',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M3 3V21H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M9 9L12 6L16 10L21 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                Quick Charts
+              </h4>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                {(['bar', 'line', 'pie'] as const).map(type => (
+                  <button
+                    key={type}
+                    onClick={() => {
+                      setChartType(type);
+                      setShowChart(true);
+                    }}
+                    style={{
+                      padding: '8px 12px',
+                      border: `1px solid ${colors.border}`,
+                      background: 'white',
+                      color: colors.text,
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      textTransform: 'capitalize',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    {type === 'bar' && '📊'}
+                    {type === 'line' && '📈'}
+                    {type === 'pie' && '🍰'}
+                    {type}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* AI Prompt */}
           <h4 style={{ 
             margin: '0 0 12px 0', 
@@ -570,7 +627,7 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
           <textarea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Type what you want to do... e.g., 'sort by name', 'highlight top 10', 'create pivot table'"
+            placeholder="Type what you want to do... e.g., 'sort by name', 'highlight top 10', 'create bar chart', 'show pie chart'"
             style={{
               width: '100%',
               height: '80px',
@@ -800,6 +857,61 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
                     title="🤖 AI Result"
                     subtitle={`${aiResultData.length} rows × ${aiResultData[0]?.length || 0} columns`}
                   />
+                )}
+
+                {/* Chart Display */}
+                {showChart && spreadsheetData.length > 0 && (
+                  <div style={{ marginTop: '20px' }}>
+                    <div style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '12px', 
+                      marginBottom: '16px',
+                      padding: '12px',
+                      background: '#f9f9f9',
+                      borderRadius: '8px'
+                    }}>
+                      <span style={{ fontWeight: '500', color: '#252525' }}>Chart Type:</span>
+                      {(['bar', 'line', 'pie'] as const).map(type => (
+                        <button
+                          key={type}
+                          onClick={() => setChartType(type)}
+                          style={{
+                            padding: '6px 12px',
+                            border: `1px solid ${chartType === type ? '#0078d4' : '#e0e0e0'}`,
+                            background: chartType === type ? '#0078d4' : 'white',
+                            color: chartType === type ? 'white' : '#252525',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontSize: '13px',
+                            textTransform: 'capitalize'
+                          }}
+                        >
+                          {type}
+                        </button>
+                      ))}
+                      <button
+                        onClick={() => setShowChart(false)}
+                        style={{
+                          padding: '6px 12px',
+                          border: '1px solid #e0e0e0',
+                          background: 'white',
+                          color: '#666',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '13px',
+                          marginLeft: 'auto'
+                        }}
+                      >
+                        ✕ Close
+                      </button>
+                    </div>
+                    <ChartComponent 
+                      data={spreadsheetData} 
+                      type={chartType}
+                      title={`${sheets[activeSheet]?.name || 'Sheet'} - ${chartType.charAt(0).toUpperCase() + chartType.slice(1)} Chart`}
+                    />
+                  </div>
                 )}
               </>
             )}
