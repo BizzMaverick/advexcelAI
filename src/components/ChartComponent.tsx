@@ -50,16 +50,26 @@ export default function ChartComponent({ data, type, title }: ChartComponentProp
   const headers = data[0].map(h => String(h || ''));
   const rows = data.slice(1);
 
-  // Get numeric columns
+  // Get numeric columns (more flexible detection)
   const numericColumns = headers.map((_, index) => {
     const values = rows.map(row => row[index]);
-    return values.some(val => !isNaN(Number(val)) && val !== '' && val !== null);
+    const numericValues = values.filter(val => {
+      const num = Number(val);
+      return !isNaN(num) && val !== '' && val !== null && val !== undefined;
+    });
+    // Consider column numeric if at least 50% of values are numeric
+    return numericValues.length >= Math.max(1, values.length * 0.5);
   });
 
   const labelColumn = 0; // First column as labels
-  const dataColumns = numericColumns.map((isNumeric, index) => 
+  let dataColumns = numericColumns.map((isNumeric, index) => 
     isNumeric && index !== labelColumn ? index : -1
   ).filter(index => index !== -1);
+  
+  // If no numeric columns found, try to use all columns except first as potential data
+  if (dataColumns.length === 0) {
+    dataColumns = headers.slice(1).map((_, i) => i + 1);
+  }
 
   if (dataColumns.length === 0) {
     return (
@@ -85,15 +95,23 @@ export default function ChartComponent({ data, type, title }: ChartComponentProp
 
   const chartData = {
     labels,
-    datasets: dataColumns.map((colIndex, i) => ({
-      label: headers[colIndex],
-      data: rows.map(row => Number(row[colIndex]) || 0),
-      backgroundColor: type === 'pie' 
-        ? colors.slice(0, labels.length)
-        : colors[i % colors.length] + '80',
-      borderColor: colors[i % colors.length],
-      borderWidth: 2,
-    }))
+    datasets: dataColumns.map((colIndex, i) => {
+      const columnData = rows.map(row => {
+        const val = row[colIndex];
+        const num = Number(val);
+        return !isNaN(num) ? num : 0;
+      });
+      
+      return {
+        label: headers[colIndex],
+        data: columnData,
+        backgroundColor: type === 'pie' 
+          ? colors.slice(0, labels.length)
+          : colors[i % colors.length] + '80',
+        borderColor: colors[i % colors.length],
+        borderWidth: 2,
+      };
+    })
   };
 
   const options = {

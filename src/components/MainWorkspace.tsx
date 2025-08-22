@@ -48,6 +48,7 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [showChart, setShowChart] = useState(false);
   const [chartType, setChartType] = useState<'bar' | 'line' | 'pie'>('bar');
+  const [selectedColumns, setSelectedColumns] = useState<number[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Keyboard shortcuts
@@ -340,6 +341,16 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
     console.log('Starting AI request with prompt:', prompt);
     
     try {
+      // Check if prompt is asking for a chart
+      if (prompt.toLowerCase().includes('chart') || prompt.toLowerCase().includes('graph') || prompt.toLowerCase().includes('plot')) {
+        setShowChart(true);
+        if (prompt.toLowerCase().includes('bar')) setChartType('bar');
+        else if (prompt.toLowerCase().includes('line')) setChartType('line');
+        else if (prompt.toLowerCase().includes('pie')) setChartType('pie');
+        setAiLoading(false);
+        return;
+      }
+      
       let result;
       
       if (selectedFile) {
@@ -863,51 +874,97 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
                 {showChart && spreadsheetData.length > 0 && (
                   <div style={{ marginTop: '20px' }}>
                     <div style={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: '12px', 
-                      marginBottom: '16px',
-                      padding: '12px',
+                      padding: '16px',
                       background: '#f9f9f9',
-                      borderRadius: '8px'
+                      borderRadius: '8px',
+                      marginBottom: '16px'
                     }}>
-                      <span style={{ fontWeight: '500', color: '#252525' }}>Chart Type:</span>
-                      {(['bar', 'line', 'pie'] as const).map(type => (
+                      <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '12px', 
+                        marginBottom: '12px'
+                      }}>
+                        <span style={{ fontWeight: '500', color: '#252525' }}>Chart Type:</span>
+                        {(['bar', 'line', 'pie'] as const).map(type => (
+                          <button
+                            key={type}
+                            onClick={() => setChartType(type)}
+                            style={{
+                              padding: '6px 12px',
+                              border: `1px solid ${chartType === type ? '#0078d4' : '#e0e0e0'}`,
+                              background: chartType === type ? '#0078d4' : 'white',
+                              color: chartType === type ? 'white' : '#252525',
+                              borderRadius: '4px',
+                              cursor: 'pointer',
+                              fontSize: '13px',
+                              textTransform: 'capitalize'
+                            }}
+                          >
+                            {type}
+                          </button>
+                        ))}
                         <button
-                          key={type}
-                          onClick={() => setChartType(type)}
+                          onClick={() => setShowChart(false)}
                           style={{
                             padding: '6px 12px',
-                            border: `1px solid ${chartType === type ? '#0078d4' : '#e0e0e0'}`,
-                            background: chartType === type ? '#0078d4' : 'white',
-                            color: chartType === type ? 'white' : '#252525',
+                            border: '1px solid #e0e0e0',
+                            background: 'white',
+                            color: '#666',
                             borderRadius: '4px',
                             cursor: 'pointer',
                             fontSize: '13px',
-                            textTransform: 'capitalize'
+                            marginLeft: 'auto'
                           }}
                         >
-                          {type}
+                          ✕ Close
                         </button>
-                      ))}
-                      <button
-                        onClick={() => setShowChart(false)}
-                        style={{
-                          padding: '6px 12px',
-                          border: '1px solid #e0e0e0',
-                          background: 'white',
-                          color: '#666',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          fontSize: '13px',
-                          marginLeft: 'auto'
-                        }}
-                      >
-                        ✕ Close
-                      </button>
+                      </div>
+                      
+                      {/* Column Selection */}
+                      {spreadsheetData.length > 0 && spreadsheetData[0] && (
+                        <div>
+                          <span style={{ fontWeight: '500', color: '#252525', marginRight: '12px' }}>Include Columns:</span>
+                          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '8px' }}>
+                            {spreadsheetData[0].slice(1).map((header, index) => {
+                              const colIndex = index + 1;
+                              const isSelected = selectedColumns.includes(colIndex) || selectedColumns.length === 0;
+                              return (
+                                <button
+                                  key={colIndex}
+                                  onClick={() => {
+                                    if (selectedColumns.includes(colIndex)) {
+                                      setSelectedColumns(selectedColumns.filter(i => i !== colIndex));
+                                    } else {
+                                      setSelectedColumns([...selectedColumns, colIndex]);
+                                    }
+                                  }}
+                                  style={{
+                                    padding: '4px 8px',
+                                    border: `1px solid ${isSelected ? '#0078d4' : '#e0e0e0'}`,
+                                    background: isSelected ? '#0078d4' : 'white',
+                                    color: isSelected ? 'white' : '#252525',
+                                    borderRadius: '3px',
+                                    cursor: 'pointer',
+                                    fontSize: '12px'
+                                  }}
+                                >
+                                  {String(header || `Col ${colIndex}`)}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <ChartComponent 
-                      data={spreadsheetData} 
+                      data={selectedColumns.length > 0 ? [
+                        spreadsheetData[0],
+                        ...spreadsheetData.slice(1).map(row => [
+                          row[0], // Keep first column as labels
+                          ...selectedColumns.map(colIndex => row[colIndex])
+                        ])
+                      ] : spreadsheetData} 
                       type={chartType}
                       title={`${sheets[activeSheet]?.name || 'Sheet'} - ${chartType.charAt(0).toUpperCase() + chartType.slice(1)} Chart`}
                     />
