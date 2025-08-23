@@ -391,7 +391,6 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
     console.log('Starting AI request with prompt:', prompt);
     
     try {
-      
       let result;
       
       if (selectedFile) {
