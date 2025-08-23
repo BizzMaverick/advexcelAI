@@ -3,6 +3,7 @@ import ExcelToolbar from './ExcelToolbar';
 import SimpleTable from './SimpleTable';
 import ShortcutsHelp from './ShortcutsHelp';
 import ChartComponent from './ChartComponent';
+import CountryAnalysisChart from './CountryAnalysisChart';
 import { AWSService } from '../services/awsService.js';
 import * as XLSX from 'xlsx';
 
@@ -49,6 +50,7 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
   const [showChart, setShowChart] = useState(false);
   const [chartType, setChartType] = useState<'bar' | 'line' | 'pie'>('bar');
   const [selectedColumns, setSelectedColumns] = useState<number[]>([]);
+  const [analysisCountry, setAnalysisCountry] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Keyboard shortcuts
@@ -341,12 +343,51 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
     console.log('Starting AI request with prompt:', prompt);
     
     try {
-      // Check if prompt is asking for a chart
-      if (prompt.toLowerCase().includes('chart') || prompt.toLowerCase().includes('graph') || prompt.toLowerCase().includes('plot')) {
+      // Check if prompt is asking for visualization/analysis
+      const visualKeywords = ['chart', 'graph', 'plot', 'analysis', 'analyze', 'compare', 'comparison', 'show me', 'visualize', 'display'];
+      const isVisualRequest = visualKeywords.some(keyword => prompt.toLowerCase().includes(keyword));
+      
+      if (isVisualRequest) {
         setShowChart(true);
-        if (prompt.toLowerCase().includes('bar')) setChartType('bar');
-        else if (prompt.toLowerCase().includes('line')) setChartType('line');
-        else if (prompt.toLowerCase().includes('pie')) setChartType('pie');
+        
+        // Determine best chart type based on request
+        if (prompt.toLowerCase().includes('bar') || prompt.toLowerCase().includes('compare') || prompt.toLowerCase().includes('comparison')) {
+          setChartType('bar');
+        } else if (prompt.toLowerCase().includes('line') || prompt.toLowerCase().includes('trend') || prompt.toLowerCase().includes('over time')) {
+          setChartType('line');
+        } else if (prompt.toLowerCase().includes('pie') || prompt.toLowerCase().includes('distribution') || prompt.toLowerCase().includes('breakdown')) {
+          setChartType('pie');
+        } else {
+          // Default to bar chart for analysis
+          setChartType('bar');
+        }
+        
+        // Auto-select relevant columns for specific country analysis
+        if (spreadsheetData.length > 0) {
+          const countryMatch = prompt.match(/\b(somalia|yemen|afghanistan|syria|south sudan|congo|sudan|chad|haiti|zimbabwe|[A-Z][a-z]+)\b/i);
+          if (countryMatch) {
+            const countryName = countryMatch[0];
+            setAnalysisCountry(countryName);
+            
+            // Find the row for this country
+            const countryRow = spreadsheetData.findIndex(row => 
+              row[0] && row[0].toString().toLowerCase().includes(countryName.toLowerCase())
+            );
+            
+            if (countryRow > 0) {
+              // Select all numeric columns for this country's analysis
+              const numericCols = [];
+              for (let i = 1; i < spreadsheetData[0].length; i++) {
+                const val = spreadsheetData[countryRow][i];
+                if (!isNaN(Number(val)) && val !== '' && val !== null) {
+                  numericCols.push(i);
+                }
+              }
+              setSelectedColumns(numericCols);
+            }
+          }
+        }
+        
         setAiLoading(false);
         return;
       }
@@ -638,7 +679,7 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
           <textarea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Type what you want to do... e.g., 'sort by name', 'highlight top 10', 'create bar chart', 'show pie chart'"
+            placeholder="Type what you want to do... e.g., 'analyze Somalia', 'compare Yemen and Syria', 'show fragility trends', 'create bar chart'"
             style={{
               width: '100%',
               height: '80px',
@@ -905,7 +946,11 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
                           </button>
                         ))}
                         <button
-                          onClick={() => setShowChart(false)}
+                          onClick={() => {
+                            setShowChart(false);
+                            setAnalysisCountry('');
+                            setSelectedColumns([]);
+                          }}
                           style={{
                             padding: '6px 12px',
                             border: '1px solid #e0e0e0',
@@ -957,17 +1002,24 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
                         </div>
                       )}
                     </div>
-                    <ChartComponent 
-                      data={selectedColumns.length > 0 ? [
-                        spreadsheetData[0],
-                        ...spreadsheetData.slice(1).map(row => [
-                          row[0], // Keep first column as labels
-                          ...selectedColumns.map(colIndex => row[colIndex])
-                        ])
-                      ] : spreadsheetData} 
-                      type={chartType}
-                      title={`${sheets[activeSheet]?.name || 'Sheet'} - ${chartType.charAt(0).toUpperCase() + chartType.slice(1)} Chart`}
-                    />
+                    {analysisCountry ? (
+                      <CountryAnalysisChart 
+                        data={spreadsheetData}
+                        countryName={analysisCountry}
+                      />
+                    ) : (
+                      <ChartComponent 
+                        data={selectedColumns.length > 0 ? [
+                          spreadsheetData[0],
+                          ...spreadsheetData.slice(1).map(row => [
+                            row[0], // Keep first column as labels
+                            ...selectedColumns.map(colIndex => row[colIndex])
+                          ])
+                        ] : spreadsheetData} 
+                        type={chartType}
+                        title={`${sheets[activeSheet]?.name || 'Sheet'} - ${chartType.charAt(0).toUpperCase() + chartType.slice(1)} Chart`}
+                      />
+                    )}
                   </div>
                 )}
               </>
