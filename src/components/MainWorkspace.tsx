@@ -337,60 +337,60 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
 
   const handleRunAI = async () => {
     if (!prompt.trim()) return;
+    
+    // Check if prompt is asking for visualization/analysis FIRST
+    const visualKeywords = ['chart', 'graph', 'plot', 'analysis', 'analyze', 'compare', 'comparison', 'show me', 'visualize', 'display'];
+    const isVisualRequest = visualKeywords.some(keyword => prompt.toLowerCase().includes(keyword));
+    
+    if (isVisualRequest && spreadsheetData.length > 0) {
+      setShowChart(true);
+      
+      // Determine best chart type based on request
+      if (prompt.toLowerCase().includes('bar') || prompt.toLowerCase().includes('compare') || prompt.toLowerCase().includes('comparison')) {
+        setChartType('bar');
+      } else if (prompt.toLowerCase().includes('line') || prompt.toLowerCase().includes('trend') || prompt.toLowerCase().includes('over time')) {
+        setChartType('line');
+      } else if (prompt.toLowerCase().includes('pie') || prompt.toLowerCase().includes('distribution') || prompt.toLowerCase().includes('breakdown')) {
+        setChartType('pie');
+      } else {
+        // Default to bar chart for analysis
+        setChartType('bar');
+      }
+      
+      // Auto-select relevant columns for specific country analysis
+      const countryMatch = prompt.match(/\b(somalia|yemen|afghanistan|syria|south sudan|congo|sudan|chad|haiti|zimbabwe|[A-Z][a-z]+)\b/i);
+      if (countryMatch) {
+        const countryName = countryMatch[0];
+        setAnalysisCountry(countryName);
+        
+        // Find the row for this country
+        const countryRow = spreadsheetData.findIndex(row => 
+          row[0] && row[0].toString().toLowerCase().includes(countryName.toLowerCase())
+        );
+        
+        if (countryRow > 0) {
+          // Select all numeric columns for this country's analysis
+          const numericCols = [];
+          for (let i = 1; i < spreadsheetData[0].length; i++) {
+            const val = spreadsheetData[countryRow][i];
+            if (!isNaN(Number(val)) && val !== '' && val !== null) {
+              numericCols.push(i);
+            }
+          }
+          setSelectedColumns(numericCols);
+        }
+      }
+      
+      setPrompt(''); // Clear the prompt
+      return; // Exit early - don't call AWS
+    }
+    
+    // Only proceed with AWS if not a visual request
     setAiLoading(true);
     setAiError(null);
-    
     console.log('Starting AI request with prompt:', prompt);
     
     try {
-      // Check if prompt is asking for visualization/analysis
-      const visualKeywords = ['chart', 'graph', 'plot', 'analysis', 'analyze', 'compare', 'comparison', 'show me', 'visualize', 'display'];
-      const isVisualRequest = visualKeywords.some(keyword => prompt.toLowerCase().includes(keyword));
-      
-      if (isVisualRequest) {
-        setShowChart(true);
-        
-        // Determine best chart type based on request
-        if (prompt.toLowerCase().includes('bar') || prompt.toLowerCase().includes('compare') || prompt.toLowerCase().includes('comparison')) {
-          setChartType('bar');
-        } else if (prompt.toLowerCase().includes('line') || prompt.toLowerCase().includes('trend') || prompt.toLowerCase().includes('over time')) {
-          setChartType('line');
-        } else if (prompt.toLowerCase().includes('pie') || prompt.toLowerCase().includes('distribution') || prompt.toLowerCase().includes('breakdown')) {
-          setChartType('pie');
-        } else {
-          // Default to bar chart for analysis
-          setChartType('bar');
-        }
-        
-        // Auto-select relevant columns for specific country analysis
-        if (spreadsheetData.length > 0) {
-          const countryMatch = prompt.match(/\b(somalia|yemen|afghanistan|syria|south sudan|congo|sudan|chad|haiti|zimbabwe|[A-Z][a-z]+)\b/i);
-          if (countryMatch) {
-            const countryName = countryMatch[0];
-            setAnalysisCountry(countryName);
-            
-            // Find the row for this country
-            const countryRow = spreadsheetData.findIndex(row => 
-              row[0] && row[0].toString().toLowerCase().includes(countryName.toLowerCase())
-            );
-            
-            if (countryRow > 0) {
-              // Select all numeric columns for this country's analysis
-              const numericCols = [];
-              for (let i = 1; i < spreadsheetData[0].length; i++) {
-                const val = spreadsheetData[countryRow][i];
-                if (!isNaN(Number(val)) && val !== '' && val !== null) {
-                  numericCols.push(i);
-                }
-              }
-              setSelectedColumns(numericCols);
-            }
-          }
-        }
-        
-        setAiLoading(false);
-        return;
-      }
       
       let result;
       
