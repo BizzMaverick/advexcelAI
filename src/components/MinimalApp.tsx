@@ -626,6 +626,16 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       return;
     }
 
+    // BLOCK ANALYSIS REQUESTS - Show message instead of calling AWS
+    const analysisKeywords = ['analysis', 'analyze', 'compare', 'comparison', 'show me', 'visualize', 'display'];
+    const isAnalysisRequest = analysisKeywords.some(keyword => lowerPrompt.includes(keyword));
+    
+    if (isAnalysisRequest) {
+      setAiResponse(`<strong>📊 Analysis Request Detected!</strong><br><br>For advanced analysis and visualization features, please use the <strong>MainWorkspace</strong> component which includes:<br><br>• Interactive charts (bar, line, pie)<br>• Country-specific analysis<br>• Visual data exploration<br>• Chart customization<br><br>This component focuses on data manipulation operations like sorting, filtering, and calculations.`);
+      setPrompt('');
+      return;
+    }
+
     setIsProcessing(true);
     setAiResponse('');
     
