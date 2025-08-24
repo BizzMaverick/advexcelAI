@@ -338,11 +338,23 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
   const handleRunAI = async () => {
     if (!prompt.trim()) return;
     
+    console.log('🔍 DEBUG: Prompt received:', prompt);
+    console.log('🔍 DEBUG: Spreadsheet data length:', spreadsheetData.length);
+    
     // Check if prompt is asking for visualization/analysis FIRST
     const visualKeywords = ['chart', 'graph', 'plot', 'analysis', 'analyze', 'compare', 'comparison', 'show me', 'visualize', 'display'];
     const isVisualRequest = visualKeywords.some(keyword => prompt.toLowerCase().includes(keyword));
     
+    console.log('🔍 DEBUG: Is visual request?', isVisualRequest);
+    console.log('🔍 DEBUG: Visual keywords found:', visualKeywords.filter(keyword => prompt.toLowerCase().includes(keyword)));
+    
     if (isVisualRequest && spreadsheetData.length > 0) {
+      console.log('🎯 DEBUG: Triggering visualization - NO AWS CALL');
+      
+      // Clear any existing AI results to prevent confusion
+      setAiResultData(null);
+      setAiError(null);
+      
       setShowChart(true);
       
       // Determine best chart type based on request
@@ -382,10 +394,23 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
       }
       
       setPrompt(''); // Clear the prompt
+      console.log('✅ DEBUG: Visualization setup complete - EXITING EARLY');
       return; // Exit early - don't call AWS
     }
     
+    // Additional safety check - if it contains 'analyze' or 'analysis', force visualization
+    if ((prompt.toLowerCase().includes('analyze') || prompt.toLowerCase().includes('analysis')) && spreadsheetData.length > 0) {
+      console.log('🚨 DEBUG: SAFETY CHECK - Forcing visualization for analysis request');
+      setShowChart(true);
+      setChartType('bar');
+      setAiResultData(null);
+      setAiError(null);
+      setPrompt('');
+      return;
+    }
+    
     // Only proceed with AWS if not a visual request
+    console.log('☁️ DEBUG: Proceeding with AWS call for non-visual request');
     setAiLoading(true);
     setAiError(null);
     console.log('Starting AI request with prompt:', prompt);
