@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import './App.css';
 import './animations.css';
-import MinimalApp from './components/MinimalApp';
+import MainWorkspace from './components/MainWorkspace';
 import LandingPage from './LandingPage';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsAndConditions from './components/TermsAndConditions';
@@ -151,11 +151,9 @@ function App() {
                   onRefresh={handleTrialRefresh}
                 />
               )}
-              <MinimalApp 
+              <MainWorkspace 
                 user={user} 
                 onLogout={handleLogout}
-                trialStatus={trialStatus}
-                onTrialRefresh={handleTrialRefresh}
               />
             </>
           ) : (

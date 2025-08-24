@@ -7,6 +7,115 @@ import bedrockService from '../services/bedrockService';
 import PaymentService from '../services/paymentService';
 import ErrorBoundary from './ErrorBoundary';
 import { generateChart } from '../utils/analytics';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Bar, Line, Pie } from 'react-chartjs-2';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
+// Generate chart for analysis requests
+const generateAnalysisChart = (data: any[][], prompt: string): string => {
+  if (!data || data.length < 2) {
+    return '<strong>📊 Chart Error:</strong><br><br>Not enough data to create chart. Need at least 2 rows with headers.';
+  }
+
+  const headers = data[0].map(h => String(h || ''));
+  const rows = data.slice(1);
+  
+  // Check for country-specific analysis
+  const countryMatch = prompt.match(/\b(somalia|yemen|afghanistan|syria|south sudan|congo|sudan|chad|haiti|zimbabwe|[A-Z][a-z]+)\b/i);
+  
+  if (countryMatch) {
+    const countryName = countryMatch[0];
+    const countryRow = rows.find(row => 
+      row[0] && row[0].toString().toLowerCase().includes(countryName.toLowerCase())
+    );
+    
+    if (countryRow) {
+      // Generate country-specific chart HTML
+      let chartHtml = `<strong>📊 Analysis: ${countryName}</strong><br><br>`;
+      chartHtml += '<div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">';
+      chartHtml += `<canvas id="analysisChart-${Date.now()}" width="400" height="200"></canvas>`;
+      chartHtml += '</div>';
+      
+      // Add script to render chart
+      setTimeout(() => {
+        const canvas = document.querySelector(`canvas[id^="analysisChart-"]`) as HTMLCanvasElement;
+        if (canvas) {
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            // Get numeric data for the country
+            const labels = [];
+            const values = [];
+            
+            for (let i = 1; i < headers.length; i++) {
+              const value = Number(countryRow[i]);
+              if (!isNaN(value) && value > 0) {
+                labels.push(headers[i]);
+                values.push(value);
+              }
+            }
+            
+            new ChartJS(ctx, {
+              type: 'bar',
+              data: {
+                labels: labels.slice(0, 10), // Limit to 10 items
+                datasets: [{
+                  label: `${countryName} Metrics`,
+                  data: values.slice(0, 10),
+                  backgroundColor: [
+                    '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57',
+                    '#ff9ff3', '#54a0ff', '#5f27cd', '#00d2d3', '#ff9f43'
+                  ],
+                  borderColor: '#333',
+                  borderWidth: 1,
+                }]
+              },
+              options: {
+                responsive: true,
+                plugins: {
+                  legend: { display: false },
+                  title: { 
+                    display: true, 
+                    text: `${countryName} - Detailed Analysis`
+                  }
+                },
+                scales: {
+                  y: { beginAtZero: true }
+                }
+              }
+            });
+          }
+        }
+      }, 100);
+      
+      return chartHtml;
+    }
+  }
+  
+  // General analysis chart
+  return '<strong>📊 Analysis Chart:</strong><br><br>Chart functionality is being prepared for your data. Please try a more specific request like "analyze [country name]".';
+};
 
 interface User {
   email: string;
@@ -48,6 +157,9 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
   const [feedbackText, setFeedbackText] = useState('');
   const [showLegalModal, setShowLegalModal] = useState(false);
   const [legalContent, setLegalContent] = useState({ title: '', content: '' });
+  const [showChart, setShowChart] = useState(false);
+  const [chartType, setChartType] = useState<'bar' | 'line' | 'pie'>('bar');
+  const [analysisCountry, setAnalysisCountry] = useState<string>('');
 
   // Generate device fingerprint for single device login
   const getDeviceFingerprint = () => {
@@ -626,12 +738,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       return;
     }
 
-    // BLOCK ANALYSIS REQUESTS - Show message instead of calling AWS
+    // HANDLE ANALYSIS REQUESTS - Generate charts instead of AWS calls
     const analysisKeywords = ['analysis', 'analyze', 'compare', 'comparison', 'show me', 'visualize', 'display'];
     const isAnalysisRequest = analysisKeywords.some(keyword => lowerPrompt.includes(keyword));
     
     if (isAnalysisRequest) {
-      setAiResponse(`<strong>📊 Analysis Request Detected!</strong><br><br>For advanced analysis and visualization features, please use the <strong>MainWorkspace</strong> component which includes:<br><br>• Interactive charts (bar, line, pie)<br>• Country-specific analysis<br>• Visual data exploration<br>• Chart customization<br><br>This component focuses on data manipulation operations like sorting, filtering, and calculations.`);
+      // Generate chart for analysis request
+      const chartHtml = generateAnalysisChart(fileData, trimmedPrompt);
+      setAiResponse(chartHtml);
       setPrompt('');
       return;
     }
