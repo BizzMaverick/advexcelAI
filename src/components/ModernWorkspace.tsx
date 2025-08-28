@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { DataDetectionService } from '../services/dataDetectionService';
 import { EnhancedAiService } from '../services/enhancedAiService';
 import { AWSService } from '../services/awsService.js';
+import ChartComponent from './ChartComponent';
+import ModernDataInsights from './ModernDataInsights';
 import * as XLSX from 'xlsx';
 
 interface User {
@@ -21,7 +23,13 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
   const [prompt, setPrompt] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [aiResponse, setAiResponse] = useState<string>('');
+  const [aiResultData, setAiResultData] = useState<any[][] | null>(null);
   const [dragActive, setDragActive] = useState(false);
+  const [showChart, setShowChart] = useState(false);
+  const [chartType, setChartType] = useState<'bar' | 'line' | 'pie'>('bar');
+  const [sortColumn, setSortColumn] = useState<number>(-1);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [filterText, setFilterText] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = async (file: File) => {
@@ -88,7 +96,10 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
         await AWSService.processPromptWithData(spreadsheetData, enhancedPrompt);
       
       if (result.data && Array.isArray(result.data)) {
-        setAiResponse('Analysis completed successfully!');
+        setAiResultData(result.data);
+        setAiResponse('✅ Analysis completed! Results are displayed below.');
+      } else {
+        setAiResponse(result.response || 'Analysis completed successfully!');
       }
     } catch (err: any) {
       setAiResponse(err.message || 'Processing failed');
@@ -97,6 +108,54 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
       setPrompt('');
     }
   };
+
+  const handleSort = (columnIndex: number) => {
+    const newDirection = sortColumn === columnIndex && sortDirection === 'asc' ? 'desc' : 'asc';
+    setSortColumn(columnIndex);
+    setSortDirection(newDirection);
+    
+    const sortedData = [...spreadsheetData];
+    const headers = sortedData[0];
+    const dataRows = sortedData.slice(1);
+    
+    dataRows.sort((a, b) => {
+      const aVal = String(a[columnIndex] || '').toLowerCase();
+      const bVal = String(b[columnIndex] || '').toLowerCase();
+      
+      const aNum = parseFloat(aVal);
+      const bNum = parseFloat(bVal);
+      
+      if (!isNaN(aNum) && !isNaN(bNum)) {
+        return newDirection === 'asc' ? aNum - bNum : bNum - aNum;
+      }
+      
+      return newDirection === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+    });
+    
+    setSpreadsheetData([headers, ...dataRows]);
+  };
+
+  const getFilteredData = () => {
+    if (!filterText) return spreadsheetData;
+    
+    const headers = spreadsheetData[0];
+    const filteredRows = spreadsheetData.slice(1).filter(row => 
+      row.some(cell => 
+        String(cell || '').toLowerCase().includes(filterText.toLowerCase())
+      )
+    );
+    
+    return [headers, ...filteredRows];
+  };
+
+  const downloadExcel = (data: any[][], filename: string) => {
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+    XLSX.writeFile(wb, filename);
+  };
+
+  const displayData = getFilteredData();
 
   return (
     <div style={{
@@ -253,6 +312,47 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
               </div>
             )}
 
+            {/* Quick Actions */}
+            {spreadsheetData.length > 0 && (
+              <div style={{ marginBottom: '32px' }}>
+                <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600' }}>
+                  ⚡ Quick Actions
+                </h4>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                  <button
+                    onClick={() => setShowChart(!showChart)}
+                    style={{
+                      background: showChart ? 'linear-gradient(45deg, #ff6b6b, #4ecdc4)' : 'rgba(255, 255, 255, 0.1)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      borderRadius: '8px',
+                      padding: '8px 12px',
+                      color: 'white',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      fontWeight: '500'
+                    }}
+                  >
+                    📊 {showChart ? 'Hide' : 'Show'} Chart
+                  </button>
+                  <button
+                    onClick={() => downloadExcel(spreadsheetData, `${selectedFile?.name || 'data'}_export.xlsx`)}
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.1)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      borderRadius: '8px',
+                      padding: '8px 12px',
+                      color: 'white',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      fontWeight: '500'
+                    }}
+                  >
+                    💾 Export
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Smart Suggestions */}
             {dataStructure && (
               <div style={{ marginBottom: '32px' }}>
@@ -260,7 +360,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   💡 Smart Suggestions
                 </h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {EnhancedAiService.generateFollowUpQuestions(dataStructure).slice(0, 3).map((suggestion, index) => (
+                  {EnhancedAiService.generateFollowUpQuestions(dataStructure).slice(0, 2).map((suggestion, index) => (
                     <button
                       key={index}
                       onClick={() => setPrompt(suggestion)}
@@ -345,13 +445,31 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           }}>
             {spreadsheetData.length > 0 ? (
               <>
-                <div style={{ marginBottom: '24px' }}>
-                  <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: '600' }}>
-                    📊 Your Data
-                  </h3>
-                  <p style={{ margin: 0, fontSize: '14px', opacity: 0.7 }}>
-                    {spreadsheetData.length} rows × {spreadsheetData[0]?.length || 0} columns
-                  </p>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <div>
+                    <h3 style={{ margin: '0 0 4px 0', fontSize: '18px', fontWeight: '600' }}>
+                      📊 Your Data
+                    </h3>
+                    <p style={{ margin: 0, fontSize: '14px', opacity: 0.7 }}>
+                      {displayData.length - 1} rows × {displayData[0]?.length || 0} columns
+                    </p>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="🔍 Filter data..."
+                    value={filterText}
+                    onChange={(e) => setFilterText(e.target.value)}
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.1)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      borderRadius: '8px',
+                      padding: '8px 12px',
+                      color: 'white',
+                      fontSize: '12px',
+                      width: '200px',
+                      outline: 'none'
+                    }}
+                  />
                 </div>
                 
                 <div style={{
@@ -364,21 +482,30 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
                       <tr style={{ background: 'rgba(255, 255, 255, 0.1)' }}>
-                        {spreadsheetData[0]?.map((header, index) => (
-                          <th key={index} style={{
-                            padding: '12px 16px',
-                            textAlign: 'left',
-                            fontSize: '12px',
-                            fontWeight: '600',
-                            borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
-                          }}>
+                        {displayData[0]?.map((header, index) => (
+                          <th key={index} 
+                            onClick={() => handleSort(index)}
+                            style={{
+                              padding: '12px 16px',
+                              textAlign: 'left',
+                              fontSize: '12px',
+                              fontWeight: '600',
+                              borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                              cursor: 'pointer',
+                              position: 'relative'
+                            }}>
                             {String(header || `Col ${index + 1}`)}
+                            {sortColumn === index && (
+                              <span style={{ marginLeft: '4px' }}>
+                                {sortDirection === 'asc' ? '↑' : '↓'}
+                              </span>
+                            )}
                           </th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
-                      {spreadsheetData.slice(1, 11).map((row, rowIndex) => (
+                      {displayData.slice(1, 11).map((row, rowIndex) => (
                         <tr key={rowIndex}>
                           {row.map((cell, cellIndex) => (
                             <td key={cellIndex} style={{
@@ -396,9 +523,9 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   </table>
                 </div>
                 
-                {spreadsheetData.length > 11 && (
+                {displayData.length > 11 && (
                   <p style={{ margin: '16px 0 0 0', fontSize: '12px', opacity: 0.6, textAlign: 'center' }}>
-                    Showing first 10 rows of {spreadsheetData.length}
+                    Showing first 10 rows of {displayData.length - 1} {filterText && '(filtered)'}
                   </p>
                 )}
               </>
@@ -423,6 +550,144 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           </div>
         </div>
 
+        {/* Chart Display */}
+        {showChart && spreadsheetData.length > 0 && (
+          <div style={{
+            maxWidth: '1200px',
+            margin: '40px auto 0',
+            background: 'rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(20px)',
+            borderRadius: '24px',
+            padding: '32px',
+            border: '1px solid rgba(255, 255, 255, 0.2)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>
+                📊 Data Visualization
+              </h3>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {(['bar', 'line', 'pie'] as const).map(type => (
+                  <button
+                    key={type}
+                    onClick={() => setChartType(type)}
+                    style={{
+                      background: chartType === type ? 'linear-gradient(45deg, #ff6b6b, #4ecdc4)' : 'rgba(255, 255, 255, 0.1)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      borderRadius: '8px',
+                      padding: '8px 16px',
+                      color: 'white',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      fontWeight: '500',
+                      textTransform: 'capitalize'
+                    }}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div style={{ background: 'rgba(255, 255, 255, 0.05)', borderRadius: '12px', padding: '24px' }}>
+              <ChartComponent 
+                data={spreadsheetData} 
+                type={chartType}
+                title={`${selectedFile?.name || 'Data'} - ${chartType.charAt(0).toUpperCase() + chartType.slice(1)} Chart`}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Data Insights */}
+        {dataStructure && (
+          <div style={{
+            maxWidth: '1200px',
+            margin: '40px auto 0'
+          }}>
+            <ModernDataInsights 
+              data={spreadsheetData}
+              onPromptSelect={(selectedPrompt) => {
+                setPrompt(selectedPrompt);
+                setTimeout(() => handleRunAI(), 100);
+              }}
+            />
+          </div>
+        )}
+
+        {/* AI Results */}
+        {aiResultData && (
+          <div style={{
+            maxWidth: '1200px',
+            margin: '40px auto 0',
+            background: 'rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(20px)',
+            borderRadius: '24px',
+            padding: '32px',
+            border: '1px solid rgba(255, 255, 255, 0.2)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>
+                🤖 AI Analysis Results
+              </h3>
+              <button
+                onClick={() => downloadExcel(aiResultData, 'ai_results.xlsx')}
+                style={{
+                  background: 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '8px 16px',
+                  color: 'white',
+                  cursor: 'pointer',
+                  fontSize: '12px',
+                  fontWeight: '500'
+                }}
+              >
+                💾 Export Results
+              </button>
+            </div>
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.05)',
+              borderRadius: '12px',
+              overflow: 'hidden',
+              maxHeight: '400px',
+              overflowY: 'auto'
+            }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ background: 'rgba(255, 255, 255, 0.1)' }}>
+                    {aiResultData[0]?.map((header, index) => (
+                      <th key={index} style={{
+                        padding: '12px 16px',
+                        textAlign: 'left',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+                      }}>
+                        {String(header || `Col ${index + 1}`)}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {aiResultData.slice(1).map((row, rowIndex) => (
+                    <tr key={rowIndex}>
+                      {row.map((cell, cellIndex) => (
+                        <td key={cellIndex} style={{
+                          padding: '12px 16px',
+                          fontSize: '13px',
+                          borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                          opacity: 0.9
+                        }}>
+                          {String(cell || '')}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
         {/* AI Response */}
         {aiResponse && (
           <div style={{
@@ -435,7 +700,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
             border: '1px solid rgba(255, 255, 255, 0.2)'
           }}>
             <h3 style={{ margin: '0 0 20px 0', fontSize: '18px', fontWeight: '600' }}>
-              🤖 AI Analysis Results
+              💬 AI Response
             </h3>
             <div style={{
               background: 'rgba(255, 255, 255, 0.05)',
