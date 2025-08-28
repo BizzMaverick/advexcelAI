@@ -725,38 +725,67 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
 
 
     
-    // Handle lookup queries like "show Owner for Status Resolved"
+    // Smart lookup - auto-detect data structure
     const lowerPrompt = trimmedPrompt.toLowerCase();
     if (lowerPrompt.includes('show') || lowerPrompt.includes('get') || lowerPrompt.includes('find') || lowerPrompt.includes('lookup')) {
-      const headers = fileData[0];
-      const dataRows = fileData.slice(1);
       
-      // Parse query like "show Owner for Status Resolved"
+      // Smart header detection - find row with most text columns
+      let headerRowIndex = 0;
+      let maxTextColumns = 0;
+      
+      for (let i = 0; i < Math.min(10, fileData.length); i++) {
+        const row = fileData[i];
+        const textColumns = row.filter(cell => {
+          const str = String(cell || '').trim();
+          return str.length > 0 && isNaN(Number(str));
+        }).length;
+        
+        if (textColumns > maxTextColumns) {
+          maxTextColumns = textColumns;
+          headerRowIndex = i;
+        }
+      }
+      
+      const headers = fileData[headerRowIndex];
+      const dataRows = fileData.slice(headerRowIndex + 1);
+      
+      // Parse query patterns
       const showMatch = trimmedPrompt.match(/show\s+(\w+)\s+for\s+(\w+)\s+(\w+)/i);
       const getMatch = trimmedPrompt.match(/get\s+(\w+)\s+(?:where|for)\s+(\w+)\s+(?:is|=|equals?)\s*(\w+)/i);
       
       if (showMatch || getMatch) {
         const [, targetColumn, filterColumn, filterValue] = showMatch || getMatch;
         
-        // Find column indices
-        const targetColIndex = headers.findIndex(h => String(h).toLowerCase().includes(targetColumn.toLowerCase()));
-        const filterColIndex = headers.findIndex(h => String(h).toLowerCase().includes(filterColumn.toLowerCase()));
+        // Smart column detection - fuzzy match
+        const findColumn = (searchTerm) => {
+          return headers.findIndex(h => {
+            const headerStr = String(h || '').toLowerCase();
+            const searchStr = searchTerm.toLowerCase();
+            return headerStr.includes(searchStr) || searchStr.includes(headerStr);
+          });
+        };
+        
+        const targetColIndex = findColumn(targetColumn);
+        const filterColIndex = findColumn(filterColumn);
         
         if (targetColIndex === -1 || filterColIndex === -1) {
-          setAiResponse(`<strong>Error:</strong> Could not find columns "${targetColumn}" or "${filterColumn}"`);
+          setAiResponse(`<strong>Columns not found.</strong> Available columns: ${headers.map(h => String(h)).join(', ')}`);
           setPrompt('');
           return;
         }
         
-        // Filter rows and get unique values
+        // Smart filtering - partial match
         const matchingValues = new Set();
         const matchingRows = [];
         
         dataRows.forEach(row => {
           const cellValue = String(row[filterColIndex] || '').toLowerCase();
-          if (cellValue.includes(filterValue.toLowerCase())) {
-            matchingValues.add(row[targetColIndex]);
-            matchingRows.push(row);
+          if (cellValue.includes(filterValue.toLowerCase()) || filterValue.toLowerCase().includes(cellValue)) {
+            const targetValue = row[targetColIndex];
+            if (targetValue && String(targetValue).trim()) {
+              matchingValues.add(targetValue);
+              matchingRows.push(row);
+            }
           }
         });
         
@@ -767,42 +796,20 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           
           let response = `<strong>${headers[targetColIndex]} for ${headers[filterColIndex]} "${filterValue}":</strong><br><br>`;
           
-          // Show unique values first
-          response += '<div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 15px;">';
-          response += `<strong>Unique ${headers[targetColIndex]} values:</strong><br>`;
-          Array.from(matchingValues).forEach(value => {
+          // Show unique values
+          response += '<div style="background: #e8f5e8; padding: 15px; border-radius: 6px; margin-bottom: 15px;">';
+          response += `<strong>Found ${matchingValues.size} unique ${headers[targetColIndex]} values:</strong><br>`;
+          Array.from(matchingValues).slice(0, 20).forEach(value => {
             response += `• ${value}<br>`;
           });
+          if (matchingValues.size > 20) response += `... and ${matchingValues.size - 20} more`;
           response += '</div>';
-          
-          // Show detailed table
-          response += '<table style="width: 100%; border-collapse: collapse;">';
-          response += '<thead><tr style="background: #e6f3ff; border-bottom: 2px solid #0078d4;">';
-          response += '<th style="padding: 8px; font-size: 11px; font-weight: bold; color: #0078d4; border: 1px solid #ddd;">#</th>';
-          headers.forEach((header, index) => {
-            const colLetter = String.fromCharCode(65 + index);
-            response += `<th style="padding: 8px; font-size: 11px; font-weight: bold; color: #0078d4; border: 1px solid #ddd;">${colLetter}</th>`;
-          });
-          response += '</tr></thead><tbody>';
-          response += '<tr><td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; font-size: 11px; color: #0078d4; background: #f8f9ff; text-align: center;">1</td>';
-          headers.forEach(header => {
-            response += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; color: #333;">${header}</td>`;
-          });
-          response += '</tr>';
-          matchingRows.forEach((row, index) => {
-            response += '<tr><td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; font-size: 11px; color: #0078d4; background: #f8f9ff; text-align: center;">' + (index + 2) + '</td>';
-            row.forEach(cell => {
-              response += `<td style="padding: 8px; border-right: 1px solid #eee; color: #333;">${cell || 'N/A'}</td>`;
-            });
-            response += '</tr>';
-          });
-          response += '</tbody></table>';
           
           setAiResponse(response);
           setPrompt('');
           return;
         } else {
-          setAiResponse(`<strong>No results found for ${headers[filterColumn]} = "${filterValue}"</strong>`);
+          setAiResponse(`<strong>No matches found for "${filterValue}" in ${headers[filterColIndex]}</strong>`);
           setPrompt('');
           return;
         }

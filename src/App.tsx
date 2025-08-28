@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-route
 import './App.css';
 import './animations.css';
 import MinimalApp from './components/MinimalApp';
+import MainWorkspace from './components/MainWorkspace';
 import LandingPage from './LandingPage';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsAndConditions from './components/TermsAndConditions';
@@ -35,6 +36,11 @@ function App() {
   }>({ hasValidPayment: false });
   
   const [loading, setLoading] = useState(false);
+  
+  // Feature flag for new interface - only for specific users
+  const useNewInterface = user?.email === 'katragadda225@gmail.com' || 
+                         user?.email?.includes('@advexcel.online') ||
+                         localStorage.getItem('use_new_interface') === 'true';
 
   // Check trial/payment status when user logs in
   useEffect(() => {
@@ -139,24 +145,52 @@ function App() {
             />
           ) : trialStatus.hasValidPayment ? (
             <>
-              {trialStatus.inTrial && (
+              {trialStatus.inTrial && !useNewInterface && (
                 <TrialStatus 
                   trialExpiryDate={trialStatus.trialExpiryDate}
                   promptsRemaining={trialStatus.promptsRemaining || 0}
                   promptsUsed={trialStatus.promptsUsed || 0}
                   onUpgrade={() => {
-                    // Prevent page refresh - just show alert for now
                     alert('Upgrade feature temporarily disabled to prevent data loss. Please contact support.');
                   }}
                   onRefresh={handleTrialRefresh}
                 />
               )}
-              <MinimalApp 
-                user={user} 
-                onLogout={handleLogout}
-                trialStatus={trialStatus}
-                onTrialRefresh={handleTrialRefresh}
-              />
+              
+              {/* Beta Testing Toggle - Only for admin */}
+              {user?.email === 'katragadda225@gmail.com' && (
+                <div style={{
+                  position: 'fixed',
+                  top: '10px',
+                  right: '10px',
+                  zIndex: 9999,
+                  background: '#0078d4',
+                  color: 'white',
+                  padding: '8px 12px',
+                  borderRadius: '4px',
+                  fontSize: '12px',
+                  cursor: 'pointer'
+                }} onClick={() => {
+                  const current = localStorage.getItem('use_new_interface') === 'true';
+                  localStorage.setItem('use_new_interface', (!current).toString());
+                  window.location.reload();
+                }}>
+                  {useNewInterface ? '🔄 Switch to Old UI' : '✨ Try New UI'}
+                </div>
+              )}
+              {useNewInterface ? (
+                <MainWorkspace 
+                  user={user} 
+                  onLogout={handleLogout}
+                />
+              ) : (
+                <MinimalApp 
+                  user={user} 
+                  onLogout={handleLogout}
+                  trialStatus={trialStatus}
+                  onTrialRefresh={handleTrialRefresh}
+                />
+              )}
             </>
           ) : (
             <PaymentPage 

@@ -4,7 +4,11 @@ import SimpleTable from './SimpleTable';
 import ShortcutsHelp from './ShortcutsHelp';
 import ChartComponent from './ChartComponent';
 import CountryAnalysisChart from './CountryAnalysisChart';
+import DataInsights from './DataInsights';
+import SmartFileUpload from './SmartFileUpload';
 import { AWSService } from '../services/awsService.js';
+import { DataDetectionService } from '../services/dataDetectionService';
+import { EnhancedAiService } from '../services/enhancedAiService';
 import * as XLSX from 'xlsx';
 
 interface User {
@@ -51,6 +55,7 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
   const [chartType, setChartType] = useState<'bar' | 'line' | 'pie'>('bar');
   const [selectedColumns, setSelectedColumns] = useState<number[]>([]);
   const [analysisCountry, setAnalysisCountry] = useState<string>('');
+  const [dataStructure, setDataStructure] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Keyboard shortcuts
@@ -151,38 +156,21 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
   // Unused function - commented out to fix TypeScript error
   // const handleDirectFormatting = (action: string) => { ... };
 
-  const handleFileUpload = async (file: File) => {
-    try {
-      setSelectedFile(file);
-      const reader = new FileReader();
-      reader.onload = (evt) => {
-        try {
-          const data = evt.target?.result;
-          if (!data) throw new Error('No data read from file');
-          const workbook = XLSX.read(data, { type: 'binary' });
-          const sheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[sheetName];
-          const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as SpreadsheetData;
-          
-          const newFormatting = jsonData.map(row => row.map(() => ({})));
-          const newSheet = {
-            name: file.name.replace(/\.[^/.]+$/, ""),
-            data: jsonData,
-            formatting: newFormatting
-          };
-          
-          setSheets([newSheet]);
-          setActiveSheet(0);
-          setSpreadsheetData(jsonData);
-          setFormatting(newFormatting);
-        } catch (err) {
-          console.error('Failed to process file:', err);
-        }
-      };
-      reader.readAsBinaryString(file);
-    } catch (err) {
-      console.error('File upload error:', err);
-    }
+  const handleSmartFileUpload = (file: File, jsonData: SpreadsheetData, structure: any) => {
+    setSelectedFile(file);
+    
+    const newFormatting = jsonData.map(row => row.map(() => ({})));
+    const newSheet = {
+      name: file.name.replace(/\.[^/.]+$/, ""),
+      data: jsonData,
+      formatting: newFormatting
+    };
+    
+    setSheets([newSheet]);
+    setActiveSheet(0);
+    setSpreadsheetData(jsonData);
+    setFormatting(newFormatting);
+    setDataStructure(structure);
   };
 
   const handleToolAction = (action: string) => {
@@ -418,14 +406,21 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
     try {
       let result;
       
+      // Enhance prompt with data structure context if available
+      const enhancedPrompt = dataStructure ? 
+        EnhancedAiService.enhancePrompt(prompt, dataStructure) : 
+        prompt;
+      
+      console.log('Enhanced prompt:', enhancedPrompt);
+      
       if (selectedFile) {
         // Use AWS service with file
         console.log('Using file with AWS service:', selectedFile.name);
-        result = await AWSService.uploadSpreadsheetWithPrompt(selectedFile, prompt);
+        result = await AWSService.uploadSpreadsheetWithPrompt(selectedFile, enhancedPrompt);
       } else {
         // Use AWS service with current data
         console.log('Using current sheet data with AWS service');
-        result = await AWSService.processPromptWithData(spreadsheetData, prompt);
+        result = await AWSService.processPromptWithData(spreadsheetData, enhancedPrompt);
       }
       
       console.log('AWS Result received:', result);
@@ -568,46 +563,12 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
             </svg>
             File Upload
           </h3>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".xlsx,.xls,.csv"
-            style={{ display: 'none' }}
-            onChange={(e) => {
-              if (e.target.files?.[0]) {
-                handleFileUpload(e.target.files[0]);
-              }
-            }}
+          <SmartFileUpload 
+            onFileProcessed={handleSmartFileUpload}
+            isProcessing={aiLoading}
           />
-          
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            style={{
-              width: '100%',
-              padding: '12px',
-              background: colors.primary,
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              marginBottom: '20px',
-              fontSize: '14px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
-              transition: 'all 0.2s'
-            }}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 15V3M12 3L8 7M12 3L16 7" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M3 15V19C3 19.5304 3.21071 20.0391 3.58579 20.4142C3.96086 20.7893 4.46957 21 5 21H19C19.5304 21 20.0391 20.7893 20.4142 20.4142C20.7893 20.0391 21 19.5304 21 19V15" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            Choose Excel/CSV File
-          </button>
 
-          {selectedFile && (
+          {selectedFile && dataStructure && (
             <div style={{
               background: 'rgba(16, 124, 16, 0.1)',
               padding: '12px 16px',
@@ -622,11 +583,11 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
                   <path d="M22 11.0857V12.0057C21.9988 14.1621 21.3005 16.2604 20.0093 17.9875C18.7182 19.7147 16.9033 20.9782 14.8354 21.5896C12.7674 22.201 10.5573 22.1276 8.53447 21.3803C6.51168 20.633 4.78465 19.2518 3.61096 17.4428C2.43727 15.6338 1.87979 13.4938 2.02168 11.342C2.16356 9.19029 2.99721 7.14205 4.39828 5.5028C5.79935 3.86354 7.69279 2.72111 9.79619 2.24587C11.8996 1.77063 14.1003 1.98806 16.07 2.86572" stroke="#107c10" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   <path d="M22 4L12 14.01L9 11.01" stroke="#107c10" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
-                <strong style={{ fontWeight: '500' }}>File Loaded</strong>
+                <strong style={{ fontWeight: '500' }}>Smart Analysis Complete</strong>
               </div>
               <div style={{ marginLeft: '24px', color: colors.textSecondary }}>
                 <div style={{ marginBottom: '4px' }}>{selectedFile.name}</div>
-                <div>{spreadsheetData.length} rows</div>
+                <div>{spreadsheetData.length} rows • {dataStructure.detectedFormat} format • {Math.round(dataStructure.dataQuality.completeness * 100)}% complete</div>
               </div>
             </div>
           )}
@@ -683,6 +644,52 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
             </div>
           )}
 
+          {/* Smart Prompts */}
+          {dataStructure && (
+            <div style={{ marginBottom: '20px' }}>
+              <h4 style={{ 
+                margin: '0 0 12px 0', 
+                color: colors.text, 
+                fontSize: '16px', 
+                fontWeight: '500',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                💡 Smart Suggestions
+              </h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                {DataDetectionService.generateSmartPrompts(dataStructure).slice(0, 3).map((smartPrompt, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setPrompt(smartPrompt)}
+                    style={{
+                      padding: '8px 12px',
+                      background: 'white',
+                      border: '1px solid #e0e0e0',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      textAlign: 'left',
+                      color: colors.text,
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#f0f8ff';
+                      e.currentTarget.style.borderColor = colors.primary;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'white';
+                      e.currentTarget.style.borderColor = '#e0e0e0';
+                    }}
+                  >
+                    {smartPrompt}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* AI Prompt */}
           <h4 style={{ 
             margin: '0 0 12px 0', 
@@ -703,7 +710,10 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
           <textarea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Type what you want to do... e.g., 'analyze Somalia', 'compare Yemen and Syria', 'show fragility trends', 'create bar chart'"
+            placeholder={dataStructure ? 
+              `Smart suggestions above, or try:\n• ${EnhancedAiService.generateFollowUpQuestions(dataStructure)[0] || 'analyze key trends'}\n• ${EnhancedAiService.generateTransformationSuggestions(dataStructure)[0] || 'create summary statistics'}\n• generate insights and recommendations` :
+              "Type what you want to do... e.g., 'analyze data', 'create charts', 'clean data'"
+            }
             style={{
               width: '100%',
               height: '80px',
@@ -913,7 +923,19 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
               </div>
             ) : (
               <>
-                {/* Spreadsheet data will be displayed below */}
+                {/* Smart Data Insights */}
+                {spreadsheetData.length > 0 && (
+                  <DataInsights 
+                    data={spreadsheetData}
+                    onPromptSelect={(selectedPrompt) => {
+                      setPrompt(selectedPrompt);
+                      // Auto-run the selected prompt
+                      setTimeout(() => {
+                        handleRunAI();
+                      }, 100);
+                    }}
+                  />
+                )}
                 
                 {/* Current Sheet Data */}
                 {spreadsheetData.length > 0 && (
