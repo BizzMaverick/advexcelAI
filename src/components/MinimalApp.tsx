@@ -33,7 +33,7 @@ ChartJS.register(
   Legend
 );
 
-// Generate chart for analysis requests
+// Enhanced chart generation with all chart types
 const generateAnalysisChart = (data: any[][], prompt: string): string => {
   if (!data || data.length < 2) {
     return '<strong>📊 Chart Error:</strong><br><br>Not enough data to create chart. Need at least 2 rows with headers.';
@@ -41,68 +41,67 @@ const generateAnalysisChart = (data: any[][], prompt: string): string => {
 
   const headers = data[0].map(h => String(h || ''));
   const rows = data.slice(1);
+  const chartId = `chart-${Date.now()}`;
   
-  // Check for country-specific analysis
-  const countryMatch = prompt.match(/\b(somalia|yemen|afghanistan|syria|south sudan|congo|sudan|chad|haiti|zimbabwe|[A-Z][a-z]+)\b/i);
+  // Detect chart type from prompt
+  let chartType = 'bar';
+  if (prompt.match(/\b(pie|donut)\b/i)) chartType = 'pie';
+  else if (prompt.match(/\b(line|trend)\b/i)) chartType = 'line';
+  else if (prompt.match(/\b(scatter)\b/i)) chartType = 'scatter';
   
-  if (countryMatch) {
-    const countryName = countryMatch[0];
-    const countryRow = rows.find(row => 
-      row[0] && row[0].toString().toLowerCase().includes(countryName.toLowerCase())
+  // Check for specific data analysis
+  const entityMatch = prompt.match(/\b(somalia|yemen|afghanistan|syria|south sudan|congo|sudan|chad|haiti|zimbabwe|[A-Z][a-z]+)\b/i);
+  
+  if (entityMatch) {
+    const entityName = entityMatch[0];
+    const entityRow = rows.find(row => 
+      row[0] && row[0].toString().toLowerCase().includes(entityName.toLowerCase())
     );
     
-    if (countryRow) {
-      // Generate country-specific chart HTML
-      let chartHtml = `<strong>📊 Analysis: ${countryName}</strong><br><br>`;
+    if (entityRow) {
+      let chartHtml = `<strong>📊 ${entityName} Analysis</strong><br><br>`;
       chartHtml += '<div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">';
-      chartHtml += `<canvas id="analysisChart-${Date.now()}" width="400" height="200"></canvas>`;
+      chartHtml += `<canvas id="${chartId}" width="600" height="400"></canvas>`;
       chartHtml += '</div>';
       
-      // Add script to render chart
       setTimeout(() => {
-        const canvas = document.querySelector(`canvas[id^="analysisChart-"]`) as HTMLCanvasElement;
+        const canvas = document.getElementById(chartId) as HTMLCanvasElement;
         if (canvas) {
           const ctx = canvas.getContext('2d');
           if (ctx) {
-            // Get numeric data for the country
             const labels = [];
             const values = [];
             
             for (let i = 1; i < headers.length; i++) {
-              const value = Number(countryRow[i]);
-              if (!isNaN(value) && value > 0) {
+              const value = Number(entityRow[i]);
+              if (!isNaN(value) && value !== 0) {
                 labels.push(headers[i]);
                 values.push(value);
               }
             }
             
+            const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'];
+            
             new ChartJS(ctx, {
-              type: 'bar',
+              type: chartType,
               data: {
-                labels: labels.slice(0, 10), // Limit to 10 items
+                labels: labels.slice(0, 10),
                 datasets: [{
-                  label: `${countryName} Metrics`,
+                  label: `${entityName} Data`,
                   data: values.slice(0, 10),
-                  backgroundColor: [
-                    '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57',
-                    '#ff9ff3', '#54a0ff', '#5f27cd', '#00d2d3', '#ff9f43'
-                  ],
-                  borderColor: '#333',
-                  borderWidth: 1,
+                  backgroundColor: chartType === 'pie' ? colors : colors[0],
+                  borderColor: chartType === 'line' ? colors[0] : '#fff',
+                  borderWidth: 2,
+                  fill: chartType === 'line' ? false : true
                 }]
               },
               options: {
                 responsive: true,
                 plugins: {
-                  legend: { display: false },
-                  title: { 
-                    display: true, 
-                    text: `${countryName} - Detailed Analysis`
-                  }
+                  legend: { display: chartType === 'pie' },
+                  title: { display: true, text: `${entityName} - ${chartType.toUpperCase()} Chart` }
                 },
-                scales: {
-                  y: { beginAtZero: true }
-                }
+                scales: chartType === 'pie' ? {} : { y: { beginAtZero: true } }
               }
             });
           }
@@ -113,8 +112,65 @@ const generateAnalysisChart = (data: any[][], prompt: string): string => {
     }
   }
   
-  // General analysis chart
-  return '<strong>📊 Analysis Chart:</strong><br><br>Chart functionality is being prepared for your data. Please try a more specific request like "analyze [country name]".';
+  // General data chart
+  let chartHtml = '<strong>📊 Data Visualization</strong><br><br>';
+  chartHtml += '<div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">';
+  chartHtml += `<canvas id="${chartId}" width="600" height="400"></canvas>`;
+  chartHtml += '</div>';
+  
+  setTimeout(() => {
+    const canvas = document.getElementById(chartId) as HTMLCanvasElement;
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        // Auto-detect columns for charting
+        let labelColumn = 0;
+        let valueColumn = 1;
+        
+        // Find first numeric column
+        for (let i = 1; i < headers.length; i++) {
+          const hasNumericData = rows.some(row => !isNaN(Number(row[i])) && row[i] !== '');
+          if (hasNumericData) {
+            valueColumn = i;
+            break;
+          }
+        }
+        
+        const labels = rows.slice(0, 15).map(row => String(row[labelColumn] || ''));
+        const values = rows.slice(0, 15).map(row => {
+          const val = Number(row[valueColumn]);
+          return isNaN(val) ? 0 : val;
+        });
+        
+        const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'];
+        
+        new ChartJS(ctx, {
+          type: chartType,
+          data: {
+            labels: labels,
+            datasets: [{
+              label: headers[valueColumn],
+              data: values,
+              backgroundColor: chartType === 'pie' ? colors : colors[0],
+              borderColor: chartType === 'line' ? colors[0] : '#fff',
+              borderWidth: 2,
+              fill: chartType === 'line' ? false : true
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { display: chartType === 'pie' },
+              title: { display: true, text: `${chartType.toUpperCase()} Chart - ${headers[valueColumn]}` }
+            },
+            scales: chartType === 'pie' ? {} : { y: { beginAtZero: true } }
+          }
+        });
+      }
+    }
+  }, 100);
+  
+  return chartHtml;
 };
 
 interface User {
