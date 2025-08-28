@@ -161,25 +161,47 @@ function App() {
                 />
               )}
               
-              {/* Beta Testing Toggle - Only for admin */}
+              {/* Modern Beta Testing Toggle - Only for admin */}
               {canUseNewInterface && (
                 <div style={{
                   position: 'fixed',
-                  top: '10px',
-                  right: '10px',
+                  top: '20px',
+                  right: '20px',
                   zIndex: 9999,
-                  background: '#0078d4',
+                  background: useNewInterface ? 
+                    'linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1))' :
+                    'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
+                  backdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
                   color: 'white',
-                  padding: '8px 12px',
-                  borderRadius: '4px',
-                  fontSize: '12px',
-                  cursor: 'pointer'
+                  padding: '12px 20px',
+                  borderRadius: '25px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  fontFamily: '"Poppins", sans-serif',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
                 }} onClick={() => {
                   const newValue = !useNewInterface;
                   localStorage.setItem('use_new_interface', newValue.toString());
                   setUseNewInterface(newValue);
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 12px 40px rgba(0, 0, 0, 0.15)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.1)';
                 }}>
-                  {useNewInterface ? '🔄 Switch to Old UI' : '✨ Try New UI'}
+                  <span style={{ fontSize: '16px' }}>
+                    {useNewInterface ? '🔄' : '✨'}
+                  </span>
+                  {useNewInterface ? 'Classic UI' : 'Modern UI'}
                 </div>
               )}
               {(useNewInterface && canUseNewInterface) ? (
