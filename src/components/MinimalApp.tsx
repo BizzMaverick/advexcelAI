@@ -6,7 +6,7 @@ import logo from '../assets/logo.png';
 import bedrockService from '../services/bedrockService';
 import PaymentService from '../services/paymentService';
 import ErrorBoundary from './ErrorBoundary';
-import { generateChart } from '../utils/analytics';
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -732,7 +732,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
 
     // Handle chart generation (Phase 1 Analytics)
     if (lowerPrompt.includes('chart') || lowerPrompt.includes('graph') || lowerPrompt.includes('plot')) {
-      const chartHtml = generateChart(fileData, trimmedPrompt);
+      const chartHtml = generateAnalysisChart(fileData, trimmedPrompt);
       setAiResponse(chartHtml);
       setPrompt('');
       return;
