@@ -717,57 +717,72 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
 
 
     
-    // Handle simple lookup
+    // Handle lookup queries like "show Owner for Status Resolved"
     const lowerPrompt = trimmedPrompt.toLowerCase();
-    if (lowerPrompt.includes('lookup') || lowerPrompt.includes('find')) {
+    if (lowerPrompt.includes('show') || lowerPrompt.includes('get') || lowerPrompt.includes('find') || lowerPrompt.includes('lookup')) {
       const headers = fileData[0];
       const dataRows = fileData.slice(1);
-      let searchText = trimmedPrompt.replace(/lookup|find|show|e1:|economy|for|data|of|the/gi, '').trim();
       
-      // Split by any combination of comma, 'and', or spaces and filter meaningful words
-      const words = searchText.split(/[,\s]+|\s+and\s+/).map(w => w.trim()).filter(w => w.length > 2);
-      const countries = words.filter(w => !['and', 'or', 'with'].includes(w.toLowerCase()));
+      // Parse query like "show Owner for Status Resolved"
+      const showMatch = trimmedPrompt.match(/show\s+(\w+)\s+for\s+(\w+)\s+(\w+)/i);
+      const getMatch = trimmedPrompt.match(/get\s+(\w+)\s+(?:where|for)\s+(\w+)\s+(?:is|=|equals?)\s*(\w+)/i);
       
-      if (countries.length > 0) {
-        const matches = [];
+      if (showMatch || getMatch) {
+        const [, targetColumn, filterColumn, filterValue] = showMatch || getMatch;
         
-        for (let i = 0; i < dataRows.length; i++) {
-          const row = dataRows[i];
-          for (const country of countries) {
-            for (let j = 0; j < row.length; j++) {
-              const cellValue = String(row[j] || '').toLowerCase();
-              if (cellValue.includes(country.toLowerCase())) {
-                matches.push(row);
-                break;
-              }
-            }
-          }
+        // Find column indices
+        const targetColIndex = headers.findIndex(h => String(h).toLowerCase().includes(targetColumn.toLowerCase()));
+        const filterColIndex = headers.findIndex(h => String(h).toLowerCase().includes(filterColumn.toLowerCase()));
+        
+        if (targetColIndex === -1 || filterColIndex === -1) {
+          setAiResponse(`<strong>Error:</strong> Could not find columns "${targetColumn}" or "${filterColumn}"`);
+          setPrompt('');
+          return;
         }
         
-        if (matches.length > 0) {
-          const result = [headers, ...matches];
+        // Filter rows and get unique values
+        const matchingValues = new Set();
+        const matchingRows = [];
+        
+        dataRows.forEach(row => {
+          const cellValue = String(row[filterColIndex] || '').toLowerCase();
+          if (cellValue.includes(filterValue.toLowerCase())) {
+            matchingValues.add(row[targetColIndex]);
+            matchingRows.push(row);
+          }
+        });
+        
+        if (matchingValues.size > 0) {
+          const result = [headers, ...matchingRows];
           setLastAiResult(result);
           setShowUseResultButton(true);
           
-          let response = `<strong>Results for ${countries.join(', ')}:</strong><br><br>`;
+          let response = `<strong>${headers[targetColIndex]} for ${headers[filterColIndex]} "${filterValue}":</strong><br><br>`;
+          
+          // Show unique values first
+          response += '<div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 15px;">';
+          response += `<strong>Unique ${headers[targetColIndex]} values:</strong><br>`;
+          Array.from(matchingValues).forEach(value => {
+            response += `• ${value}<br>`;
+          });
+          response += '</div>';
+          
+          // Show detailed table
           response += '<table style="width: 100%; border-collapse: collapse;">';
-          response += '<thead>';
-          response += '<tr style="background: #e6f3ff; border-bottom: 2px solid #0078d4;">';
+          response += '<thead><tr style="background: #e6f3ff; border-bottom: 2px solid #0078d4;">';
           response += '<th style="padding: 8px; font-size: 11px; font-weight: bold; color: #0078d4; border: 1px solid #ddd;">#</th>';
           headers.forEach((header, index) => {
             const colLetter = String.fromCharCode(65 + index);
             response += `<th style="padding: 8px; font-size: 11px; font-weight: bold; color: #0078d4; border: 1px solid #ddd;">${colLetter}</th>`;
           });
           response += '</tr></thead><tbody>';
-          response += '<tr>';
-          response += '<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; font-size: 11px; color: #0078d4; background: #f8f9ff; text-align: center;">1</td>';
+          response += '<tr><td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; font-size: 11px; color: #0078d4; background: #f8f9ff; text-align: center;">1</td>';
           headers.forEach(header => {
             response += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; color: #333;">${header}</td>`;
           });
           response += '</tr>';
-          matches.forEach((row, index) => {
-            response += '<tr>';
-            response += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; font-size: 11px; color: #0078d4; background: #f8f9ff; text-align: center;">${index + 2}</td>`;
+          matchingRows.forEach((row, index) => {
+            response += '<tr><td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; font-size: 11px; color: #0078d4; background: #f8f9ff; text-align: center;">' + (index + 2) + '</td>';
             row.forEach(cell => {
               response += `<td style="padding: 8px; border-right: 1px solid #eee; color: #333;">${cell || 'N/A'}</td>`;
             });
@@ -779,7 +794,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           setPrompt('');
           return;
         } else {
-          setAiResponse(`<strong>No matches found for ${countries.join(', ')}</strong>`);
+          setAiResponse(`<strong>No results found for ${headers[filterColumn]} = "${filterValue}"</strong>`);
           setPrompt('');
           return;
         }
