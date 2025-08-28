@@ -18,6 +18,10 @@ import {
   Title,
   Tooltip,
   Legend,
+  BarController,
+  LineController,
+  PieController,
+  ScatterController
 } from 'chart.js';
 import { Bar, Line, Pie } from 'react-chartjs-2';
 
@@ -30,7 +34,11 @@ ChartJS.register(
   ArcElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  BarController,
+  LineController,
+  PieController,
+  ScatterController
 );
 
 // Enhanced chart generation with all chart types
