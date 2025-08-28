@@ -4,7 +4,9 @@ import './App.css';
 import './animations.css';
 import MinimalApp from './components/MinimalApp';
 import MainWorkspace from './components/MainWorkspace';
+import ModernWorkspace from './components/ModernWorkspace';
 import LandingPage from './LandingPage';
+import ModernLandingPage from './components/ModernLandingPage';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsAndConditions from './components/TermsAndConditions';
 import CancellationRefund from './components/CancellationRefund';
@@ -39,11 +41,10 @@ function App() {
   
   // Feature flag for new interface - only for specific users
   const [useNewInterface, setUseNewInterface] = useState(() => {
-    if (user?.email === 'katragadda225@gmail.com' || user?.email?.includes('@advexcel.online')) {
-      return localStorage.getItem('use_new_interface') === 'true';
-    }
-    return false;
+    return localStorage.getItem('use_new_interface') === 'true';
   });
+  
+  const canUseNewInterface = user?.email === 'katragadda225@gmail.com' || user?.email?.includes('@advexcel.online');
 
   // Check trial/payment status when user logs in
   useEffect(() => {
@@ -138,7 +139,7 @@ function App() {
         {/* Main App Routes */}
         <Route path="/" element={
           !user ? (
-            <LandingPage onLogin={handleLogin} />
+            (useNewInterface && canUseNewInterface) ? <ModernLandingPage onLogin={handleLogin} /> : <LandingPage onLogin={handleLogin} />
           ) : trialStatus.trialExpired ? (
             <PaymentPage 
               userEmail={user.email} 
@@ -161,7 +162,7 @@ function App() {
               )}
               
               {/* Beta Testing Toggle - Only for admin */}
-              {user?.email === 'katragadda225@gmail.com' && (
+              {canUseNewInterface && (
                 <div style={{
                   position: 'fixed',
                   top: '10px',
@@ -181,8 +182,8 @@ function App() {
                   {useNewInterface ? '🔄 Switch to Old UI' : '✨ Try New UI'}
                 </div>
               )}
-              {useNewInterface ? (
-                <MainWorkspace 
+              {(useNewInterface && canUseNewInterface) ? (
+                <ModernWorkspace 
                   user={user} 
                   onLogout={handleLogout}
                 />
@@ -215,7 +216,7 @@ function App() {
               trialExpired={false}
             />
           ) : (
-            <LandingPage onLogin={handleLogin} />
+            (useNewInterface && canUseNewInterface) ? <ModernLandingPage onLogin={handleLogin} /> : <LandingPage onLogin={handleLogin} />
           )
         } />
       </Routes>
