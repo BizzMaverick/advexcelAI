@@ -38,9 +38,12 @@ function App() {
   const [loading, setLoading] = useState(false);
   
   // Feature flag for new interface - only for specific users
-  const useNewInterface = user?.email === 'katragadda225@gmail.com' || 
-                         user?.email?.includes('@advexcel.online') ||
-                         localStorage.getItem('use_new_interface') === 'true';
+  const [useNewInterface, setUseNewInterface] = useState(() => {
+    if (user?.email === 'katragadda225@gmail.com' || user?.email?.includes('@advexcel.online')) {
+      return localStorage.getItem('use_new_interface') === 'true';
+    }
+    return false;
+  });
 
   // Check trial/payment status when user logs in
   useEffect(() => {
@@ -171,9 +174,9 @@ function App() {
                   fontSize: '12px',
                   cursor: 'pointer'
                 }} onClick={() => {
-                  const current = localStorage.getItem('use_new_interface') === 'true';
-                  localStorage.setItem('use_new_interface', (!current).toString());
-                  window.location.reload();
+                  const newValue = !useNewInterface;
+                  localStorage.setItem('use_new_interface', newValue.toString());
+                  setUseNewInterface(newValue);
                 }}>
                   {useNewInterface ? '🔄 Switch to Old UI' : '✨ Try New UI'}
                 </div>
