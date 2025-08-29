@@ -127,32 +127,65 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
       const result = await bedrockService.processExcelData(data, enhancedPrompt, selectedFile?.name || 'data');
       
       if (result.success) {
-        // Build comprehensive response from structured data
+        // Perform comprehensive local analytics
+        const analytics = performComprehensiveAnalytics(data);
+        
         let fullAnalysis = `📊 **COMPREHENSIVE DATA ANALYTICS REPORT**\n\n`;
         
+        // Basic Statistics
         if (result.structured && result.structured.result) {
-          fullAnalysis += `**STATISTICAL SUMMARY:**\n`;
+          fullAnalysis += `**📊 STATISTICAL SUMMARY:**\n`;
           const stats = result.structured.result;
           stats.slice(1).forEach(([stat, value]) => {
             fullAnalysis += `• ${stat}: ${value}\n`;
           });
           fullAnalysis += `\n`;
-          
-          // Set structured data for table display
-          setAiResultData(stats);
         }
         
-        fullAnalysis += `**DATASET OVERVIEW:**\n`;
+        // Data Quality Analysis
+        fullAnalysis += `**🔍 DATA QUALITY:**\n`;
         fullAnalysis += `• Total Rows: ${data.length}\n`;
         fullAnalysis += `• Total Columns: ${data[0]?.length || 0}\n`;
-        fullAnalysis += `• Data Quality: ${data.length > 0 ? 'Good' : 'No data'}\n\n`;
+        fullAnalysis += `• Duplicate Rows: ${analytics.duplicates}\n`;
+        fullAnalysis += `• Missing Values: ${analytics.missingValues}\n\n`;
         
-        fullAnalysis += `**KEY INSIGHTS:**\n`;
-        fullAnalysis += `• Dataset contains ${data.length} records across ${data[0]?.length || 0} variables\n`;
-        fullAnalysis += `• Statistical analysis shows comprehensive metrics\n`;
-        fullAnalysis += `• Data appears suitable for further analysis\n\n`;
+        // Top 5 Analysis
+        if (analytics.top5.length > 0) {
+          fullAnalysis += `**🔝 TOP 5 HIGHEST VALUES:**\n`;
+          analytics.top5.forEach((item, index) => {
+            fullAnalysis += `${index + 1}. ${item.country || item.name || 'Row ' + item.index}: ${item.value}\n`;
+          });
+          fullAnalysis += `\n`;
+        }
         
-        fullAnalysis += result.response || 'Analysis completed successfully';
+        // Bottom 5 Analysis
+        if (analytics.bottom5.length > 0) {
+          fullAnalysis += `**🔽 BOTTOM 5 LOWEST VALUES:**\n`;
+          analytics.bottom5.forEach((item, index) => {
+            fullAnalysis += `${index + 1}. ${item.country || item.name || 'Row ' + item.index}: ${item.value}\n`;
+          });
+          fullAnalysis += `\n`;
+        }
+        
+        // Comparison Analysis
+        if (analytics.top5.length > 0 && analytics.bottom5.length > 0) {
+          const topAvg = analytics.top5.reduce((sum, item) => sum + item.value, 0) / analytics.top5.length;
+          const bottomAvg = analytics.bottom5.reduce((sum, item) => sum + item.value, 0) / analytics.bottom5.length;
+          const ratio = (topAvg / bottomAvg).toFixed(2);
+          
+          fullAnalysis += `**⚖️ TOP vs BOTTOM COMPARISON:**\n`;
+          fullAnalysis += `• Top 5 Average: ${topAvg.toFixed(2)}\n`;
+          fullAnalysis += `• Bottom 5 Average: ${bottomAvg.toFixed(2)}\n`;
+          fullAnalysis += `• Ratio (Top/Bottom): ${ratio}x\n`;
+          fullAnalysis += `• Gap Analysis: ${topAvg > bottomAvg * 2 ? 'High inequality detected' : 'Moderate distribution'}\n\n`;
+        }
+        
+        // Key Insights
+        fullAnalysis += `**💡 KEY INSIGHTS:**\n`;
+        fullAnalysis += `• Data Range: ${analytics.range.toFixed(2)} (${analytics.min} to ${analytics.max})\n`;
+        fullAnalysis += `• Data Quality: ${analytics.duplicates === 0 ? 'Excellent (No duplicates)' : `${analytics.duplicates} duplicates found`}\n`;
+        fullAnalysis += `• Distribution: ${analytics.standardDeviation > analytics.mean ? 'High variability' : 'Low variability'}\n`;
+        fullAnalysis += `• Recommendation: ${analytics.duplicates > 0 ? 'Clean duplicate data' : 'Data ready for analysis'}\n`;
         
         setAiResponse(fullAnalysis);
         return;
@@ -320,6 +353,74 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
     XLSX.writeFile(wb, filename);
+  };
+
+  const performComprehensiveAnalytics = (data: any[][]) => {
+    if (!data || data.length < 2) return { duplicates: 0, missingValues: 0, top5: [], bottom5: [], range: 0, min: 0, max: 0, mean: 0, standardDeviation: 0 };
+    
+    const headers = data[0];
+    const rows = data.slice(1);
+    
+    // Find numeric columns
+    let numericColumnIndex = -1;
+    let countryColumnIndex = -1;
+    
+    for (let i = 0; i < headers.length; i++) {
+      const header = String(headers[i]).toLowerCase();
+      if (header.includes('total') || header.includes('count') || header.includes('number') || header.includes('value')) {
+        numericColumnIndex = i;
+      }
+      if (header.includes('country') || header.includes('name') || header.includes('region')) {
+        countryColumnIndex = i;
+      }
+    }
+    
+    // Count duplicates
+    const uniqueRows = new Set(rows.map(row => JSON.stringify(row)));
+    const duplicates = rows.length - uniqueRows.size;
+    
+    // Count missing values
+    let missingValues = 0;
+    rows.forEach(row => {
+      row.forEach(cell => {
+        if (cell === null || cell === undefined || cell === '') missingValues++;
+      });
+    });
+    
+    // Analyze numeric data
+    let numericData = [];
+    if (numericColumnIndex >= 0) {
+      numericData = rows.map((row, index) => ({
+        value: parseFloat(row[numericColumnIndex]) || 0,
+        country: countryColumnIndex >= 0 ? row[countryColumnIndex] : `Row ${index + 1}`,
+        index: index + 1
+      })).filter(item => !isNaN(item.value) && item.value > 0);
+    }
+    
+    // Sort for top/bottom analysis
+    const sortedData = [...numericData].sort((a, b) => b.value - a.value);
+    const top5 = sortedData.slice(0, 5);
+    const bottom5 = sortedData.slice(-5).reverse();
+    
+    // Calculate statistics
+    const values = numericData.map(item => item.value);
+    const min = Math.min(...values) || 0;
+    const max = Math.max(...values) || 0;
+    const mean = values.length > 0 ? values.reduce((sum, val) => sum + val, 0) / values.length : 0;
+    const variance = values.length > 0 ? values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length : 0;
+    const standardDeviation = Math.sqrt(variance);
+    
+    return {
+      duplicates,
+      missingValues,
+      top5,
+      bottom5,
+      range: max - min,
+      min,
+      max,
+      mean,
+      standardDeviation
+    };
   };
 
   const displayData = getFilteredData();
@@ -736,81 +837,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
               </div>
             )}
             
-            {/* AI Results in Right Panel */}
-            {aiResultData && (
-              <div style={{
-                marginTop: '32px',
-                background: 'rgba(255, 255, 255, 0.05)',
-                borderRadius: '12px',
-                padding: '24px'
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                  <h4 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>
-                    🤖 AI Analysis Results
-                  </h4>
-                  <button
-                    onClick={() => downloadExcel(aiResultData, 'ai_results.xlsx')}
-                    style={{
-                      background: 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
-                      border: 'none',
-                      borderRadius: '6px',
-                      padding: '6px 12px',
-                      color: 'white',
-                      cursor: 'pointer',
-                      fontSize: '11px',
-                      fontWeight: '500'
-                    }}
-                  >
-                    💾 Export
-                  </button>
-                </div>
-                <div style={{
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  borderRadius: '8px',
-                  overflow: 'auto',
-                  maxHeight: '300px',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  scrollbarWidth: 'thin',
-                  scrollbarColor: 'rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1)'
-                }} className="custom-scrollbar">
-                  <table style={{ borderCollapse: 'collapse', width: 'max-content', minWidth: '100%' }}>
-                    <thead>
-                      <tr style={{ background: 'rgba(255, 255, 255, 0.1)' }}>
-                        {aiResultData[0]?.map((header, index) => (
-                          <th key={index} style={{
-                            padding: '8px 12px',
-                            textAlign: 'left',
-                            fontSize: '11px',
-                            fontWeight: '600',
-                            borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-                            whiteSpace: 'nowrap'
-                          }}>
-                            {String(header || `Col ${index + 1}`)}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {aiResultData.slice(1).map((row, rowIndex) => (
-                        <tr key={rowIndex}>
-                          {row.map((cell, cellIndex) => (
-                            <td key={cellIndex} style={{
-                              padding: '8px 12px',
-                              fontSize: '12px',
-                              borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-                              opacity: 0.9,
-                              whiteSpace: 'nowrap'
-                            }}>
-                              {String(cell || '')}
-                            </td>
-                          ))}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
+
             
             {/* AI Response in Right Panel */}
             {aiResponse && (
