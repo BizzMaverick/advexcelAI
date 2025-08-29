@@ -1144,13 +1144,13 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
             {/* Custom Analysis */}
             <div>
               <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600' }}>
-                📝 Custom Analysis
+                🤖 AI Assistant
               </h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="Ask for specific analysis or insights..."
+                  placeholder="Ask anything: analysis, pivot tables, summaries, charts...\ne.g., 'countries with economy', 'sum of sales', 'show duplicates'"
                   style={{
                     background: 'rgba(255, 255, 255, 0.1)',
                     border: '1px solid rgba(255, 255, 255, 0.2)',
@@ -1180,70 +1180,12 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                     opacity: (!prompt.trim() || !spreadsheetData.length) ? 0.5 : 1
                   }}
                 >
-                  {aiLoading ? '🔄 Processing...' : '🔍 Custom Analysis'}
+                  {aiLoading ? '🔄 Processing...' : '🤖 AI Assistant'}
                 </button>
               </div>
             </div>
             
-            {/* Custom Pivot */}
-            {spreadsheetData.length > 0 && (
-              <div style={{ marginTop: '24px' }}>
-                <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600' }}>
-                  📋 Custom Pivot
-                </h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <input
-                    type="text"
-                    value={pivotPrompt}
-                    onChange={(e) => setPivotPrompt(e.target.value)}
-                    placeholder="e.g., 'countries with economy', 'employees with salary', 'items with price'"
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
-                      borderRadius: '12px',
-                      padding: '16px',
-                      color: 'white',
-                      fontSize: '14px',
-                      outline: 'none'
-                    }}
-                  />
-                  <button
-                    onClick={() => {
-                      if (pivotPrompt.trim()) {
-                        const localPivot = createCustomPivot(spreadsheetData, pivotPrompt);
-                        if (localPivot) {
-                          const customPivot = {
-                            title: 'Custom Pivot',
-                            description: pivotPrompt,
-                            data: localPivot
-                          };
-                          setPivotTables([...pivotTables, customPivot]);
-                          setSelectedPivot(pivotTables.length);
-                          setPivotPrompt('');
-                        } else {
-                          setAiResponse('❌ Could not create pivot table. Please check column names and try again.');
-                        }
-                      }
-                    }}
-                    disabled={!pivotPrompt.trim()}
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
-                      borderRadius: '12px',
-                      padding: '16px',
-                      color: 'white',
-                      fontSize: '14px',
-                      fontWeight: '600',
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease',
-                      opacity: !pivotPrompt.trim() ? 0.5 : 1
-                    }}
-                  >
-                    ✨ Create Pivot
-                  </button>
-                </div>
-              </div>
-            )}
+
           </div>
 
           {/* Right Panel - Data Display Only */}
