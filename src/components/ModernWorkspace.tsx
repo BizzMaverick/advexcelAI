@@ -3,7 +3,7 @@ import { DataDetectionService } from '../services/dataDetectionService';
 import { EnhancedAiService } from '../services/enhancedAiService';
 import bedrockService from '../services/bedrockService';
 import ChartComponent from './ChartComponent';
-import ModernDataInsights from './ModernDataInsights';
+
 import * as XLSX from 'xlsx';
 import emailjs from '@emailjs/browser';
 
@@ -1499,21 +1499,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           </div>
         )}
 
-        {/* Data Insights */}
-        {dataStructure && (
-          <div style={{
-            maxWidth: '1200px',
-            margin: '40px auto 0'
-          }}>
-            <ModernDataInsights 
-              data={spreadsheetData}
-              onPromptSelect={(selectedPrompt) => {
-                setPrompt(selectedPrompt);
-                setTimeout(() => handleCustomAnalysis(), 100);
-              }}
-            />
-          </div>
-        )}
+
 
 
       </main>
