@@ -751,31 +751,47 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     const includeYear = lowerPrompt.includes('year');
     const yearIndex = headers.findIndex((h: string) => /\d{4}/.test(String(h)) || String(h).toLowerCase().includes('year'));
     
-    if (lowerPrompt.includes('rank') && isNumeric) {
-      if (includeYear && yearIndex !== -1) {
-        result.push(['Rank', rowHeader, 'Year', valueHeader]);
+    // Find actual value column (not year column)
+    let actualValueIndex = -1;
+    if (lowerPrompt.includes('total') || lowerPrompt.includes('value')) {
+      actualValueIndex = headers.findIndex((h: string) => {
+        const headerStr = String(h).toLowerCase();
+        return (headerStr.includes('total') || headerStr.includes('value')) && h !== headers[yearIndex];
+      });
+    }
+    
+    // Use actual value column if found, otherwise use detected value column
+    const finalValueIndex = actualValueIndex !== -1 ? actualValueIndex : valueIndex;
+    const finalValueHeader = finalValueIndex !== -1 ? headers[finalValueIndex] : 'Value';
+    
+    if (lowerPrompt.includes('rank') && finalValueIndex !== -1) {
+      if (includeYear && yearIndex !== -1 && yearIndex !== finalValueIndex) {
+        result.push(['Rank', rowHeader, 'Year', finalValueHeader]);
         pivotData.forEach((item, index) => {
-          const displayValue = isNumeric ? parseFloat(String(item.value)).toFixed(2) : item.value;
+          const actualValue = rows.find(row => row[rowIndex] === item.row)?.[finalValueIndex] || 0;
+          const displayValue = !isNaN(parseFloat(actualValue)) ? parseFloat(actualValue).toFixed(2) : actualValue;
           const yearValue = rows.find(row => row[rowIndex] === item.row)?.[yearIndex] || 'N/A';
           result.push([`#${index + 1}`, item.row, yearValue, displayValue]);
         });
       } else {
-        result.push(['Rank', rowHeader, valueHeader]);
+        result.push(['Rank', rowHeader, finalValueHeader]);
         pivotData.forEach((item, index) => {
-          const displayValue = isNumeric ? parseFloat(String(item.value)).toFixed(2) : item.value;
+          const actualValue = rows.find(row => row[rowIndex] === item.row)?.[finalValueIndex] || item.value;
+          const displayValue = !isNaN(parseFloat(actualValue)) ? parseFloat(actualValue).toFixed(2) : actualValue;
           result.push([`#${index + 1}`, item.row, displayValue]);
         });
       }
     } else {
-      if (includeYear && yearIndex !== -1) {
-        result.push([rowHeader, 'Year', valueHeader]);
+      if (includeYear && yearIndex !== -1 && finalValueIndex !== -1 && yearIndex !== finalValueIndex) {
+        result.push([rowHeader, 'Year', finalValueHeader]);
         pivotData.forEach(item => {
-          const displayValue = isNumeric ? parseFloat(String(item.value)).toFixed(2) : item.value;
+          const actualValue = rows.find(row => row[rowIndex] === item.row)?.[finalValueIndex] || item.value;
+          const displayValue = !isNaN(parseFloat(actualValue)) ? parseFloat(actualValue).toFixed(2) : actualValue;
           const yearValue = rows.find(row => row[rowIndex] === item.row)?.[yearIndex] || 'N/A';
           result.push([item.row, yearValue, displayValue]);
         });
       } else {
-        result.push([rowHeader, valueHeader]);
+        result.push([rowHeader, finalValueHeader]);
         pivotData.forEach(item => {
           const displayValue = isNumeric ? parseFloat(String(item.value)).toFixed(2) : item.value;
           result.push([item.row, displayValue]);
