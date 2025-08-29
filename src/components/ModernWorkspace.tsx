@@ -634,6 +634,59 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     
     return result;
   };
+  
+  const createCustomPivot = (data: any[][], prompt: string) => {
+    if (!data || data.length < 2) return null;
+    
+    const headers = data[0];
+    const lowerPrompt = prompt.toLowerCase();
+    
+    // Parse prompt for countries and specific columns
+    if (lowerPrompt.includes('countries') || lowerPrompt.includes('country')) {
+      const countryIndex = headers.findIndex((h: string) => String(h).toLowerCase().includes('country'));
+      if (countryIndex === -1) return null;
+      
+      // Look for specific column mentions (like E1: Economy)
+      let valueIndex = -1;
+      headers.forEach((header, index) => {
+        const headerStr = String(header).toLowerCase();
+        if (lowerPrompt.includes(headerStr) || 
+            (headerStr.includes('e1') && lowerPrompt.includes('economy')) ||
+            (headerStr.includes('economy') && lowerPrompt.includes('e1'))) {
+          valueIndex = index;
+        }
+      });
+      
+      // If no specific column found, use first numeric column
+      if (valueIndex === -1) {
+        valueIndex = headers.findIndex((h, i) => {
+          if (i === countryIndex) return false;
+          const values = data.slice(1).map(row => parseFloat(row[i])).filter(v => !isNaN(v));
+          return values.length > 0;
+        });
+      }
+      
+      if (valueIndex === -1) return null;
+      
+      // Create country ranking pivot
+      const countryData = data.slice(1).map(row => ({
+        country: row[countryIndex] || 'Unknown',
+        value: parseFloat(row[valueIndex]) || 0
+      })).filter(item => item.value > 0);
+      
+      // Sort by value descending
+      countryData.sort((a, b) => b.value - a.value);
+      
+      const result = [['Rank', 'Country', headers[valueIndex] || 'Value']];
+      countryData.forEach((item, index) => {
+        result.push([`#${index + 1}`, item.country, item.value.toFixed(2)]);
+      });
+      
+      return result;
+    }
+    
+    return null;
+  };
 
   const performComprehensiveAnalytics = (data: any[][]) => {
     if (!data || data.length < 2) return { duplicates: 0, missingValues: 0, top5: [], bottom5: [], range: 0, min: 0, max: 0, mean: 0, standardDeviation: 0 };
