@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { DataDetectionService } from '../services/dataDetectionService';
 import { EnhancedAiService } from '../services/enhancedAiService';
-import { AWSService } from '../services/awsService.js';
+import bedrockService from '../services/bedrockService';
 import ChartComponent from './ChartComponent';
 import ModernDataInsights from './ModernDataInsights';
 import * as XLSX from 'xlsx';
@@ -95,9 +95,13 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     setAiResponse('🔄 Performing comprehensive data analysis...');
     
     try {
-      // Fallback analysis when AWS API is unavailable
-      if (!data || data.length < 2) {
-        throw new Error('Insufficient data for analysis');
+      const result = await bedrockService.processExcelData(data, enhancedPrompt, selectedFile?.name || 'data');
+      
+      if (result.success && result.response) {
+        setAiResponse(result.response);
+        return;
+      } else {
+        throw new Error(result.error || 'AI analysis failed');
       }
       
       // Generate local analysis as fallback
@@ -177,17 +181,12 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           EnhancedAiService.enhancePrompt(prompt, dataStructure) : 
           prompt;
         
-        const result = selectedFile ? 
-          await AWSService.uploadSpreadsheetWithPrompt(selectedFile, enhancedPrompt) :
-          await AWSService.processPromptWithData(spreadsheetData, enhancedPrompt);
+        const result = await bedrockService.processExcelData(spreadsheetData, enhancedPrompt, selectedFile?.name || 'data');
         
-        if (result.data && Array.isArray(result.data)) {
-          setAiResultData(result.data);
-          setAiResponse('✅ Custom analysis completed! Results are displayed below.');
-        } else if (result.result) {
-          setAiResponse(result.result);
+        if (result.success && result.response) {
+          setAiResponse(result.response);
         } else {
-          setAiResponse(result.response || result.error || 'Analysis completed successfully!');
+          throw new Error(result.error || 'Analysis failed');
         }
       } catch (apiError) {
         // Fallback: Provide helpful response based on prompt
