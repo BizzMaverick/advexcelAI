@@ -572,7 +572,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   maxHeight: '400px',
                   width: '100%'
                 }}>
-                  <table style={{ borderCollapse: 'collapse' }}>
+                  <table style={{ borderCollapse: 'collapse', width: 'max-content', minWidth: '100%' }}>
                     <thead>
                       <tr style={{ background: 'rgba(255, 255, 255, 0.1)' }}>
                         {displayData[0]?.map((header, index) => (
