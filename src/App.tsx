@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-route
 import './App.css';
 import './animations.css';
 import MinimalApp from './components/MinimalApp';
-import MainWorkspace from './components/MainWorkspace';
 import ModernWorkspace from './components/ModernWorkspace';
 import LandingPage from './LandingPage';
 import ModernLandingPage from './components/ModernLandingPage';
