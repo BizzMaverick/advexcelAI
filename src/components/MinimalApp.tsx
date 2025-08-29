@@ -458,10 +458,10 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             case 'multiply': result = val1 * val2; break;
             case 'divide': result = val2 !== 0 ? val1 / val2 : 'Error: Division by zero'; break;
           }
-          return `<strong>Cell ${operation} Result:</strong><br><br>${col1}${row1} (${val1}) ${symbol} ${col2}${row2} (${val2}) = <strong>${result}</strong>`;
+          return `${col1}${row1} ${symbol} ${col2}${row2} = ${val1} ${symbol} ${val2} = ${result}`;
         }
       }
-      return `<strong>Error:</strong> Could not find numeric values in specified cells`;
+      return `Error: Could not find numeric values in specified cells`;
     };
     
     if (cellAddMatch) return performCellOperation(cellAddMatch, 'add', '+');
