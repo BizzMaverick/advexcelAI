@@ -615,7 +615,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                             }}>
                               {String(row[cellIndex] || '')}
                             </td>
-                          ))
+                          ))}
                         </tr>
                       ))}
                     </tbody>
