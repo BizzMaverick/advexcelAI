@@ -266,7 +266,30 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     
     setAiLoading(true);
     try {
-      // Try AWS service first, fallback to local processing
+      // Check if this is a pivot table request
+      const lowerPrompt = prompt.toLowerCase();
+      if (lowerPrompt.includes('pivot') || 
+          (lowerPrompt.includes('countries') && (lowerPrompt.includes('rank') || lowerPrompt.includes('economy'))) ||
+          (lowerPrompt.includes('employees') && (lowerPrompt.includes('salary') || lowerPrompt.includes('performance'))) ||
+          (lowerPrompt.includes('items') && lowerPrompt.includes('price'))) {
+        
+        const localPivot = createCustomPivot(spreadsheetData, prompt);
+        if (localPivot) {
+          const customPivot = {
+            title: 'Custom Pivot',
+            description: prompt,
+            data: localPivot
+          };
+          setPivotTables([...pivotTables, customPivot]);
+          setSelectedPivot(pivotTables.length);
+          setAiResponse(`✅ **Pivot Table Created**\n\nYour pivot table "${prompt}" has been generated and is displayed below.`);
+          setPrompt('');
+          setAiLoading(false);
+          return;
+        }
+      }
+      
+      // Try AWS service for other analysis
       try {
         const enhancedPrompt = dataStructure ? 
           EnhancedAiService.enhancePrompt(prompt, dataStructure) : 
@@ -281,7 +304,6 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
         }
       } catch (apiError) {
         // Fallback: Provide helpful response based on prompt
-        const lowerPrompt = prompt.toLowerCase();
         let response = `⚠️ **AI Service Temporarily Unavailable**\n\n`;
         
         if (lowerPrompt.includes('sum') || lowerPrompt.includes('total')) {
