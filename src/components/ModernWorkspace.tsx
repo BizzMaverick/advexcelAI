@@ -95,6 +95,16 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     setAiResponse('🔄 Performing comprehensive data analysis...');
     
     try {
+      const enhancedPrompt = `Perform a comprehensive analysis of this dataset. Provide:
+1. Data summary and key statistics
+2. Identify patterns and trends
+3. Detect anomalies or outliers
+4. Suggest data cleaning recommendations
+5. Generate insights and recommendations
+6. Create summary tables if needed
+
+Analyze all columns and provide actionable insights.`;
+      
       const result = await bedrockService.processExcelData(data, enhancedPrompt, selectedFile?.name || 'data');
       
       if (result.success && result.response) {
