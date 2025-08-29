@@ -599,7 +599,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                       </tr>
                     </thead>
                     <tbody>
-                      {displayData.slice(1, 11).map((row, rowIndex) => (
+                      {displayData.slice(1).map((row, rowIndex) => (
                         <tr key={rowIndex}>
                           {row.map((cell, cellIndex) => (
                             <td key={cellIndex} style={{
@@ -619,11 +619,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   </table>
                 </div>
                 
-                {displayData.length > 11 && (
-                  <p style={{ margin: '16px 0 0 0', fontSize: '12px', opacity: 0.6, textAlign: 'center' }}>
-                    Showing first 10 rows of {displayData.length - 1} {filterText && '(filtered)'}
-                  </p>
-                )}
+
               </>
             ) : (
               <div style={{
