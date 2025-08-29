@@ -569,9 +569,10 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   background: 'rgba(255, 255, 255, 0.05)',
                   borderRadius: '12px',
                   overflow: 'auto',
-                  maxHeight: '400px'
+                  maxHeight: '400px',
+                  width: '100%'
                 }}>
-                  <table style={{ borderCollapse: 'collapse', minWidth: '800px', width: 'max-content' }}>
+                  <table style={{ borderCollapse: 'collapse' }}>
                     <thead>
                       <tr style={{ background: 'rgba(255, 255, 255, 0.1)' }}>
                         {displayData[0]?.map((header, index) => (
@@ -586,7 +587,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                               cursor: 'pointer',
                               position: 'relative',
                               whiteSpace: 'nowrap',
-                              minWidth: '120px'
+                              minWidth: '150px'
                             }}>
                             {String(header || `Col ${index + 1}`)}
                             {sortColumn === index && (
@@ -608,7 +609,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                               borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
                               opacity: 0.9,
                               whiteSpace: 'nowrap',
-                              minWidth: '120px'
+                              minWidth: '150px'
                             }}>
                               {String(cell || '')}
                             </td>
