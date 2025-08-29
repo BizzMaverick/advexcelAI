@@ -57,6 +57,9 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
         try {
           const structure = DataDetectionService.analyzeData(jsonData);
           setDataStructure(structure);
+          
+          // Automatically trigger comprehensive AI analysis
+          setTimeout(() => performAutoAnalysis(jsonData), 1000);
         } catch (err) {
           console.error('Data analysis failed:', err);
         }
@@ -87,77 +90,40 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     }
   };
 
-  const handleLocalLookup = (searchTerm: string) => {
-    const headers = spreadsheetData[0];
-    const dataRows = spreadsheetData.slice(1);
+  const performAutoAnalysis = async (data: any[][]) => {
+    setAiLoading(true);
+    setAiResponse('🔄 Performing comprehensive data analysis...');
     
-    const matches = dataRows.filter(row => 
-      row.some(cell => 
-        String(cell || '').toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    );
-    
-    if (matches.length > 0) {
-      const resultData = [headers, ...matches];
-      setAiResultData(resultData);
-      setAiResponse(`🔍 Found ${matches.length} matches for '${searchTerm}':\n\nResults are displayed in the table below.`);
-      return true;
-    }
-    return false;
-  };
+    try {
+      const enhancedPrompt = `Perform a comprehensive analysis of this dataset. Provide:
+1. Data summary and key statistics
+2. Identify patterns and trends
+3. Detect anomalies or outliers
+4. Suggest data cleaning recommendations
+5. Generate insights and recommendations
+6. Create summary tables if needed
 
-  const handleLocalMath = (formula: string) => {
-    // Handle cell references like B3*E3, A1+B2, etc.
-    const cellMathMatch = formula.match(/([A-Z])(\d+)\s*([+\-*/])\s*([A-Z])(\d+)/i);
-    if (cellMathMatch) {
-      const [, col1, row1, operator, col2, row2] = cellMathMatch;
-      const colIndex1 = col1.charCodeAt(0) - 65;
-      const colIndex2 = col2.charCodeAt(0) - 65;
-      const rowIndex1 = parseInt(row1) - 1;
-      const rowIndex2 = parseInt(row2) - 1;
+Analyze all columns and provide actionable insights.`;
       
-      if (rowIndex1 >= 0 && rowIndex1 < spreadsheetData.length && 
-          rowIndex2 >= 0 && rowIndex2 < spreadsheetData.length &&
-          colIndex1 >= 0 && colIndex1 < (spreadsheetData[0]?.length || 0) &&
-          colIndex2 >= 0 && colIndex2 < (spreadsheetData[0]?.length || 0)) {
-        
-        const val1 = parseFloat(String(spreadsheetData[rowIndex1][colIndex1]));
-        const val2 = parseFloat(String(spreadsheetData[rowIndex2][colIndex2]));
-        
-        if (!isNaN(val1) && !isNaN(val2)) {
-          let result;
-          switch (operator) {
-            case '+': result = val1 + val2; break;
-            case '-': result = val1 - val2; break;
-            case '*': result = val1 * val2; break;
-            case '/': result = val2 !== 0 ? val1 / val2 : 'Error: Division by zero'; break;
-          }
-          setAiResponse(`${col1}${row1} ${operator} ${col2}${row2} = ${val1} ${operator} ${val2} = ${result}`);
-          return true;
-        }
+      const result = selectedFile ? 
+        await AWSService.uploadSpreadsheetWithPrompt(selectedFile, enhancedPrompt) :
+        await AWSService.processPromptWithData(data, enhancedPrompt);
+      
+      if (result.data && Array.isArray(result.data)) {
+        setAiResultData(result.data);
       }
+      
+      setAiResponse(result.response || result.result || '✅ Comprehensive analysis completed! Review the insights below.');
+    } catch (err: any) {
+      console.error('Auto Analysis Error:', err);
+      setAiResponse(`❌ Analysis Error: ${err.message || 'Failed to analyze data'}`);
+    } finally {
+      setAiLoading(false);
     }
-    return false;
   };
 
-  const handleRunAI = async () => {
+  const handleCustomAnalysis = async () => {
     if (!prompt.trim() || !spreadsheetData.length) return;
-    
-    // Check for simple math operations first
-    if (handleLocalMath(prompt.trim())) {
-      setPrompt('');
-      return;
-    }
-    
-    // Check for simple lookup queries
-    const lookupMatch = prompt.match(/(?:show|find|lookup|search)\s+(?:for\s+)?['"]?([^'"\s]+)['"]?/i);
-    if (lookupMatch) {
-      const searchTerm = lookupMatch[1];
-      if (handleLocalLookup(searchTerm)) {
-        setPrompt('');
-        return;
-      }
-    }
     
     setAiLoading(true);
     try {
@@ -171,9 +137,8 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
       
       if (result.data && Array.isArray(result.data)) {
         setAiResultData(result.data);
-        setAiResponse('✅ Analysis completed! Results are displayed below.');
+        setAiResponse('✅ Custom analysis completed! Results are displayed below.');
       } else if (result.result) {
-        // Handle text-based results
         setAiResponse(result.result);
       } else {
         setAiResponse(result.response || result.error || 'Analysis completed successfully!');
@@ -183,10 +148,14 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
       setAiResponse(`❌ Error: ${err.message || 'Processing failed'}`);
     } finally {
       setAiLoading(false);
-      if (!aiResultData) {
-        setPrompt('');
-      }
+      setPrompt('');
     }
+  };
+  
+  const handleCellEdit = (rowIndex: number, colIndex: number, newValue: string) => {
+    const newData = [...spreadsheetData];
+    newData[rowIndex][colIndex] = newValue;
+    setSpreadsheetData(newData);
   };
 
   const handleSort = (columnIndex: number) => {
@@ -449,52 +418,44 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
               </div>
             )}
 
-            {/* Smart Suggestions */}
-            {dataStructure && (
+            {/* Analysis Actions */}
+            {spreadsheetData.length > 0 && (
               <div style={{ marginBottom: '32px' }}>
                 <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600' }}>
-                  💡 Smart Suggestions
+                  🔄 Analysis Actions
                 </h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {EnhancedAiService.generateFollowUpQuestions(dataStructure).slice(0, 2).map((suggestion, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setPrompt(suggestion)}
-                      style={{
-                        background: 'rgba(255, 255, 255, 0.1)',
-                        border: '1px solid rgba(255, 255, 255, 0.2)',
-                        borderRadius: '12px',
-                        padding: '12px 16px',
-                        color: 'white',
-                        cursor: 'pointer',
-                        fontSize: '13px',
-                        textAlign: 'left',
-                        transition: 'all 0.3s ease'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-                      }}
-                    >
-                      {suggestion}
-                    </button>
-                  ))}
+                  <button
+                    onClick={() => performAutoAnalysis(spreadsheetData)}
+                    disabled={aiLoading}
+                    style={{
+                      background: aiLoading ? 'rgba(255, 255, 255, 0.2)' : 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      borderRadius: '12px',
+                      padding: '12px 16px',
+                      color: 'white',
+                      cursor: aiLoading ? 'not-allowed' : 'pointer',
+                      fontSize: '13px',
+                      fontWeight: '500',
+                      transition: 'all 0.3s ease'
+                    }}
+                  >
+                    {aiLoading ? '🔄 Analyzing...' : '🧠 Re-run Full Analysis'}
+                  </button>
                 </div>
               </div>
             )}
 
-            {/* AI Prompt */}
+            {/* Custom Analysis */}
             <div>
               <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600' }}>
-                🤖 AI Assistant
+                📝 Custom Analysis
               </h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="Ask me anything about your data..."
+                  placeholder="Ask for specific analysis or insights..."
                   style={{
                     background: 'rgba(255, 255, 255, 0.1)',
                     border: '1px solid rgba(255, 255, 255, 0.2)',
@@ -509,11 +470,11 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   }}
                 />
                 <button
-                  onClick={handleRunAI}
+                  onClick={handleCustomAnalysis}
                   disabled={!prompt.trim() || !spreadsheetData.length || aiLoading}
                   style={{
-                    background: aiLoading ? 'rgba(255, 255, 255, 0.2)' : 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
-                    border: 'none',
+                    background: aiLoading ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.1)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
                     borderRadius: '12px',
                     padding: '16px',
                     color: 'white',
@@ -524,7 +485,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                     opacity: (!prompt.trim() || !spreadsheetData.length) ? 0.5 : 1
                   }}
                 >
-                  {aiLoading ? '🔄 Processing...' : '✨ Analyze Data'}
+                  {aiLoading ? '🔄 Processing...' : '🔍 Custom Analysis'}
                 </button>
               </div>
             </div>
@@ -600,16 +561,36 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                         <tr key={rowIndex}>
                           {displayData[0]?.map((_, cellIndex) => (
                             <td key={cellIndex} style={{
-                              padding: '12px 16px',
+                              padding: '4px',
                               fontSize: '13px',
                               borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
                               opacity: 0.9,
                               whiteSpace: 'nowrap',
                               minWidth: '150px'
                             }}>
-                              {String(row[cellIndex] || '')}
+                              <input
+                                type="text"
+                                value={String(row[cellIndex] || '')}
+                                onChange={(e) => handleCellEdit(rowIndex + 1, cellIndex, e.target.value)}
+                                style={{
+                                  background: 'transparent',
+                                  border: 'none',
+                                  color: 'white',
+                                  fontSize: '13px',
+                                  width: '100%',
+                                  padding: '8px 12px',
+                                  outline: 'none'
+                                }}
+                                onFocus={(e) => {
+                                  e.target.style.background = 'rgba(255, 255, 255, 0.1)';
+                                  e.target.style.borderRadius = '4px';
+                                }}
+                                onBlur={(e) => {
+                                  e.target.style.background = 'transparent';
+                                }}
+                              />
                             </td>
-                          ))}
+                          ))
                         </tr>
                       ))}
                     </tbody>
