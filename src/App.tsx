@@ -160,42 +160,7 @@ function App() {
                 />
               )}
               
-              {/* UI Toggle - Only for admin */}
-              {canUseNewInterface && (
-                <button
-                  onClick={() => {
-                    const newValue = !useNewInterface;
-                    localStorage.setItem('use_new_interface', newValue.toString());
-                    setUseNewInterface(newValue);
-                  }}
-                  style={{
-                    position: 'fixed',
-                    top: '70px',
-                    right: '20px',
-                    zIndex: 9999,
-                    background: useNewInterface ? '#10b981' : '#0078d4',
-                    color: 'white',
-                    border: 'none',
-                    padding: '8px 12px',
-                    borderRadius: '6px',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    fontFamily: 'system-ui, -apple-system, sans-serif',
-                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-                    transition: 'all 0.2s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.transform = 'scale(1.05)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.transform = 'scale(1)';
-                  }}
-                  title={`Switch to ${useNewInterface ? 'Phase 1' : 'Phase 2'}`}
-                >
-                  {useNewInterface ? 'Phase 1' : 'Phase 2'}
-                </button>
-              )}
+
               {(useNewInterface && canUseNewInterface) ? (
                 <ModernWorkspace 
                   user={user} 

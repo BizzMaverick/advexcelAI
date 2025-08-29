@@ -979,16 +979,38 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             <img src={logo} alt="Logo" style={{ height: '24px' }} />
             <span style={{ fontSize: '16px', fontWeight: '600' }}>AdvExcel</span>
           </div>
-          <button onClick={onLogout} style={{ 
-            background: 'rgba(255,255,255,0.2)', 
-            border: 'none', 
-            color: 'white', 
-            padding: '6px 12px', 
-            borderRadius: '4px', 
-            cursor: 'pointer'
-          }}>
-            Logout
-          </button>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            {(user.email === 'katragadda225@gmail.com' || user.email?.includes('@advexcel.online')) && (
+              <button
+                onClick={() => {
+                  const newValue = !localStorage.getItem('use_new_interface') || localStorage.getItem('use_new_interface') === 'false';
+                  localStorage.setItem('use_new_interface', newValue.toString());
+                  window.location.reload();
+                }}
+                style={{
+                  background: 'rgba(255,255,255,0.2)',
+                  border: 'none',
+                  color: 'white',
+                  padding: '6px 12px',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '12px'
+                }}
+              >
+                Advanced
+              </button>
+            )}
+            <button onClick={onLogout} style={{ 
+              background: 'rgba(255,255,255,0.2)', 
+              border: 'none', 
+              color: 'white', 
+              padding: '6px 12px', 
+              borderRadius: '4px', 
+              cursor: 'pointer'
+            }}>
+              Logout
+            </button>
+          </div>
         </header>
         
         <main style={{ padding: '20px', background: '#f5f5f5', minHeight: 'calc(100vh - 50px)' }}>
