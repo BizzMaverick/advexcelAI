@@ -33,6 +33,8 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
   const [filterText, setFilterText] = useState('');
   const [showFeedbackBox, setShowFeedbackBox] = useState(false);
   const [feedbackText, setFeedbackText] = useState('');
+  const [showLegalModal, setShowLegalModal] = useState(false);
+  const [legalContent, setLegalContent] = useState({ title: '', content: '' });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = async (file: File) => {
@@ -805,6 +807,326 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
 
 
       </main>
+      
+      {/* Footer with Legal Pages */}
+      <footer style={{
+        background: 'rgba(255, 255, 255, 0.1)',
+        backdropFilter: 'blur(20px)',
+        borderTop: '1px solid rgba(255, 255, 255, 0.2)',
+        color: 'white',
+        padding: '40px',
+        textAlign: 'center'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '32px', flexWrap: 'wrap', marginBottom: '20px' }}>
+          <a onClick={() => {
+            setLegalContent({ 
+              title: 'Privacy Policy', 
+              content: `Last updated: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+
+What Information We Collect:
+• Your name and email address when you create an account
+• Excel/CSV files you upload for processing
+• Usage data to improve our service
+
+How We Use Your Information:
+• Process your files to provide AI-powered analysis
+• Maintain your account and authentication
+• Improve our services and user experience
+
+Data Security:
+• We use Amazon Web Services (AWS) for secure processing
+• Your data is encrypted and protected with industry standards
+• Files are processed temporarily and not permanently stored
+• Account data is kept secure until you delete your account
+
+Data Sharing:
+• We do not sell or share your personal information
+• We only use AWS services (Cognito, Bedrock) for processing
+• No third-party access to your data
+
+Your Rights:
+• Access, modify, or delete your personal information
+• Request account deletion at any time
+• Withdraw consent for data processing
+
+Contact Us:
+For privacy questions, email: contact@advexcel.online` 
+            });
+            setShowLegalModal(true);
+          }} style={{ color: 'white', textDecoration: 'none', fontSize: '16px', cursor: 'pointer', opacity: 0.8, transition: 'opacity 0.3s ease' }}
+          onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+          onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}
+          >Privacy Policy</a>
+          
+          <a onClick={() => {
+            setLegalContent({ 
+              title: 'Terms of Service', 
+              content: `Last updated: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+
+By using Excel AI, you agree to these terms.
+
+What Excel AI Does:
+• AI-powered analysis of Excel and CSV files
+• Data sorting, filtering, and mathematical calculations
+• Duplicate detection and data manipulation
+• Powered by Amazon Web Services
+
+Your Responsibilities:
+• Only upload files you have permission to process
+• Don't upload sensitive personal data or confidential information
+• Use the service legally and responsibly
+• Keep your account credentials secure
+• Don't attempt to hack or compromise the service
+
+Prohibited Uses:
+• Illegal, harmful, or malicious content
+• Files with viruses or malware
+• Unauthorized access attempts
+• Commercial use without permission
+• Violating applicable laws
+
+Service Terms:
+• Service provided "as-is" without warranties
+• We may modify or discontinue service anytime
+• No guarantee of uninterrupted access
+• Limited liability for service issues
+
+Changes:
+• We may update these terms anytime
+• Continued use means you accept changes
+
+Contact: contact@advexcel.online` 
+            });
+            setShowLegalModal(true);
+          }} style={{ color: 'white', textDecoration: 'none', fontSize: '16px', cursor: 'pointer', opacity: 0.8, transition: 'opacity 0.3s ease' }}
+          onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+          onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}
+          >Terms of Service</a>
+          
+          <a onClick={() => {
+            setLegalContent({ 
+              title: 'Cookie Policy', 
+              content: `Last updated: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+
+What Are Cookies:
+Small text files stored on your device to make websites work better.
+
+How We Use Cookies:
+• Keep you logged in (authentication)
+• Remember your preferences
+• Analyze usage to improve our service
+• Ensure security and prevent fraud
+
+Types of Cookies:
+
+Essential Cookies (Required):
+• AWS Cognito authentication cookies
+• Security and session management
+• Application functionality
+
+Analytical Cookies (Optional):
+• Usage analytics and performance monitoring
+• Feature tracking to improve services
+
+Third-Party Cookies:
+• Amazon Web Services for authentication and security
+• No other third-party cookies
+
+Managing Cookies:
+• Control cookies through your browser settings
+• View, delete, or block cookies as needed
+• Disabling essential cookies may break functionality
+• Session cookies deleted when browser closes
+
+Contact: contact@advexcel.online` 
+            });
+            setShowLegalModal(true);
+          }} style={{ color: 'white', textDecoration: 'none', fontSize: '16px', cursor: 'pointer', opacity: 0.8, transition: 'opacity 0.3s ease' }}
+          onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+          onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}
+          >Cookie Policy</a>
+          
+          <a onClick={() => {
+            setLegalContent({ 
+              title: 'Support & Help', 
+              content: `Getting Started:
+• Create account with your email
+• Upload Excel (.xlsx, .xls) or CSV files
+• Use natural language commands
+• Apply results or download new files
+
+Supported Files:
+• Excel files (.xlsx, .xls)
+• CSV files (.csv)
+• Large files truncated to 1000 rows
+
+Key Features:
+• Sort data by any column
+• Find and remove duplicates
+• Math operations (sum, average, count, min, max)
+• Data filtering and search
+• AI-powered data insights
+• Chart generation and visualization
+
+Common Commands:
+• "Sort by column A"
+• "Find duplicates"
+• "Sum column B"
+• "Show data for [item]"
+• "Create a chart"
+
+Troubleshooting:
+• Upload issues: Check file format, refresh page
+• AI not responding: Upload file first, use clear commands
+• Scrolling issues: Use horizontal/vertical scroll bars
+
+Best Practices:
+• Use descriptive column headers
+• Keep reasonable file sizes
+• Be specific in commands
+• Review results before applying
+
+Need Help:
+• Use feedback button (👍) for quick questions
+• Email: contact@advexcel.online
+• Include browser type and specific issue details
+
+System Requirements:
+• Modern web browser
+• Internet connection
+• JavaScript and cookies enabled` 
+            });
+            setShowLegalModal(true);
+          }} style={{ color: 'white', textDecoration: 'none', fontSize: '16px', cursor: 'pointer', opacity: 0.8, transition: 'opacity 0.3s ease' }}
+          onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+          onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}
+          >Support</a>
+          
+          <a onClick={() => {
+            setLegalContent({ 
+              title: 'Contact Us', 
+              content: `Quick Support:
+• Click the feedback button (👍) in bottom right corner
+• Describe your issue or question
+• We'll respond promptly
+
+Email Contact:
+• contact@advexcel.online
+• Response time: 24-48 hours
+• For all inquiries: technical support, questions, business, partnerships
+
+Before Contacting:
+• Try troubleshooting steps in Support section
+• Note your browser type and version
+• Describe specific steps that caused the issue
+• Include any error messages
+
+Feature Requests:
+• Use feedback button with "Feature Request"
+• Email with subject "Feature Request"
+• Include detailed descriptions
+
+Privacy & Security:
+• Email with subject "Privacy/Security"
+• Reference our Privacy Policy
+• Report security issues responsibly
+
+Business Hours:
+• Monday-Friday, 9 AM - 6 PM EST
+• Feedback monitored 24/7 for urgent issues
+• Weekend response times may vary
+
+About Us:
+• AdvExcel AI Development Team
+• Powered by Amazon Web Services
+• Cloud-based for global accessibility
+
+We're committed to excellent support and continuous improvement based on your feedback!` 
+            });
+            setShowLegalModal(true);
+          }} style={{ color: 'white', textDecoration: 'none', fontSize: '16px', cursor: 'pointer', opacity: 0.8, transition: 'opacity 0.3s ease' }}
+          onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+          onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}
+          >Contact Us</a>
+        </div>
+        <p style={{ margin: 0, fontSize: '14px', opacity: 0.7 }}>
+          © 2024 AdvExcel AI. All rights reserved. | Powered by AWS
+        </p>
+      </footer>
+      
+      {/* Legal Modal */}
+      {showLegalModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'rgba(0, 0, 0, 0.7)',
+          backdropFilter: 'blur(10px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 2000
+        }}>
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(20px)',
+            borderRadius: '20px',
+            padding: '32px',
+            maxWidth: '600px',
+            width: '90%',
+            maxHeight: '70vh',
+            overflow: 'auto',
+            border: '1px solid rgba(255, 255, 255, 0.3)',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)'
+          }}>
+            <div style={{ position: 'relative', marginBottom: '24px', textAlign: 'center' }}>
+              <h3 style={{ margin: 0, color: '#333', fontSize: '24px', fontWeight: '600' }}>{legalContent.title}</h3>
+              <button
+                onClick={() => setShowLegalModal(false)}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  right: 0,
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  color: '#666',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                ×
+              </button>
+            </div>
+            <div style={{ color: '#333', lineHeight: '1.6', margin: 0, whiteSpace: 'pre-line', fontSize: '15px' }}>{legalContent.content}</div>
+            <div style={{ marginTop: '24px', textAlign: 'right' }}>
+              <button
+                onClick={() => setShowLegalModal(false)}
+                style={{
+                  background: 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* Floating Feedback Button */}
       <div style={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 1000 }}>
