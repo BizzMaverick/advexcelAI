@@ -5,6 +5,7 @@ import { AWSService } from '../services/awsService.js';
 import ChartComponent from './ChartComponent';
 import ModernDataInsights from './ModernDataInsights';
 import * as XLSX from 'xlsx';
+import emailjs from '@emailjs/browser';
 
 interface User {
   email: string;
@@ -30,6 +31,8 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
   const [sortColumn, setSortColumn] = useState<number>(-1);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [filterText, setFilterText] = useState('');
+  const [showFeedbackBox, setShowFeedbackBox] = useState(false);
+  const [feedbackText, setFeedbackText] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = async (file: File) => {
@@ -802,6 +805,136 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
 
 
       </main>
+      
+      {/* Floating Feedback Button */}
+      <div style={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 1000 }}>
+        <div 
+          onClick={() => setShowFeedbackBox(!showFeedbackBox)}
+          style={{
+            width: '60px',
+            height: '60px',
+            borderRadius: '50%',
+            background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1))',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.3)',
+            color: 'white',
+            cursor: 'pointer',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '24px',
+            transition: 'all 0.3s ease'
+          }}
+          onMouseEnter={(e) => {
+            const target = e.target as HTMLElement;
+            target.style.transform = 'scale(1.1)';
+            target.style.background = 'linear-gradient(145deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.2))';
+          }}
+          onMouseLeave={(e) => {
+            const target = e.target as HTMLElement;
+            target.style.transform = 'scale(1)';
+            target.style.background = 'linear-gradient(145deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1))';
+          }}
+          title="Give Feedback"
+        >
+          👍
+        </div>
+        
+        {showFeedbackBox && (
+          <div style={{
+            position: 'absolute',
+            bottom: '70px',
+            right: '0',
+            width: '300px',
+            background: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(20px)',
+            borderRadius: '16px',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+            padding: '20px',
+            border: '1px solid rgba(255, 255, 255, 0.2)'
+          }}>
+            <h4 style={{ margin: '0 0 12px 0', color: '#333', fontSize: '16px', fontWeight: '600' }}>Send Feedback</h4>
+            <textarea
+              value={feedbackText}
+              onChange={(e) => setFeedbackText(e.target.value)}
+              placeholder="Share your thoughts about AdvExcel..."
+              style={{
+                width: '100%',
+                height: '80px',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                borderRadius: '8px',
+                padding: '12px',
+                fontSize: '14px',
+                fontFamily: 'inherit',
+                resize: 'none',
+                outline: 'none',
+                boxSizing: 'border-box',
+                background: 'rgba(255, 255, 255, 0.8)',
+                color: '#333'
+              }}
+            />
+            <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+              <button
+                onClick={async () => {
+                  if (feedbackText.trim()) {
+                    try {
+                      await emailjs.send(
+                        'service_gyuegyb',
+                        'template_16urb42',
+                        {
+                          user_email: user.email,
+                          user_name: user.name,
+                          message: feedbackText,
+                          to_email: 'contact@advexcel.online'
+                        },
+                        '3xCIlXaFmm79QkBaB'
+                      );
+                      alert('Thank you for your feedback! We have received your message and will respond soon.');
+                      setFeedbackText('');
+                      setShowFeedbackBox(false);
+                    } catch (error) {
+                      console.error('Failed to send feedback:', error);
+                      alert('Sorry, there was an error sending your feedback. Please try again or email us directly at contact@advexcel.online');
+                    }
+                  }
+                }}
+                style={{
+                  background: 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '10px 16px',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                Send
+              </button>
+              <button
+                onClick={() => {
+                  setShowFeedbackBox(false);
+                  setFeedbackText('');
+                }}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.8)',
+                  color: '#333',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  padding: '10px 16px',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
