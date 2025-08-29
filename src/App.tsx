@@ -164,15 +164,7 @@ function App() {
               {canUseNewInterface && (
                 <div 
                   draggable
-                  onDragStart={(e) => {
-                    e.dataTransfer.setData('text/plain', '');
-                  }}
-                  onDragEnd={(e) => {
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    e.currentTarget.style.position = 'fixed';
-                    e.currentTarget.style.left = `${e.clientX - rect.width/2}px`;
-                    e.currentTarget.style.top = `${e.clientY - rect.height/2}px`;
-                  }}
+
                   style={{
                     position: 'fixed',
                     top: '70px',
@@ -203,12 +195,28 @@ function App() {
                     setUseNewInterface(newValue);
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'scale(1.05)';
-                    e.currentTarget.style.boxShadow = '0 12px 40px rgba(0, 0, 0, 0.15)';
+                    if (!e.currentTarget.dragging) {
+                      e.currentTarget.style.transform = 'scale(1.05)';
+                      e.currentTarget.style.boxShadow = '0 12px 40px rgba(0, 0, 0, 0.15)';
+                    }
                   }}
                   onMouseLeave={(e) => {
+                    if (!e.currentTarget.dragging) {
+                      e.currentTarget.style.transform = 'scale(1)';
+                      e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.1)';
+                    }
+                  }}
+                  onDragStart={(e) => {
+                    e.dataTransfer.setData('text/plain', '');
+                    e.currentTarget.dragging = true;
                     e.currentTarget.style.transform = 'scale(1)';
-                    e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.1)';
+                  }}
+                  onDragEnd={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    e.currentTarget.style.position = 'fixed';
+                    e.currentTarget.style.left = `${e.clientX - rect.width/2}px`;
+                    e.currentTarget.style.top = `${e.clientY - rect.height/2}px`;
+                    e.currentTarget.dragging = false;
                   }}
                   title="Drag to move, click to toggle UI"
                 >
