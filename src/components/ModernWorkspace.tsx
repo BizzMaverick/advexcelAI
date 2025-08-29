@@ -101,10 +101,50 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     return false;
   };
 
+  const handleLocalMath = (formula: string) => {
+    // Handle cell references like B3*E3, A1+B2, etc.
+    const cellMathMatch = formula.match(/([A-Z])(\d+)\s*([+\-*/])\s*([A-Z])(\d+)/i);
+    if (cellMathMatch) {
+      const [, col1, row1, operator, col2, row2] = cellMathMatch;
+      const colIndex1 = col1.charCodeAt(0) - 65;
+      const colIndex2 = col2.charCodeAt(0) - 65;
+      const rowIndex1 = parseInt(row1) - 1;
+      const rowIndex2 = parseInt(row2) - 1;
+      
+      if (rowIndex1 >= 0 && rowIndex1 < spreadsheetData.length && 
+          rowIndex2 >= 0 && rowIndex2 < spreadsheetData.length &&
+          colIndex1 >= 0 && colIndex1 < (spreadsheetData[0]?.length || 0) &&
+          colIndex2 >= 0 && colIndex2 < (spreadsheetData[0]?.length || 0)) {
+        
+        const val1 = parseFloat(String(spreadsheetData[rowIndex1][colIndex1]));
+        const val2 = parseFloat(String(spreadsheetData[rowIndex2][colIndex2]));
+        
+        if (!isNaN(val1) && !isNaN(val2)) {
+          let result;
+          switch (operator) {
+            case '+': result = val1 + val2; break;
+            case '-': result = val1 - val2; break;
+            case '*': result = val1 * val2; break;
+            case '/': result = val2 !== 0 ? val1 / val2 : 'Error: Division by zero'; break;
+          }
+          setAiResponse(`${col1}${row1} ${operator} ${col2}${row2} = ${val1} ${operator} ${val2} = ${result}`);
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+
   const handleRunAI = async () => {
     if (!prompt.trim() || !spreadsheetData.length) return;
     
-    // Check for simple lookup queries first
+    // Check for simple math operations first
+    if (handleLocalMath(prompt.trim())) {
+      setPrompt('');
+      return;
+    }
+    
+    // Check for simple lookup queries
     const lookupMatch = prompt.match(/(?:show|find|lookup|search)\s+(?:for\s+)?['"]?([^'"\s]+)['"]?/i);
     if (lookupMatch) {
       const searchTerm = lookupMatch[1];
