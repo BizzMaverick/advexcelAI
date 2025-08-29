@@ -149,35 +149,43 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
         fullAnalysis += `• Duplicate Rows: ${analytics.duplicates}\n`;
         fullAnalysis += `• Missing Values: ${analytics.missingValues}\n\n`;
         
-        // Top 5 Analysis
-        if (analytics.top5.length > 0) {
-          fullAnalysis += `**🔝 TOP 5 HIGHEST VALUES:**\n`;
-          analytics.top5.forEach((item, index) => {
-            fullAnalysis += `${index + 1}. ${item.country || item.name || 'Row ' + item.index}: ${item.value}\n`;
-          });
-          fullAnalysis += `\n`;
-        }
-        
-        // Bottom 5 Analysis
-        if (analytics.bottom5.length > 0) {
-          fullAnalysis += `**🔽 BOTTOM 5 LOWEST VALUES:**\n`;
-          analytics.bottom5.forEach((item, index) => {
-            fullAnalysis += `${index + 1}. ${item.country || item.name || 'Row ' + item.index}: ${item.value}\n`;
-          });
-          fullAnalysis += `\n`;
-        }
-        
-        // Comparison Analysis
+        // Create analytics tables for display
         if (analytics.top5.length > 0 && analytics.bottom5.length > 0) {
+          const analyticsTable = [
+            ['Category', 'Rank', 'Country/Region', 'Value'],
+            ...analytics.top5.map((item, index) => [
+              'Top 5', 
+              `#${index + 1}`, 
+              item.country || `Row ${item.index}`, 
+              item.value.toFixed(2)
+            ]),
+            ...analytics.bottom5.map((item, index) => [
+              'Bottom 5', 
+              `#${index + 1}`, 
+              item.country || `Row ${item.index}`, 
+              item.value.toFixed(2)
+            ])
+          ];
+          
+          // Comparison table
           const topAvg = analytics.top5.reduce((sum, item) => sum + item.value, 0) / analytics.top5.length;
           const bottomAvg = analytics.bottom5.reduce((sum, item) => sum + item.value, 0) / analytics.bottom5.length;
           const ratio = (topAvg / bottomAvg).toFixed(2);
           
-          fullAnalysis += `**⚖️ TOP vs BOTTOM COMPARISON:**\n`;
-          fullAnalysis += `• Top 5 Average: ${topAvg.toFixed(2)}\n`;
-          fullAnalysis += `• Bottom 5 Average: ${bottomAvg.toFixed(2)}\n`;
-          fullAnalysis += `• Ratio (Top/Bottom): ${ratio}x\n`;
-          fullAnalysis += `• Gap Analysis: ${topAvg > bottomAvg * 2 ? 'High inequality detected' : 'Moderate distribution'}\n\n`;
+          const comparisonTable = [
+            ['Metric', 'Top 5', 'Bottom 5', 'Difference'],
+            ['Average', topAvg.toFixed(2), bottomAvg.toFixed(2), (topAvg - bottomAvg).toFixed(2)],
+            ['Highest Value', analytics.top5[0].value.toFixed(2), analytics.bottom5[0].value.toFixed(2), (analytics.top5[0].value - analytics.bottom5[0].value).toFixed(2)],
+            ['Ratio', `${ratio}x higher`, '1.0x baseline', `${ratio}x gap`],
+            ['Assessment', topAvg > bottomAvg * 2 ? 'High inequality' : 'Moderate gap', 'Baseline', topAvg > bottomAvg * 2 ? 'Action needed' : 'Acceptable']
+          ];
+          
+          setAiResultData([...analyticsTable, [], ['COMPARISON ANALYSIS'], ...comparisonTable]);
+          
+          fullAnalysis += `**📊 TOP 5 vs BOTTOM 5 ANALYSIS:**\n`;
+          fullAnalysis += `• View detailed rankings and comparison in the table below\n`;
+          fullAnalysis += `• Top 5 average: ${topAvg.toFixed(2)} | Bottom 5 average: ${bottomAvg.toFixed(2)}\n`;
+          fullAnalysis += `• Performance gap: ${ratio}x difference detected\n\n`;
         }
         
         // Key Insights
@@ -848,7 +856,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                 padding: '24px'
               }}>
                 <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600' }}>
-                  💬 AI Response
+                  💬 AI Analytics Report
                 </h4>
                 <div style={{
                   background: 'rgba(255, 255, 255, 0.05)',
@@ -862,6 +870,70 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   minWidth: '400px'
                 }}>
                   <div dangerouslySetInnerHTML={{ __html: aiResponse.replace(/\n/g, '<br>') }} />
+                </div>
+              </div>
+            )}
+            
+            {/* Analytics Tables */}
+            {aiResultData && (
+              <div style={{
+                marginTop: '32px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                borderRadius: '12px',
+                padding: '24px'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <h4 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>
+                    📊 Analytics Tables
+                  </h4>
+                  <button
+                    onClick={() => downloadExcel(aiResultData, 'analytics_results.xlsx')}
+                    style={{
+                      background: 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
+                      border: 'none',
+                      borderRadius: '6px',
+                      padding: '6px 12px',
+                      color: 'white',
+                      cursor: 'pointer',
+                      fontSize: '11px',
+                      fontWeight: '500'
+                    }}
+                  >
+                    💾 Export Tables
+                  </button>
+                </div>
+                <div style={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  borderRadius: '8px',
+                  overflow: 'auto',
+                  maxHeight: '400px',
+                  border: '1px solid rgba(255, 255, 255, 0.1)'
+                }}>
+                  <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+                    <tbody>
+                      {aiResultData.map((row, rowIndex) => (
+                        <tr key={rowIndex} style={{
+                          background: rowIndex === 0 || (Array.isArray(row) && row[0] === 'COMPARISON ANALYSIS') ? 'rgba(255, 255, 255, 0.1)' : 'transparent'
+                        }}>
+                          {Array.isArray(row) ? row.map((cell, cellIndex) => (
+                            <td key={cellIndex} style={{
+                              padding: '8px 12px',
+                              fontSize: rowIndex === 0 ? '12px' : '11px',
+                              fontWeight: rowIndex === 0 || cell === 'COMPARISON ANALYSIS' ? '600' : '400',
+                              borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                              color: cell?.toString().includes('Top 5') ? '#4ecdc4' : cell?.toString().includes('Bottom 5') ? '#ff6b6b' : 'white'
+                            }}>
+                              {String(cell || '')}
+                            </td>
+                          )) : (
+                            <td colSpan={4} style={{ padding: '8px 12px', fontSize: '12px', fontWeight: '600' }}>
+                              {String(row)}
+                            </td>
+                          )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             )}
