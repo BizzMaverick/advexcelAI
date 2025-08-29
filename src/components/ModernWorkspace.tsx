@@ -568,11 +568,13 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                 <div style={{
                   background: 'rgba(255, 255, 255, 0.05)',
                   borderRadius: '12px',
-                  overflow: 'auto',
+                  overflow: 'scroll',
                   maxHeight: '400px',
-                  width: '100%'
+                  width: '100%',
+                  overflowX: 'scroll',
+                  overflowY: 'scroll'
                 }}>
-                  <table style={{ borderCollapse: 'collapse', width: 'max-content', minWidth: '100%' }}>
+                  <table style={{ borderCollapse: 'collapse', width: 'auto' }}>
                     <thead>
                       <tr style={{ background: 'rgba(255, 255, 255, 0.1)' }}>
                         {displayData[0]?.map((header, index) => (
