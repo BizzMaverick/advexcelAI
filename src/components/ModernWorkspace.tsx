@@ -24,6 +24,9 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
   const [prompt, setPrompt] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [analyticsData, setAnalyticsData] = useState<any>(null);
+  const [pivotTables, setPivotTables] = useState<any[]>([]);
+  const [selectedPivot, setSelectedPivot] = useState<number | null>(null);
+  const [pivotPrompt, setPivotPrompt] = useState<string>('');
   const [aiResponse, setAiResponse] = useState<string>('');
   const [aiResultData, setAiResultData] = useState<any[][] | null>(null);
   const [dragActive, setDragActive] = useState(false);
@@ -167,6 +170,10 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
               gap: topAvg > bottomAvg * 2 ? 'High inequality' : 'Moderate gap'
             }
           });
+          
+          // Generate pivot tables
+          const pivots = generatePivotTables(data);
+          setPivotTables(pivots);
           
           fullAnalysis += `**📊 ANALYTICS OVERVIEW:**\n`;
           fullAnalysis += `• Top 5 average: ${topAvg.toFixed(2)} | Bottom 5 average: ${bottomAvg.toFixed(2)}\n`;
@@ -347,6 +354,142 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
     XLSX.writeFile(wb, filename);
+  };
+
+  const generatePivotTables = (data: any[][]) => {
+    if (!data || data.length < 2) return [];
+    
+    const headers = data[0];
+    const rows = data.slice(1);
+    
+    const pivots = [
+      {
+        title: 'Summary by Country',
+        description: 'Total values grouped by country/region',
+        data: createCountryPivot(data)
+      },
+      {
+        title: 'Year-wise Analysis',
+        description: 'Trends over time periods',
+        data: createYearPivot(data)
+      },
+      {
+        title: 'Top Categories',
+        description: 'Highest performing categories',
+        data: createCategoryPivot(data)
+      },
+      {
+        title: 'Statistical Summary',
+        description: 'Key metrics and totals',
+        data: createStatsPivot(data)
+      },
+      {
+        title: 'Comparative Analysis',
+        description: 'Side-by-side comparisons',
+        data: createComparativePivot(data)
+      }
+    ];
+    
+    return pivots.filter(pivot => pivot.data && pivot.data.length > 1);
+  };
+  
+  const createCountryPivot = (data: any[][]) => {
+    const headers = data[0];
+    const rows = data.slice(1);
+    
+    const countryIndex = headers.findIndex((h: string) => 
+      String(h).toLowerCase().includes('country') || 
+      String(h).toLowerCase().includes('region') ||
+      String(h).toLowerCase().includes('name')
+    );
+    
+    const valueIndex = headers.findIndex((h: string) => 
+      String(h).toLowerCase().includes('total') ||
+      String(h).toLowerCase().includes('value') ||
+      String(h).toLowerCase().includes('count')
+    );
+    
+    if (countryIndex === -1 || valueIndex === -1) return null;
+    
+    const grouped = rows.reduce((acc: any, row) => {
+      const country = row[countryIndex] || 'Unknown';
+      const value = parseFloat(row[valueIndex]) || 0;
+      acc[country] = (acc[country] || 0) + value;
+      return acc;
+    }, {});
+    
+    const result = [['Country/Region', 'Total Value']];
+    Object.entries(grouped)
+      .sort(([,a], [,b]) => (b as number) - (a as number))
+      .forEach(([country, total]) => {
+        result.push([country, (total as number).toFixed(2)]);
+      });
+    
+    return result;
+  };
+  
+  const createYearPivot = (data: any[][]) => {
+    const headers = data[0];
+    const yearColumns = headers.filter((h: string) => /\d{4}/.test(String(h)));
+    
+    if (yearColumns.length === 0) return null;
+    
+    const result = [['Year', 'Total', 'Average']];
+    yearColumns.forEach(year => {
+      const yearIndex = headers.indexOf(year);
+      const values = data.slice(1).map(row => parseFloat(row[yearIndex]) || 0).filter(v => v > 0);
+      const total = values.reduce((sum, val) => sum + val, 0);
+      const avg = values.length > 0 ? total / values.length : 0;
+      result.push([String(year), total.toFixed(2), avg.toFixed(2)]);
+    });
+    
+    return result;
+  };
+  
+  const createCategoryPivot = (data: any[][]) => {
+    const analytics = performComprehensiveAnalytics(data);
+    if (!analytics.top5.length) return null;
+    
+    const result = [['Rank', 'Category', 'Value', 'Percentage']];
+    const total = analytics.top5.reduce((sum, item) => sum + item.value, 0);
+    
+    analytics.top5.forEach((item, index) => {
+      const percentage = ((item.value / total) * 100).toFixed(1);
+      result.push([`#${index + 1}`, item.country || `Item ${index + 1}`, item.value.toFixed(2), `${percentage}%`]);
+    });
+    
+    return result;
+  };
+  
+  const createStatsPivot = (data: any[][]) => {
+    const analytics = performComprehensiveAnalytics(data);
+    
+    return [
+      ['Metric', 'Value'],
+      ['Total Records', data.length - 1],
+      ['Total Columns', data[0]?.length || 0],
+      ['Duplicate Records', analytics.duplicates],
+      ['Missing Values', analytics.missingValues],
+      ['Minimum Value', analytics.min.toFixed(2)],
+      ['Maximum Value', analytics.max.toFixed(2)],
+      ['Average Value', analytics.mean.toFixed(2)],
+      ['Data Range', analytics.range.toFixed(2)]
+    ];
+  };
+  
+  const createComparativePivot = (data: any[][]) => {
+    const analytics = performComprehensiveAnalytics(data);
+    if (!analytics.top5.length || !analytics.bottom5.length) return null;
+    
+    const result = [['Metric', 'Top 5', 'Bottom 5', 'Difference']];
+    const topAvg = analytics.top5.reduce((sum, item) => sum + item.value, 0) / analytics.top5.length;
+    const bottomAvg = analytics.bottom5.reduce((sum, item) => sum + item.value, 0) / analytics.bottom5.length;
+    
+    result.push(['Average', topAvg.toFixed(2), bottomAvg.toFixed(2), (topAvg - bottomAvg).toFixed(2)]);
+    result.push(['Highest', analytics.top5[0].value.toFixed(2), analytics.bottom5[0].value.toFixed(2), (analytics.top5[0].value - analytics.bottom5[0].value).toFixed(2)]);
+    result.push(['Count', '5', '5', '0']);
+    
+    return result;
   };
 
   const performComprehensiveAnalytics = (data: any[][]) => {
@@ -869,9 +1012,29 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                 padding: '24px',
                 border: '1px solid rgba(76, 205, 196, 0.3)'
               }}>
-                <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600', color: '#4ecdc4' }}>
-                  🔝 Top 5 Highest Values
-                </h4>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <h4 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: '#4ecdc4' }}>
+                    🔝 Top 5 Highest Values
+                  </h4>
+                  <button
+                    onClick={() => {
+                      const top5Data = [['Rank', 'Country/Region', 'Value'], ...analyticsData.top5.map((item: any, index: number) => [`#${index + 1}`, item.country || `Row ${item.index}`, item.value.toFixed(2)])];
+                      downloadExcel(top5Data, 'top5_analysis.xlsx');
+                    }}
+                    style={{
+                      background: 'linear-gradient(45deg, #4ecdc4, #44b3a8)',
+                      border: 'none',
+                      borderRadius: '6px',
+                      padding: '6px 12px',
+                      color: 'white',
+                      cursor: 'pointer',
+                      fontSize: '11px',
+                      fontWeight: '500'
+                    }}
+                  >
+                    📥 Download
+                  </button>
+                </div>
                 <div style={{ display: 'flex', gap: '20px' }}>
                   <div style={{ flex: 1 }}>
                     <table style={{ borderCollapse: 'collapse', width: '100%' }}>
@@ -912,9 +1075,29 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                 padding: '24px',
                 border: '1px solid rgba(255, 107, 107, 0.3)'
               }}>
-                <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600', color: '#ff6b6b' }}>
-                  🔽 Bottom 5 Lowest Values
-                </h4>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <h4 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: '#ff6b6b' }}>
+                    🔽 Bottom 5 Lowest Values
+                  </h4>
+                  <button
+                    onClick={() => {
+                      const bottom5Data = [['Rank', 'Country/Region', 'Value'], ...analyticsData.bottom5.map((item: any, index: number) => [`#${index + 1}`, item.country || `Row ${item.index}`, item.value.toFixed(2)])];
+                      downloadExcel(bottom5Data, 'bottom5_analysis.xlsx');
+                    }}
+                    style={{
+                      background: 'linear-gradient(45deg, #ff6b6b, #e55555)',
+                      border: 'none',
+                      borderRadius: '6px',
+                      padding: '6px 12px',
+                      color: 'white',
+                      cursor: 'pointer',
+                      fontSize: '11px',
+                      fontWeight: '500'
+                    }}
+                  >
+                    📥 Download
+                  </button>
+                </div>
                 <div style={{ display: 'flex', gap: '20px' }}>
                   <div style={{ flex: 1 }}>
                     <table style={{ borderCollapse: 'collapse', width: '100%' }}>
@@ -980,6 +1163,170 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                     <div style={{ fontSize: '10px', marginTop: '4px', color: analyticsData.comparison.gap === 'High inequality' ? '#ff6b6b' : '#4ecdc4' }}>{analyticsData.comparison.gap}</div>
                   </div>
                 </div>
+              </div>
+            )}
+            
+            {/* Pivot Tables Section */}
+            {pivotTables.length > 0 && (
+              <div style={{
+                marginTop: '32px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                borderRadius: '12px',
+                padding: '24px'
+              }}>
+                <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600' }}>
+                  📋 Pivot Tables
+                </h4>
+                
+                {/* Pivot Table Selection */}
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexWrap: 'wrap' }}>
+                  {pivotTables.map((pivot, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedPivot(selectedPivot === index ? null : index)}
+                      style={{
+                        background: selectedPivot === index ? 'linear-gradient(45deg, #ff6b6b, #4ecdc4)' : 'rgba(255, 255, 255, 0.1)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                        borderRadius: '8px',
+                        padding: '8px 12px',
+                        color: 'white',
+                        cursor: 'pointer',
+                        fontSize: '11px',
+                        fontWeight: '500'
+                      }}
+                    >
+                      {pivot.title}
+                    </button>
+                  ))}
+                </div>
+                
+                {/* Custom Pivot Prompt */}
+                <div style={{ marginBottom: '20px' }}>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <input
+                      type="text"
+                      value={pivotPrompt}
+                      onChange={(e) => setPivotPrompt(e.target.value)}
+                      placeholder="Request custom pivot table (e.g., 'Group by year and show totals')"
+                      style={{
+                        flex: 1,
+                        background: 'rgba(255, 255, 255, 0.1)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                        borderRadius: '6px',
+                        padding: '8px 12px',
+                        color: 'white',
+                        fontSize: '12px'
+                      }}
+                    />
+                    <button
+                      onClick={async () => {
+                        if (pivotPrompt.trim()) {
+                          setAiLoading(true);
+                          try {
+                            const result = await bedrockService.processExcelData(spreadsheetData, `Create a pivot table: ${pivotPrompt}. Return the result as a structured table with headers.`, selectedFile?.name || 'data');
+                            if (result.success && result.structured) {
+                              const customPivot = {
+                                title: 'Custom Pivot',
+                                description: pivotPrompt,
+                                data: result.structured.result || [['No data', 'available']]
+                              };
+                              setPivotTables([...pivotTables, customPivot]);
+                              setSelectedPivot(pivotTables.length);
+                              setPivotPrompt('');
+                            }
+                          } catch (error) {
+                            console.error('Custom pivot error:', error);
+                          }
+                          setAiLoading(false);
+                        }
+                      }}
+                      disabled={!pivotPrompt.trim() || aiLoading}
+                      style={{
+                        background: 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
+                        border: 'none',
+                        borderRadius: '6px',
+                        padding: '8px 16px',
+                        color: 'white',
+                        cursor: 'pointer',
+                        fontSize: '11px',
+                        fontWeight: '500',
+                        opacity: !pivotPrompt.trim() || aiLoading ? 0.5 : 1
+                      }}
+                    >
+                      {aiLoading ? '⏳' : '✨'} Generate
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Selected Pivot Table Display */}
+                {selectedPivot !== null && pivotTables[selectedPivot] && (
+                  <div style={{
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    borderRadius: '8px',
+                    padding: '16px'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                      <div>
+                        <h5 style={{ margin: 0, fontSize: '14px', fontWeight: '600' }}>{pivotTables[selectedPivot].title}</h5>
+                        <p style={{ margin: '4px 0 0 0', fontSize: '11px', opacity: 0.7 }}>{pivotTables[selectedPivot].description}</p>
+                      </div>
+                      <button
+                        onClick={() => downloadExcel(pivotTables[selectedPivot].data, `${pivotTables[selectedPivot].title.replace(/\s+/g, '_').toLowerCase()}_pivot.xlsx`)}
+                        style={{
+                          background: 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
+                          border: 'none',
+                          borderRadius: '6px',
+                          padding: '6px 12px',
+                          color: 'white',
+                          cursor: 'pointer',
+                          fontSize: '11px',
+                          fontWeight: '500'
+                        }}
+                      >
+                        📥 Download
+                      </button>
+                    </div>
+                    <div style={{
+                      overflow: 'auto',
+                      maxHeight: '300px',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      borderRadius: '6px'
+                    }}>
+                      <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+                        <thead>
+                          <tr style={{ background: 'rgba(255, 255, 255, 0.1)' }}>
+                            {pivotTables[selectedPivot].data[0]?.map((header: string, index: number) => (
+                              <th key={index} style={{
+                                padding: '8px 12px',
+                                textAlign: 'left',
+                                fontSize: '11px',
+                                fontWeight: '600',
+                                borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+                              }}>
+                                {String(header)}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {pivotTables[selectedPivot].data.slice(1).map((row: any[], rowIndex: number) => (
+                            <tr key={rowIndex}>
+                              {row.map((cell: any, cellIndex: number) => (
+                                <td key={cellIndex} style={{
+                                  padding: '8px 12px',
+                                  fontSize: '11px',
+                                  borderBottom: '1px solid rgba(255, 255, 255, 0.05)'
+                                }}>
+                                  {String(cell || '')}
+                                </td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
