@@ -172,7 +172,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           });
           
           // Generate pivot tables
-          const pivots = generatePivotTables(data);
+          const pivots = generateAdvancedPivotTables(data);
           setPivotTables(pivots);
           
           fullAnalysis += `**📊 ANALYTICS OVERVIEW:**\n`;
@@ -356,37 +356,40 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     XLSX.writeFile(wb, filename);
   };
 
-  const generatePivotTables = (data: any[][]) => {
+  const generateAdvancedPivotTables = (data: any[][]) => {
     if (!data || data.length < 2) return [];
     
     const headers = data[0];
-    const rows = data.slice(1);
-    
     const pivots = [
       {
-        title: 'Summary by Country',
-        description: 'Total values grouped by country/region',
-        data: createCountryPivot(data)
+        title: 'Country × Year Matrix',
+        description: 'Countries as rows, years as columns',
+        data: createCountryYearMatrix(data)
       },
       {
-        title: 'Year-wise Analysis',
-        description: 'Trends over time periods',
-        data: createYearPivot(data)
+        title: 'Year × Category Breakdown',
+        description: 'Years as rows, categories as columns',
+        data: createYearCategoryMatrix(data)
       },
       {
-        title: 'Top Categories',
-        description: 'Highest performing categories',
-        data: createCategoryPivot(data)
+        title: 'Regional Summary',
+        description: 'Regions as rows, metrics as columns',
+        data: createRegionalSummary(data)
       },
       {
-        title: 'Statistical Summary',
-        description: 'Key metrics and totals',
-        data: createStatsPivot(data)
+        title: 'Top vs Bottom Analysis',
+        description: 'Performance tiers as rows, metrics as columns',
+        data: createPerformanceMatrix(data)
       },
       {
-        title: 'Comparative Analysis',
-        description: 'Side-by-side comparisons',
-        data: createComparativePivot(data)
+        title: 'Statistical Overview',
+        description: 'Metrics as rows, calculations as columns',
+        data: createStatisticalMatrix(data)
+      },
+      {
+        title: 'Quarterly Trends',
+        description: 'Quarters as rows, countries as columns',
+        data: createQuarterlyMatrix(data)
       }
     ];
     
@@ -477,17 +480,156 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     ];
   };
   
-  const createComparativePivot = (data: any[][]) => {
+  const createCountryYearMatrix = (data: any[][]) => {
+    const headers = data[0];
+    const rows = data.slice(1);
+    
+    const countryIndex = headers.findIndex((h: string) => String(h).toLowerCase().includes('country') || String(h).toLowerCase().includes('region'));
+    const yearColumns = headers.map((h, i) => ({ header: h, index: i })).filter(({ header }) => /\d{4}/.test(String(header)));
+    
+    if (countryIndex === -1 || yearColumns.length === 0) return null;
+    
+    const countryData: any = {};
+    rows.forEach(row => {
+      const country = row[countryIndex] || 'Unknown';
+      if (!countryData[country]) countryData[country] = {};
+      
+      yearColumns.forEach(({ header, index }) => {
+        const value = parseFloat(row[index]) || 0;
+        countryData[country][header] = (countryData[country][header] || 0) + value;
+      });
+    });
+    
+    const result = [['Country', ...yearColumns.map(y => y.header), 'Total']];
+    Object.entries(countryData).forEach(([country, years]: [string, any]) => {
+      const yearValues = yearColumns.map(y => (years[y.header] || 0).toFixed(2));
+      const total = yearColumns.reduce((sum, y) => sum + (years[y.header] || 0), 0);
+      result.push([country, ...yearValues, total.toFixed(2)]);
+    });
+    
+    return result;
+  };
+  
+  const createYearCategoryMatrix = (data: any[][]) => {
+    const headers = data[0];
+    const yearColumns = headers.map((h, i) => ({ header: h, index: i })).filter(({ header }) => /\d{4}/.test(String(header)));
+    const categoryIndex = headers.findIndex((h: string) => String(h).toLowerCase().includes('type') || String(h).toLowerCase().includes('category'));
+    
+    if (yearColumns.length === 0) return null;
+    
+    const result = [['Year', 'Total Records', 'Average Value', 'Min Value', 'Max Value']];
+    yearColumns.forEach(({ header, index }) => {
+      const values = data.slice(1).map(row => parseFloat(row[index]) || 0).filter(v => v > 0);
+      const total = values.length;
+      const avg = total > 0 ? values.reduce((sum, val) => sum + val, 0) / total : 0;
+      const min = total > 0 ? Math.min(...values) : 0;
+      const max = total > 0 ? Math.max(...values) : 0;
+      
+      result.push([String(header), total.toString(), avg.toFixed(2), min.toFixed(2), max.toFixed(2)]);
+    });
+    
+    return result;
+  };
+  
+  const createRegionalSummary = (data: any[][]) => {
     const analytics = performComprehensiveAnalytics(data);
-    if (!analytics.top5.length || !analytics.bottom5.length) return null;
+    const headers = data[0];
+    const countryIndex = headers.findIndex((h: string) => String(h).toLowerCase().includes('country') || String(h).toLowerCase().includes('region'));
     
-    const result = [['Metric', 'Top 5', 'Bottom 5', 'Difference']];
-    const topAvg = analytics.top5.reduce((sum, item) => sum + item.value, 0) / analytics.top5.length;
-    const bottomAvg = analytics.bottom5.reduce((sum, item) => sum + item.value, 0) / analytics.bottom5.length;
+    if (countryIndex === -1) return null;
     
-    result.push(['Average', topAvg.toFixed(2), bottomAvg.toFixed(2), (topAvg - bottomAvg).toFixed(2)]);
-    result.push(['Highest', analytics.top5[0].value.toFixed(2), analytics.bottom5[0].value.toFixed(2), (analytics.top5[0].value - analytics.bottom5[0].value).toFixed(2)]);
-    result.push(['Count', '5', '5', '0']);
+    const regions: any = {};
+    data.slice(1).forEach(row => {
+      const country = String(row[countryIndex] || 'Unknown');
+      const region = country.includes('Africa') ? 'Africa' : 
+                    country.includes('Asia') ? 'Asia' : 
+                    country.includes('Europe') ? 'Europe' : 
+                    country.includes('America') ? 'Americas' : 'Other';
+      
+      if (!regions[region]) regions[region] = { count: 0, values: [] };
+      regions[region].count++;
+      
+      const numericValue = parseFloat(row.find((cell, i) => i !== countryIndex && !isNaN(parseFloat(cell)))) || 0;
+      if (numericValue > 0) regions[region].values.push(numericValue);
+    });
+    
+    const result = [['Region', 'Countries', 'Total Value', 'Average', 'Percentage']];
+    const grandTotal = Object.values(regions).reduce((sum: number, region: any) => sum + region.values.reduce((s: number, v: number) => s + v, 0), 0);
+    
+    Object.entries(regions).forEach(([region, data]: [string, any]) => {
+      const total = data.values.reduce((sum: number, val: number) => sum + val, 0);
+      const avg = data.values.length > 0 ? total / data.values.length : 0;
+      const percentage = grandTotal > 0 ? ((total / grandTotal) * 100).toFixed(1) : '0.0';
+      
+      result.push([region, data.count.toString(), total.toFixed(2), avg.toFixed(2), `${percentage}%`]);
+    });
+    
+    return result;
+  };
+  
+  const createPerformanceMatrix = (data: any[][]) => {
+    const analytics = performComprehensiveAnalytics(data);
+    
+    const result = [['Performance Tier', 'Count', 'Average Value', 'Min Value', 'Max Value', 'Total']];
+    
+    if (analytics.top5.length > 0) {
+      const topValues = analytics.top5.map(item => item.value);
+      const topAvg = topValues.reduce((sum, val) => sum + val, 0) / topValues.length;
+      const topTotal = topValues.reduce((sum, val) => sum + val, 0);
+      result.push(['Top Performers', '5', topAvg.toFixed(2), Math.min(...topValues).toFixed(2), Math.max(...topValues).toFixed(2), topTotal.toFixed(2)]);
+    }
+    
+    if (analytics.bottom5.length > 0) {
+      const bottomValues = analytics.bottom5.map(item => item.value);
+      const bottomAvg = bottomValues.reduce((sum, val) => sum + val, 0) / bottomValues.length;
+      const bottomTotal = bottomValues.reduce((sum, val) => sum + val, 0);
+      result.push(['Bottom Performers', '5', bottomAvg.toFixed(2), Math.min(...bottomValues).toFixed(2), Math.max(...bottomValues).toFixed(2), bottomTotal.toFixed(2)]);
+    }
+    
+    result.push(['Overall', (data.length - 1).toString(), analytics.mean.toFixed(2), analytics.min.toFixed(2), analytics.max.toFixed(2), (analytics.mean * (data.length - 1)).toFixed(2)]);
+    
+    return result;
+  };
+  
+  const createStatisticalMatrix = (data: any[][]) => {
+    const analytics = performComprehensiveAnalytics(data);
+    
+    return [
+      ['Metric', 'Value', 'Percentage', 'Status'],
+      ['Total Records', (data.length - 1).toString(), '100.0%', 'Complete'],
+      ['Duplicate Records', analytics.duplicates.toString(), `${((analytics.duplicates / (data.length - 1)) * 100).toFixed(1)}%`, analytics.duplicates > 0 ? 'Needs Cleaning' : 'Clean'],
+      ['Missing Values', analytics.missingValues.toString(), `${((analytics.missingValues / ((data.length - 1) * data[0].length)) * 100).toFixed(1)}%`, analytics.missingValues > 0 ? 'Incomplete' : 'Complete'],
+      ['Data Range', analytics.range.toFixed(2), '100.0%', analytics.range > analytics.mean ? 'High Variance' : 'Low Variance'],
+      ['Standard Deviation', analytics.standardDeviation.toFixed(2), `${((analytics.standardDeviation / analytics.mean) * 100).toFixed(1)}%`, analytics.standardDeviation > analytics.mean ? 'High Spread' : 'Low Spread']
+    ];
+  };
+  
+  const createQuarterlyMatrix = (data: any[][]) => {
+    const headers = data[0];
+    const countryIndex = headers.findIndex((h: string) => String(h).toLowerCase().includes('country'));
+    const yearColumns = headers.map((h, i) => ({ header: h, index: i })).filter(({ header }) => /\d{4}/.test(String(header)));
+    
+    if (countryIndex === -1 || yearColumns.length === 0) return null;
+    
+    const countries = [...new Set(data.slice(1).map(row => row[countryIndex]))].slice(0, 5);
+    
+    const result = [['Quarter', ...countries.map(c => String(c)), 'Total']];
+    
+    yearColumns.forEach(({ header }) => {
+      const year = String(header);
+      for (let q = 1; q <= 4; q++) {
+        const quarter = `${year} Q${q}`;
+        const quarterData = countries.map(country => {
+          const countryRows = data.slice(1).filter(row => row[countryIndex] === country);
+          const avgValue = countryRows.length > 0 ? 
+            countryRows.reduce((sum, row) => sum + (parseFloat(row[yearColumns.find(y => y.header === header)?.index || 0]) || 0), 0) / countryRows.length / 4 : 0;
+          return avgValue.toFixed(2);
+        });
+        
+        const total = quarterData.reduce((sum, val) => sum + parseFloat(val), 0);
+        result.push([quarter, ...quarterData, total.toFixed(2)]);
+      }
+    });
     
     return result;
   };
@@ -754,6 +896,25 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                     }}
                   >
                     📊 {showChart ? 'Hide' : 'Show'} Chart
+                  </button>
+                  <button
+                    onClick={() => {
+                      const pivots = generateAdvancedPivotTables(spreadsheetData);
+                      setPivotTables(pivots);
+                      setSelectedPivot(0);
+                    }}
+                    style={{
+                      background: pivotTables.length > 0 ? 'linear-gradient(45deg, #ff6b6b, #4ecdc4)' : 'rgba(255, 255, 255, 0.1)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      borderRadius: '8px',
+                      padding: '8px 12px',
+                      color: 'white',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      fontWeight: '500'
+                    }}
+                  >
+                    📋 Pivot Tables
                   </button>
                   <button
                     onClick={() => downloadExcel(spreadsheetData, `${selectedFile?.name || 'data'}_export.xlsx`)}
