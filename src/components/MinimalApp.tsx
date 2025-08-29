@@ -725,9 +725,66 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
 
 
     
-    // Smart lookup - auto-detect data structure
+    // Handle simple lookup commands
     const lowerPrompt = trimmedPrompt.toLowerCase();
-    if (lowerPrompt.includes('show') || lowerPrompt.includes('get') || lowerPrompt.includes('find') || lowerPrompt.includes('lookup')) {
+    if (lowerPrompt.includes('lookup')) {
+      const lookupMatch = trimmedPrompt.match(/lookup\s+(\w+)/i);
+      if (lookupMatch) {
+        const searchTerm = lookupMatch[1].toLowerCase();
+        const headers = fileData[0];
+        const dataRows = fileData.slice(1);
+        
+        // Find all rows containing the search term
+        const matchingRows = dataRows.filter(row => 
+          row.some(cell => 
+            String(cell || '').toLowerCase().includes(searchTerm)
+          )
+        );
+        
+        if (matchingRows.length > 0) {
+          const result = [headers, ...matchingRows];
+          setLastAiResult(result);
+          setShowUseResultButton(true);
+          
+          let response = `<strong>Lookup results for '${searchTerm}' - Found ${matchingRows.length} matches:</strong><br><br>`;
+          response += '<table style="width: 100%; border-collapse: collapse;">';
+          response += '<thead>';
+          response += '<tr style="background: #e6f3ff; border-bottom: 2px solid #0078d4;">';
+          response += '<th style="padding: 8px; font-size: 11px; font-weight: bold; color: #0078d4; border: 1px solid #ddd;">#</th>';
+          headers.forEach((header, index) => {
+            const colLetter = String.fromCharCode(65 + index);
+            response += `<th style="padding: 8px; font-size: 11px; font-weight: bold; color: #0078d4; border: 1px solid #ddd;">${colLetter}</th>`;
+          });
+          response += '</tr></thead><tbody>';
+          response += '<tr>';
+          response += '<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; font-size: 11px; color: #0078d4; background: #f8f9ff; text-align: center;">1</td>';
+          headers.forEach(header => {
+            response += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; color: #333;">${header}</td>`;
+          });
+          response += '</tr>';
+          matchingRows.forEach((row, index) => {
+            response += '<tr>';
+            response += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; font-size: 11px; color: #0078d4; background: #f8f9ff; text-align: center;">${index + 2}</td>`;
+            row.forEach(cell => {
+              response += `<td style="padding: 8px; border-right: 1px solid #eee; color: #333;">${cell || 'N/A'}</td>`;
+            });
+            response += '</tr>';
+          });
+          response += '</tbody></table>';
+          
+          setAiResponse(response);
+          setPrompt('');
+          return;
+        } else {
+          setAiResponse(`<strong>No matches found for '${searchTerm}'</strong>`);
+          setPrompt('');
+          return;
+        }
+      }
+    }
+    
+    // Smart lookup - auto-detect data structure
+    if (lowerPrompt.includes('show') || lowerPrompt.includes('get') || lowerPrompt.includes('find')) {
       
       // Smart header detection - find row with most text columns
       let headerRowIndex = 0;
@@ -794,16 +851,31 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           setLastAiResult(result);
           setShowUseResultButton(true);
           
-          let response = `<strong>${headers[targetColIndex]} for ${headers[filterColIndex]} "${filterValue}":</strong><br><br>`;
-          
-          // Show unique values
-          response += '<div style="background: #e8f5e8; padding: 15px; border-radius: 6px; margin-bottom: 15px;">';
-          response += `<strong>Found ${matchingValues.size} unique ${headers[targetColIndex]} values:</strong><br>`;
-          Array.from(matchingValues).slice(0, 20).forEach(value => {
-            response += `• ${value}<br>`;
+          let response = `<strong>Lookup results for '${filterValue}' - Found ${matchingRows.length} matches:</strong><br><br>`;
+          response += '<table style="width: 100%; border-collapse: collapse;">';
+          response += '<thead>';
+          response += '<tr style="background: #e6f3ff; border-bottom: 2px solid #0078d4;">';
+          response += '<th style="padding: 8px; font-size: 11px; font-weight: bold; color: #0078d4; border: 1px solid #ddd;">#</th>';
+          headers.forEach((header, index) => {
+            const colLetter = String.fromCharCode(65 + index);
+            response += `<th style="padding: 8px; font-size: 11px; font-weight: bold; color: #0078d4; border: 1px solid #ddd;">${colLetter}</th>`;
           });
-          if (matchingValues.size > 20) response += `... and ${matchingValues.size - 20} more`;
-          response += '</div>';
+          response += '</tr></thead><tbody>';
+          response += '<tr>';
+          response += '<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; font-size: 11px; color: #0078d4; background: #f8f9ff; text-align: center;">1</td>';
+          headers.forEach(header => {
+            response += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; color: #333;">${header}</td>`;
+          });
+          response += '</tr>';
+          matchingRows.forEach((row, index) => {
+            response += '<tr>';
+            response += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; font-size: 11px; color: #0078d4; background: #f8f9ff; text-align: center;">${index + 2}</td>`;
+            row.forEach(cell => {
+              response += `<td style="padding: 8px; border-right: 1px solid #eee; color: #333;">${cell || 'N/A'}</td>`;
+            });
+            response += '</tr>';
+          });
+          response += '</tbody></table>';
           
           setAiResponse(response);
           setPrompt('');
