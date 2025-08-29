@@ -183,7 +183,8 @@ function App() {
                     cursor: 'move',
                     fontFamily: '"Poppins", sans-serif',
                     boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                    transition: 'all 0.3s ease',
+                    width: '120px',
+                    height: '44px',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px',
@@ -194,18 +195,7 @@ function App() {
                     localStorage.setItem('use_new_interface', newValue.toString());
                     setUseNewInterface(newValue);
                   }}
-                  onMouseEnter={(e) => {
-                    if (!e.currentTarget.dragging) {
-                      e.currentTarget.style.transform = 'scale(1.05)';
-                      e.currentTarget.style.boxShadow = '0 12px 40px rgba(0, 0, 0, 0.15)';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!e.currentTarget.dragging) {
-                      e.currentTarget.style.transform = 'scale(1)';
-                      e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.1)';
-                    }
-                  }}
+
                   onDragStart={(e) => {
                     e.dataTransfer.setData('text/plain', '');
                     e.currentTarget.dragging = true;
