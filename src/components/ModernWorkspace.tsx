@@ -539,31 +539,13 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           }}>
             {spreadsheetData.length > 0 ? (
               <>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                  <div>
-                    <h3 style={{ margin: '0 0 4px 0', fontSize: '18px', fontWeight: '600' }}>
-                      📊 Your Data
-                    </h3>
-                    <p style={{ margin: 0, fontSize: '14px', opacity: 0.7 }}>
-                      {displayData.length - 1} rows × {displayData[0]?.length || 0} columns
-                    </p>
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="🔍 Filter data..."
-                    value={filterText}
-                    onChange={(e) => setFilterText(e.target.value)}
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
-                      borderRadius: '8px',
-                      padding: '8px 12px',
-                      color: 'white',
-                      fontSize: '12px',
-                      width: '200px',
-                      outline: 'none'
-                    }}
-                  />
+                <div style={{ marginBottom: '16px' }}>
+                  <h3 style={{ margin: '0 0 4px 0', fontSize: '18px', fontWeight: '600' }}>
+                    📊 Your Data
+                  </h3>
+                  <p style={{ margin: 0, fontSize: '14px', opacity: 0.7 }}>
+                    {displayData.length - 1} rows × {displayData[0]?.length || 0} columns
+                  </p>
                 </div>
                 
                 <div style={{

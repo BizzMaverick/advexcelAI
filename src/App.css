@@ -861,4 +861,23 @@
 .custom-scrollbar::-webkit-scrollbar-corner {
   background: rgba(255, 255, 255, 0.1);
 }
+
+/* AI Assistant Textarea Placeholder Styling */
+textarea::placeholder {
+  color: rgba(255, 255, 255, 0.7) !important;
+  opacity: 1;
+}
+
+textarea::-webkit-input-placeholder {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+textarea::-moz-placeholder {
+  color: rgba(255, 255, 255, 0.7) !important;
+  opacity: 1;
+}
+
+textarea:-ms-input-placeholder {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
  
