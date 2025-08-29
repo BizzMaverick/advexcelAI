@@ -95,20 +95,40 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     setAiResponse('🔄 Performing comprehensive data analysis...');
     
     try {
-      const enhancedPrompt = `Perform a comprehensive analysis of this dataset. Provide:
-1. Data summary and key statistics
-2. Identify patterns and trends
-3. Detect anomalies or outliers
-4. Suggest data cleaning recommendations
-5. Generate insights and recommendations
-6. Create summary tables if needed
+      const enhancedPrompt = `You are a senior data analyst. Perform COMPLETE data analytics on this dataset and provide ALL possible outcomes:
 
-Analyze all columns and provide actionable insights.`;
+**REQUIRED ANALYSIS:**
+1. **DATA OVERVIEW**: Total rows, columns, data types, missing values
+2. **STATISTICAL SUMMARY**: Min, max, mean, median, mode, standard deviation for all numeric columns
+3. **TREND ANALYSIS**: Year-over-year changes, growth rates, seasonal patterns
+4. **GEOGRAPHIC ANALYSIS**: Country/region breakdowns, highest/lowest values
+5. **CORRELATION ANALYSIS**: Relationships between variables
+6. **ANOMALY DETECTION**: Outliers, unusual patterns, data quality issues
+7. **PREDICTIVE INSIGHTS**: Future trends, forecasting
+8. **ACTIONABLE RECOMMENDATIONS**: Policy suggestions, resource allocation, strategic decisions
+9. **RISK ASSESSMENT**: Potential issues, warning indicators
+10. **COMPARATIVE ANALYSIS**: Benchmarking, rankings, performance metrics
+
+**OUTPUT FORMAT:**
+- Provide detailed numerical results
+- Include percentage changes and ratios
+- Generate summary tables with key metrics
+- Highlight top 5 insights
+- Give specific recommendations with reasoning
+
+Be comprehensive and analytical - this is for executive decision making.`;
       
       const result = await bedrockService.processExcelData(data, enhancedPrompt, selectedFile?.name || 'data');
       
       if (result.success && result.response) {
-        setAiResponse(result.response);
+        // Enhanced response formatting for comprehensive analysis
+        const formattedResponse = `📊 **COMPREHENSIVE DATA ANALYTICS REPORT**\n\n${result.response}`;
+        setAiResponse(formattedResponse);
+        
+        // If structured data is available, set it for table display
+        if (result.structured && Array.isArray(result.structured)) {
+          setAiResultData(result.structured);
+        }
         return;
       } else {
         throw new Error(result.error || 'AI analysis failed');

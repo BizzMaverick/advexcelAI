@@ -39,11 +39,14 @@ class BedrockService {
           fileData,
           prompt: enhancedPrompt,
           fileName,
-          maxTokens: 4000, // Request longer response
+          maxTokens: 8000, // Increased for comprehensive analysis
+          temperature: 0.1, // More focused analysis
           dataInfo: {
             totalRows: fileData.length,
             totalColumns: fileData[0]?.length || 0,
-            headers: fileData[0] || []
+            headers: fileData[0] || [],
+            sampleData: fileData.slice(0, 10), // More sample data
+            analysisType: 'comprehensive'
           }
         })
       });
@@ -68,6 +71,25 @@ class BedrockService {
   // Enhance prompts with intelligent context understanding
   private enhancePromptWithExcelFunctions(prompt: string): string {
     const lowerPrompt = prompt.toLowerCase();
+    
+    // For comprehensive analysis, provide detailed instructions
+    if (lowerPrompt.includes('comprehensive analysis') || lowerPrompt.includes('complete data analytics')) {
+      return `${prompt}
+
+**ANALYSIS REQUIREMENTS:**
+- Calculate ALL statistical measures (mean, median, mode, std dev, variance)
+- Identify trends, patterns, and correlations
+- Detect outliers and anomalies
+- Provide year-over-year growth rates and percentage changes
+- Generate geographic/demographic breakdowns
+- Create predictive insights and forecasts
+- Suggest actionable business recommendations
+- Highlight top risks and opportunities
+- Include comparative analysis and benchmarking
+- Provide executive summary with key takeaways
+
+Return detailed numerical results with explanations.`;
+    }
     
     // Keep enhancements simple to avoid AI confusion
     if (lowerPrompt.includes('sort') || lowerPrompt.includes('order') || lowerPrompt.includes('arrange')) {
