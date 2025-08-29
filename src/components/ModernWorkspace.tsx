@@ -82,8 +82,37 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     }
   };
 
+  const handleLocalLookup = (searchTerm: string) => {
+    const headers = spreadsheetData[0];
+    const dataRows = spreadsheetData.slice(1);
+    
+    const matches = dataRows.filter(row => 
+      row.some(cell => 
+        String(cell || '').toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+    
+    if (matches.length > 0) {
+      const resultData = [headers, ...matches];
+      setAiResultData(resultData);
+      setAiResponse(`🔍 Found ${matches.length} matches for '${searchTerm}':\n\nResults are displayed in the table below.`);
+      return true;
+    }
+    return false;
+  };
+
   const handleRunAI = async () => {
     if (!prompt.trim() || !spreadsheetData.length) return;
+    
+    // Check for simple lookup queries first
+    const lookupMatch = prompt.match(/(?:show|find|lookup|search)\s+(?:for\s+)?['"]?([^'"\s]+)['"]?/i);
+    if (lookupMatch) {
+      const searchTerm = lookupMatch[1];
+      if (handleLocalLookup(searchTerm)) {
+        setPrompt('');
+        return;
+      }
+    }
     
     setAiLoading(true);
     try {
@@ -98,14 +127,20 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
       if (result.data && Array.isArray(result.data)) {
         setAiResultData(result.data);
         setAiResponse('✅ Analysis completed! Results are displayed below.');
+      } else if (result.result) {
+        // Handle text-based results
+        setAiResponse(result.result);
       } else {
-        setAiResponse(result.response || 'Analysis completed successfully!');
+        setAiResponse(result.response || result.error || 'Analysis completed successfully!');
       }
     } catch (err: any) {
-      setAiResponse(err.message || 'Processing failed');
+      console.error('AI Processing Error:', err);
+      setAiResponse(`❌ Error: ${err.message || 'Processing failed'}`);
     } finally {
       setAiLoading(false);
-      setPrompt('');
+      if (!aiResultData) {
+        setPrompt('');
+      }
     }
   };
 
@@ -707,9 +742,10 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
               borderRadius: '12px',
               padding: '24px',
               fontSize: '14px',
-              lineHeight: '1.6'
+              lineHeight: '1.6',
+              whiteSpace: 'pre-wrap'
             }}>
-              {aiResponse}
+              <div dangerouslySetInnerHTML={{ __html: aiResponse.replace(/\n/g, '<br>') }} />
             </div>
           </div>
         )}
