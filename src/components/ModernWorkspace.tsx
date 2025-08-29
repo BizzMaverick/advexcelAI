@@ -1108,6 +1108,66 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                 </button>
               </div>
             </div>
+            
+            {/* Custom Pivot */}
+            {spreadsheetData.length > 0 && (
+              <div style={{ marginTop: '24px' }}>
+                <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600' }}>
+                  📋 Custom Pivot
+                </h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <input
+                    type="text"
+                    value={pivotPrompt}
+                    onChange={(e) => setPivotPrompt(e.target.value)}
+                    placeholder="e.g., 'countries with ranks and E1: Economy'"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.1)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      borderRadius: '12px',
+                      padding: '16px',
+                      color: 'white',
+                      fontSize: '14px',
+                      outline: 'none'
+                    }}
+                  />
+                  <button
+                    onClick={() => {
+                      if (pivotPrompt.trim()) {
+                        const localPivot = createCustomPivot(spreadsheetData, pivotPrompt);
+                        if (localPivot) {
+                          const customPivot = {
+                            title: 'Custom Pivot',
+                            description: pivotPrompt,
+                            data: localPivot
+                          };
+                          setPivotTables([...pivotTables, customPivot]);
+                          setSelectedPivot(pivotTables.length);
+                          setPivotPrompt('');
+                        } else {
+                          setAiResponse('❌ Could not create pivot table. Please check column names and try again.');
+                        }
+                      }
+                    }}
+                    disabled={!pivotPrompt.trim()}
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.1)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      borderRadius: '12px',
+                      padding: '16px',
+                      color: 'white',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                      opacity: !pivotPrompt.trim() ? 0.5 : 1
+                    }}
+                  >
+                    ✨ Create Pivot
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Right Panel - Data Display Only */}
