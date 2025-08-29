@@ -993,8 +993,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                   color: 'white',
                   padding: '6px 12px',
                   borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '12px'
+                  cursor: 'pointer'
                 }}
               >
                 Advanced
