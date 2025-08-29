@@ -571,7 +571,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   overflow: 'auto',
                   maxHeight: '400px'
                 }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
+                  <table style={{ borderCollapse: 'collapse', minWidth: '800px', width: 'max-content' }}>
                     <thead>
                       <tr style={{ background: 'rgba(255, 255, 255, 0.1)' }}>
                         {displayData[0]?.map((header, index) => (
@@ -584,7 +584,9 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                               fontWeight: '600',
                               borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
                               cursor: 'pointer',
-                              position: 'relative'
+                              position: 'relative',
+                              whiteSpace: 'nowrap',
+                              minWidth: '120px'
                             }}>
                             {String(header || `Col ${index + 1}`)}
                             {sortColumn === index && (
@@ -604,7 +606,9 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                               padding: '12px 16px',
                               fontSize: '13px',
                               borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-                              opacity: 0.9
+                              opacity: 0.9,
+                              whiteSpace: 'nowrap',
+                              minWidth: '120px'
                             }}>
                               {String(cell || '')}
                             </td>
@@ -674,7 +678,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   overflow: 'auto',
                   maxHeight: '300px'
                 }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
+                  <table style={{ borderCollapse: 'collapse', minWidth: '800px', width: 'max-content' }}>
                     <thead>
                       <tr style={{ background: 'rgba(255, 255, 255, 0.1)' }}>
                         {aiResultData[0]?.map((header, index) => (
