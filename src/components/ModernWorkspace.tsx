@@ -1166,12 +1166,18 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
             {/* Custom Analysis */}
             <div>
               <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600' }}>
-                🤖 AI Assistant
+                📝 Custom Analysis
               </h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleCustomAnalysis();
+                    }
+                  }}
                   placeholder="Ask anything: analysis, pivot tables, summaries, charts...\ne.g., 'countries with economy', 'sum of sales', 'show duplicates'"
                   style={{
                     background: 'rgba(255, 255, 255, 0.1)',
@@ -1183,7 +1189,8 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                     fontFamily: 'inherit',
                     resize: 'vertical',
                     minHeight: '80px',
-                    outline: 'none'
+                    outline: 'none',
+                    overflow: 'hidden'
                   }}
                 />
                 <button
@@ -1202,7 +1209,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                     opacity: (!prompt.trim() || !spreadsheetData.length) ? 0.5 : 1
                   }}
                 >
-                  {aiLoading ? '🔄 Processing...' : '🤖 AI Assistant'}
+                  {aiLoading ? '🔄 Processing...' : '🔍 Custom Analysis'}
                 </button>
               </div>
             </div>
@@ -1359,8 +1366,10 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   whiteSpace: 'nowrap',
                   overflow: 'auto',
                   maxHeight: '200px',
-                  minWidth: '400px'
-                }}>
+                  minWidth: '400px',
+                  scrollbarWidth: 'thin',
+                  scrollbarColor: 'rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1)'
+                }} className="custom-scrollbar">
                   <div dangerouslySetInnerHTML={{ __html: aiResponse.replace(/\n/g, '<br>') }} />
                 </div>
               </div>
@@ -1563,8 +1572,10 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   borderRadius: '8px',
                   overflow: 'auto',
                   maxHeight: '500px',
-                  border: '1px solid rgba(255, 255, 255, 0.1)'
-                }}>
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  scrollbarWidth: 'thin',
+                  scrollbarColor: 'rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1)'
+                }} className="custom-scrollbar">
                   <table style={{ borderCollapse: 'collapse', width: '100%' }}>
                     <thead>
                       <tr style={{ background: 'rgba(255, 255, 255, 0.1)' }}>
