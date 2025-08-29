@@ -604,7 +604,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                     <tbody>
                       {displayData.slice(1).map((row, rowIndex) => (
                         <tr key={rowIndex}>
-                          {row.map((cell, cellIndex) => (
+                          {displayData[0]?.map((_, cellIndex) => (
                             <td key={cellIndex} style={{
                               padding: '12px 16px',
                               fontSize: '13px',
@@ -613,9 +613,9 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                               whiteSpace: 'nowrap',
                               minWidth: '150px'
                             }}>
-                              {String(cell || '')}
+                              {String(row[cellIndex] || '')}
                             </td>
-                          ))}
+                          ))
                         </tr>
                       ))}
                     </tbody>
