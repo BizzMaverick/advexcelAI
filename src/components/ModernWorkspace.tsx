@@ -250,18 +250,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
         alignItems: 'center'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{
-            width: '40px',
-            height: '40px',
-            background: 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
-            borderRadius: '12px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '20px'
-          }}>
-            ✨
-          </div>
+          <img src="/logo.png" alt="AdvExcel" style={{ height: '40px' }} />
           <div>
             <h1 style={{ margin: 0, fontSize: '24px', fontWeight: '600' }}>AdvExcel AI</h1>
             <p style={{ margin: 0, fontSize: '14px', opacity: 0.8 }}>Intelligent Data Analysis</p>
@@ -536,14 +525,16 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
             </div>
           </div>
 
-          {/* Right Panel - Data Display */}
+          {/* Right Panel - Data Display Only */}
           <div style={{
             background: 'rgba(255, 255, 255, 0.1)',
             backdropFilter: 'blur(20px)',
             borderRadius: '24px',
             padding: '32px',
             border: '1px solid rgba(255, 255, 255, 0.2)',
-            minHeight: '600px'
+            minHeight: '600px',
+            display: 'flex',
+            flexDirection: 'column'
           }}>
             {spreadsheetData.length > 0 ? (
               <>
@@ -577,9 +568,9 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                 <div style={{
                   background: 'rgba(255, 255, 255, 0.05)',
                   borderRadius: '12px',
-                  overflow: 'hidden',
+                  overflow: 'auto',
                   maxHeight: '400px',
-                  overflowY: 'auto'
+                  maxWidth: '100%'
                 }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
@@ -649,6 +640,107 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                 </p>
               </div>
             )}
+            
+            {/* AI Results in Right Panel */}
+            {aiResultData && (
+              <div style={{
+                marginTop: '32px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                borderRadius: '12px',
+                padding: '24px'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <h4 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>
+                    🤖 AI Analysis Results
+                  </h4>
+                  <button
+                    onClick={() => downloadExcel(aiResultData, 'ai_results.xlsx')}
+                    style={{
+                      background: 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
+                      border: 'none',
+                      borderRadius: '6px',
+                      padding: '6px 12px',
+                      color: 'white',
+                      cursor: 'pointer',
+                      fontSize: '11px',
+                      fontWeight: '500'
+                    }}
+                  >
+                    💾 Export
+                  </button>
+                </div>
+                <div style={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  borderRadius: '8px',
+                  overflow: 'auto',
+                  maxHeight: '300px',
+                  maxWidth: '100%'
+                }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ background: 'rgba(255, 255, 255, 0.1)' }}>
+                        {aiResultData[0]?.map((header, index) => (
+                          <th key={index} style={{
+                            padding: '8px 12px',
+                            textAlign: 'left',
+                            fontSize: '11px',
+                            fontWeight: '600',
+                            borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                            whiteSpace: 'nowrap'
+                          }}>
+                            {String(header || `Col ${index + 1}`)}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {aiResultData.slice(1).map((row, rowIndex) => (
+                        <tr key={rowIndex}>
+                          {row.map((cell, cellIndex) => (
+                            <td key={cellIndex} style={{
+                              padding: '8px 12px',
+                              fontSize: '12px',
+                              borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                              opacity: 0.9,
+                              whiteSpace: 'nowrap'
+                            }}>
+                              {String(cell || '')}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+            
+            {/* AI Response in Right Panel */}
+            {aiResponse && (
+              <div style={{
+                marginTop: '32px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                borderRadius: '12px',
+                padding: '24px'
+              }}>
+                <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600' }}>
+                  💬 AI Response
+                </h4>
+                <div style={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  borderRadius: '8px',
+                  padding: '16px',
+                  fontSize: '13px',
+                  lineHeight: '1.6',
+                  whiteSpace: 'pre-wrap',
+                  overflow: 'auto',
+                  maxHeight: '200px',
+                  maxWidth: '100%'
+                }}>
+                  <div dangerouslySetInnerHTML={{ __html: aiResponse.replace(/\n/g, '<br>') }} />
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -715,107 +807,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           </div>
         )}
 
-        {/* AI Results */}
-        {aiResultData && (
-          <div style={{
-            maxWidth: '1200px',
-            margin: '40px auto 0',
-            background: 'rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(20px)',
-            borderRadius: '24px',
-            padding: '32px',
-            border: '1px solid rgba(255, 255, 255, 0.2)'
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>
-                🤖 AI Analysis Results
-              </h3>
-              <button
-                onClick={() => downloadExcel(aiResultData, 'ai_results.xlsx')}
-                style={{
-                  background: 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
-                  border: 'none',
-                  borderRadius: '8px',
-                  padding: '8px 16px',
-                  color: 'white',
-                  cursor: 'pointer',
-                  fontSize: '12px',
-                  fontWeight: '500'
-                }}
-              >
-                💾 Export Results
-              </button>
-            </div>
-            <div style={{
-              background: 'rgba(255, 255, 255, 0.05)',
-              borderRadius: '12px',
-              overflow: 'hidden',
-              maxHeight: '400px',
-              overflowY: 'auto'
-            }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ background: 'rgba(255, 255, 255, 0.1)' }}>
-                    {aiResultData[0]?.map((header, index) => (
-                      <th key={index} style={{
-                        padding: '12px 16px',
-                        textAlign: 'left',
-                        fontSize: '12px',
-                        fontWeight: '600',
-                        borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
-                      }}>
-                        {String(header || `Col ${index + 1}`)}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {aiResultData.slice(1).map((row, rowIndex) => (
-                    <tr key={rowIndex}>
-                      {row.map((cell, cellIndex) => (
-                        <td key={cellIndex} style={{
-                          padding: '12px 16px',
-                          fontSize: '13px',
-                          borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-                          opacity: 0.9
-                        }}>
-                          {String(cell || '')}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
 
-        {/* AI Response */}
-        {aiResponse && (
-          <div style={{
-            maxWidth: '1200px',
-            margin: '40px auto 0',
-            background: 'rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(20px)',
-            borderRadius: '24px',
-            padding: '32px',
-            border: '1px solid rgba(255, 255, 255, 0.2)'
-          }}>
-            <h3 style={{ margin: '0 0 20px 0', fontSize: '18px', fontWeight: '600' }}>
-              💬 AI Response
-            </h3>
-            <div style={{
-              background: 'rgba(255, 255, 255, 0.05)',
-              borderRadius: '12px',
-              padding: '24px',
-              fontSize: '14px',
-              lineHeight: '1.6',
-              whiteSpace: 'pre-wrap'
-            }}>
-              <div dangerouslySetInnerHTML={{ __html: aiResponse.replace(/\n/g, '<br>') }} />
-            </div>
-          </div>
-        )}
       </main>
     </div>
   );
