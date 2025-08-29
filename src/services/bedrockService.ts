@@ -19,16 +19,13 @@ class BedrockService {
       // Enhance prompt with Excel function context
       const enhancedPrompt = this.enhancePromptWithExcelFunctions(prompt);
       
-      console.log('Sending request to Bedrock API:', {
-        endpoint: this.apiEndpoint,
-        fileName,
-        originalPrompt: prompt,
-        enhancedPrompt,
-        promptChanged: prompt !== enhancedPrompt,
-        dataRows: fileData.length,
-        dataColumns: fileData[0]?.length || 0,
-        sampleData: fileData.slice(0, 3) // Show first 3 rows for debugging
-      });
+      console.log('Sending request to Bedrock API:');
+      console.log('Endpoint:', this.apiEndpoint);
+      console.log('FileName:', fileName);
+      console.log('Original Prompt:', prompt);
+      console.log('Enhanced Prompt:', enhancedPrompt);
+      console.log('Data Rows:', fileData.length);
+      console.log('Data Columns:', fileData[0]?.length || 0);
 
       const response = await fetch(this.apiEndpoint, {
         method: 'POST',
@@ -56,7 +53,11 @@ class BedrockService {
       }
 
       const result: BedrockResponse = await response.json();
-      console.log('Bedrock API response:', result);
+      console.log('Bedrock API response:');
+      console.log('Success:', result.success);
+      console.log('Response:', result.response);
+      console.log('Error:', result.error);
+      console.log('Full result:', JSON.stringify(result, null, 2));
 
       return result;
     } catch (error) {
