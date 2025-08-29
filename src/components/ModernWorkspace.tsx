@@ -534,7 +534,8 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
             border: '1px solid rgba(255, 255, 255, 0.2)',
             minHeight: '600px',
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            overflow: 'hidden'
           }}>
             {spreadsheetData.length > 0 ? (
               <>
@@ -568,13 +569,17 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                 <div style={{
                   background: 'rgba(255, 255, 255, 0.05)',
                   borderRadius: '12px',
-                  overflowX: 'auto',
-                  overflowY: 'auto',
+                  overflowX: 'scroll',
+                  overflowY: 'scroll',
                   maxHeight: '400px',
                   width: '100%',
                   border: '1px solid rgba(255, 255, 255, 0.1)'
                 }}>
-                  <table style={{ borderCollapse: 'collapse', width: 'max-content', minWidth: 'max-content' }}>
+                  <table style={{ 
+                    borderCollapse: 'collapse', 
+                    width: 'auto',
+                    tableLayout: 'auto'
+                  }}>
                     <thead>
                       <tr style={{ background: 'rgba(255, 255, 255, 0.1)' }}>
                         {displayData[0]?.map((header, index) => (
@@ -589,8 +594,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                               cursor: 'pointer',
                               position: 'relative',
                               whiteSpace: 'nowrap',
-                              minWidth: '120px',
-                              width: 'auto'
+                              minWidth: '150px'
                             }}>
                             {String(header || `Col ${index + 1}`)}
                             {sortColumn === index && (
@@ -612,8 +616,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                               borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
                               opacity: 0.9,
                               whiteSpace: 'nowrap',
-                              minWidth: '120px',
-                              width: 'auto'
+                              minWidth: '150px'
                             }}>
                               {String(row[cellIndex] || '')}
                             </td>
