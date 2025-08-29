@@ -326,7 +326,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           display: 'grid',
           gridTemplateColumns: '1fr 2fr',
           gap: '40px',
-          alignItems: 'start'
+          alignItems: 'stretch'
         }}>
           {/* Left Panel - Upload & AI */}
           <div style={{
@@ -569,10 +569,9 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   background: 'rgba(255, 255, 255, 0.05)',
                   borderRadius: '12px',
                   overflow: 'auto',
-                  maxHeight: '400px',
-                  maxWidth: '100%'
+                  maxHeight: '400px'
                 }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
                     <thead>
                       <tr style={{ background: 'rgba(255, 255, 255, 0.1)' }}>
                         {displayData[0]?.map((header, index) => (
@@ -673,10 +672,9 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   background: 'rgba(255, 255, 255, 0.05)',
                   borderRadius: '8px',
                   overflow: 'auto',
-                  maxHeight: '300px',
-                  maxWidth: '100%'
+                  maxHeight: '300px'
                 }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
                     <thead>
                       <tr style={{ background: 'rgba(255, 255, 255, 0.1)' }}>
                         {aiResultData[0]?.map((header, index) => (
@@ -732,10 +730,10 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   padding: '16px',
                   fontSize: '13px',
                   lineHeight: '1.6',
-                  whiteSpace: 'pre-wrap',
+                  whiteSpace: 'nowrap',
                   overflow: 'auto',
                   maxHeight: '200px',
-                  maxWidth: '100%'
+                  minWidth: '400px'
                 }}>
                   <div dangerouslySetInnerHTML={{ __html: aiResponse.replace(/\n/g, '<br>') }} />
                 </div>
