@@ -176,15 +176,15 @@ function App() {
                     backdropFilter: 'blur(20px)',
                     border: '1px solid rgba(255, 255, 255, 0.3)',
                     color: 'white',
-                    padding: '8px 12px',
+                    padding: '0',
                     borderRadius: '25px',
-                    fontSize: '14px',
+                    fontSize: '12px',
                     fontWeight: '600',
                     cursor: 'move',
                     fontFamily: '"Poppins", sans-serif',
                     boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                    width: 'auto',
-                    height: 'auto',
+                    width: '40px',
+                    height: '40px',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px',
@@ -210,11 +210,9 @@ function App() {
                   }}
                   title="Drag to move, click to toggle UI"
                 >
-                  <span style={{ fontSize: '12px', opacity: 0.8 }}>☰</span>
-                  <span style={{ fontSize: '16px' }}>
+                  <span style={{ fontSize: '20px' }}>
                     {useNewInterface ? '🔄' : '✨'}
                   </span>
-                  {useNewInterface ? 'Classic' : 'Modern'}
                 </div>
               )}
               {(useNewInterface && canUseNewInterface) ? (
