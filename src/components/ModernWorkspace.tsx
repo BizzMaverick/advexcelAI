@@ -747,18 +747,40 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     
     const result = [];
     
+    // Check if user wants year column included
+    const includeYear = lowerPrompt.includes('year');
+    const yearIndex = headers.findIndex((h: string) => /\d{4}/.test(String(h)) || String(h).toLowerCase().includes('year'));
+    
     if (lowerPrompt.includes('rank') && isNumeric) {
-      result.push(['Rank', rowHeader, valueHeader]);
-      pivotData.forEach((item, index) => {
-        const displayValue = isNumeric ? parseFloat(String(item.value)).toFixed(2) : item.value;
-        result.push([`#${index + 1}`, item.row, displayValue]);
-      });
+      if (includeYear && yearIndex !== -1) {
+        result.push(['Rank', rowHeader, 'Year', valueHeader]);
+        pivotData.forEach((item, index) => {
+          const displayValue = isNumeric ? parseFloat(String(item.value)).toFixed(2) : item.value;
+          const yearValue = rows.find(row => row[rowIndex] === item.row)?.[yearIndex] || 'N/A';
+          result.push([`#${index + 1}`, item.row, yearValue, displayValue]);
+        });
+      } else {
+        result.push(['Rank', rowHeader, valueHeader]);
+        pivotData.forEach((item, index) => {
+          const displayValue = isNumeric ? parseFloat(String(item.value)).toFixed(2) : item.value;
+          result.push([`#${index + 1}`, item.row, displayValue]);
+        });
+      }
     } else {
-      result.push([rowHeader, valueHeader]);
-      pivotData.forEach(item => {
-        const displayValue = isNumeric ? parseFloat(String(item.value)).toFixed(2) : item.value;
-        result.push([item.row, displayValue]);
-      });
+      if (includeYear && yearIndex !== -1) {
+        result.push([rowHeader, 'Year', valueHeader]);
+        pivotData.forEach(item => {
+          const displayValue = isNumeric ? parseFloat(String(item.value)).toFixed(2) : item.value;
+          const yearValue = rows.find(row => row[rowIndex] === item.row)?.[yearIndex] || 'N/A';
+          result.push([item.row, yearValue, displayValue]);
+        });
+      } else {
+        result.push([rowHeader, valueHeader]);
+        pivotData.forEach(item => {
+          const displayValue = isNumeric ? parseFloat(String(item.value)).toFixed(2) : item.value;
+          result.push([item.row, displayValue]);
+        });
+      }
     }
     
     return result;
