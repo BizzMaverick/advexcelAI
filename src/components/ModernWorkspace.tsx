@@ -590,7 +590,7 @@ Analyze all columns and provide actionable insights.`;
                                 }}
                               />
                             </td>
-                          ))
+                          ))}
                         </tr>
                       ))}
                     </tbody>
@@ -780,7 +780,7 @@ Analyze all columns and provide actionable insights.`;
               data={spreadsheetData}
               onPromptSelect={(selectedPrompt) => {
                 setPrompt(selectedPrompt);
-                setTimeout(() => handleRunAI(), 100);
+                setTimeout(() => handleCustomAnalysis(), 100);
               }}
             />
           </div>
