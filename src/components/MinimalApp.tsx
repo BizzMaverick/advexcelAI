@@ -1881,28 +1881,27 @@ We're committed to excellent support and continuous improvement based on your fe
             style={{
               width: '60px',
               height: '60px',
-              borderRadius: '50%',
-              background: 'linear-gradient(145deg, #4CAF50, #45a049)',
+              borderRadius: '8px',
+              background: '#0078d4',
               color: 'white',
               cursor: 'pointer',
-              boxShadow: '0 8px 16px rgba(76,175,80,0.3), inset 0 2px 4px rgba(255,255,255,0.2)',
+              boxShadow: '0 4px 8px rgba(0, 120, 212, 0.3)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: '24px',
               border: 'none',
-              transition: 'all 0.3s ease',
-              animation: 'spin3d 2s infinite linear'
+              transition: 'all 0.3s ease'
             }}
             onMouseEnter={(e) => {
               const target = e.target as HTMLElement;
-              target.style.transform = 'scale(1.1)';
-              target.style.boxShadow = '0 12px 24px rgba(76,175,80,0.4), inset 0 2px 4px rgba(255,255,255,0.3)';
+              target.style.transform = 'translateY(-2px)';
+              target.style.boxShadow = '0 6px 12px rgba(0, 120, 212, 0.4)';
             }}
             onMouseLeave={(e) => {
               const target = e.target as HTMLElement;
-              target.style.transform = 'scale(1)';
-              target.style.boxShadow = '0 8px 16px rgba(76,175,80,0.3), inset 0 2px 4px rgba(255,255,255,0.2)';
+              target.style.transform = 'translateY(0)';
+              target.style.boxShadow = '0 4px 8px rgba(0, 120, 212, 0.3)';
             }}
             title="Give Feedback"
           >
@@ -1916,12 +1915,12 @@ We're committed to excellent support and continuous improvement based on your fe
               right: '0',
               width: '300px',
               background: 'white',
-              borderRadius: '12px',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+              borderRadius: '8px',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
               padding: '20px',
-              border: '1px solid #e1e5e9'
+              border: '1px solid #ddd'
             }}>
-              <h4 style={{ margin: '0 0 12px 0', color: '#232f3e', fontSize: '16px' }}>Send Feedback</h4>
+              <h4 style={{ margin: '0 0 12px 0', color: '#333', fontSize: '16px' }}>Send Feedback</h4>
               <textarea
                 value={feedbackText}
                 onChange={(e) => setFeedbackText(e.target.value)}
@@ -1965,11 +1964,11 @@ We're committed to excellent support and continuous improvement based on your fe
                     }
                   }}
                   style={{
-                    background: '#4CAF50',
+                    background: '#0078d4',
                     color: 'white',
                     border: 'none',
                     padding: '8px 16px',
-                    borderRadius: '6px',
+                    borderRadius: '4px',
                     cursor: 'pointer',
                     fontSize: '14px',
                     fontWeight: '500'
@@ -1985,9 +1984,9 @@ We're committed to excellent support and continuous improvement based on your fe
                   style={{
                     background: '#f5f5f5',
                     color: '#333',
-                    border: '1px solid #d5d9d9',
+                    border: '1px solid #ddd',
                     padding: '8px 16px',
-                    borderRadius: '6px',
+                    borderRadius: '4px',
                     cursor: 'pointer',
                     fontSize: '14px'
                   }}
@@ -1999,12 +1998,7 @@ We're committed to excellent support and continuous improvement based on your fe
           )}
         </div>
         
-        <style>{`
-          @keyframes spin3d {
-            0% { transform: rotateY(0deg); }
-            100% { transform: rotateY(360deg); }
-          }
-        `}</style>
+
       </div>
     </ErrorBoundary>
   );
