@@ -568,13 +568,12 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                 <div style={{
                   background: 'rgba(255, 255, 255, 0.05)',
                   borderRadius: '12px',
-                  overflow: 'scroll',
+                  overflow: 'auto',
                   maxHeight: '400px',
                   width: '100%',
-                  overflowX: 'scroll',
-                  overflowY: 'scroll'
+                  border: '1px solid rgba(255, 255, 255, 0.1)'
                 }}>
-                  <table style={{ borderCollapse: 'collapse', width: 'auto' }}>
+                  <table style={{ borderCollapse: 'collapse', width: 'max-content', minWidth: '100%' }}>
                     <thead>
                       <tr style={{ background: 'rgba(255, 255, 255, 0.1)' }}>
                         {displayData[0]?.map((header, index) => (
@@ -675,9 +674,10 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   background: 'rgba(255, 255, 255, 0.05)',
                   borderRadius: '8px',
                   overflow: 'auto',
-                  maxHeight: '300px'
+                  maxHeight: '300px',
+                  border: '1px solid rgba(255, 255, 255, 0.1)'
                 }}>
-                  <table style={{ borderCollapse: 'collapse', minWidth: '800px', width: 'max-content' }}>
+                  <table style={{ borderCollapse: 'collapse', width: 'max-content', minWidth: '100%' }}>
                     <thead>
                       <tr style={{ background: 'rgba(255, 255, 255, 0.1)' }}>
                         {aiResultData[0]?.map((header, index) => (
