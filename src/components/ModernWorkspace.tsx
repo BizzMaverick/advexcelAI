@@ -23,6 +23,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
   const [dataStructure, setDataStructure] = useState<any>(null);
   const [prompt, setPrompt] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
+  const [analyticsData, setAnalyticsData] = useState<any>(null);
   const [aiResponse, setAiResponse] = useState<string>('');
   const [aiResultData, setAiResultData] = useState<any[][] | null>(null);
   const [dragActive, setDragActive] = useState(false);
@@ -149,43 +150,28 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
         fullAnalysis += `• Duplicate Rows: ${analytics.duplicates}\n`;
         fullAnalysis += `• Missing Values: ${analytics.missingValues}\n\n`;
         
-        // Create analytics tables for display
+        // Create separate analytics data
         if (analytics.top5.length > 0 && analytics.bottom5.length > 0) {
-          const analyticsTable = [
-            ['Category', 'Rank', 'Country/Region', 'Value'],
-            ...analytics.top5.map((item, index) => [
-              'Top 5', 
-              `#${index + 1}`, 
-              item.country || `Row ${item.index}`, 
-              item.value.toFixed(2)
-            ]),
-            ...analytics.bottom5.map((item, index) => [
-              'Bottom 5', 
-              `#${index + 1}`, 
-              item.country || `Row ${item.index}`, 
-              item.value.toFixed(2)
-            ])
-          ];
-          
-          // Comparison table
           const topAvg = analytics.top5.reduce((sum, item) => sum + item.value, 0) / analytics.top5.length;
           const bottomAvg = analytics.bottom5.reduce((sum, item) => sum + item.value, 0) / analytics.bottom5.length;
           const ratio = (topAvg / bottomAvg).toFixed(2);
           
-          const comparisonTable = [
-            ['Metric', 'Top 5', 'Bottom 5', 'Difference'],
-            ['Average', topAvg.toFixed(2), bottomAvg.toFixed(2), (topAvg - bottomAvg).toFixed(2)],
-            ['Highest Value', analytics.top5[0].value.toFixed(2), analytics.bottom5[0].value.toFixed(2), (analytics.top5[0].value - analytics.bottom5[0].value).toFixed(2)],
-            ['Ratio', `${ratio}x higher`, '1.0x baseline', `${ratio}x gap`],
-            ['Assessment', topAvg > bottomAvg * 2 ? 'High inequality' : 'Moderate gap', 'Baseline', topAvg > bottomAvg * 2 ? 'Action needed' : 'Acceptable']
-          ];
+          // Store analytics data for separate display
+          setAnalyticsData({
+            top5: analytics.top5,
+            bottom5: analytics.bottom5,
+            comparison: {
+              topAvg: topAvg.toFixed(2),
+              bottomAvg: bottomAvg.toFixed(2),
+              ratio,
+              gap: topAvg > bottomAvg * 2 ? 'High inequality' : 'Moderate gap'
+            }
+          });
           
-          setAiResultData([...analyticsTable, [], ['COMPARISON ANALYSIS'], ...comparisonTable]);
-          
-          fullAnalysis += `**📊 TOP 5 vs BOTTOM 5 ANALYSIS:**\n`;
-          fullAnalysis += `• View detailed rankings and comparison in the table below\n`;
+          fullAnalysis += `**📊 ANALYTICS OVERVIEW:**\n`;
           fullAnalysis += `• Top 5 average: ${topAvg.toFixed(2)} | Bottom 5 average: ${bottomAvg.toFixed(2)}\n`;
-          fullAnalysis += `• Performance gap: ${ratio}x difference detected\n\n`;
+          fullAnalysis += `• Performance gap: ${ratio}x difference detected\n`;
+          fullAnalysis += `• View detailed tables and charts below\n\n`;
         }
         
         // Key Insights
@@ -874,66 +860,125 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
               </div>
             )}
             
-            {/* Analytics Tables */}
-            {aiResultData && (
+            {/* Top 5 Table */}
+            {analyticsData?.top5 && (
               <div style={{
                 marginTop: '32px',
+                background: 'rgba(76, 205, 196, 0.1)',
+                borderRadius: '12px',
+                padding: '24px',
+                border: '1px solid rgba(76, 205, 196, 0.3)'
+              }}>
+                <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600', color: '#4ecdc4' }}>
+                  🔝 Top 5 Highest Values
+                </h4>
+                <div style={{ display: 'flex', gap: '20px' }}>
+                  <div style={{ flex: 1 }}>
+                    <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+                      <thead>
+                        <tr style={{ background: 'rgba(76, 205, 196, 0.2)' }}>
+                          <th style={{ padding: '8px 12px', textAlign: 'left', fontSize: '12px' }}>Rank</th>
+                          <th style={{ padding: '8px 12px', textAlign: 'left', fontSize: '12px' }}>Country/Region</th>
+                          <th style={{ padding: '8px 12px', textAlign: 'left', fontSize: '12px' }}>Value</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {analyticsData.top5.map((item: any, index: number) => (
+                          <tr key={index}>
+                            <td style={{ padding: '8px 12px', fontSize: '11px' }}>#{index + 1}</td>
+                            <td style={{ padding: '8px 12px', fontSize: '11px' }}>{item.country || `Row ${item.index}`}</td>
+                            <td style={{ padding: '8px 12px', fontSize: '11px', fontWeight: '600' }}>{item.value.toFixed(2)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div style={{ width: '200px', height: '150px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '24px', fontWeight: '600', color: '#4ecdc4' }}>{analyticsData.comparison?.topAvg}</div>
+                      <div style={{ fontSize: '11px', opacity: 0.7 }}>Average</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Bottom 5 Table */}
+            {analyticsData?.bottom5 && (
+              <div style={{
+                marginTop: '20px',
+                background: 'rgba(255, 107, 107, 0.1)',
+                borderRadius: '12px',
+                padding: '24px',
+                border: '1px solid rgba(255, 107, 107, 0.3)'
+              }}>
+                <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600', color: '#ff6b6b' }}>
+                  🔽 Bottom 5 Lowest Values
+                </h4>
+                <div style={{ display: 'flex', gap: '20px' }}>
+                  <div style={{ flex: 1 }}>
+                    <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+                      <thead>
+                        <tr style={{ background: 'rgba(255, 107, 107, 0.2)' }}>
+                          <th style={{ padding: '8px 12px', textAlign: 'left', fontSize: '12px' }}>Rank</th>
+                          <th style={{ padding: '8px 12px', textAlign: 'left', fontSize: '12px' }}>Country/Region</th>
+                          <th style={{ padding: '8px 12px', textAlign: 'left', fontSize: '12px' }}>Value</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {analyticsData.bottom5.map((item: any, index: number) => (
+                          <tr key={index}>
+                            <td style={{ padding: '8px 12px', fontSize: '11px' }}>#{index + 1}</td>
+                            <td style={{ padding: '8px 12px', fontSize: '11px' }}>{item.country || `Row ${item.index}`}</td>
+                            <td style={{ padding: '8px 12px', fontSize: '11px', fontWeight: '600' }}>{item.value.toFixed(2)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div style={{ width: '200px', height: '150px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '24px', fontWeight: '600', color: '#ff6b6b' }}>{analyticsData.comparison?.bottomAvg}</div>
+                      <div style={{ fontSize: '11px', opacity: 0.7 }}>Average</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Comparison Chart */}
+            {analyticsData?.comparison && (
+              <div style={{
+                marginTop: '20px',
                 background: 'rgba(255, 255, 255, 0.05)',
                 borderRadius: '12px',
                 padding: '24px'
               }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                  <h4 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>
-                    📊 Analytics Tables
-                  </h4>
-                  <button
-                    onClick={() => downloadExcel(aiResultData, 'analytics_results.xlsx')}
-                    style={{
-                      background: 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
-                      border: 'none',
-                      borderRadius: '6px',
-                      padding: '6px 12px',
-                      color: 'white',
-                      cursor: 'pointer',
-                      fontSize: '11px',
-                      fontWeight: '500'
-                    }}
-                  >
-                    💾 Export Tables
-                  </button>
-                </div>
-                <div style={{
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  borderRadius: '8px',
-                  overflow: 'auto',
-                  maxHeight: '400px',
-                  border: '1px solid rgba(255, 255, 255, 0.1)'
-                }}>
-                  <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-                    <tbody>
-                      {aiResultData.map((row, rowIndex) => (
-                        <tr key={rowIndex} style={{
-                          background: rowIndex === 0 || (Array.isArray(row) && row[0] === 'COMPARISON ANALYSIS') ? 'rgba(255, 255, 255, 0.1)' : 'transparent'
-                        }}>
-                          {Array.isArray(row) ? row.map((cell, cellIndex) => (
-                            <td key={cellIndex} style={{
-                              padding: '8px 12px',
-                              fontSize: rowIndex === 0 ? '12px' : '11px',
-                              fontWeight: rowIndex === 0 || cell === 'COMPARISON ANALYSIS' ? '600' : '400',
-                              borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-                              color: cell?.toString().includes('Top 5') ? '#4ecdc4' : cell?.toString().includes('Bottom 5') ? '#ff6b6b' : 'white'
-                            }}>
-                              {String(cell || '')}
-                            </td>
-                          )) : (
-                            <td colSpan={4} style={{ padding: '8px 12px', fontSize: '12px', fontWeight: '600' }}>
-                              {String(row)}
-                            </td>
-                          )}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600' }}>
+                  ⚖️ Comparison Analysis
+                </h4>
+                <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                      <div style={{ width: '100px', fontSize: '12px' }}>Top 5 Avg:</div>
+                      <div style={{ flex: 1, background: 'rgba(255,255,255,0.1)', borderRadius: '4px', height: '20px', position: 'relative' }}>
+                        <div style={{ background: '#4ecdc4', height: '100%', width: '100%', borderRadius: '4px' }}></div>
+                        <span style={{ position: 'absolute', right: '8px', top: '2px', fontSize: '11px', fontWeight: '600' }}>{analyticsData.comparison.topAvg}</span>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                      <div style={{ width: '100px', fontSize: '12px' }}>Bottom 5 Avg:</div>
+                      <div style={{ flex: 1, background: 'rgba(255,255,255,0.1)', borderRadius: '4px', height: '20px', position: 'relative' }}>
+                        <div style={{ background: '#ff6b6b', height: '100%', width: `${(parseFloat(analyticsData.comparison.bottomAvg) / parseFloat(analyticsData.comparison.topAvg)) * 100}%`, borderRadius: '4px' }}></div>
+                        <span style={{ position: 'absolute', right: '8px', top: '2px', fontSize: '11px', fontWeight: '600' }}>{analyticsData.comparison.bottomAvg}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'center', minWidth: '120px' }}>
+                    <div style={{ fontSize: '32px', fontWeight: '600', color: analyticsData.comparison.gap === 'High inequality' ? '#ff6b6b' : '#4ecdc4' }}>{analyticsData.comparison.ratio}x</div>
+                    <div style={{ fontSize: '11px', opacity: 0.7 }}>Ratio</div>
+                    <div style={{ fontSize: '10px', marginTop: '4px', color: analyticsData.comparison.gap === 'High inequality' ? '#ff6b6b' : '#4ecdc4' }}>{analyticsData.comparison.gap}</div>
+                  </div>
                 </div>
               </div>
             )}
