@@ -179,7 +179,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           fullAnalysis += `**📊 ANALYTICS OVERVIEW:**\n`;
           fullAnalysis += `• Top 5 average: ${topAvg.toFixed(2)} | Bottom 5 average: ${bottomAvg.toFixed(2)}\n`;
           fullAnalysis += `• Performance gap: ${ratio}x difference detected\n`;
-          fullAnalysis += `• View detailed tables and charts below\n\n`;
+          fullAnalysis += `• Detailed analytics completed successfully\n\n`;
         }
         
         // Key Insights
@@ -282,7 +282,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           };
           setPivotTables([...pivotTables, customPivot]);
           setSelectedPivot(pivotTables.length);
-          setAiResponse(`✅ **Pivot Table Created**\n\nYour pivot table "${prompt}" has been generated and is displayed below.`);
+          setAiResponse(`✅ **Pivot Table Created**\n\nYour pivot table "${prompt}" has been generated successfully.`);
           setPrompt('');
           setAiLoading(false);
           return;
@@ -1371,7 +1371,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                 padding: '24px'
               }}>
                 <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600' }}>
-                  💬 AI Analytics Report
+                  💬 Custom Analytics Response
                 </h4>
                 <div style={{
                   background: 'rgba(255, 255, 255, 0.05)',
