@@ -160,60 +160,41 @@ function App() {
                 />
               )}
               
-              {/* Draggable Modern UI Toggle - Only for admin */}
+              {/* UI Toggle - Only for admin */}
               {canUseNewInterface && (
-                <div 
-                  draggable
-
-                  style={{
-                    position: 'fixed',
-                    top: '70px',
-                    right: '20px',
-                    zIndex: 9999,
-                    background: useNewInterface ? 
-                      'linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1))' :
-                      'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
-                    backdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(255, 255, 255, 0.3)',
-                    color: 'white',
-                    padding: '0',
-                    borderRadius: '25px',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    cursor: 'move',
-                    fontFamily: '"Poppins", sans-serif',
-                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                    width: '40px',
-                    height: '40px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    userSelect: 'none'
-                  }} 
+                <button
                   onClick={() => {
                     const newValue = !useNewInterface;
                     localStorage.setItem('use_new_interface', newValue.toString());
                     setUseNewInterface(newValue);
                   }}
-
-                  onDragStart={(e) => {
-                    e.dataTransfer.setData('text/plain', '');
-                    e.currentTarget.dragging = true;
-                    e.currentTarget.style.transform = 'scale(1)';
+                  style={{
+                    position: 'fixed',
+                    top: '70px',
+                    right: '20px',
+                    zIndex: 9999,
+                    background: useNewInterface ? '#10b981' : '#0078d4',
+                    color: 'white',
+                    border: 'none',
+                    padding: '8px 12px',
+                    borderRadius: '6px',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    fontFamily: 'system-ui, -apple-system, sans-serif',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                    transition: 'all 0.2s ease'
                   }}
-                  onDragEnd={(e) => {
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    e.currentTarget.style.position = 'fixed';
-                    e.currentTarget.style.left = `${e.clientX - rect.width/2}px`;
-                    e.currentTarget.style.top = `${e.clientY - rect.height/2}px`;
-                    e.currentTarget.dragging = false;
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = 'scale(1.05)';
                   }}
-                  title="Drag to move, click to toggle UI"
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = 'scale(1)';
+                  }}
+                  title={`Switch to ${useNewInterface ? 'Phase 1' : 'Phase 2'}`}
                 >
-                  <span style={{ fontSize: '20px' }}>
-                    {useNewInterface ? '🔄' : '✨'}
-                  </span>
-                </div>
+                  {useNewInterface ? 'Phase 1' : 'Phase 2'}
+                </button>
               )}
               {(useNewInterface && canUseNewInterface) ? (
                 <ModernWorkspace 
