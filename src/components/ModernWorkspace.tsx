@@ -573,8 +573,10 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   overflowY: 'scroll',
                   maxHeight: '400px',
                   width: '100%',
-                  border: '1px solid rgba(255, 255, 255, 0.1)'
-                }}>
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  scrollbarWidth: 'thin',
+                  scrollbarColor: 'rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1)'
+                }} className="custom-scrollbar">
                   <table style={{ 
                     borderCollapse: 'collapse', 
                     width: 'auto',
@@ -681,8 +683,10 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   borderRadius: '8px',
                   overflow: 'auto',
                   maxHeight: '300px',
-                  border: '1px solid rgba(255, 255, 255, 0.1)'
-                }}>
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  scrollbarWidth: 'thin',
+                  scrollbarColor: 'rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1)'
+                }} className="custom-scrollbar">
                   <table style={{ borderCollapse: 'collapse', width: 'max-content', minWidth: '100%' }}>
                     <thead>
                       <tr style={{ background: 'rgba(255, 255, 255, 0.1)' }}>
