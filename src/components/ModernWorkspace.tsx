@@ -95,28 +95,34 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     setAiResponse('🔄 Performing comprehensive data analysis...');
     
     try {
-      const enhancedPrompt = `You are a senior data analyst. Perform COMPLETE data analytics on this dataset and provide ALL possible outcomes:
+      const enhancedPrompt = `ANALYZE THIS DATA COMPLETELY. DO NOT just give a title. Provide FULL DETAILED ANALYSIS:
 
-**REQUIRED ANALYSIS:**
-1. **DATA OVERVIEW**: Total rows, columns, data types, missing values
-2. **STATISTICAL SUMMARY**: Min, max, mean, median, mode, standard deviation for all numeric columns
-3. **TREND ANALYSIS**: Year-over-year changes, growth rates, seasonal patterns
-4. **GEOGRAPHIC ANALYSIS**: Country/region breakdowns, highest/lowest values
-5. **CORRELATION ANALYSIS**: Relationships between variables
-6. **ANOMALY DETECTION**: Outliers, unusual patterns, data quality issues
-7. **PREDICTIVE INSIGHTS**: Future trends, forecasting
-8. **ACTIONABLE RECOMMENDATIONS**: Policy suggestions, resource allocation, strategic decisions
-9. **RISK ASSESSMENT**: Potential issues, warning indicators
-10. **COMPARATIVE ANALYSIS**: Benchmarking, rankings, performance metrics
+**MANDATORY SECTIONS - INCLUDE ALL:**
 
-**OUTPUT FORMAT:**
-- Provide detailed numerical results
-- Include percentage changes and ratios
-- Generate summary tables with key metrics
-- Highlight top 5 insights
-- Give specific recommendations with reasoning
+1. **DATA SUMMARY:**
+   - Total rows: [number]
+   - Total columns: [number]
+   - Column names and data types
+   - Missing values count
 
-Be comprehensive and analytical - this is for executive decision making.`;
+2. **STATISTICAL ANALYSIS:**
+   - For EACH numeric column: min, max, average, median
+   - Calculate totals and subtotals
+   - Show percentage distributions
+
+3. **KEY FINDINGS:**
+   - Top 5 highest values
+   - Top 5 lowest values
+   - Most significant trends
+   - Notable patterns
+
+4. **INSIGHTS & RECOMMENDATIONS:**
+   - What the data reveals
+   - Actionable recommendations
+   - Areas of concern
+   - Opportunities identified
+
+**CRITICAL: Provide actual numbers, calculations, and detailed analysis. Do NOT just give titles or summaries. Show the work and results.**`;
       
       const result = await bedrockService.processExcelData(data, enhancedPrompt, selectedFile?.name || 'data');
       
