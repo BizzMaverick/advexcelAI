@@ -640,52 +640,106 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     
     const headers = data[0];
     const lowerPrompt = prompt.toLowerCase();
+    const rows = data.slice(1);
     
-    // Parse prompt for countries and specific columns
-    if (lowerPrompt.includes('countries') || lowerPrompt.includes('country')) {
-      const countryIndex = headers.findIndex((h: string) => String(h).toLowerCase().includes('country'));
-      if (countryIndex === -1) return null;
-      
-      // Look for specific column mentions (like E1: Economy)
-      let valueIndex = -1;
-      headers.forEach((header, index) => {
-        const headerStr = String(header).toLowerCase();
-        if (lowerPrompt.includes(headerStr) || 
-            (headerStr.includes('e1') && lowerPrompt.includes('economy')) ||
-            (headerStr.includes('economy') && lowerPrompt.includes('e1'))) {
-          valueIndex = index;
-        }
-      });
-      
-      // If no specific column found, use first numeric column
-      if (valueIndex === -1) {
-        valueIndex = headers.findIndex((h, i) => {
-          if (i === countryIndex) return false;
-          const values = data.slice(1).map(row => parseFloat(row[i])).filter(v => !isNaN(v));
-          return values.length > 0;
+    // Find row and value columns based on common patterns
+    let rowIndex = -1;
+    let valueIndex = -1;
+    
+    // Common row patterns
+    const rowPatterns = {
+      'countries': ['country', 'nation', 'region'],
+      'employees': ['employee', 'name', 'staff', 'worker'],
+      'items': ['item', 'product', 'goods'],
+      'customers': ['customer', 'client'],
+      'departments': ['department', 'dept'],
+      'categories': ['category', 'type', 'class']
+    };
+    
+    // Common value patterns
+    const valuePatterns = {
+      'ranks': ['rank', 'position', 'order'],
+      'economy': ['economy', 'economic', 'e1'],
+      'performance': ['performance', 'score', 'rating'],
+      'salary': ['salary', 'wage', 'pay', 'income'],
+      'price': ['price', 'cost', 'amount', 'value'],
+      'sales': ['sales', 'revenue', 'total']
+    };
+    
+    // Find row column
+    Object.entries(rowPatterns).forEach(([key, patterns]) => {
+      if (lowerPrompt.includes(key)) {
+        patterns.forEach(pattern => {
+          const index = headers.findIndex((h: string) => String(h).toLowerCase().includes(pattern));
+          if (index !== -1) rowIndex = index;
         });
       }
-      
-      if (valueIndex === -1) return null;
-      
-      // Create country ranking pivot
-      const countryData = data.slice(1).map(row => ({
-        country: row[countryIndex] || 'Unknown',
-        value: parseFloat(row[valueIndex]) || 0
-      })).filter(item => item.value > 0);
-      
-      // Sort by value descending
-      countryData.sort((a, b) => b.value - a.value);
-      
-      const result = [['Rank', 'Country', headers[valueIndex] || 'Value']];
-      countryData.forEach((item, index) => {
-        result.push([`#${index + 1}`, item.country, item.value.toFixed(2)]);
+    });
+    
+    // Find value column
+    Object.entries(valuePatterns).forEach(([key, patterns]) => {
+      if (lowerPrompt.includes(key)) {
+        patterns.forEach(pattern => {
+          const index = headers.findIndex((h: string) => String(h).toLowerCase().includes(pattern));
+          if (index !== -1) valueIndex = index;
+        });
+      }
+    });
+    
+    // Fallback: find any text and numeric columns
+    if (rowIndex === -1) {
+      rowIndex = headers.findIndex((h, i) => {
+        const values = rows.map(row => row[i]).filter(val => val && isNaN(parseFloat(String(val))));
+        return values.length > rows.length * 0.5; // Mostly text
       });
-      
-      return result;
     }
     
-    return null;
+    if (valueIndex === -1) {
+      valueIndex = headers.findIndex((h, i) => {
+        if (i === rowIndex) return false;
+        const values = rows.map(row => parseFloat(row[i])).filter(v => !isNaN(v));
+        return values.length > rows.length * 0.3; // Some numeric data
+      });
+    }
+    
+    if (rowIndex === -1) return null;
+    
+    // Create pivot table
+    const pivotData = rows.map(row => ({
+      row: String(row[rowIndex] || 'Unknown'),
+      value: valueIndex !== -1 ? (parseFloat(row[valueIndex]) || String(row[valueIndex]) || 'N/A') : 'N/A'
+    }));
+    
+    // Sort by value if numeric, otherwise alphabetically
+    const isNumeric = valueIndex !== -1 && !isNaN(parseFloat(String(pivotData[0]?.value)));
+    
+    if (isNumeric) {
+      pivotData.sort((a, b) => parseFloat(String(b.value)) - parseFloat(String(a.value)));
+    } else {
+      pivotData.sort((a, b) => String(a.row).localeCompare(String(b.row)));
+    }
+    
+    // Build result table
+    const valueHeader = valueIndex !== -1 ? headers[valueIndex] : 'Value';
+    const rowHeader = headers[rowIndex] || 'Item';
+    
+    const result = [];
+    
+    if (lowerPrompt.includes('rank') && isNumeric) {
+      result.push(['Rank', rowHeader, valueHeader]);
+      pivotData.forEach((item, index) => {
+        const displayValue = isNumeric ? parseFloat(String(item.value)).toFixed(2) : item.value;
+        result.push([`#${index + 1}`, item.row, displayValue]);
+      });
+    } else {
+      result.push([rowHeader, valueHeader]);
+      pivotData.forEach(item => {
+        const displayValue = isNumeric ? parseFloat(String(item.value)).toFixed(2) : item.value;
+        result.push([item.row, displayValue]);
+      });
+    }
+    
+    return result;
   };
 
   const performComprehensiveAnalytics = (data: any[][]) => {
@@ -1120,7 +1174,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                     type="text"
                     value={pivotPrompt}
                     onChange={(e) => setPivotPrompt(e.target.value)}
-                    placeholder="e.g., 'countries with ranks and E1: Economy'"
+                    placeholder="e.g., 'countries with economy', 'employees with salary', 'items with price'"
                     style={{
                       background: 'rgba(255, 255, 255, 0.1)',
                       border: '1px solid rgba(255, 255, 255, 0.2)',
