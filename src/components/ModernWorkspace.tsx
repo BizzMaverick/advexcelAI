@@ -26,6 +26,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
   const [analyticsData, setAnalyticsData] = useState<any>(null);
   const [pivotTables, setPivotTables] = useState<any[]>([]);
   const [selectedPivot, setSelectedPivot] = useState<number | null>(null);
+  const [showPivotDropdown, setShowPivotDropdown] = useState(false);
   const [pivotPrompt, setPivotPrompt] = useState<string>('');
   const [aiResponse, setAiResponse] = useState<string>('');
   const [aiResultData, setAiResultData] = useState<any[][] | null>(null);
@@ -897,25 +898,73 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   >
                     📊 {showChart ? 'Hide' : 'Show'} Chart
                   </button>
-                  <button
-                    onClick={() => {
-                      const pivots = generateAdvancedPivotTables(spreadsheetData);
-                      setPivotTables(pivots);
-                      setSelectedPivot(0);
-                    }}
-                    style={{
-                      background: pivotTables.length > 0 ? 'linear-gradient(45deg, #ff6b6b, #4ecdc4)' : 'rgba(255, 255, 255, 0.1)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
-                      borderRadius: '8px',
-                      padding: '8px 12px',
-                      color: 'white',
-                      cursor: 'pointer',
-                      fontSize: '12px',
-                      fontWeight: '500'
-                    }}
-                  >
-                    📋 Pivot Tables
-                  </button>
+                  <div style={{ position: 'relative' }}>
+                    <button
+                      onClick={() => {
+                        if (pivotTables.length === 0) {
+                          const pivots = generateAdvancedPivotTables(spreadsheetData);
+                          setPivotTables(pivots);
+                        }
+                        setShowPivotDropdown(!showPivotDropdown);
+                      }}
+                      style={{
+                        background: pivotTables.length > 0 ? 'linear-gradient(45deg, #ff6b6b, #4ecdc4)' : 'rgba(255, 255, 255, 0.1)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                        borderRadius: '8px',
+                        padding: '8px 12px',
+                        color: 'white',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: '500',
+                        width: '100%'
+                      }}
+                    >
+                      📋 Pivot Tables {showPivotDropdown ? '▲' : '▼'}
+                    </button>
+                    
+                    {showPivotDropdown && pivotTables.length > 0 && (
+                      <div style={{
+                        position: 'absolute',
+                        top: '100%',
+                        left: 0,
+                        right: 0,
+                        background: 'rgba(255, 255, 255, 0.95)',
+                        backdropFilter: 'blur(20px)',
+                        borderRadius: '8px',
+                        border: '1px solid rgba(255, 255, 255, 0.3)',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+                        zIndex: 1000,
+                        marginTop: '4px'
+                      }}>
+                        {pivotTables.map((pivot, index) => (
+                          <div
+                            key={index}
+                            onClick={() => {
+                              setSelectedPivot(index);
+                              setShowPivotDropdown(false);
+                            }}
+                            style={{
+                              padding: '8px 12px',
+                              cursor: 'pointer',
+                              fontSize: '11px',
+                              color: '#333',
+                              borderBottom: index < pivotTables.length - 1 ? '1px solid rgba(255, 255, 255, 0.2)' : 'none',
+                              transition: 'background 0.2s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.background = 'transparent';
+                            }}
+                          >
+                            <div style={{ fontWeight: '600' }}>{pivot.title}</div>
+                            <div style={{ fontSize: '10px', opacity: 0.7 }}>{pivot.description}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                   <button
                     onClick={() => downloadExcel(spreadsheetData, `${selectedFile?.name || 'data'}_export.xlsx`)}
                     style={{
@@ -1327,167 +1376,77 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
               </div>
             )}
             
-            {/* Pivot Tables Section */}
-            {pivotTables.length > 0 && (
+            {/* Selected Pivot Table Display */}
+            {selectedPivot !== null && pivotTables[selectedPivot] && (
               <div style={{
                 marginTop: '32px',
                 background: 'rgba(255, 255, 255, 0.05)',
                 borderRadius: '12px',
                 padding: '24px'
               }}>
-                <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600' }}>
-                  📋 Pivot Tables
-                </h4>
-                
-                {/* Pivot Table Selection */}
-                <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexWrap: 'wrap' }}>
-                  {pivotTables.map((pivot, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setSelectedPivot(selectedPivot === index ? null : index)}
-                      style={{
-                        background: selectedPivot === index ? 'linear-gradient(45deg, #ff6b6b, #4ecdc4)' : 'rgba(255, 255, 255, 0.1)',
-                        border: '1px solid rgba(255, 255, 255, 0.2)',
-                        borderRadius: '8px',
-                        padding: '8px 12px',
-                        color: 'white',
-                        cursor: 'pointer',
-                        fontSize: '11px',
-                        fontWeight: '500'
-                      }}
-                    >
-                      {pivot.title}
-                    </button>
-                  ))}
-                </div>
-                
-                {/* Custom Pivot Prompt */}
-                <div style={{ marginBottom: '20px' }}>
-                  <div style={{ display: 'flex', gap: '10px' }}>
-                    <input
-                      type="text"
-                      value={pivotPrompt}
-                      onChange={(e) => setPivotPrompt(e.target.value)}
-                      placeholder="Request custom pivot table (e.g., 'Group by year and show totals')"
-                      style={{
-                        flex: 1,
-                        background: 'rgba(255, 255, 255, 0.1)',
-                        border: '1px solid rgba(255, 255, 255, 0.2)',
-                        borderRadius: '6px',
-                        padding: '8px 12px',
-                        color: 'white',
-                        fontSize: '12px'
-                      }}
-                    />
-                    <button
-                      onClick={async () => {
-                        if (pivotPrompt.trim()) {
-                          setAiLoading(true);
-                          try {
-                            const result = await bedrockService.processExcelData(spreadsheetData, `Create a pivot table: ${pivotPrompt}. Return the result as a structured table with headers.`, selectedFile?.name || 'data');
-                            if (result.success && result.structured) {
-                              const customPivot = {
-                                title: 'Custom Pivot',
-                                description: pivotPrompt,
-                                data: result.structured.result || [['No data', 'available']]
-                              };
-                              setPivotTables([...pivotTables, customPivot]);
-                              setSelectedPivot(pivotTables.length);
-                              setPivotPrompt('');
-                            }
-                          } catch (error) {
-                            console.error('Custom pivot error:', error);
-                          }
-                          setAiLoading(false);
-                        }
-                      }}
-                      disabled={!pivotPrompt.trim() || aiLoading}
-                      style={{
-                        background: 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
-                        border: 'none',
-                        borderRadius: '6px',
-                        padding: '8px 16px',
-                        color: 'white',
-                        cursor: 'pointer',
-                        fontSize: '11px',
-                        fontWeight: '500',
-                        opacity: !pivotPrompt.trim() || aiLoading ? 0.5 : 1
-                      }}
-                    >
-                      {aiLoading ? '⏳' : '✨'} Generate
-                    </button>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>📋 {pivotTables[selectedPivot].title}</h4>
+                    <p style={{ margin: '4px 0 0 0', fontSize: '12px', opacity: 0.7 }}>{pivotTables[selectedPivot].description}</p>
                   </div>
+                  <button
+                    onClick={() => downloadExcel(pivotTables[selectedPivot].data, `${pivotTables[selectedPivot].title.replace(/\s+/g, '_').toLowerCase()}_pivot.xlsx`)}
+                    style={{
+                      background: 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
+                      border: 'none',
+                      borderRadius: '6px',
+                      padding: '8px 16px',
+                      color: 'white',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      fontWeight: '500'
+                    }}
+                  >
+                    📥 Download
+                  </button>
                 </div>
-                
-                {/* Selected Pivot Table Display */}
-                {selectedPivot !== null && pivotTables[selectedPivot] && (
-                  <div style={{
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    borderRadius: '8px',
-                    padding: '16px'
-                  }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                      <div>
-                        <h5 style={{ margin: 0, fontSize: '14px', fontWeight: '600' }}>{pivotTables[selectedPivot].title}</h5>
-                        <p style={{ margin: '4px 0 0 0', fontSize: '11px', opacity: 0.7 }}>{pivotTables[selectedPivot].description}</p>
-                      </div>
-                      <button
-                        onClick={() => downloadExcel(pivotTables[selectedPivot].data, `${pivotTables[selectedPivot].title.replace(/\s+/g, '_').toLowerCase()}_pivot.xlsx`)}
-                        style={{
-                          background: 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
-                          border: 'none',
-                          borderRadius: '6px',
-                          padding: '6px 12px',
-                          color: 'white',
-                          cursor: 'pointer',
-                          fontSize: '11px',
-                          fontWeight: '500'
-                        }}
-                      >
-                        📥 Download
-                      </button>
-                    </div>
-                    <div style={{
-                      overflow: 'auto',
-                      maxHeight: '300px',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      borderRadius: '6px'
-                    }}>
-                      <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-                        <thead>
-                          <tr style={{ background: 'rgba(255, 255, 255, 0.1)' }}>
-                            {pivotTables[selectedPivot].data[0]?.map((header: string, index: number) => (
-                              <th key={index} style={{
-                                padding: '8px 12px',
-                                textAlign: 'left',
-                                fontSize: '11px',
-                                fontWeight: '600',
-                                borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
-                              }}>
-                                {String(header)}
-                              </th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {pivotTables[selectedPivot].data.slice(1).map((row: any[], rowIndex: number) => (
-                            <tr key={rowIndex}>
-                              {row.map((cell: any, cellIndex: number) => (
-                                <td key={cellIndex} style={{
-                                  padding: '8px 12px',
-                                  fontSize: '11px',
-                                  borderBottom: '1px solid rgba(255, 255, 255, 0.05)'
-                                }}>
-                                  {String(cell || '')}
-                                </td>
-                              ))}
-                            </tr>
+                <div style={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  borderRadius: '8px',
+                  overflow: 'auto',
+                  maxHeight: '500px',
+                  border: '1px solid rgba(255, 255, 255, 0.1)'
+                }}>
+                  <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+                    <thead>
+                      <tr style={{ background: 'rgba(255, 255, 255, 0.1)' }}>
+                        {pivotTables[selectedPivot].data[0]?.map((header: string, index: number) => (
+                          <th key={index} style={{
+                            padding: '12px 16px',
+                            textAlign: 'left',
+                            fontSize: '12px',
+                            fontWeight: '600',
+                            borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                            whiteSpace: 'nowrap'
+                          }}>
+                            {String(header)}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pivotTables[selectedPivot].data.slice(1).map((row: any[], rowIndex: number) => (
+                        <tr key={rowIndex}>
+                          {row.map((cell: any, cellIndex: number) => (
+                            <td key={cellIndex} style={{
+                              padding: '10px 16px',
+                              fontSize: '12px',
+                              borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                              whiteSpace: 'nowrap'
+                            }}>
+                              {String(cell || '')}
+                            </td>
                           ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
           </div>
