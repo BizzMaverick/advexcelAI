@@ -884,10 +884,12 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
         background: 'rgba(255, 255, 255, 0.1)',
         backdropFilter: 'blur(20px)',
         borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
-        padding: '20px 40px',
+        padding: window.innerWidth <= 768 ? '15px 20px' : '20px 40px',
         display: 'flex',
         justifyContent: 'space-between',
-        alignItems: 'center'
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: '10px'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <img src="/logo.png" alt="AdvExcel" style={{ height: '40px' }} />
@@ -959,13 +961,13 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
       </header>
 
       {/* Main Content */}
-      <main style={{ padding: '40px' }}>
+      <main style={{ padding: window.innerWidth <= 768 ? '20px' : '40px' }}>
         <div style={{
           maxWidth: '1200px',
           margin: '0 auto',
           display: 'grid',
-          gridTemplateColumns: '1fr 2fr',
-          gap: '40px',
+          gridTemplateColumns: window.innerWidth <= 768 ? '1fr' : '1fr 2fr',
+          gap: window.innerWidth <= 768 ? '20px' : '40px',
           alignItems: 'stretch'
         }}>
           {/* Left Panel - Upload & AI */}
@@ -1049,7 +1051,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                 <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600' }}>
                   ⚡ Quick Actions
                 </h4>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth <= 480 ? '1fr' : '1fr 1fr', gap: '8px' }}>
                   <button
                     onClick={() => setShowChart(!showChart)}
                     style={{
@@ -1382,7 +1384,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   whiteSpace: 'nowrap',
                   overflow: 'auto',
                   maxHeight: '200px',
-                  minWidth: '400px',
+                  minWidth: window.innerWidth <= 768 ? '100%' : '400px',
                   scrollbarWidth: 'thin',
                   scrollbarColor: 'rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1)'
                 }} className="custom-scrollbar">
@@ -1693,7 +1695,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
         padding: '40px',
         textAlign: 'center'
       }}>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '32px', flexWrap: 'wrap', marginBottom: '20px' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: window.innerWidth <= 768 ? '16px' : '32px', flexWrap: 'wrap', marginBottom: '20px' }}>
           <a onClick={() => {
             setLegalContent({ 
               title: 'Privacy Policy', 
@@ -1950,7 +1952,7 @@ We're committed to excellent support and continuous improvement based on your fe
             backdropFilter: 'blur(20px)',
             borderRadius: '20px',
             padding: '32px',
-            maxWidth: '600px',
+            maxWidth: window.innerWidth <= 768 ? '95%' : '600px',
             width: '90%',
             maxHeight: '70vh',
             overflow: 'auto',
@@ -2044,7 +2046,7 @@ We're committed to excellent support and continuous improvement based on your fe
             position: 'absolute',
             bottom: '70px',
             right: '0',
-            width: '300px',
+            width: window.innerWidth <= 480 ? '250px' : '300px',
             background: 'rgba(255, 255, 255, 0.95)',
             backdropFilter: 'blur(20px)',
             borderRadius: '16px',
