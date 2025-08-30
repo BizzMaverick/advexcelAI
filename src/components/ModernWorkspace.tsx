@@ -877,6 +877,82 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     return result;
   };
 
+  const performStatisticalAnalysis = (data: any[][]) => {
+    if (!data || data.length < 2) return null;
+    
+    const headers = data[0];
+    const rows = data.slice(1);
+    
+    // Find all numeric columns
+    const numericColumns = [];
+    for (let i = 0; i < headers.length; i++) {
+      const values = rows.map(row => parseFloat(row[i])).filter(v => !isNaN(v));
+      if (values.length > rows.length * 0.5) {
+        numericColumns.push({
+          index: i,
+          name: headers[i],
+          values: values,
+          mean: values.reduce((sum, val) => sum + val, 0) / values.length,
+          min: Math.min(...values),
+          max: Math.max(...values)
+        });
+      }
+    }
+    
+    // Calculate correlations between numeric columns
+    const correlations = [];
+    for (let i = 0; i < numericColumns.length; i++) {
+      for (let j = i + 1; j < numericColumns.length; j++) {
+        const col1 = numericColumns[i];
+        const col2 = numericColumns[j];
+        
+        // Pearson correlation coefficient
+        const n = Math.min(col1.values.length, col2.values.length);
+        let sumXY = 0, sumX = 0, sumY = 0, sumX2 = 0, sumY2 = 0;
+        
+        for (let k = 0; k < n; k++) {
+          const x = col1.values[k];
+          const y = col2.values[k];
+          sumXY += x * y;
+          sumX += x;
+          sumY += y;
+          sumX2 += x * x;
+          sumY2 += y * y;
+        }
+        
+        const correlation = (n * sumXY - sumX * sumY) / 
+          Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+        
+        if (!isNaN(correlation)) {
+          correlations.push({
+            col1: col1.name,
+            col2: col2.name,
+            correlation: correlation,
+            strength: Math.abs(correlation) > 0.7 ? 'Strong' : Math.abs(correlation) > 0.3 ? 'Moderate' : 'Weak'
+          });
+        }
+      }
+    }
+    
+    // Calculate percentiles for each numeric column
+    const percentiles = numericColumns.map(col => {
+      const sorted = [...col.values].sort((a, b) => a - b);
+      return {
+        name: col.name,
+        p25: sorted[Math.floor(sorted.length * 0.25)],
+        p50: sorted[Math.floor(sorted.length * 0.50)],
+        p75: sorted[Math.floor(sorted.length * 0.75)],
+        p90: sorted[Math.floor(sorted.length * 0.90)]
+      };
+    });
+    
+    return {
+      numericColumns,
+      correlations,
+      percentiles
+    };
+  };
+
   const performComprehensiveAnalytics = (data: any[][]) => {
     if (!data || data.length < 2) return { duplicates: 0, missingValues: 0, top5: [], bottom5: [], range: 0, min: 0, max: 0, mean: 0, standardDeviation: 0 };
     
@@ -1209,6 +1285,45 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                       </div>
                     )}
                   </div>
+                  <button
+                    onClick={() => {
+                      const stats = performStatisticalAnalysis(spreadsheetData);
+                      if (stats) {
+                        let analysis = `📊 **STATISTICAL ANALYSIS**\n\n`;
+                        
+                        analysis += `**CORRELATION ANALYSIS:**\n`;
+                        if (stats.correlations.length > 0) {
+                          stats.correlations.forEach(corr => {
+                            analysis += `• ${corr.col1} ↔ ${corr.col2}: ${corr.correlation.toFixed(3)} (${corr.strength})\n`;
+                          });
+                        } else {
+                          analysis += `• No significant correlations found\n`;
+                        }
+                        analysis += `\n`;
+                        
+                        analysis += `**PERCENTILE ANALYSIS:**\n`;
+                        stats.percentiles.forEach(p => {
+                          analysis += `• ${p.name}: 25th=${p.p25?.toFixed(2)}, 50th=${p.p50?.toFixed(2)}, 75th=${p.p75?.toFixed(2)}, 90th=${p.p90?.toFixed(2)}\n`;
+                        });
+                        
+                        setAiResponse(analysis);
+                      } else {
+                        setAiResponse('⚠️ No numeric data found for statistical analysis.');
+                      }
+                    }}
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.1)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      borderRadius: '8px',
+                      padding: '8px 12px',
+                      color: 'white',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      fontWeight: '500'
+                    }}
+                  >
+                    📊 Statistics
+                  </button>
                   <button
                     onClick={() => downloadExcel(spreadsheetData, `${selectedFile?.name || 'data'}_export.xlsx`)}
                     style={{
