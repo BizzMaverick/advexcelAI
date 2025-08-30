@@ -282,6 +282,28 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           fullAnalysis += `\n`;
         }
         
+        // Predictive Analysis
+        const predictions = performPredictiveAnalysis(data);
+        if (predictions && predictions.trends.length > 0) {
+          fullAnalysis += `**🔮 PREDICTIVE INSIGHTS:**\n`;
+          
+          // Key trends
+          const significantTrends = predictions.trends.filter(t => t.strength !== 'Weak');
+          if (significantTrends.length > 0) {
+            fullAnalysis += `• Significant Trends Detected:\n`;
+            significantTrends.slice(0, 2).forEach(trend => {
+              fullAnalysis += `  - ${trend.column}: ${trend.direction} (${trend.growthRate}% growth rate)\n`;
+            });
+          }
+          
+          // Forecasting summary
+          const highConfidenceForecasts = predictions.forecasts.filter(f => f.confidence === 'High');
+          if (highConfidenceForecasts.length > 0) {
+            fullAnalysis += `• High Confidence Forecasts: ${highConfidenceForecasts.length} predictions available\n`;
+          }
+          fullAnalysis += `\n`;
+        }
+        
         // Key Insights
         fullAnalysis += `**💡 KEY INSIGHTS:**\n`;
         fullAnalysis += `• Data Range: ${analytics.range.toFixed(2)} (${analytics.min} to ${analytics.max})\n`;
@@ -1063,6 +1085,101 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     return result;
   };
 
+  const performPredictiveAnalysis = (data: any[][]) => {
+    if (!data || data.length < 5) return null;
+    
+    const headers = data[0];
+    const rows = data.slice(1);
+    
+    // Find time-based columns (years) and numeric columns
+    const yearColumns = headers.map((h, i) => ({ header: h, index: i })).filter(({ header }) => /\d{4}/.test(String(header)));
+    const numericColumns = [];
+    
+    for (let i = 0; i < headers.length; i++) {
+      if (yearColumns.some(y => y.index === i)) continue;
+      const values = rows.map(row => parseFloat(row[i])).filter(v => !isNaN(v));
+      if (values.length > rows.length * 0.5) {
+        numericColumns.push({ index: i, name: headers[i], values });
+      }
+    }
+    
+    if (yearColumns.length === 0 || numericColumns.length === 0) return null;
+    
+    const trends = [];
+    const forecasts = [];
+    const seasonality = [];
+    
+    // Analyze trends for each numeric column across years
+    numericColumns.forEach(col => {
+      const yearlyData = [];
+      
+      yearColumns.forEach(yearCol => {
+        const yearValues = rows.map(row => parseFloat(row[yearCol.index])).filter(v => !isNaN(v));
+        if (yearValues.length > 0) {
+          const avgValue = yearValues.reduce((sum, val) => sum + val, 0) / yearValues.length;
+          yearlyData.push({ year: parseInt(yearCol.header), value: avgValue });
+        }
+      });
+      
+      if (yearlyData.length >= 3) {
+        // Calculate trend using linear regression
+        const n = yearlyData.length;
+        const sumX = yearlyData.reduce((sum, d) => sum + d.year, 0);
+        const sumY = yearlyData.reduce((sum, d) => sum + d.value, 0);
+        const sumXY = yearlyData.reduce((sum, d) => sum + d.year * d.value, 0);
+        const sumX2 = yearlyData.reduce((sum, d) => sum + d.year * d.year, 0);
+        
+        const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+        const intercept = (sumY - slope * sumX) / n;
+        
+        // Determine trend direction and strength
+        const direction = slope > 0 ? 'Upward' : slope < 0 ? 'Downward' : 'Stable';
+        const strength = Math.abs(slope) > 100 ? 'Strong' : Math.abs(slope) > 10 ? 'Moderate' : 'Weak';
+        const growthRate = ((slope / (sumY / n)) * 100).toFixed(1);
+        
+        trends.push({
+          column: col.name,
+          direction,
+          strength,
+          growthRate,
+          slope
+        });
+        
+        // Forecast next period
+        const lastYear = Math.max(...yearlyData.map(d => d.year));
+        const nextYear = lastYear + 1;
+        const predicted = slope * nextYear + intercept;
+        const confidence = strength === 'Strong' ? 'High' : strength === 'Moderate' ? 'Medium' : 'Low';
+        
+        forecasts.push({
+          column: col.name,
+          predicted,
+          confidence,
+          nextPeriod: nextYear
+        });
+        
+        // Check for seasonality (simplified)
+        const values = yearlyData.map(d => d.value);
+        const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+        const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
+        const stdDev = Math.sqrt(variance);
+        
+        if (stdDev > mean * 0.2) {
+          seasonality.push({
+            column: col.name,
+            pattern: 'High Variability'
+          });
+        }
+      }
+    });
+    
+    return {
+      trends,
+      forecasts,
+      seasonality
+    };
+  };
+
   const performStatisticalAnalysis = (data: any[][]) => {
     if (!data || data.length < 2) return null;
     
@@ -1509,6 +1626,53 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                     }}
                   >
                     📊 Statistics
+                  </button>
+                  <button
+                    onClick={() => {
+                      const predictions = performPredictiveAnalysis(spreadsheetData);
+                      if (predictions) {
+                        let analysis = `🔮 **PREDICTIVE ANALYTICS**\n\n`;
+                        
+                        analysis += `**TREND ANALYSIS:**\n`;
+                        predictions.trends.forEach(trend => {
+                          analysis += `• ${trend.column}: ${trend.direction} trend (${trend.strength})\n`;
+                          analysis += `  Growth Rate: ${trend.growthRate}% per period\n`;
+                        });
+                        analysis += `\n`;
+                        
+                        analysis += `**FORECASTING:**\n`;
+                        predictions.forecasts.forEach(forecast => {
+                          analysis += `• ${forecast.column} Next Period: ${forecast.predicted.toFixed(2)}\n`;
+                          analysis += `  Confidence: ${forecast.confidence}\n`;
+                        });
+                        analysis += `\n`;
+                        
+                        analysis += `**SEASONAL PATTERNS:**\n`;
+                        if (predictions.seasonality.length > 0) {
+                          predictions.seasonality.forEach(season => {
+                            analysis += `• ${season.pattern} detected in ${season.column}\n`;
+                          });
+                        } else {
+                          analysis += `• No clear seasonal patterns detected\n`;
+                        }
+                        
+                        setAiResponse(analysis);
+                      } else {
+                        setAiResponse('⚠️ Insufficient time-series data for predictions.');
+                      }
+                    }}
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.1)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      borderRadius: '8px',
+                      padding: '8px 12px',
+                      color: 'white',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      fontWeight: '500'
+                    }}
+                  >
+                    🔮 Predictions
                   </button>
                   <button
                     onClick={() => downloadExcel(spreadsheetData, `${selectedFile?.name || 'data'}_export.xlsx`)}
