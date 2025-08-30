@@ -27,6 +27,8 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
   const [pivotTables, setPivotTables] = useState<any[]>([]);
   const [selectedPivot, setSelectedPivot] = useState<number | null>(null);
   const [showPivotDropdown, setShowPivotDropdown] = useState(false);
+  const [pivotFilters, setPivotFilters] = useState<{[key: string]: string}>({});
+  const [showAdvancedPivot, setShowAdvancedPivot] = useState(false);
   const [pivotPrompt, setPivotPrompt] = useState<string>('');
   const [aiResponse, setAiResponse] = useState<string>('');
   const [aiResultData, setAiResultData] = useState<any[][] | null>(null);
@@ -502,6 +504,109 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     XLSX.writeFile(wb, filename);
   };
 
+  const createMultiDimensionalPivot = (data: any[][], dimensions: string[], measures: string[], filters: {[key: string]: string} = {}) => {
+    if (!data || data.length < 2) return null;
+    
+    const headers = data[0];
+    const rows = data.slice(1);
+    
+    // Apply filters
+    let filteredRows = rows;
+    Object.entries(filters).forEach(([column, filterValue]) => {
+      if (filterValue && filterValue !== 'All') {
+        const colIndex = headers.indexOf(column);
+        if (colIndex !== -1) {
+          filteredRows = filteredRows.filter(row => 
+            String(row[colIndex]).toLowerCase().includes(filterValue.toLowerCase())
+          );
+        }
+      }
+    });
+    
+    // Group by dimensions
+    const grouped = {};
+    filteredRows.forEach(row => {
+      const key = dimensions.map(dim => {
+        const dimIndex = headers.indexOf(dim);
+        return dimIndex !== -1 ? row[dimIndex] : 'Unknown';
+      }).join(' | ');
+      
+      if (!grouped[key]) {
+        grouped[key] = [];
+      }
+      grouped[key].push(row);
+    });
+    
+    // Calculate measures
+    const result = [dimensions.concat(measures.map(m => `${m} (Sum)`, `${m} (Avg)`, `${m} (Count)`)).flat()];
+    
+    Object.entries(grouped).forEach(([key, groupRows]: [string, any[]]) => {
+      const dimensionValues = key.split(' | ');
+      const measureValues = [];
+      
+      measures.forEach(measure => {
+        const measureIndex = headers.indexOf(measure);
+        if (measureIndex !== -1) {
+          const values = groupRows.map(row => parseFloat(row[measureIndex])).filter(v => !isNaN(v));
+          const sum = values.reduce((s, v) => s + v, 0);
+          const avg = values.length > 0 ? sum / values.length : 0;
+          const count = values.length;
+          
+          measureValues.push(sum.toFixed(2), avg.toFixed(2), count.toString());
+        } else {
+          measureValues.push('N/A', 'N/A', '0');
+        }
+      });
+      
+      result.push(dimensionValues.concat(measureValues));
+    });
+    
+    return result;
+  };
+  
+  const createPivotWithCalculatedFields = (data: any[][], baseColumns: string[], calculatedFields: {name: string, formula: string}[]) => {
+    if (!data || data.length < 2) return null;
+    
+    const headers = data[0];
+    const rows = data.slice(1);
+    
+    // Add calculated field headers
+    const newHeaders = [...baseColumns, ...calculatedFields.map(cf => cf.name)];
+    const result = [newHeaders];
+    
+    rows.forEach(row => {
+      const baseValues = baseColumns.map(col => {
+        const colIndex = headers.indexOf(col);
+        return colIndex !== -1 ? row[colIndex] : 'N/A';
+      });
+      
+      const calculatedValues = calculatedFields.map(cf => {
+        // Simple calculated field evaluation
+        if (cf.formula.includes('+')) {
+          const [col1, col2] = cf.formula.split('+').map(s => s.trim());
+          const val1 = parseFloat(row[headers.indexOf(col1)]) || 0;
+          const val2 = parseFloat(row[headers.indexOf(col2)]) || 0;
+          return (val1 + val2).toFixed(2);
+        } else if (cf.formula.includes('*')) {
+          const [col1, col2] = cf.formula.split('*').map(s => s.trim());
+          const val1 = parseFloat(row[headers.indexOf(col1)]) || 0;
+          const val2 = parseFloat(row[headers.indexOf(col2)]) || 0;
+          return (val1 * val2).toFixed(2);
+        } else if (cf.formula.includes('/')) {
+          const [col1, col2] = cf.formula.split('/').map(s => s.trim());
+          const val1 = parseFloat(row[headers.indexOf(col1)]) || 0;
+          const val2 = parseFloat(row[headers.indexOf(col2)]) || 1;
+          return (val1 / val2).toFixed(2);
+        }
+        return 'N/A';
+      });
+      
+      result.push(baseValues.concat(calculatedValues));
+    });
+    
+    return result;
+  };
+
   const generateAdvancedPivotTables = (data: any[][]) => {
     if (!data || data.length < 2) return [];
     
@@ -510,32 +615,35 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
       {
         title: 'Country × Year Matrix',
         description: 'Countries as rows, years as columns',
-        data: createCountryYearMatrix(data)
+        data: createCountryYearMatrix(data),
+        type: 'standard'
       },
       {
-        title: 'Year × Category Breakdown',
-        description: 'Years as rows, categories as columns',
-        data: createYearCategoryMatrix(data)
+        title: 'Multi-Dimensional Analysis',
+        description: 'Advanced pivot with multiple dimensions',
+        data: createMultiDimensionalPivot(data, ['Country'], ['2023', '2022'], pivotFilters),
+        type: 'multidimensional'
+      },
+      {
+        title: 'Calculated Fields Pivot',
+        description: 'Pivot with calculated performance metrics',
+        data: createPivotWithCalculatedFields(data, ['Country', '2023'], [
+          {name: 'Growth Rate', formula: '2023 - 2022'},
+          {name: 'Performance Index', formula: '2023 * 1.1'}
+        ]),
+        type: 'calculated'
       },
       {
         title: 'Regional Summary',
         description: 'Regions as rows, metrics as columns',
-        data: createRegionalSummary(data)
-      },
-      {
-        title: 'Top vs Bottom Analysis',
-        description: 'Performance tiers as rows, metrics as columns',
-        data: createPerformanceMatrix(data)
+        data: createRegionalSummary(data),
+        type: 'standard'
       },
       {
         title: 'Statistical Overview',
         description: 'Metrics as rows, calculations as columns',
-        data: createStatisticalMatrix(data)
-      },
-      {
-        title: 'Quarterly Trends',
-        description: 'Quarters as rows, countries as columns',
-        data: createQuarterlyMatrix(data)
+        data: createStatisticalMatrix(data),
+        type: 'standard'
       }
     ];
     
@@ -2109,22 +2217,85 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                     <h4 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>📋 {pivotTables[selectedPivot].title}</h4>
                     <p style={{ margin: '4px 0 0 0', fontSize: '12px', opacity: 0.7 }}>{pivotTables[selectedPivot].description}</p>
                   </div>
-                  <button
-                    onClick={() => downloadExcel(pivotTables[selectedPivot].data, `${pivotTables[selectedPivot].title.replace(/\s+/g, '_').toLowerCase()}_pivot.xlsx`)}
-                    style={{
-                      background: 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
-                      border: 'none',
-                      borderRadius: '6px',
-                      padding: '8px 16px',
-                      color: 'white',
-                      cursor: 'pointer',
-                      fontSize: '12px',
-                      fontWeight: '500'
-                    }}
-                  >
-                    📥 Download
-                  </button>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    {pivotTables[selectedPivot].type === 'multidimensional' && (
+                      <button
+                        onClick={() => setShowAdvancedPivot(!showAdvancedPivot)}
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.1)',
+                          border: '1px solid rgba(255, 255, 255, 0.2)',
+                          borderRadius: '6px',
+                          padding: '6px 12px',
+                          color: 'white',
+                          cursor: 'pointer',
+                          fontSize: '11px',
+                          fontWeight: '500'
+                        }}
+                      >
+                        ⚙️ {showAdvancedPivot ? 'Hide' : 'Show'} Filters
+                      </button>
+                    )}
+                    <button
+                      onClick={() => downloadExcel(pivotTables[selectedPivot].data, `${pivotTables[selectedPivot].title.replace(/\s+/g, '_').toLowerCase()}_pivot.xlsx`)}
+                      style={{
+                        background: 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
+                        border: 'none',
+                        borderRadius: '6px',
+                        padding: '8px 16px',
+                        color: 'white',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: '500'
+                      }}
+                    >
+                      📥 Download
+                    </button>
+                  </div>
                 </div>
+                
+                {/* Dynamic Filters */}
+                {showAdvancedPivot && pivotTables[selectedPivot].type === 'multidimensional' && (
+                  <div style={{
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    borderRadius: '8px',
+                    padding: '16px',
+                    marginBottom: '16px'
+                  }}>
+                    <h5 style={{ margin: '0 0 12px 0', fontSize: '14px', fontWeight: '600' }}>Dynamic Filters</h5>
+                    <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                      {spreadsheetData[0]?.slice(0, 3).map((header: string, index: number) => (
+                        <div key={index} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <label style={{ fontSize: '11px', opacity: 0.8 }}>{String(header)}</label>
+                          <select
+                            value={pivotFilters[header] || 'All'}
+                            onChange={(e) => {
+                              const newFilters = { ...pivotFilters, [header]: e.target.value };
+                              setPivotFilters(newFilters);
+                              // Regenerate pivot with new filters
+                              const newPivots = generateAdvancedPivotTables(spreadsheetData);
+                              setPivotTables(newPivots);
+                            }}
+                            style={{
+                              background: 'rgba(255, 255, 255, 0.1)',
+                              border: '1px solid rgba(255, 255, 255, 0.2)',
+                              borderRadius: '4px',
+                              padding: '4px 8px',
+                              color: 'white',
+                              fontSize: '11px',
+                              minWidth: '100px'
+                            }}
+                          >
+                            <option value="All">All</option>
+                            {[...new Set(spreadsheetData.slice(1).map(row => String(row[index])))].slice(0, 10).map(value => (
+                              <option key={value} value={value} style={{ color: '#333' }}>{value}</option>
+                            ))}
+                          </select>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
                 <div style={{
                   background: 'rgba(255, 255, 255, 0.05)',
                   borderRadius: '8px',
@@ -2152,20 +2323,36 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                       </tr>
                     </thead>
                     <tbody>
-                      {pivotTables[selectedPivot].data.slice(1).map((row: any[], rowIndex: number) => (
-                        <tr key={rowIndex}>
-                          {row.map((cell: any, cellIndex: number) => (
-                            <td key={cellIndex} style={{
-                              padding: '10px 16px',
-                              fontSize: '12px',
-                              borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-                              whiteSpace: 'nowrap'
-                            }}>
-                              {String(cell || '')}
-                            </td>
-                          ))}
-                        </tr>
-                      ))}
+                      {pivotTables[selectedPivot].data.slice(1).map((row: any[], rowIndex: number) => {
+                        // Conditional formatting
+                        const isHighValue = pivotTables[selectedPivot].type === 'calculated' && 
+                          row.some(cell => !isNaN(parseFloat(String(cell))) && parseFloat(String(cell)) > 1000);
+                        
+                        return (
+                          <tr key={rowIndex} style={{
+                            background: isHighValue ? 'rgba(78, 205, 196, 0.1)' : 'transparent'
+                          }}>
+                            {row.map((cell: any, cellIndex: number) => {
+                              const cellValue = parseFloat(String(cell));
+                              const isNumeric = !isNaN(cellValue);
+                              const isHighCell = isNumeric && cellValue > 5000;
+                              
+                              return (
+                                <td key={cellIndex} style={{
+                                  padding: '10px 16px',
+                                  fontSize: '12px',
+                                  borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                                  whiteSpace: 'nowrap',
+                                  background: isHighCell ? 'rgba(255, 107, 107, 0.2)' : 'transparent',
+                                  fontWeight: isHighCell ? '600' : 'normal'
+                                }}>
+                                  {String(cell || '')}
+                                </td>
+                              );
+                            })}
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
