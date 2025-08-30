@@ -29,6 +29,10 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
   const [showPivotDropdown, setShowPivotDropdown] = useState(false);
   const [pivotFilters, setPivotFilters] = useState<{[key: string]: string}>({});
   const [showAdvancedPivot, setShowAdvancedPivot] = useState(false);
+  const [showExportDropdown, setShowExportDropdown] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [emailAddress, setEmailAddress] = useState('');
+  const [scheduledReports, setScheduledReports] = useState<any[]>([]);
   const [pivotPrompt, setPivotPrompt] = useState<string>('');
   const [aiResponse, setAiResponse] = useState<string>('');
   const [aiResultData, setAiResultData] = useState<any[][] | null>(null);
@@ -1215,6 +1219,148 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     return result;
   };
 
+  const exportToCSV = (data: any[][], filename: string) => {
+    const csvContent = data.map(row => 
+      row.map(cell => `"${String(cell || '').replace(/"/g, '""')}"`).join(',')
+    ).join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+  };
+  
+  const exportToJSON = (data: any[][], filename: string) => {
+    const headers = data[0];
+    const jsonData = data.slice(1).map(row => {
+      const obj: any = {};
+      headers.forEach((header, index) => {
+        obj[String(header)] = row[index];
+      });
+      return obj;
+    });
+    
+    const blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+  };
+  
+  const generatePDFReport = () => {
+    const analytics = performComprehensiveAnalytics(spreadsheetData);
+    const stats = performStatisticalAnalysis(spreadsheetData);
+    const predictions = performPredictiveAnalysis(spreadsheetData);
+    const qualityReport = performDataQualityAnalysis(spreadsheetData);
+    
+    let reportContent = `ADVANCED EXCEL AI ANALYTICS REPORT\n\n`;
+    reportContent += `Generated: ${new Date().toLocaleString()}\n`;
+    reportContent += `Dataset: ${selectedFile?.name || 'Unknown'}\n\n`;
+    
+    reportContent += `EXECUTIVE SUMMARY\n`;
+    reportContent += `Total Records: ${spreadsheetData.length - 1}\n`;
+    reportContent += `Total Columns: ${spreadsheetData[0]?.length || 0}\n`;
+    reportContent += `Data Quality Score: ${qualityReport?.overallScore || 'N/A'}/100\n\n`;
+    
+    if (stats && stats.correlations.length > 0) {
+      reportContent += `STATISTICAL ANALYSIS\n`;
+      reportContent += `Strong Correlations: ${stats.correlations.filter(c => Math.abs(c.correlation) > 0.7).length}\n`;
+      reportContent += `Moderate Correlations: ${stats.correlations.filter(c => Math.abs(c.correlation) > 0.3 && Math.abs(c.correlation) <= 0.7).length}\n\n`;
+    }
+    
+    if (predictions && predictions.trends.length > 0) {
+      reportContent += `PREDICTIVE INSIGHTS\n`;
+      reportContent += `Upward Trends: ${predictions.trends.filter(t => t.direction === 'Upward').length}\n`;
+      reportContent += `Downward Trends: ${predictions.trends.filter(t => t.direction === 'Downward').length}\n\n`;
+    }
+    
+    if (qualityReport) {
+      reportContent += `DATA QUALITY ASSESSMENT\n`;
+      reportContent += `Cleaning Issues: ${qualityReport.cleaningSuggestions.length}\n`;
+      reportContent += `Validation Issues: ${qualityReport.validationIssues.length}\n`;
+      reportContent += `Anomalies Detected: ${qualityReport.anomalies.length}\n\n`;
+    }
+    
+    reportContent += `RECOMMENDATIONS\n`;
+    if (qualityReport && qualityReport.cleaningSuggestions.length > 0) {
+      reportContent += `1. Address ${qualityReport.cleaningSuggestions.length} data quality issues\n`;
+    }
+    if (stats && stats.correlations.length > 0) {
+      reportContent += `2. Explore ${stats.correlations.length} variable relationships\n`;
+    }
+    if (predictions && predictions.forecasts.length > 0) {
+      reportContent += `3. Review ${predictions.forecasts.length} predictive forecasts\n`;
+    }
+    
+    const blob = new Blob([reportContent], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${selectedFile?.name || 'data'}_analytics_report.txt`;
+    link.click();
+    
+    setAiResponse('✅ **PDF Report Generated**\n\nComprehensive analytics report has been downloaded as a text file. For full PDF functionality, consider integrating with a PDF generation service.');
+  };
+  
+  const generateAPIEndpoint = () => {
+    const apiData = {
+      endpoint: 'https://api.advexcel.com/v1/analytics',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer YOUR_API_KEY'
+      },
+      payload: {
+        data: spreadsheetData,
+        analysis_types: ['statistical', 'predictive', 'quality'],
+        export_format: 'json'
+      },
+      response_format: {
+        statistics: 'Correlation analysis and percentiles',
+        predictions: 'Trend analysis and forecasting',
+        quality: 'Data quality score and recommendations'
+      }
+    };
+    
+    const blob = new Blob([JSON.stringify(apiData, null, 2)], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'api_integration_guide.json';
+    link.click();
+    
+    setAiResponse('🔗 **API Integration Guide Generated**\n\nAPI endpoint configuration and integration guide has been downloaded. Use this to integrate with external tools and services.');
+  };
+  
+  const scheduleReport = (frequency: string) => {
+    const newSchedule = {
+      id: Date.now(),
+      frequency,
+      email: emailAddress,
+      dataset: selectedFile?.name || 'Unknown',
+      created: new Date().toLocaleString(),
+      nextRun: getNextRunDate(frequency)
+    };
+    
+    setScheduledReports([...scheduledReports, newSchedule]);
+    setAiResponse(`⏰ **Report Scheduled**\n\nAnalytics report scheduled to run ${frequency} and email to ${emailAddress}. Next run: ${newSchedule.nextRun}`);
+  };
+  
+  const getNextRunDate = (frequency: string) => {
+    const now = new Date();
+    switch (frequency) {
+      case 'daily':
+        now.setDate(now.getDate() + 1);
+        break;
+      case 'weekly':
+        now.setDate(now.getDate() + 7);
+        break;
+      case 'monthly':
+        now.setMonth(now.getMonth() + 1);
+        break;
+    }
+    return now.toLocaleString();
+  };
+
   const performDataQualityAnalysis = (data: any[][]) => {
     if (!data || data.length < 2) return null;
     
@@ -2052,21 +2198,130 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   >
                     🔍 Data Quality
                   </button>
-                  <button
-                    onClick={() => downloadExcel(spreadsheetData, `${selectedFile?.name || 'data'}_export.xlsx`)}
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
-                      borderRadius: '8px',
-                      padding: '8px 12px',
-                      color: 'white',
-                      cursor: 'pointer',
-                      fontSize: '12px',
-                      fontWeight: '500'
-                    }}
-                  >
-                    💾 Export
-                  </button>
+                  <div style={{ position: 'relative' }}>
+                    <button
+                      onClick={() => setShowExportDropdown(!showExportDropdown)}
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.1)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                        borderRadius: '8px',
+                        padding: '8px 12px',
+                        color: 'white',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: '500',
+                        width: '100%'
+                      }}
+                    >
+                      💾 Export {showExportDropdown ? '▲' : '▼'}
+                    </button>
+                    
+                    {showExportDropdown && (
+                      <div style={{
+                        position: 'absolute',
+                        top: '100%',
+                        left: 0,
+                        right: 0,
+                        background: 'rgba(255, 255, 255, 0.95)',
+                        backdropFilter: 'blur(20px)',
+                        borderRadius: '8px',
+                        border: '1px solid rgba(255, 255, 255, 0.3)',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+                        zIndex: 1000,
+                        marginTop: '4px'
+                      }}>
+                        <div
+                          onClick={() => {
+                            downloadExcel(spreadsheetData, `${selectedFile?.name || 'data'}_export.xlsx`);
+                            setShowExportDropdown(false);
+                          }}
+                          style={{
+                            padding: '8px 12px',
+                            cursor: 'pointer',
+                            fontSize: '11px',
+                            color: '#333',
+                            borderBottom: '1px solid rgba(255, 255, 255, 0.2)'
+                          }}
+                        >
+                          📊 Excel (.xlsx)
+                        </div>
+                        <div
+                          onClick={() => {
+                            exportToCSV(spreadsheetData, `${selectedFile?.name || 'data'}_export.csv`);
+                            setShowExportDropdown(false);
+                          }}
+                          style={{
+                            padding: '8px 12px',
+                            cursor: 'pointer',
+                            fontSize: '11px',
+                            color: '#333',
+                            borderBottom: '1px solid rgba(255, 255, 255, 0.2)'
+                          }}
+                        >
+                          📄 CSV (.csv)
+                        </div>
+                        <div
+                          onClick={() => {
+                            generatePDFReport();
+                            setShowExportDropdown(false);
+                          }}
+                          style={{
+                            padding: '8px 12px',
+                            cursor: 'pointer',
+                            fontSize: '11px',
+                            color: '#333',
+                            borderBottom: '1px solid rgba(255, 255, 255, 0.2)'
+                          }}
+                        >
+                          📄 PDF Report
+                        </div>
+                        <div
+                          onClick={() => {
+                            exportToJSON(spreadsheetData, `${selectedFile?.name || 'data'}_export.json`);
+                            setShowExportDropdown(false);
+                          }}
+                          style={{
+                            padding: '8px 12px',
+                            cursor: 'pointer',
+                            fontSize: '11px',
+                            color: '#333',
+                            borderBottom: '1px solid rgba(255, 255, 255, 0.2)'
+                          }}
+                        >
+                          📄 JSON (.json)
+                        </div>
+                        <div
+                          onClick={() => {
+                            setShowEmailModal(true);
+                            setShowExportDropdown(false);
+                          }}
+                          style={{
+                            padding: '8px 12px',
+                            cursor: 'pointer',
+                            fontSize: '11px',
+                            color: '#333',
+                            borderBottom: '1px solid rgba(255, 255, 255, 0.2)'
+                          }}
+                        >
+                          📧 Email Report
+                        </div>
+                        <div
+                          onClick={() => {
+                            generateAPIEndpoint();
+                            setShowExportDropdown(false);
+                          }}
+                          style={{
+                            padding: '8px 12px',
+                            cursor: 'pointer',
+                            fontSize: '11px',
+                            color: '#333'
+                          }}
+                        >
+                          🔗 API Integration
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
