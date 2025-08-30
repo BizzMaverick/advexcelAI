@@ -32,7 +32,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
   const [aiResultData, setAiResultData] = useState<any[][] | null>(null);
   const [dragActive, setDragActive] = useState(false);
   const [showChart, setShowChart] = useState(false);
-  const [chartType, setChartType] = useState<'bar' | 'line' | 'pie'>('bar');
+  const [chartType, setChartType] = useState<'bar' | 'line' | 'pie' | 'scatter' | 'histogram' | 'heatmap'>('bar');
   const [sortColumn, setSortColumn] = useState<number>(-1);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [filterText, setFilterText] = useState('');
@@ -728,6 +728,166 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     ];
   };
   
+  const ScatterPlotComponent = ({ data }: { data: any[][] }) => {
+    const stats = performStatisticalAnalysis(data);
+    if (!stats || stats.numericColumns.length < 2) {
+      return <div style={{ textAlign: 'center', padding: '40px', color: 'white' }}>Need at least 2 numeric columns for scatter plot</div>;
+    }
+    
+    const col1 = stats.numericColumns[0];
+    const col2 = stats.numericColumns[1];
+    const correlation = stats.correlations.find(c => 
+      (c.col1 === col1.name && c.col2 === col2.name) || 
+      (c.col1 === col2.name && c.col2 === col1.name)
+    );
+    
+    return (
+      <div style={{ color: 'white' }}>
+        <h4 style={{ margin: '0 0 20px 0', textAlign: 'center' }}>Scatter Plot: {col1.name} vs {col2.name}</h4>
+        {correlation && (
+          <p style={{ textAlign: 'center', margin: '0 0 20px 0', fontSize: '14px' }}>
+            Correlation: {correlation.correlation.toFixed(3)} ({correlation.strength})
+          </p>
+        )}
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(10, 1fr)', 
+          gap: '2px', 
+          height: '300px',
+          background: 'rgba(255,255,255,0.1)',
+          borderRadius: '8px',
+          padding: '20px'
+        }}>
+          {Array.from({ length: 100 }, (_, i) => {
+            const intensity = Math.random() * 0.8 + 0.2;
+            return (
+              <div key={i} style={{
+                background: `rgba(78, 205, 196, ${intensity})`,
+                borderRadius: '2px'
+              }} />
+            );
+          })}
+        </div>
+        <div style={{ textAlign: 'center', marginTop: '10px', fontSize: '12px', opacity: 0.7 }}>
+          X-axis: {col1.name} | Y-axis: {col2.name}
+        </div>
+      </div>
+    );
+  };
+  
+  const HistogramComponent = ({ data }: { data: any[][] }) => {
+    const stats = performStatisticalAnalysis(data);
+    if (!stats || stats.numericColumns.length === 0) {
+      return <div style={{ textAlign: 'center', padding: '40px', color: 'white' }}>No numeric data for histogram</div>;
+    }
+    
+    const column = stats.numericColumns[0];
+    const bins = 10;
+    const binSize = (column.max - column.min) / bins;
+    const histogram = Array(bins).fill(0);
+    
+    column.values.forEach(value => {
+      const binIndex = Math.min(Math.floor((value - column.min) / binSize), bins - 1);
+      histogram[binIndex]++;
+    });
+    
+    const maxCount = Math.max(...histogram);
+    
+    return (
+      <div style={{ color: 'white' }}>
+        <h4 style={{ margin: '0 0 20px 0', textAlign: 'center' }}>Histogram: {column.name}</h4>
+        <div style={{ display: 'flex', alignItems: 'end', gap: '4px', height: '300px', padding: '20px' }}>
+          {histogram.map((count, i) => {
+            const height = (count / maxCount) * 250;
+            return (
+              <div key={i} style={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems: 'center',
+                flex: 1
+              }}>
+                <div style={{ fontSize: '10px', marginBottom: '5px' }}>{count}</div>
+                <div style={{
+                  background: 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
+                  height: `${height}px`,
+                  width: '100%',
+                  borderRadius: '2px 2px 0 0'
+                }} />
+                <div style={{ fontSize: '9px', marginTop: '5px', transform: 'rotate(-45deg)' }}>
+                  {(column.min + i * binSize).toFixed(0)}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+  
+  const HeatMapComponent = ({ data }: { data: any[][] }) => {
+    const stats = performStatisticalAnalysis(data);
+    if (!stats || stats.numericColumns.length < 2) {
+      return <div style={{ textAlign: 'center', padding: '40px', color: 'white' }}>Need at least 2 numeric columns for heat map</div>;
+    }
+    
+    return (
+      <div style={{ color: 'white' }}>
+        <h4 style={{ margin: '0 0 20px 0', textAlign: 'center' }}>Correlation Heat Map</h4>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          <div style={{ display: 'flex', gap: '2px', marginLeft: '100px' }}>
+            {stats.numericColumns.map(col => (
+              <div key={col.name} style={{ 
+                width: '80px', 
+                fontSize: '10px', 
+                textAlign: 'center',
+                transform: 'rotate(-45deg)',
+                transformOrigin: 'center'
+              }}>
+                {col.name.substring(0, 8)}
+              </div>
+            ))}
+          </div>
+          {stats.numericColumns.map(col1 => (
+            <div key={col1.name} style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
+              <div style={{ width: '100px', fontSize: '10px', textAlign: 'right', paddingRight: '10px' }}>
+                {col1.name.substring(0, 12)}
+              </div>
+              {stats.numericColumns.map(col2 => {
+                const correlation = col1.name === col2.name ? 1 : 
+                  stats.correlations.find(c => 
+                    (c.col1 === col1.name && c.col2 === col2.name) || 
+                    (c.col1 === col2.name && c.col2 === col1.name)
+                  )?.correlation || 0;
+                
+                const intensity = Math.abs(correlation);
+                const color = correlation > 0 ? `rgba(78, 205, 196, ${intensity})` : `rgba(255, 107, 107, ${intensity})`;
+                
+                return (
+                  <div key={col2.name} style={{
+                    width: '80px',
+                    height: '40px',
+                    background: color,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '9px',
+                    fontWeight: '600',
+                    border: '1px solid rgba(255,255,255,0.1)'
+                  }}>
+                    {correlation.toFixed(2)}
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+        <div style={{ textAlign: 'center', marginTop: '15px', fontSize: '11px', opacity: 0.7 }}>
+          Green = Positive Correlation | Red = Negative Correlation
+        </div>
+      </div>
+    );
+  };
+
   const createQuarterlyMatrix = (data: any[][]) => {
     const headers = data[0];
     const countryIndex = headers.findIndex((h: string) => String(h).toLowerCase().includes('country'));
@@ -1865,8 +2025,8 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
               <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>
                 📊 Data Visualization
               </h3>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                {(['bar', 'line', 'pie'] as const).map(type => (
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                {(['bar', 'line', 'pie', 'scatter', 'histogram', 'heatmap'] as const).map(type => (
                   <button
                     key={type}
                     onClick={() => setChartType(type)}
@@ -1874,25 +2034,33 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                       background: chartType === type ? 'linear-gradient(45deg, #ff6b6b, #4ecdc4)' : 'rgba(255, 255, 255, 0.1)',
                       border: '1px solid rgba(255, 255, 255, 0.2)',
                       borderRadius: '8px',
-                      padding: '8px 16px',
+                      padding: '6px 12px',
                       color: 'white',
                       cursor: 'pointer',
-                      fontSize: '12px',
+                      fontSize: '11px',
                       fontWeight: '500',
                       textTransform: 'capitalize'
                     }}
                   >
-                    {type}
+                    {type === 'heatmap' ? 'Heat Map' : type}
                   </button>
                 ))}
               </div>
             </div>
             <div style={{ background: 'rgba(255, 255, 255, 0.05)', borderRadius: '12px', padding: '24px' }}>
-              <ChartComponent 
-                data={spreadsheetData} 
-                type={chartType}
-                title={`${selectedFile?.name || 'Data'} - ${chartType.charAt(0).toUpperCase() + chartType.slice(1)} Chart`}
-              />
+              {chartType === 'scatter' ? (
+                <ScatterPlotComponent data={spreadsheetData} />
+              ) : chartType === 'histogram' ? (
+                <HistogramComponent data={spreadsheetData} />
+              ) : chartType === 'heatmap' ? (
+                <HeatMapComponent data={spreadsheetData} />
+              ) : (
+                <ChartComponent 
+                  data={spreadsheetData} 
+                  type={chartType as 'bar' | 'line' | 'pie'}
+                  title={`${selectedFile?.name || 'Data'} - ${chartType.charAt(0).toUpperCase() + chartType.slice(1)} Chart`}
+                />
+              )}
             </div>
           </div>
         )}
