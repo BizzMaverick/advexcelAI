@@ -306,6 +306,28 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           fullAnalysis += `\n`;
         }
         
+        // Data Quality Analysis
+        const qualityReport = performDataQualityAnalysis(data);
+        if (qualityReport) {
+          fullAnalysis += `**🔍 DATA QUALITY ASSESSMENT:**\n`;
+          fullAnalysis += `• Overall Quality Score: ${qualityReport.overallScore}/100\n`;
+          
+          if (qualityReport.cleaningSuggestions.length > 0) {
+            const highPriority = qualityReport.cleaningSuggestions.filter(s => s.severity === 'High');
+            fullAnalysis += `• Cleaning Issues: ${qualityReport.cleaningSuggestions.length} total (${highPriority.length} high priority)\n`;
+          }
+          
+          if (qualityReport.validationIssues.length > 0) {
+            fullAnalysis += `• Validation Issues: ${qualityReport.validationIssues.length} columns need attention\n`;
+          }
+          
+          if (qualityReport.anomalies.length > 0) {
+            fullAnalysis += `• Anomalies Detected: ${qualityReport.anomalies.length} columns have statistical outliers\n`;
+          }
+          
+          fullAnalysis += `\n`;
+        }
+        
         // Key Insights
         fullAnalysis += `**💡 KEY INSIGHTS:**\n`;
         fullAnalysis += `• Data Range: ${analytics.range.toFixed(2)} (${analytics.min} to ${analytics.max})\n`;
@@ -1193,6 +1215,205 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     return result;
   };
 
+  const performDataQualityAnalysis = (data: any[][]) => {
+    if (!data || data.length < 2) return null;
+    
+    const headers = data[0];
+    const rows = data.slice(1);
+    const totalCells = rows.length * headers.length;
+    
+    const cleaningSuggestions = [];
+    const validationIssues = [];
+    const inconsistencies = [];
+    const anomalies = [];
+    let qualityScore = 100;
+    
+    // 1. Automated Data Cleaning Suggestions
+    headers.forEach((header, colIndex) => {
+      const columnData = rows.map(row => row[colIndex]);
+      const nonEmptyData = columnData.filter(cell => cell !== null && cell !== undefined && cell !== '');
+      
+      // Missing data detection
+      const missingCount = columnData.length - nonEmptyData.length;
+      if (missingCount > 0) {
+        const missingPercentage = ((missingCount / columnData.length) * 100).toFixed(1);
+        cleaningSuggestions.push({
+          issue: `Missing Data in ${header}`,
+          suggestion: `${missingCount} missing values (${missingPercentage}%). Consider filling with median/mode or removing rows.`,
+          severity: missingCount > columnData.length * 0.1 ? 'High' : 'Medium'
+        });
+        qualityScore -= Math.min(missingCount * 2, 20);
+      }
+      
+      // Duplicate detection
+      const uniqueValues = new Set(nonEmptyData.map(val => String(val).toLowerCase().trim()));
+      if (uniqueValues.size < nonEmptyData.length * 0.8 && nonEmptyData.length > 10) {
+        cleaningSuggestions.push({
+          issue: `High Duplication in ${header}`,
+          suggestion: `Only ${uniqueValues.size} unique values out of ${nonEmptyData.length}. Consider data deduplication.`,
+          severity: 'Medium'
+        });
+        qualityScore -= 10;
+      }
+    });
+    
+    // 2. Data Validation Rules
+    headers.forEach((header, colIndex) => {
+      const columnData = rows.map(row => row[colIndex]).filter(cell => cell !== null && cell !== undefined && cell !== '');
+      const headerLower = String(header).toLowerCase();
+      
+      // Email validation
+      if (headerLower.includes('email')) {
+        const invalidEmails = columnData.filter(email => {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          return !emailRegex.test(String(email));
+        });
+        if (invalidEmails.length > 0) {
+          validationIssues.push({
+            column: header,
+            issue: 'Invalid email format',
+            count: invalidEmails.length,
+            examples: invalidEmails.slice(0, 3)
+          });
+          qualityScore -= invalidEmails.length * 3;
+        }
+      }
+      
+      // Numeric validation
+      if (headerLower.includes('year') || headerLower.includes('age') || headerLower.includes('count')) {
+        const invalidNumbers = columnData.filter(val => {
+          const num = parseFloat(String(val));
+          return isNaN(num) || (headerLower.includes('year') && (num < 1900 || num > 2030));
+        });
+        if (invalidNumbers.length > 0) {
+          validationIssues.push({
+            column: header,
+            issue: 'Invalid numeric format or range',
+            count: invalidNumbers.length,
+            examples: invalidNumbers.slice(0, 3)
+          });
+          qualityScore -= invalidNumbers.length * 2;
+        }
+      }
+    });
+    
+    // 3. Inconsistency Detection
+    headers.forEach((header, colIndex) => {
+      const columnData = rows.map(row => row[colIndex]).filter(cell => cell !== null && cell !== undefined && cell !== '');
+      
+      // Format inconsistencies
+      const formats = new Set();
+      columnData.forEach(val => {
+        const str = String(val);
+        if (/^\d{4}-\d{2}-\d{2}$/.test(str)) formats.add('YYYY-MM-DD');
+        else if (/^\d{2}\/\d{2}\/\d{4}$/.test(str)) formats.add('MM/DD/YYYY');
+        else if (/^\d+\.\d{2}$/.test(str)) formats.add('Decimal');
+        else if (/^\d+$/.test(str)) formats.add('Integer');
+        else formats.add('Text');
+      });
+      
+      if (formats.size > 2) {
+        inconsistencies.push({
+          type: 'Format Inconsistency',
+          description: `${header} has mixed formats: ${Array.from(formats).join(', ')}`,
+          column: header
+        });
+        qualityScore -= 15;
+      }
+      
+      // Spelling inconsistencies (for text columns)
+      if (columnData.length > 5 && columnData.every(val => isNaN(parseFloat(String(val))))) {
+        const valueCounts = {};
+        columnData.forEach(val => {
+          const normalized = String(val).toLowerCase().trim();
+          valueCounts[normalized] = (valueCounts[normalized] || 0) + 1;
+        });
+        
+        const similarValues = [];
+        const values = Object.keys(valueCounts);
+        for (let i = 0; i < values.length; i++) {
+          for (let j = i + 1; j < values.length; j++) {
+            const similarity = calculateSimilarity(values[i], values[j]);
+            if (similarity > 0.8 && similarity < 1.0) {
+              similarValues.push([values[i], values[j]]);
+            }
+          }
+        }
+        
+        if (similarValues.length > 0) {
+          inconsistencies.push({
+            type: 'Spelling Inconsistency',
+            description: `${header} has similar values that might be duplicates: ${similarValues[0].join(' vs ')}`,
+            column: header
+          });
+          qualityScore -= 10;
+        }
+      }
+    });
+    
+    // 4. Anomaly Scoring
+    headers.forEach((header, colIndex) => {
+      const columnData = rows.map(row => parseFloat(row[colIndex])).filter(val => !isNaN(val));
+      
+      if (columnData.length > 5) {
+        const mean = columnData.reduce((sum, val) => sum + val, 0) / columnData.length;
+        const variance = columnData.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / columnData.length;
+        const stdDev = Math.sqrt(variance);
+        
+        const outliers = columnData.filter(val => Math.abs(val - mean) > 2 * stdDev);
+        if (outliers.length > 0) {
+          const anomalyScore = Math.min((outliers.length / columnData.length) * 100, 100).toFixed(1);
+          anomalies.push({
+            column: header,
+            description: `${outliers.length} statistical outliers detected (beyond 2 standard deviations)`,
+            score: anomalyScore,
+            examples: outliers.slice(0, 3).map(val => val.toFixed(2))
+          });
+          qualityScore -= outliers.length;
+        }
+      }
+    });
+    
+    return {
+      overallScore: Math.max(qualityScore, 0),
+      cleaningSuggestions,
+      validationIssues,
+      inconsistencies,
+      anomalies
+    };
+  };
+  
+  const calculateSimilarity = (str1: string, str2: string) => {
+    const longer = str1.length > str2.length ? str1 : str2;
+    const shorter = str1.length > str2.length ? str2 : str1;
+    const editDistance = levenshteinDistance(longer, shorter);
+    return (longer.length - editDistance) / longer.length;
+  };
+  
+  const levenshteinDistance = (str1: string, str2: string) => {
+    const matrix = [];
+    for (let i = 0; i <= str2.length; i++) {
+      matrix[i] = [i];
+    }
+    for (let j = 0; j <= str1.length; j++) {
+      matrix[0][j] = j;
+    }
+    for (let i = 1; i <= str2.length; i++) {
+      for (let j = 1; j <= str1.length; j++) {
+        if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
+          matrix[i][j] = matrix[i - 1][j - 1];
+        } else {
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j - 1] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j] + 1
+          );
+        }
+      }
+    }
+    return matrix[str2.length][str1.length];
+  };
+
   const performPredictiveAnalysis = (data: any[][]) => {
     if (!data || data.length < 5) return null;
     
@@ -1781,6 +2002,55 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                     }}
                   >
                     🔮 Predictions
+                  </button>
+                  <button
+                    onClick={() => {
+                      const qualityReport = performDataQualityAnalysis(spreadsheetData);
+                      if (qualityReport) {
+                        let analysis = `🔍 **DATA QUALITY REPORT**\n\n`;
+                        
+                        analysis += `**QUALITY SCORE: ${qualityReport.overallScore}/100**\n\n`;
+                        
+                        analysis += `**CLEANING SUGGESTIONS:**\n`;
+                        qualityReport.cleaningSuggestions.forEach(suggestion => {
+                          analysis += `• ${suggestion.issue}: ${suggestion.suggestion}\n`;
+                        });
+                        analysis += `\n`;
+                        
+                        analysis += `**VALIDATION ISSUES:**\n`;
+                        qualityReport.validationIssues.forEach(issue => {
+                          analysis += `• ${issue.column}: ${issue.issue} (${issue.count} records)\n`;
+                        });
+                        analysis += `\n`;
+                        
+                        analysis += `**INCONSISTENCIES DETECTED:**\n`;
+                        qualityReport.inconsistencies.forEach(inconsistency => {
+                          analysis += `• ${inconsistency.type}: ${inconsistency.description}\n`;
+                        });
+                        analysis += `\n`;
+                        
+                        analysis += `**ANOMALIES FOUND:**\n`;
+                        qualityReport.anomalies.forEach(anomaly => {
+                          analysis += `• ${anomaly.column}: ${anomaly.description} (Score: ${anomaly.score})\n`;
+                        });
+                        
+                        setAiResponse(analysis);
+                      } else {
+                        setAiResponse('⚠️ Unable to perform data quality analysis.');
+                      }
+                    }}
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.1)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      borderRadius: '8px',
+                      padding: '8px 12px',
+                      color: 'white',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      fontWeight: '500'
+                    }}
+                  >
+                    🔍 Data Quality
                   </button>
                   <button
                     onClick={() => downloadExcel(spreadsheetData, `${selectedFile?.name || 'data'}_export.xlsx`)}
