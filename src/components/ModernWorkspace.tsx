@@ -257,11 +257,37 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           fullAnalysis += `• Detailed analytics completed successfully\n\n`;
         }
         
+        // Statistical Analysis
+        const stats = performStatisticalAnalysis(data);
+        if (stats && stats.correlations.length > 0) {
+          fullAnalysis += `**📊 STATISTICAL INSIGHTS:**\n`;
+          
+          // Top correlations
+          const strongCorrelations = stats.correlations.filter(c => Math.abs(c.correlation) > 0.5);
+          if (strongCorrelations.length > 0) {
+            fullAnalysis += `• Strong Correlations Found:\n`;
+            strongCorrelations.slice(0, 3).forEach(corr => {
+              fullAnalysis += `  - ${corr.col1} ↔ ${corr.col2}: ${corr.correlation.toFixed(3)} (${corr.strength})\n`;
+            });
+          } else {
+            fullAnalysis += `• No strong correlations detected between variables\n`;
+          }
+          
+          // Percentile insights
+          if (stats.percentiles.length > 0) {
+            const mainColumn = stats.percentiles[0];
+            const iqr = mainColumn.p75 - mainColumn.p25;
+            fullAnalysis += `• Data Distribution (${mainColumn.name}): IQR = ${iqr.toFixed(2)}\n`;
+          }
+          fullAnalysis += `\n`;
+        }
+        
         // Key Insights
         fullAnalysis += `**💡 KEY INSIGHTS:**\n`;
         fullAnalysis += `• Data Range: ${analytics.range.toFixed(2)} (${analytics.min} to ${analytics.max})\n`;
         fullAnalysis += `• Data Quality: ${analytics.duplicates === 0 ? 'Excellent (No duplicates)' : `${analytics.duplicates} duplicates found`}\n`;
         fullAnalysis += `• Distribution: ${analytics.standardDeviation > analytics.mean ? 'High variability' : 'Low variability'}\n`;
+        fullAnalysis += `• Statistical Analysis: ${stats && stats.correlations.length > 0 ? `${stats.correlations.length} relationships analyzed` : 'Limited numeric data'}\n`;
         fullAnalysis += `• Recommendation: ${analytics.duplicates > 0 ? 'Clean duplicate data' : 'Data ready for analysis'}\n`;
         
         setAiResponse(fullAnalysis);
