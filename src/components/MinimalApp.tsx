@@ -728,16 +728,24 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     // Handle simple lookup commands
     const lowerPrompt = trimmedPrompt.toLowerCase();
     if (lowerPrompt.includes('lookup')) {
-      const lookupMatch = trimmedPrompt.match(/lookup\s+(\w+)/i);
+      // Extract multiple search terms (supports "lookup somalia and yemen" or "lookup somalia yemen")
+      const lookupMatch = trimmedPrompt.match(/lookup\s+(.+)/i);
       if (lookupMatch) {
-        const searchTerm = lookupMatch[1].toLowerCase();
+        const searchText = lookupMatch[1];
+        // Split by "and", "or", "," or spaces to get multiple terms
+        const searchTerms = searchText.split(/\s+(?:and|or|,)\s+|\s+/)
+          .map(term => term.trim().toLowerCase())
+          .filter(term => term.length > 0 && !['and', 'or'].includes(term));
+        
         const headers = fileData[0];
         const dataRows = fileData.slice(1);
         
-        // Find all rows containing the search term
+        // Find all rows containing any of the search terms
         const matchingRows = dataRows.filter(row => 
-          row.some(cell => 
-            String(cell || '').toLowerCase().includes(searchTerm)
+          searchTerms.some(searchTerm =>
+            row.some(cell => 
+              String(cell || '').toLowerCase().includes(searchTerm)
+            )
           )
         );
         
@@ -746,7 +754,8 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           setLastAiResult(result);
           setShowUseResultButton(true);
           
-          let response = `<strong>Lookup results for '${searchTerm}' - Found ${matchingRows.length} matches:</strong><br><br>`;
+          const searchDisplay = searchTerms.length > 1 ? searchTerms.join(', ') : searchTerms[0];
+          let response = `<strong>Lookup results for '${searchDisplay}' - Found ${matchingRows.length} matches:</strong><br><br>`;
           response += '<table style="width: 100%; border-collapse: collapse;">';
           response += '<thead>';
           response += '<tr style="background: #e6f3ff; border-bottom: 2px solid #0078d4;">';
@@ -776,7 +785,8 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           setPrompt('');
           return;
         } else {
-          setAiResponse(`<strong>No matches found for '${searchTerm}'</strong>`);
+          const searchDisplay = searchTerms.length > 1 ? searchTerms.join(', ') : searchTerms[0];
+          setAiResponse(`<strong>No matches found for '${searchDisplay}'</strong>`);
           setPrompt('');
           return;
         }
