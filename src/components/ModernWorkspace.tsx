@@ -667,43 +667,98 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     if (!data || data.length < 2) return [];
     
     const headers = data[0];
-    const pivots = [
-      {
+    const pivots = [];
+    
+    // Always add basic pivots that work with any data
+    const basicPivot = createBasicPivot(data);
+    if (basicPivot) {
+      pivots.push({
+        title: 'Data Summary',
+        description: 'Basic data summary and statistics',
+        data: basicPivot,
+        type: 'standard'
+      });
+    }
+    
+    // Try to create country-year matrix
+    const countryYearMatrix = createCountryYearMatrix(data);
+    if (countryYearMatrix) {
+      pivots.push({
         title: 'Country × Year Matrix',
         description: 'Countries as rows, years as columns',
-        data: createCountryYearMatrix(data),
+        data: countryYearMatrix,
         type: 'standard'
-      },
-      {
+      });
+    }
+    
+    // Try multi-dimensional pivot
+    const multiDimPivot = createMultiDimensionalPivot(data, [headers[0]], headers.slice(1, 3), pivotFilters);
+    if (multiDimPivot) {
+      pivots.push({
         title: 'Multi-Dimensional Analysis',
         description: 'Advanced pivot with multiple dimensions',
-        data: createMultiDimensionalPivot(data, ['Country'], ['2023', '2022'], pivotFilters),
+        data: multiDimPivot,
         type: 'multidimensional'
-      },
-      {
+      });
+    }
+    
+    // Try calculated fields pivot
+    const calcFieldsPivot = createPivotWithCalculatedFields(data, [headers[0]], [
+      {name: 'Sum Total', formula: headers[1] + ' + ' + (headers[2] || headers[1])}
+    ]);
+    if (calcFieldsPivot) {
+      pivots.push({
         title: 'Calculated Fields Pivot',
         description: 'Pivot with calculated performance metrics',
-        data: createPivotWithCalculatedFields(data, ['Country', '2023'], [
-          {name: 'Growth Rate', formula: '2023 - 2022'},
-          {name: 'Performance Index', formula: '2023 * 1.1'}
-        ]),
+        data: calcFieldsPivot,
         type: 'calculated'
-      },
-      {
-        title: 'Regional Summary',
-        description: 'Regions as rows, metrics as columns',
-        data: createRegionalSummary(data),
-        type: 'standard'
-      },
-      {
+      });
+    }
+    
+    // Always add statistical overview
+    const statsMatrix = createStatisticalMatrix(data);
+    if (statsMatrix) {
+      pivots.push({
         title: 'Statistical Overview',
         description: 'Metrics as rows, calculations as columns',
-        data: createStatisticalMatrix(data),
+        data: statsMatrix,
         type: 'standard'
-      }
-    ];
+      });
+    }
     
-    return pivots.filter(pivot => pivot.data && pivot.data.length > 1);
+    console.log('Generated pivot tables:', pivots.length);
+    return pivots.length > 0 ? pivots : [{
+      title: 'Basic Data View',
+      description: 'Simple data overview',
+      data: [headers, ...data.slice(1, 11)], // First 10 rows
+      type: 'standard'
+    }];
+  };
+  
+  const createBasicPivot = (data: any[][]) => {
+    if (!data || data.length < 2) return null;
+    
+    const headers = data[0];
+    const rows = data.slice(1);
+    
+    // Create a simple summary pivot
+    const result = [['Column', 'Total Rows', 'Unique Values', 'Data Type']];
+    
+    headers.forEach((header, index) => {
+      const columnData = rows.map(row => row[index]).filter(val => val !== null && val !== undefined && val !== '');
+      const uniqueValues = new Set(columnData.map(val => String(val).toLowerCase()));
+      const numericValues = columnData.filter(val => !isNaN(parseFloat(String(val))));
+      const dataType = numericValues.length > columnData.length * 0.7 ? 'Numeric' : 'Text';
+      
+      result.push([
+        String(header),
+        columnData.length.toString(),
+        uniqueValues.size.toString(),
+        dataType
+      ]);
+    });
+    
+    return result;
   };
   
   const createCountryPivot = (data: any[][]) => {
@@ -2296,6 +2351,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                       onClick={() => {
                         if (pivotTables.length === 0) {
                           const pivots = generateAdvancedPivotTables(spreadsheetData);
+                          console.log('Generated pivots:', pivots);
                           setPivotTables(pivots);
                         }
                         setShowPivotDropdown(!showPivotDropdown);
