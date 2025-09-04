@@ -69,6 +69,11 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           const structure = DataDetectionService.analyzeData(jsonData);
           setDataStructure(structure);
           
+          // Generate 5 sample pivot tables immediately
+          const pivots = generateAdvancedPivotTables(jsonData);
+          setPivotTables(pivots);
+          console.log('Auto-generated pivot tables on upload:', pivots.length);
+          
           // Automatically trigger comprehensive AI analysis
           setTimeout(() => performAutoAnalysis(jsonData), 1000);
         } catch (err) {
@@ -253,9 +258,10 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
             }
           });
           
-          // Generate pivot tables
+          // Generate 5 sample pivot tables automatically
           const pivots = generateAdvancedPivotTables(data);
           setPivotTables(pivots);
+          console.log('Auto-generated pivot tables:', pivots.length);
           
           fullAnalysis += `**📊 ANALYTICS OVERVIEW:**\n`;
           fullAnalysis += `• Top 5 average: ${topAvg.toFixed(2)} | Bottom 5 average: ${bottomAvg.toFixed(2)}\n`;
@@ -669,59 +675,57 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     const headers = data[0];
     const pivots = [];
     
-    // Always add basic pivots that work with any data
-    const basicPivot = createBasicPivot(data);
-    if (basicPivot) {
+    // 1. Country Pivot (Top performers by country/region)
+    const countryPivot = createCountryPivot(data);
+    if (countryPivot) {
       pivots.push({
-        title: 'Data Summary',
-        description: 'Basic data summary and statistics',
-        data: basicPivot,
+        title: 'Top Countries/Regions',
+        description: 'Ranking by total values',
+        data: countryPivot,
         type: 'standard'
       });
     }
     
-    // Try to create country-year matrix
+    // 2. Year Analysis Pivot
+    const yearPivot = createYearPivot(data);
+    if (yearPivot) {
+      pivots.push({
+        title: 'Year-over-Year Analysis',
+        description: 'Performance trends by year',
+        data: yearPivot,
+        type: 'standard'
+      });
+    }
+    
+    // 3. Category/Performance Pivot
+    const categoryPivot = createCategoryPivot(data);
+    if (categoryPivot) {
+      pivots.push({
+        title: 'Top 5 Performance Ranking',
+        description: 'Highest performing categories',
+        data: categoryPivot,
+        type: 'standard'
+      });
+    }
+    
+    // 4. Statistical Summary Pivot
+    const statsPivot = createStatsPivot(data);
+    if (statsPivot) {
+      pivots.push({
+        title: 'Statistical Summary',
+        description: 'Key metrics and statistics',
+        data: statsPivot,
+        type: 'standard'
+      });
+    }
+    
+    // 5. Country × Year Matrix (Advanced)
     const countryYearMatrix = createCountryYearMatrix(data);
     if (countryYearMatrix) {
       pivots.push({
         title: 'Country × Year Matrix',
-        description: 'Countries as rows, years as columns',
+        description: 'Cross-tabulation of countries and years',
         data: countryYearMatrix,
-        type: 'standard'
-      });
-    }
-    
-    // Try multi-dimensional pivot
-    const multiDimPivot = createMultiDimensionalPivot(data, [headers[0]], headers.slice(1, 3), pivotFilters);
-    if (multiDimPivot) {
-      pivots.push({
-        title: 'Multi-Dimensional Analysis',
-        description: 'Advanced pivot with multiple dimensions',
-        data: multiDimPivot,
-        type: 'multidimensional'
-      });
-    }
-    
-    // Try calculated fields pivot
-    const calcFieldsPivot = createPivotWithCalculatedFields(data, [headers[0]], [
-      {name: 'Sum Total', formula: headers[1] + ' + ' + (headers[2] || headers[1])}
-    ]);
-    if (calcFieldsPivot) {
-      pivots.push({
-        title: 'Calculated Fields Pivot',
-        description: 'Pivot with calculated performance metrics',
-        data: calcFieldsPivot,
-        type: 'calculated'
-      });
-    }
-    
-    // Always add statistical overview
-    const statsMatrix = createStatisticalMatrix(data);
-    if (statsMatrix) {
-      pivots.push({
-        title: 'Statistical Overview',
-        description: 'Metrics as rows, calculations as columns',
-        data: statsMatrix,
         type: 'standard'
       });
     }
@@ -2700,6 +2704,92 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                     }}
                   >
                     {aiLoading ? '🔄 Analyzing...' : '🔍 Alternative Analysis'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Custom Pivot Tables */}
+            {spreadsheetData.length > 0 && (
+              <div style={{ marginBottom: '32px' }}>
+                <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600' }}>
+                  📋 Custom Pivot Tables
+                </h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <textarea
+                    value={pivotPrompt}
+                    onChange={(e) => setPivotPrompt(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        if (pivotPrompt.trim()) {
+                          const customPivot = createCustomPivot(spreadsheetData, pivotPrompt);
+                          if (customPivot) {
+                            const newPivot = {
+                              title: 'Custom Pivot',
+                              description: pivotPrompt,
+                              data: customPivot,
+                              type: 'custom'
+                            };
+                            setPivotTables([...pivotTables, newPivot]);
+                            setSelectedPivot(pivotTables.length);
+                            setPivotPrompt('');
+                            setAiResponse(`✅ **Custom Pivot Created**\n\nYour pivot table "${pivotPrompt}" has been generated successfully.`);
+                          } else {
+                            setAiResponse(`⚠️ **Pivot Creation Failed**\n\nCouldn't create pivot table from "${pivotPrompt}". Try being more specific about what data to group or analyze.`);
+                          }
+                        }
+                      }
+                    }}
+                    placeholder="Create custom pivot tables...\ne.g., 'rank countries by economy', 'show employees by salary', 'group items by price'"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.1)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      borderRadius: '12px',
+                      padding: '16px',
+                      color: 'white',
+                      fontSize: '14px',
+                      fontFamily: 'inherit',
+                      resize: 'vertical',
+                      minHeight: '60px',
+                      outline: 'none'
+                    }}
+                  />
+                  <button
+                    onClick={() => {
+                      if (pivotPrompt.trim()) {
+                        const customPivot = createCustomPivot(spreadsheetData, pivotPrompt);
+                        if (customPivot) {
+                          const newPivot = {
+                            title: 'Custom Pivot',
+                            description: pivotPrompt,
+                            data: customPivot,
+                            type: 'custom'
+                          };
+                          setPivotTables([...pivotTables, newPivot]);
+                          setSelectedPivot(pivotTables.length);
+                          setPivotPrompt('');
+                          setAiResponse(`✅ **Custom Pivot Created**\n\nYour pivot table "${pivotPrompt}" has been generated successfully.`);
+                        } else {
+                          setAiResponse(`⚠️ **Pivot Creation Failed**\n\nCouldn't create pivot table from "${pivotPrompt}". Try being more specific about what data to group or analyze.`);
+                        }
+                      }
+                    }}
+                    disabled={!pivotPrompt.trim()}
+                    style={{
+                      background: !pivotPrompt.trim() ? 'rgba(255, 255, 255, 0.2)' : 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      borderRadius: '12px',
+                      padding: '12px 16px',
+                      color: 'white',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      cursor: !pivotPrompt.trim() ? 'not-allowed' : 'pointer',
+                      transition: 'all 0.3s ease',
+                      opacity: !pivotPrompt.trim() ? 0.5 : 1
+                    }}
+                  >
+                    📋 Create Pivot Table
                   </button>
                 </div>
               </div>
