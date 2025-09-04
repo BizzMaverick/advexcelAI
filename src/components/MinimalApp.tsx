@@ -371,11 +371,9 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     
     // Find column by name or letter
     const getColumnIndex = (columnRef: string) => {
-      // Check if it's a letter (A, B, C)
       if (/^[A-Z]$/i.test(columnRef)) {
         return columnRef.toUpperCase().charCodeAt(0) - 65;
       }
-      // Check if it's a column name
       return headers.findIndex(h => String(h).toLowerCase().includes(columnRef.toLowerCase()));
     };
     
@@ -385,7 +383,338 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       return data.slice(1).map(row => parseFloat(String(row[colIndex] || ''))).filter(n => !isNaN(n));
     };
     
-    // Basic math operations
+    // SUMIF function
+    const sumifMatch = prompt.match(/sumif\s+([a-z0-9]+)\s+([><=!]+)\s*([^\s]+)\s+([a-z0-9]+)/i);
+    if (sumifMatch) {
+      const [, criteriaCol, operator, criteriaValue, sumCol] = sumifMatch;
+      const criteriaIndex = getColumnIndex(criteriaCol);
+      const sumIndex = getColumnIndex(sumCol);
+      
+      if (criteriaIndex >= 0 && sumIndex >= 0) {
+        let sum = 0;
+        let count = 0;
+        data.slice(1).forEach(row => {
+          const criteriaCell = String(row[criteriaIndex] || '');
+          const sumCell = parseFloat(String(row[sumIndex] || ''));
+          
+          let matches = false;
+          const numCriteria = parseFloat(criteriaValue);
+          const numCell = parseFloat(criteriaCell);
+          
+          if (!isNaN(numCriteria) && !isNaN(numCell)) {
+            switch (operator) {
+              case '>': matches = numCell > numCriteria; break;
+              case '<': matches = numCell < numCriteria; break;
+              case '>=': matches = numCell >= numCriteria; break;
+              case '<=': matches = numCell <= numCriteria; break;
+              case '=': matches = numCell === numCriteria; break;
+              case '!=': matches = numCell !== numCriteria; break;
+            }
+          } else {
+            matches = criteriaCell.toLowerCase().includes(criteriaValue.toLowerCase());
+          }
+          
+          if (matches && !isNaN(sumCell)) {
+            sum += sumCell;
+            count++;
+          }
+        });
+        
+        return `<strong>SUMIF Result:</strong><br><br>Sum where ${headers[criteriaIndex]} ${operator} ${criteriaValue}: <strong>${sum.toFixed(2)}</strong><br>Matching rows: ${count}`;
+      }
+    }
+    
+    // COUNTIF function
+    const countifMatch = prompt.match(/countif\s+([a-z0-9]+)\s+([><=!]+)\s*([^\s]+)/i);
+    if (countifMatch) {
+      const [, criteriaCol, operator, criteriaValue] = countifMatch;
+      const criteriaIndex = getColumnIndex(criteriaCol);
+      
+      if (criteriaIndex >= 0) {
+        let count = 0;
+        data.slice(1).forEach(row => {
+          const criteriaCell = String(row[criteriaIndex] || '');
+          const numCriteria = parseFloat(criteriaValue);
+          const numCell = parseFloat(criteriaCell);
+          
+          let matches = false;
+          if (!isNaN(numCriteria) && !isNaN(numCell)) {
+            switch (operator) {
+              case '>': matches = numCell > numCriteria; break;
+              case '<': matches = numCell < numCriteria; break;
+              case '>=': matches = numCell >= numCriteria; break;
+              case '<=': matches = numCell <= numCriteria; break;
+              case '=': matches = numCell === numCriteria; break;
+              case '!=': matches = numCell !== numCriteria; break;
+            }
+          } else {
+            matches = criteriaCell.toLowerCase().includes(criteriaValue.toLowerCase());
+          }
+          
+          if (matches) count++;
+        });
+        
+        return `<strong>COUNTIF Result:</strong><br><br>Count where ${headers[criteriaIndex]} ${operator} ${criteriaValue}: <strong>${count}</strong>`;
+      }
+    }
+    
+    // AVERAGEIF function
+    const averageifMatch = prompt.match(/averageif\s+([a-z0-9]+)\s+([><=!]+)\s*([^\s]+)\s+([a-z0-9]+)/i);
+    if (averageifMatch) {
+      const [, criteriaCol, operator, criteriaValue, avgCol] = averageifMatch;
+      const criteriaIndex = getColumnIndex(criteriaCol);
+      const avgIndex = getColumnIndex(avgCol);
+      
+      if (criteriaIndex >= 0 && avgIndex >= 0) {
+        let sum = 0;
+        let count = 0;
+        data.slice(1).forEach(row => {
+          const criteriaCell = String(row[criteriaIndex] || '');
+          const avgCell = parseFloat(String(row[avgIndex] || ''));
+          
+          let matches = false;
+          const numCriteria = parseFloat(criteriaValue);
+          const numCell = parseFloat(criteriaCell);
+          
+          if (!isNaN(numCriteria) && !isNaN(numCell)) {
+            switch (operator) {
+              case '>': matches = numCell > numCriteria; break;
+              case '<': matches = numCell < numCriteria; break;
+              case '>=': matches = numCell >= numCriteria; break;
+              case '<=': matches = numCell <= numCriteria; break;
+              case '=': matches = numCell === numCriteria; break;
+              case '!=': matches = numCell !== numCriteria; break;
+            }
+          } else {
+            matches = criteriaCell.toLowerCase().includes(criteriaValue.toLowerCase());
+          }
+          
+          if (matches && !isNaN(avgCell)) {
+            sum += avgCell;
+            count++;
+          }
+        });
+        
+        const avg = count > 0 ? sum / count : 0;
+        return `<strong>AVERAGEIF Result:</strong><br><br>Average where ${headers[criteriaIndex]} ${operator} ${criteriaValue}: <strong>${avg.toFixed(2)}</strong><br>Matching rows: ${count}`;
+      }
+    }
+    
+    // ROUND function
+    const roundMatch = prompt.match(/round\s+([A-Z])(\d+)\s+(\d+)/i);
+    if (roundMatch) {
+      const [, col, row, decimals] = roundMatch;
+      const colIndex = col.charCodeAt(0) - 65;
+      const rowIndex = parseInt(row) - 1;
+      const decimalPlaces = parseInt(decimals);
+      
+      if (rowIndex >= 0 && rowIndex < data.length && colIndex >= 0 && colIndex < (data[rowIndex]?.length || 0)) {
+        const value = parseFloat(String(data[rowIndex][colIndex]));
+        if (!isNaN(value)) {
+          const rounded = Math.round(value * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces);
+          return `<strong>ROUND Result:</strong><br><br>ROUND(${col}${row}, ${decimals}) = ${rounded}`;
+        }
+      }
+    }
+    
+    // ABS function
+    const absMatch = prompt.match(/abs\s+([A-Z])(\d+)/i);
+    if (absMatch) {
+      const [, col, row] = absMatch;
+      const colIndex = col.charCodeAt(0) - 65;
+      const rowIndex = parseInt(row) - 1;
+      
+      if (rowIndex >= 0 && rowIndex < data.length && colIndex >= 0 && colIndex < (data[rowIndex]?.length || 0)) {
+        const value = parseFloat(String(data[rowIndex][colIndex]));
+        if (!isNaN(value)) {
+          const absolute = Math.abs(value);
+          return `<strong>ABS Result:</strong><br><br>ABS(${col}${row}) = ${absolute}`;
+        }
+      }
+    }
+    
+    // Text functions
+    const concatenateMatch = prompt.match(/concatenate\s+([A-Z])(\d+)\s+([A-Z])(\d+)/i);
+    if (concatenateMatch) {
+      const [, col1, row1, col2, row2] = concatenateMatch;
+      const colIndex1 = col1.charCodeAt(0) - 65;
+      const colIndex2 = col2.charCodeAt(0) - 65;
+      const rowIndex1 = parseInt(row1) - 1;
+      const rowIndex2 = parseInt(row2) - 1;
+      
+      if (rowIndex1 >= 0 && rowIndex1 < data.length && colIndex1 >= 0 && colIndex1 < (data[rowIndex1]?.length || 0) &&
+          rowIndex2 >= 0 && rowIndex2 < data.length && colIndex2 >= 0 && colIndex2 < (data[rowIndex2]?.length || 0)) {
+        const val1 = String(data[rowIndex1][colIndex1] || '');
+        const val2 = String(data[rowIndex2][colIndex2] || '');
+        const result = val1 + val2;
+        return `<strong>CONCATENATE Result:</strong><br><br>CONCATENATE(${col1}${row1}, ${col2}${row2}) = "${result}"`;
+      }
+    }
+    
+    // LEFT function
+    const leftMatch = prompt.match(/left\s+([A-Z])(\d+)\s+(\d+)/i);
+    if (leftMatch) {
+      const [, col, row, length] = leftMatch;
+      const colIndex = col.charCodeAt(0) - 65;
+      const rowIndex = parseInt(row) - 1;
+      const numChars = parseInt(length);
+      
+      if (rowIndex >= 0 && rowIndex < data.length && colIndex >= 0 && colIndex < (data[rowIndex]?.length || 0)) {
+        const text = String(data[rowIndex][colIndex] || '');
+        const result = text.substring(0, numChars);
+        return `<strong>LEFT Result:</strong><br><br>LEFT(${col}${row}, ${length}) = "${result}"`;
+      }
+    }
+    
+    // RIGHT function
+    const rightMatch = prompt.match(/right\s+([A-Z])(\d+)\s+(\d+)/i);
+    if (rightMatch) {
+      const [, col, row, length] = rightMatch;
+      const colIndex = col.charCodeAt(0) - 65;
+      const rowIndex = parseInt(row) - 1;
+      const numChars = parseInt(length);
+      
+      if (rowIndex >= 0 && rowIndex < data.length && colIndex >= 0 && colIndex < (data[rowIndex]?.length || 0)) {
+        const text = String(data[rowIndex][colIndex] || '');
+        const result = text.substring(text.length - numChars);
+        return `<strong>RIGHT Result:</strong><br><br>RIGHT(${col}${row}, ${length}) = "${result}"`;
+      }
+    }
+    
+    // MID function
+    const midMatch = prompt.match(/mid\s+([A-Z])(\d+)\s+(\d+)\s+(\d+)/i);
+    if (midMatch) {
+      const [, col, row, start, length] = midMatch;
+      const colIndex = col.charCodeAt(0) - 65;
+      const rowIndex = parseInt(row) - 1;
+      const startPos = parseInt(start) - 1;
+      const numChars = parseInt(length);
+      
+      if (rowIndex >= 0 && rowIndex < data.length && colIndex >= 0 && colIndex < (data[rowIndex]?.length || 0)) {
+        const text = String(data[rowIndex][colIndex] || '');
+        const result = text.substring(startPos, startPos + numChars);
+        return `<strong>MID Result:</strong><br><br>MID(${col}${row}, ${start}, ${length}) = "${result}"`;
+      }
+    }
+    
+    // UPPER function
+    const upperMatch = prompt.match(/upper\s+([A-Z])(\d+)/i);
+    if (upperMatch) {
+      const [, col, row] = upperMatch;
+      const colIndex = col.charCodeAt(0) - 65;
+      const rowIndex = parseInt(row) - 1;
+      
+      if (rowIndex >= 0 && rowIndex < data.length && colIndex >= 0 && colIndex < (data[rowIndex]?.length || 0)) {
+        const text = String(data[rowIndex][colIndex] || '');
+        const result = text.toUpperCase();
+        return `<strong>UPPER Result:</strong><br><br>UPPER(${col}${row}) = "${result}"`;
+      }
+    }
+    
+    // LOWER function
+    const lowerMatch = prompt.match(/lower\s+([A-Z])(\d+)/i);
+    if (lowerMatch) {
+      const [, col, row] = lowerMatch;
+      const colIndex = col.charCodeAt(0) - 65;
+      const rowIndex = parseInt(row) - 1;
+      
+      if (rowIndex >= 0 && rowIndex < data.length && colIndex >= 0 && colIndex < (data[rowIndex]?.length || 0)) {
+        const text = String(data[rowIndex][colIndex] || '');
+        const result = text.toLowerCase();
+        return `<strong>LOWER Result:</strong><br><br>LOWER(${col}${row}) = "${result}"`;
+      }
+    }
+    
+    // PROPER function
+    const properMatch = prompt.match(/proper\s+([A-Z])(\d+)/i);
+    if (properMatch) {
+      const [, col, row] = properMatch;
+      const colIndex = col.charCodeAt(0) - 65;
+      const rowIndex = parseInt(row) - 1;
+      
+      if (rowIndex >= 0 && rowIndex < data.length && colIndex >= 0 && colIndex < (data[rowIndex]?.length || 0)) {
+        const text = String(data[rowIndex][colIndex] || '');
+        const result = text.toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+        return `<strong>PROPER Result:</strong><br><br>PROPER(${col}${row}) = "${result}"`;
+      }
+    }
+    
+    // TRIM function
+    const trimMatch = prompt.match(/trim\s+([A-Z])(\d+)/i);
+    if (trimMatch) {
+      const [, col, row] = trimMatch;
+      const colIndex = col.charCodeAt(0) - 65;
+      const rowIndex = parseInt(row) - 1;
+      
+      if (rowIndex >= 0 && rowIndex < data.length && colIndex >= 0 && colIndex < (data[rowIndex]?.length || 0)) {
+        const text = String(data[rowIndex][colIndex] || '');
+        const result = text.trim();
+        return `<strong>TRIM Result:</strong><br><br>TRIM(${col}${row}) = "${result}"`;
+      }
+    }
+    
+    // Date functions
+    const todayMatch = prompt.match(/today/i);
+    if (todayMatch) {
+      const today = new Date().toLocaleDateString();
+      return `<strong>TODAY Result:</strong><br><br>TODAY() = ${today}`;
+    }
+    
+    const nowMatch = prompt.match(/now/i);
+    if (nowMatch) {
+      const now = new Date().toLocaleString();
+      return `<strong>NOW Result:</strong><br><br>NOW() = ${now}`;
+    }
+    
+    const yearMatch = prompt.match(/year\s+([A-Z])(\d+)/i);
+    if (yearMatch) {
+      const [, col, row] = yearMatch;
+      const colIndex = col.charCodeAt(0) - 65;
+      const rowIndex = parseInt(row) - 1;
+      
+      if (rowIndex >= 0 && rowIndex < data.length && colIndex >= 0 && colIndex < (data[rowIndex]?.length || 0)) {
+        const dateStr = String(data[rowIndex][colIndex] || '');
+        const date = new Date(dateStr);
+        if (!isNaN(date.getTime())) {
+          const year = date.getFullYear();
+          return `<strong>YEAR Result:</strong><br><br>YEAR(${col}${row}) = ${year}`;
+        }
+      }
+    }
+    
+    const monthMatch = prompt.match(/month\s+([A-Z])(\d+)/i);
+    if (monthMatch) {
+      const [, col, row] = monthMatch;
+      const colIndex = col.charCodeAt(0) - 65;
+      const rowIndex = parseInt(row) - 1;
+      
+      if (rowIndex >= 0 && rowIndex < data.length && colIndex >= 0 && colIndex < (data[rowIndex]?.length || 0)) {
+        const dateStr = String(data[rowIndex][colIndex] || '');
+        const date = new Date(dateStr);
+        if (!isNaN(date.getTime())) {
+          const month = date.getMonth() + 1;
+          return `<strong>MONTH Result:</strong><br><br>MONTH(${col}${row}) = ${month}`;
+        }
+      }
+    }
+    
+    const dayMatch = prompt.match(/day\s+([A-Z])(\d+)/i);
+    if (dayMatch) {
+      const [, col, row] = dayMatch;
+      const colIndex = col.charCodeAt(0) - 65;
+      const rowIndex = parseInt(row) - 1;
+      
+      if (rowIndex >= 0 && rowIndex < data.length && colIndex >= 0 && colIndex < (data[rowIndex]?.length || 0)) {
+        const dateStr = String(data[rowIndex][colIndex] || '');
+        const date = new Date(dateStr);
+        if (!isNaN(date.getTime())) {
+          const day = date.getDate();
+          return `<strong>DAY Result:</strong><br><br>DAY(${col}${row}) = ${day}`;
+        }
+      }
+    }
+    
+    // Basic math operations (existing code)
     if (lowerPrompt.includes('average')) {
       const colMatch = lowerPrompt.match(/average\s+(?:of\s+)?(?:column\s+)?([a-z0-9:]+)/i);
       if (colMatch) {
@@ -431,7 +760,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       }
     }
     
-    // Cell operations
+    // Cell operations (existing code)
     const cellAddMatch = prompt.match(/([A-Z])(\d+)\s*\+\s*([A-Z])(\d+)/i);
     const cellSubMatch = prompt.match(/([A-Z])(\d+)\s*-\s*([A-Z])(\d+)/i);
     const cellMulMatch = prompt.match(/([A-Z])(\d+)\s*\*\s*([A-Z])(\d+)/i);
@@ -1083,7 +1412,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                     }
                   }
                 }}
-                placeholder="Ask about your data..."
+                placeholder="Try: SUMIF A > 100 B, CONCATENATE A1 B1, TODAY, UPPER A1..."
                 style={{ 
                   flex: 1, 
                   padding: '12px', 
