@@ -2709,92 +2709,6 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
               </div>
             )}
 
-            {/* Custom Pivot Tables */}
-            {spreadsheetData.length > 0 && (
-              <div style={{ marginBottom: '32px' }}>
-                <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600' }}>
-                  📋 Custom Pivot Tables
-                </h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <textarea
-                    value={pivotPrompt}
-                    onChange={(e) => setPivotPrompt(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        if (pivotPrompt.trim()) {
-                          const customPivot = createCustomPivot(spreadsheetData, pivotPrompt);
-                          if (customPivot) {
-                            const newPivot = {
-                              title: 'Custom Pivot',
-                              description: pivotPrompt,
-                              data: customPivot,
-                              type: 'custom'
-                            };
-                            setPivotTables([...pivotTables, newPivot]);
-                            setSelectedPivot(pivotTables.length);
-                            setPivotPrompt('');
-                            setAiResponse(`✅ **Custom Pivot Created**\n\nYour pivot table "${pivotPrompt}" has been generated successfully.`);
-                          } else {
-                            setAiResponse(`⚠️ **Pivot Creation Failed**\n\nCouldn't create pivot table from "${pivotPrompt}". Try being more specific about what data to group or analyze.`);
-                          }
-                        }
-                      }
-                    }}
-                    placeholder="Create custom pivot tables...\ne.g., 'rank countries by economy', 'show employees by salary', 'group items by price'"
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
-                      borderRadius: '12px',
-                      padding: '16px',
-                      color: 'white',
-                      fontSize: '14px',
-                      fontFamily: 'inherit',
-                      resize: 'vertical',
-                      minHeight: '60px',
-                      outline: 'none'
-                    }}
-                  />
-                  <button
-                    onClick={() => {
-                      if (pivotPrompt.trim()) {
-                        const customPivot = createCustomPivot(spreadsheetData, pivotPrompt);
-                        if (customPivot) {
-                          const newPivot = {
-                            title: 'Custom Pivot',
-                            description: pivotPrompt,
-                            data: customPivot,
-                            type: 'custom'
-                          };
-                          setPivotTables([...pivotTables, newPivot]);
-                          setSelectedPivot(pivotTables.length);
-                          setPivotPrompt('');
-                          setAiResponse(`✅ **Custom Pivot Created**\n\nYour pivot table "${pivotPrompt}" has been generated successfully.`);
-                        } else {
-                          setAiResponse(`⚠️ **Pivot Creation Failed**\n\nCouldn't create pivot table from "${pivotPrompt}". Try being more specific about what data to group or analyze.`);
-                        }
-                      }
-                    }}
-                    disabled={!pivotPrompt.trim()}
-                    style={{
-                      background: !pivotPrompt.trim() ? 'rgba(255, 255, 255, 0.2)' : 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
-                      borderRadius: '12px',
-                      padding: '12px 16px',
-                      color: 'white',
-                      fontSize: '14px',
-                      fontWeight: '600',
-                      cursor: !pivotPrompt.trim() ? 'not-allowed' : 'pointer',
-                      transition: 'all 0.3s ease',
-                      opacity: !pivotPrompt.trim() ? 0.5 : 1
-                    }}
-                  >
-                    📋 Create Pivot Table
-                  </button>
-                </div>
-              </div>
-            )}
-
             {/* Custom Analysis */}
             <div>
               <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600' }}>
@@ -2810,7 +2724,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                       handleCustomAnalysis();
                     }
                   }}
-                  placeholder="Ask anything with natural language...\ne.g., 'what patterns exist?', 'recommend analysis', 'find interesting insights', 'create smart pivot'"
+                  placeholder="Ask anything with natural language...\ne.g., 'what patterns exist?', 'rank countries by economy', 'show employees by salary', 'create pivot table'"
                   style={{
                     background: 'rgba(255, 255, 255, 0.1)',
                     border: '1px solid rgba(255, 255, 255, 0.2)',
