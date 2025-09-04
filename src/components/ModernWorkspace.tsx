@@ -2435,7 +2435,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   <button
                     onClick={() => setShowChart(!showChart)}
                     style={{
-                      background: showChart ? 'linear-gradient(45deg, #ff6b6b, #4ecdc4)' : 'rgba(255, 255, 255, 0.1)',
+                      background: 'rgba(255, 255, 255, 0.1)',
                       border: '1px solid rgba(255, 255, 255, 0.2)',
                       borderRadius: '8px',
                       padding: '8px 12px',
@@ -2458,7 +2458,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                         setShowPivotDropdown(!showPivotDropdown);
                       }}
                       style={{
-                        background: pivotTables.length > 0 ? 'linear-gradient(45deg, #ff6b6b, #4ecdc4)' : 'rgba(255, 255, 255, 0.1)',
+                        background: 'rgba(255, 255, 255, 0.1)',
                         border: '1px solid rgba(255, 255, 255, 0.2)',
                         borderRadius: '8px',
                         padding: '8px 12px',
@@ -2789,7 +2789,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                     onClick={() => performAlternativeAnalysis(spreadsheetData)}
                     disabled={aiLoading}
                     style={{
-                      background: aiLoading ? 'rgba(255, 255, 255, 0.2)' : 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
+                      background: 'rgba(255, 255, 255, 0.1)',
                       border: '1px solid rgba(255, 255, 255, 0.2)',
                       borderRadius: '12px',
                       padding: '12px 16px',
@@ -2797,7 +2797,8 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                       cursor: aiLoading ? 'not-allowed' : 'pointer',
                       fontSize: '13px',
                       fontWeight: '500',
-                      transition: 'all 0.3s ease'
+                      transition: 'all 0.3s ease',
+                      opacity: aiLoading ? 0.6 : 1
                     }}
                   >
                     {aiLoading ? '🔄 Analyzing...' : '🔍 Alternative Analysis'}
@@ -2840,16 +2841,16 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   onClick={handleCustomAnalysis}
                   disabled={!prompt.trim() || !spreadsheetData.length || aiLoading}
                   style={{
-                    background: aiLoading ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.1)',
+                    background: 'rgba(255, 255, 255, 0.1)',
                     border: '1px solid rgba(255, 255, 255, 0.2)',
                     borderRadius: '12px',
                     padding: '16px',
                     color: 'white',
                     fontSize: '14px',
                     fontWeight: '600',
-                    cursor: aiLoading ? 'not-allowed' : 'pointer',
+                    cursor: aiLoading || !prompt.trim() || !spreadsheetData.length ? 'not-allowed' : 'pointer',
                     transition: 'all 0.3s ease',
-                    opacity: (!prompt.trim() || !spreadsheetData.length) ? 0.5 : 1
+                    opacity: (!prompt.trim() || !spreadsheetData.length || aiLoading) ? 0.5 : 1
                   }}
                 >
                   {aiLoading ? '🔄 Processing...' : '🔍 Custom Analysis'}
@@ -3037,8 +3038,8 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                       downloadExcel(top5Data, 'top5_analysis.xlsx');
                     }}
                     style={{
-                      background: 'linear-gradient(45deg, #4ecdc4, #44b3a8)',
-                      border: 'none',
+                      background: 'rgba(255, 255, 255, 0.1)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
                       borderRadius: '6px',
                       padding: '6px 12px',
                       color: 'white',
@@ -3100,8 +3101,8 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                       downloadExcel(bottom5Data, 'bottom5_analysis.xlsx');
                     }}
                     style={{
-                      background: 'linear-gradient(45deg, #ff6b6b, #e55555)',
-                      border: 'none',
+                      background: 'rgba(255, 255, 255, 0.1)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
                       borderRadius: '6px',
                       padding: '6px 12px',
                       color: 'white',
@@ -3215,8 +3216,8 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                     <button
                       onClick={() => downloadExcel(pivotTables[selectedPivot].data, `${pivotTables[selectedPivot].title.replace(/\s+/g, '_').toLowerCase()}_pivot.xlsx`)}
                       style={{
-                        background: 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
-                        border: 'none',
+                        background: 'rgba(255, 255, 255, 0.1)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
                         borderRadius: '6px',
                         padding: '8px 16px',
                         color: 'white',
@@ -3359,7 +3360,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                     key={type}
                     onClick={() => setChartType(type)}
                     style={{
-                      background: chartType === type ? 'linear-gradient(45deg, #ff6b6b, #4ecdc4)' : 'rgba(255, 255, 255, 0.1)',
+                      background: 'rgba(255, 255, 255, 0.1)',
                       border: '1px solid rgba(255, 255, 255, 0.2)',
                       borderRadius: '8px',
                       padding: '6px 12px',
@@ -3367,7 +3368,8 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                       cursor: 'pointer',
                       fontSize: '11px',
                       fontWeight: '500',
-                      textTransform: 'capitalize'
+                      textTransform: 'capitalize',
+                      opacity: chartType === type ? 1 : 0.7
                     }}
                   >
                     {type === 'heatmap' ? 'Heat Map' : type}
@@ -3700,9 +3702,9 @@ We're committed to excellent support and continuous improvement based on your fe
               <button
                 onClick={() => setShowLegalModal(false)}
                 style={{
-                  background: 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
+                  background: 'rgba(255, 255, 255, 0.1)',
                   color: 'white',
-                  border: 'none',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
                   padding: '12px 24px',
                   borderRadius: '12px',
                   cursor: 'pointer',
@@ -3812,9 +3814,9 @@ We're committed to excellent support and continuous improvement based on your fe
                   }
                 }}
                 style={{
-                  background: 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
+                  background: 'rgba(255, 255, 255, 0.1)',
                   color: 'white',
-                  border: 'none',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
                   padding: '10px 16px',
                   borderRadius: '8px',
                   cursor: 'pointer',
