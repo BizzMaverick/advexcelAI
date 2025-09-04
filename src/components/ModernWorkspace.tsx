@@ -675,68 +675,200 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     const headers = data[0];
     const pivots = [];
     
-    // 1. Country Pivot (Top performers by country/region)
-    const countryPivot = createCountryPivot(data);
-    if (countryPivot) {
+    // 1. Excel-style Country × Year Pivot (Rows: Countries, Columns: Years, Values: Sum)
+    const countryYearPivot = createExcelStylePivot(data, 'country', 'year', 'sum');
+    if (countryYearPivot) {
       pivots.push({
-        title: 'Top Countries/Regions',
-        description: 'Ranking by total values',
-        data: countryPivot,
-        type: 'standard'
+        title: 'Countries × Years (Sum)',
+        description: 'Excel-style pivot: Countries as rows, Years as columns',
+        data: countryYearPivot,
+        type: 'excel-pivot'
       });
     }
     
-    // 2. Year Analysis Pivot
-    const yearPivot = createYearPivot(data);
-    if (yearPivot) {
+    // 2. Excel-style Category × Status Pivot (Rows: Categories, Columns: Status, Values: Count)
+    const categoryStatusPivot = createExcelStylePivot(data, 'category', 'status', 'count');
+    if (categoryStatusPivot) {
       pivots.push({
-        title: 'Year-over-Year Analysis',
-        description: 'Performance trends by year',
-        data: yearPivot,
-        type: 'standard'
+        title: 'Categories × Status (Count)',
+        description: 'Excel-style pivot: Categories as rows, Status as columns',
+        data: categoryStatusPivot,
+        type: 'excel-pivot'
       });
     }
     
-    // 3. Category/Performance Pivot
-    const categoryPivot = createCategoryPivot(data);
-    if (categoryPivot) {
+    // 3. Excel-style Region × Quarter Pivot (Rows: Regions, Columns: Quarters, Values: Average)
+    const regionQuarterPivot = createExcelStylePivot(data, 'region', 'quarter', 'average');
+    if (regionQuarterPivot) {
       pivots.push({
-        title: 'Top 5 Performance Ranking',
-        description: 'Highest performing categories',
-        data: categoryPivot,
-        type: 'standard'
+        title: 'Regions × Quarters (Average)',
+        description: 'Excel-style pivot: Regions as rows, Quarters as columns',
+        data: regionQuarterPivot,
+        type: 'excel-pivot'
       });
     }
     
-    // 4. Statistical Summary Pivot
-    const statsPivot = createStatsPivot(data);
-    if (statsPivot) {
+    // 4. Excel-style Product × Month Pivot (Rows: Products, Columns: Months, Values: Sum)
+    const productMonthPivot = createExcelStylePivot(data, 'product', 'month', 'sum');
+    if (productMonthPivot) {
       pivots.push({
-        title: 'Statistical Summary',
-        description: 'Key metrics and statistics',
-        data: statsPivot,
-        type: 'standard'
+        title: 'Products × Months (Sum)',
+        description: 'Excel-style pivot: Products as rows, Months as columns',
+        data: productMonthPivot,
+        type: 'excel-pivot'
       });
     }
     
-    // 5. Country × Year Matrix (Advanced)
-    const countryYearMatrix = createCountryYearMatrix(data);
-    if (countryYearMatrix) {
+    // 5. Excel-style Department × Performance Pivot (Rows: Departments, Columns: Performance Levels, Values: Count)
+    const deptPerformancePivot = createExcelStylePivot(data, 'department', 'performance', 'count');
+    if (deptPerformancePivot) {
       pivots.push({
-        title: 'Country × Year Matrix',
-        description: 'Cross-tabulation of countries and years',
-        data: countryYearMatrix,
-        type: 'standard'
+        title: 'Departments × Performance (Count)',
+        description: 'Excel-style pivot: Departments as rows, Performance as columns',
+        data: deptPerformancePivot,
+        type: 'excel-pivot'
       });
     }
     
-    console.log('Generated pivot tables:', pivots.length);
+    console.log('Generated Excel-style pivot tables:', pivots.length);
     return pivots.length > 0 ? pivots : [{
       title: 'Basic Data View',
       description: 'Simple data overview',
-      data: [headers, ...data.slice(1, 11)], // First 10 rows
+      data: [headers, ...data.slice(1, 11)],
       type: 'standard'
     }];
+  };
+  
+  const createExcelStylePivot = (data: any[][], rowField: string, columnField: string, aggregation: 'sum' | 'count' | 'average') => {
+    if (!data || data.length < 2) return null;
+    
+    const headers = data[0];
+    const rows = data.slice(1);
+    
+    // Find row field (countries, categories, regions, etc.)
+    const rowFieldIndex = headers.findIndex((h: string) => 
+      String(h).toLowerCase().includes(rowField) || 
+      String(h).toLowerCase().includes('name') ||
+      String(h).toLowerCase().includes('country') ||
+      String(h).toLowerCase().includes('region') ||
+      String(h).toLowerCase().includes('category') ||
+      String(h).toLowerCase().includes('product') ||
+      String(h).toLowerCase().includes('department')
+    );
+    
+    // Find column field (years, quarters, months, status, etc.)
+    const columnFieldIndex = headers.findIndex((h: string) => {
+      const headerStr = String(h).toLowerCase();
+      return /\d{4}/.test(String(h)) || // Years
+             headerStr.includes(columnField) ||
+             headerStr.includes('year') ||
+             headerStr.includes('quarter') ||
+             headerStr.includes('month') ||
+             headerStr.includes('status') ||
+             headerStr.includes('type') ||
+             headerStr.includes('level');
+    });
+    
+    // Find value field (numeric data to aggregate)
+    const valueFieldIndex = headers.findIndex((h: string) => {
+      const headerStr = String(h).toLowerCase();
+      return headerStr.includes('total') ||
+             headerStr.includes('value') ||
+             headerStr.includes('amount') ||
+             headerStr.includes('sales') ||
+             headerStr.includes('revenue') ||
+             headerStr.includes('count') ||
+             headerStr.includes('score');
+    });
+    
+    if (rowFieldIndex === -1) return null;
+    
+    // Get unique row values
+    const rowValues = [...new Set(rows.map(row => String(row[rowFieldIndex] || 'Unknown')))].sort();
+    
+    // Get unique column values
+    let columnValues = [];
+    if (columnFieldIndex !== -1) {
+      columnValues = [...new Set(rows.map(row => String(row[columnFieldIndex] || 'N/A')))].sort();
+    } else {
+      columnValues = ['Total']; // Fallback to single column
+    }
+    
+    // Create pivot table structure
+    const pivotData = {};
+    
+    // Initialize pivot data structure
+    rowValues.forEach(rowVal => {
+      pivotData[rowVal] = {};
+      columnValues.forEach(colVal => {
+        pivotData[rowVal][colVal] = [];
+      });
+    });
+    
+    // Populate pivot data
+    rows.forEach(row => {
+      const rowVal = String(row[rowFieldIndex] || 'Unknown');
+      const colVal = columnFieldIndex !== -1 ? String(row[columnFieldIndex] || 'N/A') : 'Total';
+      const value = valueFieldIndex !== -1 ? parseFloat(row[valueFieldIndex]) || 0 : 1; // Default to 1 for count
+      
+      if (pivotData[rowVal] && pivotData[rowVal][colVal] !== undefined) {
+        pivotData[rowVal][colVal].push(value);
+      }
+    });
+    
+    // Build result table with proper Excel-style structure
+    const result = [];
+    
+    // Header row
+    const headerRow = [headers[rowFieldIndex] || 'Row Field', ...columnValues, 'Grand Total'];
+    result.push(headerRow);
+    
+    // Data rows with aggregation
+    let grandTotals = {};
+    columnValues.forEach(col => grandTotals[col] = 0);
+    let overallGrandTotal = 0;
+    
+    rowValues.forEach(rowVal => {
+      const dataRow = [rowVal];
+      let rowTotal = 0;
+      
+      columnValues.forEach(colVal => {
+        const values = pivotData[rowVal][colVal];
+        let cellValue = 0;
+        
+        if (values.length > 0) {
+          switch (aggregation) {
+            case 'sum':
+              cellValue = values.reduce((sum, val) => sum + val, 0);
+              break;
+            case 'count':
+              cellValue = values.length;
+              break;
+            case 'average':
+              cellValue = values.reduce((sum, val) => sum + val, 0) / values.length;
+              break;
+          }
+        }
+        
+        dataRow.push(cellValue.toFixed(2));
+        rowTotal += cellValue;
+        grandTotals[colVal] += cellValue;
+      });
+      
+      dataRow.push(rowTotal.toFixed(2));
+      overallGrandTotal += rowTotal;
+      result.push(dataRow);
+    });
+    
+    // Grand Total row
+    const grandTotalRow = ['Grand Total'];
+    columnValues.forEach(colVal => {
+      grandTotalRow.push(grandTotals[colVal].toFixed(2));
+    });
+    grandTotalRow.push(overallGrandTotal.toFixed(2));
+    result.push(grandTotalRow);
+    
+    return result;
   };
   
   const createBasicPivot = (data: any[][]) => {
@@ -761,41 +893,6 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
         dataType
       ]);
     });
-    
-    return result;
-  };
-  
-  const createCountryPivot = (data: any[][]) => {
-    const headers = data[0];
-    const rows = data.slice(1);
-    
-    const countryIndex = headers.findIndex((h: string) => 
-      String(h).toLowerCase().includes('country') || 
-      String(h).toLowerCase().includes('region') ||
-      String(h).toLowerCase().includes('name')
-    );
-    
-    const valueIndex = headers.findIndex((h: string) => 
-      String(h).toLowerCase().includes('total') ||
-      String(h).toLowerCase().includes('value') ||
-      String(h).toLowerCase().includes('count')
-    );
-    
-    if (countryIndex === -1 || valueIndex === -1) return null;
-    
-    const grouped = rows.reduce((acc: any, row) => {
-      const country = row[countryIndex] || 'Unknown';
-      const value = parseFloat(row[valueIndex]) || 0;
-      acc[country] = (acc[country] || 0) + value;
-      return acc;
-    }, {});
-    
-    const result = [['Country/Region', 'Total Value']];
-    Object.entries(grouped)
-      .sort(([,a], [,b]) => (b as number) - (a as number))
-      .forEach(([country, total]) => {
-        result.push([country, (total as number).toFixed(2)]);
-      });
     
     return result;
   };
