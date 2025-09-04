@@ -979,7 +979,8 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             <img src={logo} alt="Logo" style={{ height: '24px' }} />
             <span style={{ fontSize: '16px', fontWeight: '600' }}>AdvExcel</span>
           </div>
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+            <span style={{ fontSize: '14px' }}>Welcome, {user.name}</span>
             {(user.email === 'katragadda225@gmail.com' || user.email?.includes('@advexcel.online')) && (
               <button
                 onClick={() => {
