@@ -10,6 +10,7 @@ interface PaymentPageProps {
 export default function PaymentPage({ userEmail, onPaymentSuccess, onBackToLogin, trialExpired = false }: PaymentPageProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isCheckingStatus, setIsCheckingStatus] = useState(true);
+  const [selectedPlan, setSelectedPlan] = useState<'basic' | 'full' | null>(null);
   
   // Check if user already has valid payment
   useEffect(() => {
@@ -59,6 +60,10 @@ export default function PaymentPage({ userEmail, onPaymentSuccess, onBackToLogin
     setIsProcessing(true);
     
     try {
+      if (!selectedPlan) return;
+      
+      const amount = selectedPlan === 'full' ? 19900 : 4900; // ₹199 or ₹49 in paise
+      
       // Create order first
       const orderResponse = await fetch(process.env.REACT_APP_PAYMENT_API_URL!, {
         method: 'POST',
@@ -67,8 +72,9 @@ export default function PaymentPage({ userEmail, onPaymentSuccess, onBackToLogin
         },
         body: JSON.stringify({
           action: 'create-order',
-          amount: 24900,
-          userEmail: userEmail
+          amount: amount,
+          userEmail: userEmail,
+          plan: selectedPlan
         })
       });
       
@@ -80,10 +86,10 @@ export default function PaymentPage({ userEmail, onPaymentSuccess, onBackToLogin
       
       const options = {
         key: process.env.REACT_APP_RAZORPAY_KEY_ID,
-        amount: 24900, // ₹249 in paise
+        amount: amount,
         currency: 'INR',
         name: 'AdvExcel',
-        description: 'Monthly Subscription - ₹249/month',
+        description: `${selectedPlan === 'full' ? 'Full' : 'Basic'} Plan - ₹${selectedPlan === 'full' ? '199' : '49'}`,
         order_id: orderResult.orderId,
         handler: async function (response: any) {
           console.log('Payment response:', response);
@@ -100,7 +106,8 @@ export default function PaymentPage({ userEmail, onPaymentSuccess, onBackToLogin
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_signature: response.razorpay_signature,
-                userEmail: userEmail
+                userEmail: userEmail,
+                plan: selectedPlan
               })
             });
             
@@ -185,36 +192,82 @@ export default function PaymentPage({ userEmail, onPaymentSuccess, onBackToLogin
           }
         </p>
 
-        <div style={{
-          border: '2px solid #667eea',
-          borderRadius: '8px',
-          padding: '20px',
-          marginBottom: '30px',
-          background: '#f8f9ff'
-        }}>
-          <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#667eea', marginBottom: '10px' }}>
-            ₹249<span style={{ fontSize: '16px', fontWeight: 'normal' }}>/month</span>
+        {/* Festival Season Plans */}
+        <div style={{ marginBottom: '30px' }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+            color: 'white',
+            padding: '12px',
+            borderRadius: '8px 8px 0 0',
+            textAlign: 'center',
+            fontSize: '14px',
+            fontWeight: '600'
+          }}>
+            🎉 Festival Season Offer - Until Jan 16, 2026
           </div>
-          <p style={{ color: '#666', fontSize: '14px' }}>AdvExcel Subscription</p>
+          
+          <div style={{
+            border: '2px solid #0078d4',
+            borderRadius: '0 0 8px 8px',
+            padding: '20px',
+            background: '#f8f9ff'
+          }}>
+            <div style={{ display: 'flex', gap: '15px', marginBottom: '20px' }}>
+              <div style={{
+                flex: 1,
+                border: selectedPlan === 'basic' ? '2px solid #0078d4' : '1px solid #ddd',
+                borderRadius: '8px',
+                padding: '15px',
+                background: selectedPlan === 'basic' ? '#e7f3ff' : 'white',
+                cursor: 'pointer'
+              }} onClick={() => setSelectedPlan('basic')}>
+                <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#0078d4' }}>₹49</div>
+                <div style={{ fontSize: '12px', color: '#666' }}>Basic Plan</div>
+              </div>
+              
+              <div style={{
+                flex: 1,
+                border: selectedPlan === 'full' ? '2px solid #10b981' : '1px solid #ddd',
+                borderRadius: '8px',
+                padding: '15px',
+                background: selectedPlan === 'full' ? '#ecfdf5' : 'white',
+                cursor: 'pointer',
+                position: 'relative'
+              }} onClick={() => setSelectedPlan('full')}>
+                <div style={{
+                  position: 'absolute',
+                  top: '-8px',
+                  right: '8px',
+                  background: '#10b981',
+                  color: 'white',
+                  fontSize: '10px',
+                  padding: '2px 6px',
+                  borderRadius: '4px'
+                }}>SAVE ₹29</div>
+                <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#10b981' }}>₹199</div>
+                <div style={{ fontSize: '12px', color: '#666' }}>Full Plan</div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <button
           onClick={handlePayment}
-          disabled={isProcessing}
+          disabled={isProcessing || !selectedPlan}
           style={{
             width: '100%',
             padding: '16px',
-            background: isProcessing ? '#ccc' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            background: isProcessing || !selectedPlan ? '#ccc' : (selectedPlan === 'full' ? '#10b981' : '#0078d4'),
             color: 'white',
             border: 'none',
             borderRadius: '8px',
             fontSize: '16px',
             fontWeight: 'bold',
-            cursor: isProcessing ? 'not-allowed' : 'pointer',
+            cursor: isProcessing || !selectedPlan ? 'not-allowed' : 'pointer',
             marginBottom: '20px'
           }}
         >
-          {isProcessing ? '🔄 Processing...' : '🔒 Pay with Razorpay'}
+          {isProcessing ? '🔄 Processing...' : `🔒 Pay ₹${selectedPlan === 'full' ? '199' : '49'} with Razorpay`}
         </button>
 
         <button

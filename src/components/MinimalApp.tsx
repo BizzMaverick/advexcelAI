@@ -201,9 +201,6 @@ interface MinimalAppProps {
 }
 
 export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh }: MinimalAppProps) {
-  const handleUpgrade = () => {
-    window.location.href = '/payment';
-  };
   const [prompt, setPrompt] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileData, setFileData] = useState<any[][]>([]);
@@ -1868,7 +1865,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                   localStorage.setItem('use_new_interface', 'true');
                   window.location.reload();
                 } else {
-                  handleUpgrade();
+                  window.location.href = '/payment';
                 }
               }}
               style={{
