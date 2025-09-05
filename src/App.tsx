@@ -17,9 +17,9 @@ import PaymentService from './services/paymentService';
 import authService from './services/authService';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
 
-function App() {
-  // Font injection removed to prevent potential refresh issues
-
+function AppContent() {
+  const navigate = useNavigate();
+  
   const [user, setUser] = useState<{ name: string; email: string } | null>(() => {
     const savedUser = localStorage.getItem('advexcel_user');
     return savedUser ? JSON.parse(savedUser) : null;
@@ -123,7 +123,6 @@ function App() {
   }
 
   return (
-    <Router>
       <Routes>
         {/* Legal Pages - Accessible without login */}
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
@@ -154,7 +153,7 @@ function App() {
                   promptsRemaining={trialStatus.promptsRemaining || 0}
                   promptsUsed={trialStatus.promptsUsed || 0}
                   onUpgrade={() => {
-                    window.location.href = '/payment';
+                    navigate('/payment');
                   }}
                   onRefresh={handleTrialRefresh}
                 />
@@ -199,6 +198,13 @@ function App() {
           )
         } />
       </Routes>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 }
