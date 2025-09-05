@@ -391,11 +391,29 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
   };
 
   const handleColumnSum = (prompt: string, data: any[][]) => {
+    // Handle range format like C2:C10 or C2 to C10
+    const rangeMatch = prompt.match(/sum\s+(?:of\s+)?([A-Z])(\d+)(?:\s*(?:to|:)\s*([A-Z])(\d+))?/i);
     const columnMatch = prompt.match(/sum\s+(?:of\s+)?column\s+([A-Z])/i);
-    if (!columnMatch || !data || data.length <= 1) return null;
     
-    const colLetter = columnMatch[1].toUpperCase();
-    const colIndex = colLetter.charCodeAt(0) - 65;
+    if (!data || data.length <= 1) return null;
+    
+    let colIndex, startRow, endRow, colLetter;
+    
+    if (rangeMatch) {
+      // Handle range like C2:C10
+      colLetter = rangeMatch[1].toUpperCase();
+      colIndex = colLetter.charCodeAt(0) - 65;
+      startRow = parseInt(rangeMatch[2]) - 1; // Convert to 0-based index
+      endRow = rangeMatch[4] ? parseInt(rangeMatch[4]) - 1 : startRow;
+    } else if (columnMatch) {
+      // Handle column format
+      colLetter = columnMatch[1].toUpperCase();
+      colIndex = colLetter.charCodeAt(0) - 65;
+      startRow = 1; // Skip header
+      endRow = data.length - 1;
+    } else {
+      return null;
+    }
     
     if (colIndex < 0 || colIndex >= (data[0]?.length || 0)) {
       return `<strong>Error:</strong> Column ${colLetter} does not exist`;
@@ -405,7 +423,8 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     let sum = 0;
     let count = 0;
     
-    for (let i = 1; i < data.length; i++) {
+    // Sum the specified range
+    for (let i = Math.max(startRow, 0); i <= Math.min(endRow, data.length - 1); i++) {
       const cellValue = data[i][colIndex];
       const numValue = parseFloat(String(cellValue));
       if (!isNaN(numValue)) {
@@ -415,7 +434,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     }
     
     if (count === 0) {
-      return `<strong>Column ${colLetter} Sum:</strong><br><br>No numeric values found in column ${colLetter} (${columnName})`;
+      return `<strong>Sum Result:</strong><br><br>No numeric values found in specified range`;
     }
     
     // Create result data with sum added to next row
@@ -426,7 +445,8 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     setLastAiResult(resultData);
     setShowUseResultButton(true);
     
-    return `<strong>Column ${colLetter} Sum Result:</strong><br><br>Sum of ${columnName}: <strong>${sum.toLocaleString()}</strong><br>Cells processed: ${count}`;
+    const rangeText = rangeMatch ? `${colLetter}${startRow + 1}:${colLetter}${endRow + 1}` : `Column ${colLetter}`;
+    return `<strong>Sum Result:</strong><br><br>Sum of ${rangeText}: <strong>${sum.toLocaleString()}</strong><br>Cells processed: ${count}`;
   };
 
   const handleMathOperations = (prompt: string, data: any[][]) => {
