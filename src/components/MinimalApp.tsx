@@ -345,6 +345,34 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     const sheet = wb.Sheets[sheetName];
     let parsedData = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as any[][];
     
+    // Auto-detect header row for CA sheets that don't start with headers
+    if (parsedData.length > 1) {
+      let headerRowIndex = 0;
+      let maxTextColumns = 0;
+      
+      // Check first 10 rows to find the row with most text (likely headers)
+      for (let i = 0; i < Math.min(10, parsedData.length); i++) {
+        const row = parsedData[i];
+        const textColumns = row.filter(cell => {
+          const str = String(cell || '').trim();
+          return str.length > 0 && isNaN(Number(str));
+        }).length;
+        
+        if (textColumns > maxTextColumns) {
+          maxTextColumns = textColumns;
+          headerRowIndex = i;
+        }
+      }
+      
+      // If headers found in a different row, reorganize data
+      if (headerRowIndex > 0) {
+        const headers = parsedData[headerRowIndex];
+        const dataRows = parsedData.slice(headerRowIndex + 1);
+        parsedData = [headers, ...dataRows];
+        setFileError(`Headers detected at row ${headerRowIndex + 1}, data reorganized`);
+      }
+    }
+    
     if (parsedData.length > 1000) {
       parsedData = parsedData.slice(0, 1000);
       setFileError('Sheet truncated to 1000 rows for performance');
