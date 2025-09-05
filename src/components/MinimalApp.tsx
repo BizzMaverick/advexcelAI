@@ -1844,14 +1844,32 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
 
   return (
     <ErrorBoundary>
-      <div className="page-transition" style={{ minHeight: '100vh', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+      <div className="page-transition" style={{ 
+        minHeight: '100vh', 
+        fontFamily: 'system-ui, -apple-system, sans-serif',
+        background: 'url("/background.gif") center center / cover no-repeat fixed',
+        position: 'relative'
+      }}>
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'rgba(0, 0, 0, 0.4)',
+          zIndex: 1
+        }} />
         <header style={{ 
-          background: '#0078d4', 
+          background: 'rgba(0, 120, 212, 0.9)', 
+          backdropFilter: 'blur(20px)',
           color: 'white', 
           padding: '10px', 
           display: 'flex', 
           justifyContent: 'space-between', 
-          alignItems: 'center' 
+          alignItems: 'center',
+          position: 'relative',
+          zIndex: 1000,
+          borderBottom: '1px solid rgba(255, 255, 255, 0.2)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <img src={logo} alt="Logo" style={{ height: '24px' }} />
@@ -1892,7 +1910,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           </div>
         </header>
         
-        <main style={{ padding: '20px', background: '#f5f5f5', minHeight: 'calc(100vh - 50px)' }}>
+        <main style={{ padding: '20px', background: 'rgba(245, 245, 245, 0.95)', backdropFilter: 'blur(10px)', minHeight: 'calc(100vh - 50px)', position: 'relative', zIndex: 100 }}>
           {/* File Upload */}
           <div className="section-animate card-animate" style={{ background: 'white', borderRadius: '8px', padding: '20px', marginBottom: '20px', color: '#333' }}>
             <h3 style={{ margin: '0 0 15px 0', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -2500,11 +2518,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
         
         {/* Footer with Legal Pages */}
         <footer style={{
-          background: '#232f3e',
+          background: 'rgba(35, 47, 62, 0.9)',
+          backdropFilter: 'blur(20px)',
           color: '#ffffff',
           padding: '20px',
           textAlign: 'center',
-          borderTop: '1px solid #e1e5e9'
+          borderTop: '1px solid rgba(255, 255, 255, 0.2)',
+          position: 'relative',
+          zIndex: 1000
         }}>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', flexWrap: 'wrap', marginBottom: '12px' }}>
             <a onClick={() => {

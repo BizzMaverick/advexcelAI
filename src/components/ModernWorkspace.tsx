@@ -2255,12 +2255,21 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%)',
+      background: 'url("/background.gif") center center / cover no-repeat fixed',
       fontFamily: '"Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
       color: '#ffffff',
       position: 'relative',
       overflow: 'hidden'
     }}>
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        background: 'rgba(0, 0, 0, 0.3)',
+        zIndex: 1
+      }} />
       {/* Animated Background Elements */}
       <div style={{
         position: 'absolute',
@@ -2438,7 +2447,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
       </header>
 
       {/* Main Content */}
-      <main style={{ padding: window.innerWidth <= 768 ? '20px' : '40px' }}>
+      <main style={{ padding: window.innerWidth <= 768 ? '20px' : '40px', position: 'relative', zIndex: 100 }}>
         <div style={{
           maxWidth: '1200px',
           margin: '0 auto',
