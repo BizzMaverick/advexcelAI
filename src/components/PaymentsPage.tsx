@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import PaymentService from '../services/paymentService';
+import React, { useState, useEffect } from 'react';
 
 interface PaymentsPageProps {
   user: { name: string; email: string };
@@ -11,22 +10,108 @@ export default function PaymentsPage({ user, onPaymentSuccess, onBackToLogin }: 
   const [selectedPlan, setSelectedPlan] = useState<'basic' | 'advanced' | 'full'>('full');
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // Load Razorpay script
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    document.body.appendChild(script);
+    
+    return () => {
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
+  }, []);
+
   const handlePayment = async () => {
     setIsProcessing(true);
+    
     try {
-      const amount = selectedPlan === 'basic' ? 49 : selectedPlan === 'advanced' ? 179 : 199;
-      const success = await PaymentService.initiatePayment(user.email, amount, selectedPlan);
+      const amount = selectedPlan === 'full' ? 19900 : selectedPlan === 'advanced' ? 17900 : 4900; // Convert to paise
       
-      if (success) {
-        alert('Payment successful! You can now access all features.');
-        onPaymentSuccess();
-      } else {
-        alert('Payment failed. Please try again.');
+      // Create order first
+      const orderResponse = await fetch(process.env.REACT_APP_PAYMENT_API_URL!, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'create-order',
+          amount: amount,
+          userEmail: user.email,
+          plan: selectedPlan
+        })
+      });
+      
+      const orderResult = await orderResponse.json();
+      
+      if (!orderResult.success) {
+        throw new Error('Failed to create order');
       }
+      
+      const options = {
+        key: process.env.REACT_APP_RAZORPAY_KEY_ID,
+        amount: amount,
+        currency: 'INR',
+        name: 'AdvExcel',
+        description: `${selectedPlan === 'full' ? 'Full Package' : selectedPlan === 'advanced' ? 'Advanced' : 'Basic'} Plan - ₹${selectedPlan === 'full' ? '199' : selectedPlan === 'advanced' ? '179' : '49'}`,
+        order_id: orderResult.orderId,
+        handler: async function (response: any) {
+          console.log('Payment response:', response);
+          
+          // Verify payment with backend
+          try {
+            const verifyResponse = await fetch(process.env.REACT_APP_PAYMENT_API_URL!, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                action: 'verify-payment',
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature,
+                userEmail: user.email,
+                plan: selectedPlan
+              })
+            });
+            
+            const verifyResult = await verifyResponse.json();
+            
+            if (verifyResult.success) {
+              alert('Payment verified successfully! Welcome to AdvExcel.');
+              onPaymentSuccess();
+            } else {
+              alert('Payment verification failed. Please contact support.');
+            }
+          } catch (verifyError) {
+            console.error('Verification error:', verifyError);
+            alert('Payment verification failed. Please contact support.');
+          }
+          
+          setIsProcessing(false);
+        },
+        prefill: {
+          email: user.email,
+          contact: ''
+        },
+        theme: {
+          color: '#4ecdc4'
+        },
+        modal: {
+          ondismiss: function() {
+            console.log('Payment cancelled by user');
+            setIsProcessing(false);
+          }
+        }
+      };
+      
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
     } catch (error) {
       console.error('Payment error:', error);
-      alert('Payment failed. Please try again.');
-    } finally {
+      alert('Failed to initialize payment. Please try again.');
       setIsProcessing(false);
     }
   };
