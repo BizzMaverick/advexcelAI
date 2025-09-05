@@ -350,49 +350,7 @@ export default function PaymentsPage({ user, onPaymentSuccess, onBackToLogin }: 
           </p>
         </div>
 
-        {/* Features Comparison */}
-        <div style={{
-          background: 'rgba(255, 255, 255, 0.1)',
-          backdropFilter: 'blur(20px)',
-          borderRadius: '16px',
-          padding: '32px',
-          marginTop: '60px',
-          border: '1px solid rgba(255, 255, 255, 0.2)'
-        }}>
-          <h3 style={{ margin: '0 0 24px 0', fontSize: '20px', fontWeight: '600', textAlign: 'center' }}>
-            Why Choose AdvExcel AI?
-          </h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px' }}>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '32px', marginBottom: '12px' }}>🤖</div>
-              <h4 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: '600' }}>AI-Powered</h4>
-              <p style={{ margin: 0, fontSize: '14px', opacity: 0.8 }}>
-                Natural language processing for easy data analysis
-              </p>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '32px', marginBottom: '12px' }}>☁️</div>
-              <h4 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: '600' }}>Cloud-Based</h4>
-              <p style={{ margin: 0, fontSize: '14px', opacity: 0.8 }}>
-                Secure AWS infrastructure with enterprise-grade security
-              </p>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '32px', marginBottom: '12px' }}>⚡</div>
-              <h4 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: '600' }}>Lightning Fast</h4>
-              <p style={{ margin: 0, fontSize: '14px', opacity: 0.8 }}>
-                Get insights in seconds, not hours
-              </p>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '32px', marginBottom: '12px' }}>🎯</div>
-              <h4 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: '600' }}>User-Friendly</h4>
-              <p style={{ margin: 0, fontSize: '14px', opacity: 0.8 }}>
-                No technical expertise required
-              </p>
-            </div>
-          </div>
-        </div>
+
       </main>
 
       {/* Footer */}
