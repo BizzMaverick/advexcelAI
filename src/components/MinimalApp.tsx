@@ -383,44 +383,66 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       return data.slice(1).map(row => parseFloat(String(row[colIndex] || ''))).filter(n => !isNaN(n));
     };
     
-    // SUMIF function
-    const sumifMatch = prompt.match(/sumif\s+([a-z0-9]+)\s+([><=!]+)\s*([^\s]+)\s+([a-z0-9]+)/i);
-    if (sumifMatch) {
-      const [, criteriaCol, operator, criteriaValue, sumCol] = sumifMatch;
-      const criteriaIndex = getColumnIndex(criteriaCol);
-      const sumIndex = getColumnIndex(sumCol);
-      
-      if (criteriaIndex >= 0 && sumIndex >= 0) {
-        let sum = 0;
-        let count = 0;
-        data.slice(1).forEach(row => {
-          const criteriaCell = String(row[criteriaIndex] || '');
-          const sumCell = parseFloat(String(row[sumIndex] || ''));
-          
-          let matches = false;
-          const numCriteria = parseFloat(criteriaValue);
-          const numCell = parseFloat(criteriaCell);
-          
-          if (!isNaN(numCriteria) && !isNaN(numCell)) {
-            switch (operator) {
-              case '>': matches = numCell > numCriteria; break;
-              case '<': matches = numCell < numCriteria; break;
-              case '>=': matches = numCell >= numCriteria; break;
-              case '<=': matches = numCell <= numCriteria; break;
-              case '=': matches = numCell === numCriteria; break;
-              case '!=': matches = numCell !== numCriteria; break;
-            }
-          } else {
-            matches = criteriaCell.toLowerCase().includes(criteriaValue.toLowerCase());
-          }
-          
-          if (matches && !isNaN(sumCell)) {
-            sum += sumCell;
-            count++;
-          }
-        });
+    // SUMIF function - Enhanced pattern matching
+    const sumifPatterns = [
+      /sumif\s+([a-z0-9]+)\s+([><=!]+)\s*([^\s]+)\s+([a-z0-9]+)/i,
+      /sumif\s+([a-z0-9]+)\s+([><=!]+)\s*([^\s]+)/i,
+      /sum\s+(?:of\s+)?(?:column\s+)?([a-z0-9]+)\s+(?:where|if)\s+([a-z0-9]+)\s+([><=!]+)\s*([^\s]+)/i
+    ];
+    
+    for (const pattern of sumifPatterns) {
+      const sumifMatch = prompt.match(pattern);
+      if (sumifMatch) {
+        let criteriaCol, operator, criteriaValue, sumCol;
         
-        return `<strong>SUMIF Result:</strong><br><br>Sum where ${headers[criteriaIndex]} ${operator} ${criteriaValue}: <strong>${sum.toFixed(2)}</strong><br>Matching rows: ${count}`;
+        if (sumifMatch.length === 5) {
+          // Pattern: SUMIF A > 7 B
+          [, criteriaCol, operator, criteriaValue, sumCol] = sumifMatch;
+        } else if (sumifMatch.length === 4) {
+          // Pattern: SUMIF E >7 (sum same column)
+          [, criteriaCol, operator, criteriaValue] = sumifMatch;
+          sumCol = criteriaCol;
+        } else {
+          // Pattern: sum column B where A > 7
+          [, sumCol, criteriaCol, operator, criteriaValue] = sumifMatch;
+        }
+        
+        const criteriaIndex = getColumnIndex(criteriaCol);
+        const sumIndex = getColumnIndex(sumCol);
+        
+        if (criteriaIndex >= 0 && sumIndex >= 0) {
+          let sum = 0;
+          let count = 0;
+          data.slice(1).forEach(row => {
+            const criteriaCell = String(row[criteriaIndex] || '');
+            const sumCell = parseFloat(String(row[sumIndex] || ''));
+            
+            let matches = false;
+            const numCriteria = parseFloat(criteriaValue);
+            const numCell = parseFloat(criteriaCell);
+            
+            if (!isNaN(numCriteria) && !isNaN(numCell)) {
+              switch (operator) {
+                case '>': matches = numCell > numCriteria; break;
+                case '<': matches = numCell < numCriteria; break;
+                case '>=': matches = numCell >= numCriteria; break;
+                case '<=': matches = numCell <= numCriteria; break;
+                case '=': matches = numCell === numCriteria; break;
+                case '!=': matches = numCell !== numCriteria; break;
+              }
+            } else {
+              matches = criteriaCell.toLowerCase().includes(criteriaValue.toLowerCase());
+            }
+            
+            if (matches && !isNaN(sumCell)) {
+              sum += sumCell;
+              count++;
+            }
+          });
+          
+          return `<strong>SUMIF Result:</strong><br><br>Sum where ${headers[criteriaIndex]} ${operator} ${criteriaValue}: <strong>${sum.toFixed(2)}</strong><br>Matching rows: ${count}`;
+        }
+        break;
       }
     }
     
@@ -798,6 +820,38 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     if (cellMulMatch) return performCellOperation(cellMulMatch, 'multiply', '*');
     if (cellDivMatch) return performCellOperation(cellDivMatch, 'divide', '/');
     
+    // Handle "sum of numbers in column X which are greater than Y" pattern
+    const conditionalSumMatch = prompt.match(/sum\s+(?:of\s+)?(?:numbers\s+in\s+)?column\s+([a-z])\s+(?:which\s+are\s+|that\s+are\s+)?([><=!]+)\s*([0-9.]+)/i);
+    if (conditionalSumMatch) {
+      const [, column, operator, value] = conditionalSumMatch;
+      const colIndex = getColumnIndex(column);
+      const values = getColumnValues(colIndex);
+      
+      if (values.length > 0) {
+        let sum = 0;
+        let count = 0;
+        const numValue = parseFloat(value);
+        
+        values.forEach(val => {
+          let matches = false;
+          switch (operator) {
+            case '>': matches = val > numValue; break;
+            case '<': matches = val < numValue; break;
+            case '>=': matches = val >= numValue; break;
+            case '<=': matches = val <= numValue; break;
+            case '=': matches = val === numValue; break;
+            case '!=': matches = val !== numValue; break;
+          }
+          if (matches) {
+            sum += val;
+            count++;
+          }
+        });
+        
+        return `<strong>Conditional Sum Result:</strong><br><br>Sum of values in ${headers[colIndex]} where value ${operator} ${value}: <strong>${sum.toFixed(2)}</strong><br>Matching values: ${count}`;
+      }
+    }
+    
     return null;
   };
 
@@ -855,6 +909,25 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       setAiResponse(cellOperationResult);
       setPrompt('');
       return;
+    }
+    
+    // Handle conditional sum patterns that might bypass SUMIF
+    const conditionalSumPatterns = [
+      /sum\s+(?:of\s+)?(?:numbers\s+in\s+)?column\s+([a-z])\s+(?:which\s+are\s+|that\s+are\s+)?([><=!]+)\s*([0-9.]+)/i,
+      /sum\s+(?:all\s+)?(?:values\s+in\s+)?([a-z])\s+(?:where\s+|if\s+)([a-z])\s+([><=!]+)\s*([0-9.]+)/i
+    ];
+    
+    for (const pattern of conditionalSumPatterns) {
+      const match = trimmedPrompt.match(pattern);
+      if (match) {
+        const mathResult = handleMathOperations(trimmedPrompt, fileData);
+        if (mathResult) {
+          setAiResponse(mathResult);
+          setPrompt('');
+          return;
+        }
+        break;
+      }
     }
 
     // Handle sorting
