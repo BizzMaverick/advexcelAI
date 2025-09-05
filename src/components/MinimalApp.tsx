@@ -1859,42 +1859,26 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           </div>
           <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
             <span style={{ fontSize: '14px' }}>Welcome, {user.name} {trialStatus?.hasValidPayment && !trialStatus?.inTrial ? '(Paid)' : trialStatus?.inTrial ? '(Free Trial)' : '(Free)'}</span>
-            <div style={{ display: 'flex', gap: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '6px', padding: '2px' }}>
-              <button
-                style={{
-                  background: 'rgba(255,255,255,0.3)',
-                  border: 'none',
-                  color: 'white',
-                  padding: '6px 12px',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '12px'
-                }}
-              >
-                Basic
-              </button>
-              <button
-                onClick={() => {
-                  if (trialStatus?.hasValidPayment || trialStatus?.isAdmin || user.email === 'katragadda225@gmail.com' || user.email?.includes('@advexcel.online')) {
-                    localStorage.setItem('use_new_interface', 'true');
-                    window.location.reload();
-                  } else {
-                    window.location.href = '/payment';
-                  }
-                }}
-                style={{
-                  background: 'rgba(255,255,255,0.2)',
-                  border: 'none',
-                  color: 'white',
-                  padding: '6px 12px',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '12px'
-                }}
-              >
-                Advanced
-              </button>
-            </div>
+            <button
+              onClick={() => {
+                if (trialStatus?.hasValidPayment || trialStatus?.isAdmin || user.email === 'katragadda225@gmail.com' || user.email?.includes('@advexcel.online')) {
+                  localStorage.setItem('use_new_interface', 'true');
+                  window.location.reload();
+                } else {
+                  window.location.href = '/payment';
+                }
+              }}
+              style={{
+                background: 'rgba(255,255,255,0.2)',
+                border: 'none',
+                color: 'white',
+                padding: '6px 12px',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Advanced
+            </button>
             <button onClick={onLogout} style={{ 
               background: 'rgba(255,255,255,0.2)', 
               border: 'none', 

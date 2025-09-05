@@ -25,7 +25,7 @@ export default function CancellationRefund() {
             procedures for our Excel AI Assistant subscription service.
           </p>
           <p>
-            Our service operates on a monthly subscription basis at ₹249 per month, with payments processed securely through Razorpay. 
+            Our service operates on a monthly subscription basis at ₹199 per month, with payments processed securely through Razorpay. 
             Subscriptions do not auto-renew and provide 30 days of access from the payment date.
           </p>
         </section>

@@ -56,7 +56,7 @@ export default function ContactUs() {
             <p style={{ marginBottom: '10px' }}><strong>Website:</strong> www.advexcel.online</p>
             <p style={{ marginBottom: '10px' }}><strong>Email:</strong> <a href="mailto:contact@advexcel.online" style={{ color: '#007bff', textDecoration: 'none' }}>contact@advexcel.online</a></p>
             <p style={{ marginBottom: '10px' }}><strong>Service Type:</strong> AI-powered Excel processing and analysis</p>
-            <p style={{ marginBottom: '0' }}><strong>Pricing:</strong> ₹249 per month</p>
+            <p style={{ marginBottom: '0' }}><strong>Pricing:</strong> ₹199 per month</p>
           </div>
         </section>
 

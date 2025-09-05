@@ -2288,40 +2288,31 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           }}>
             Welcome, {user.name}
           </div>
-          <div style={{ display: 'flex', gap: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '25px', padding: '2px' }}>
-            <button
-              onClick={() => {
-                localStorage.setItem('use_new_interface', 'false');
-                window.location.reload();
-              }}
-              style={{
-                background: 'rgba(255, 255, 255, 0.2)',
-                border: 'none',
-                color: 'white',
-                padding: '8px 16px',
-                borderRadius: '20px',
-                cursor: 'pointer',
-                fontSize: '12px',
-                fontWeight: '500'
-              }}
-            >
-              Basic
-            </button>
-            <button
-              style={{
-                background: 'rgba(255, 255, 255, 0.3)',
-                border: 'none',
-                color: 'white',
-                padding: '8px 16px',
-                borderRadius: '20px',
-                cursor: 'pointer',
-                fontSize: '12px',
-                fontWeight: '500'
-              }}
-            >
-              Advanced
-            </button>
-          </div>
+          <button
+            onClick={() => {
+              localStorage.setItem('use_new_interface', 'false');
+              window.location.reload();
+            }}
+            style={{
+              background: 'rgba(255, 255, 255, 0.2)',
+              border: 'none',
+              color: 'white',
+              padding: '10px 20px',
+              borderRadius: '25px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '500',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+            }}
+          >
+            Basic
+          </button>
           <button
             onClick={onLogout}
             style={{

@@ -53,7 +53,7 @@ export default function TermsAndConditions() {
           <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#000', marginBottom: '15px' }}>4. Subscription and Payment Terms</h2>
           <p style={{ marginBottom: '15px' }}>Our Service operates on a subscription basis:</p>
           <ul style={{ paddingLeft: '20px', marginBottom: '15px' }}>
-            <li>Monthly Subscription: ₹249 per month</li>
+            <li>Monthly Subscription: ₹199 per month</li>
             <li>Payment Processing: Handled securely through Razorpay</li>
             <li>Auto-renewal: Subscriptions do not auto-renew</li>
             <li>Access Period: 30 days from payment confirmation</li>

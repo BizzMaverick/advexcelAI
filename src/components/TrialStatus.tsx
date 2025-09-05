@@ -82,30 +82,10 @@ export default function TrialStatus({
               <path d="M2 17L12 22L22 17" stroke="white" strokeWidth="2"/>
               <path d="M2 12L12 17L22 12" stroke="white" strokeWidth="2"/>
             </svg>
-            Upgrade to Pro - ₹249/month
+            Upgrade to Pro - ₹199/month
           </button>
           
-          <button
-            onClick={onRefresh}
-            style={{
-              background: 'rgba(255,255,255,0.2)',
-              border: '1px solid rgba(255,255,255,0.3)',
-              color: 'white',
-              padding: '6px 12px',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontSize: '13px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px'
-            }}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <polyline points="23,4 23,10 17,10" stroke="white" strokeWidth="2"/>
-              <path d="M20.49 15A9 9 0 1 1 5.64 5.64L23 10" stroke="white" strokeWidth="2"/>
-            </svg>
-            Refresh
-          </button>
+
         </div>
       </div>
       
