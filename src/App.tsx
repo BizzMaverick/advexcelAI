@@ -195,7 +195,7 @@ function App() {
               trialExpired={false}
             />
           ) : (
-            (useNewInterface && canUseNewInterface) ? <ModernLandingPage onLogin={handleLogin} /> : <LandingPage onLogin={handleLogin} />
+            <LandingPage onLogin={handleLogin} />
           )
         } />
       </Routes>
