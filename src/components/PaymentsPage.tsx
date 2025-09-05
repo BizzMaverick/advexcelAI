@@ -117,58 +117,23 @@ export default function PaymentsPage({ user, onPaymentSuccess, onBackToLogin }: 
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      fontFamily: 'system-ui, -apple-system, sans-serif',
-      color: '#ffffff'
-    }}>
-      {/* Header */}
-      <header style={{
-        background: 'rgba(255, 255, 255, 0.1)',
-        backdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
-        padding: '20px 40px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <img src="/logo.png" alt="AdvExcel" style={{ height: '40px' }} />
-          <div>
-            <h1 style={{ margin: 0, fontSize: '24px', fontWeight: '600' }}>AdvExcel AI</h1>
-            <p style={{ margin: 0, fontSize: '14px', opacity: 0.8 }}>Choose Your Plan</p>
-          </div>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{
-            background: 'rgba(255, 255, 255, 0.1)',
-            padding: '8px 16px',
-            borderRadius: '20px',
-            fontSize: '14px'
-          }}>
-            Welcome, {user.name}
-          </div>
-          <button
-            onClick={onBackToLogin}
-            style={{
-              background: 'rgba(255, 255, 255, 0.2)',
-              border: 'none',
-              color: 'white',
-              padding: '10px 20px',
-              borderRadius: '25px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: '500'
-            }}
-          >
-            Back to App
-          </button>
-        </div>
-      </header>
+    <div style={{ backgroundColor: '#fff', minHeight: '100vh' }}>
+      <div style={{ padding: '20px', borderBottom: '1px solid #eee' }}>
+        <a href="/" style={{ color: '#007bff', textDecoration: 'none', fontSize: '16px' }}>← Back to Home</a>
+        <span style={{ marginLeft: '20px', color: '#666', fontSize: '14px' }}>Welcome, {user.name}</span>
+      </div>
 
-      {/* Main Content */}
-      <main style={{ padding: '60px 40px', maxWidth: '1000px', margin: '0 auto' }}>
+      <div style={{ 
+        padding: '40px 20px', 
+        maxWidth: '800px', 
+        margin: '0 auto',
+        fontFamily: 'system-ui, -apple-system, sans-serif',
+        lineHeight: '1.6',
+        color: '#000',
+        textAlign: 'left'
+      }}>
+        <h1 style={{ fontSize: '28px', fontWeight: '600', color: '#000', marginBottom: '10px' }}>Choose Your Plan</h1>
+        <p style={{ color: '#666', fontSize: '14px', marginBottom: '30px' }}>Select the plan that best fits your needs</p>
         {/* Festival Offer Banner */}
         <div style={{
           background: 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
@@ -351,7 +316,7 @@ export default function PaymentsPage({ user, onPaymentSuccess, onBackToLogin }: 
         </div>
 
 
-      </main>
+      </div>
 
       {/* Footer */}
       <footer style={{
