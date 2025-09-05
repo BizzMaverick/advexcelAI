@@ -412,7 +412,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       if (/^[A-Z]$/i.test(columnRef)) {
         return columnRef.toUpperCase().charCodeAt(0) - 65;
       }
-      return headers.findIndex(h => String(h).toLowerCase().includes(columnRef.toLowerCase()));
+      // Enhanced fuzzy matching for column names
+      const searchTerm = columnRef.toLowerCase();
+      return headers.findIndex(h => {
+        const headerStr = String(h || '').toLowerCase();
+        return headerStr.includes(searchTerm) || 
+               searchTerm.includes(headerStr) ||
+               headerStr.replace(/[^a-z]/g, '').includes(searchTerm.replace(/[^a-z]/g, ''));
+      });
     };
     
     // Get numeric values from column
@@ -1138,6 +1145,70 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
         setPrompt('');
         return;
       }
+    }
+    
+    // Enhanced column sum with fuzzy matching
+    const enhancedColumnSum = (prompt: string, data: any[][]) => {
+      if (!data || data.length <= 1) return null;
+      
+      const headers = data[0];
+      const lowerPrompt = prompt.toLowerCase();
+      
+      // Match patterns like "sum tax amount", "sum of tax", "total tax"
+      const sumPatterns = [
+        /(?:sum|total)\s+(?:of\s+)?(.+)/i,
+        /(.+)\s+(?:sum|total)/i
+      ];
+      
+      for (const pattern of sumPatterns) {
+        const match = prompt.match(pattern);
+        if (match) {
+          const searchTerm = match[1].trim().toLowerCase();
+          
+          // Find matching column
+          const colIndex = headers.findIndex(h => {
+            const headerStr = String(h || '').toLowerCase();
+            return headerStr.includes(searchTerm) || 
+                   searchTerm.includes(headerStr) ||
+                   headerStr.replace(/[^a-z]/g, '').includes(searchTerm.replace(/[^a-z]/g, ''));
+          });
+          
+          if (colIndex >= 0) {
+            let sum = 0;
+            let count = 0;
+            
+            for (let i = 1; i < data.length; i++) {
+              const cellValue = data[i][colIndex];
+              const numValue = parseFloat(String(cellValue));
+              if (!isNaN(numValue)) {
+                sum += numValue;
+                count++;
+              }
+            }
+            
+            if (count > 0) {
+              const resultData = [...data];
+              const newRow = new Array(data[0].length).fill('');
+              newRow[colIndex] = sum;
+              resultData.push(newRow);
+              setLastAiResult(resultData);
+              setShowUseResultButton(true);
+              
+              return `<strong>Sum Result:</strong><br><br>Sum of ${headers[colIndex]}: <strong>${sum.toLocaleString()}</strong><br>Cells processed: ${count}`;
+            } else {
+              return `<strong>No Data Found:</strong><br><br>Column "${headers[colIndex]}" contains no numeric values to sum.`;
+            }
+          }
+        }
+      }
+      return null;
+    };
+    
+    const enhancedSum = enhancedColumnSum(trimmedPrompt, fileData);
+    if (enhancedSum) {
+      setAiResponse(enhancedSum);
+      setPrompt('');
+      return;
     }
     
     const columnSumResult = handleColumnSum(trimmedPrompt, fileData);
