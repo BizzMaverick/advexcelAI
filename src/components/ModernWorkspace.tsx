@@ -2255,7 +2255,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'url("/background.gif") center center / cover no-repeat fixed',
+      background: 'url("/advanced-bg.gif") center center / cover no-repeat fixed',
       fontFamily: '"Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
       color: '#ffffff',
       position: 'relative',
@@ -3144,7 +3144,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                     WebkitTextFillColor: 'transparent',
                     fontSize: '16px'
                   }}>{aiLoading ? '✨' : '🧠'}</span>
-                  {aiLoading ? 'Neural Processing...' : 'Execute Analysis'}
+                  {aiLoading ? <><img src="/refresh.gif" alt="Processing" style={{ width: '16px', height: '16px' }} />Neural Processing...</> : 'Execute Analysis'}
                 </button>
               </div>
             </div>

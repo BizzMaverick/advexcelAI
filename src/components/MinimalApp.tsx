@@ -1847,7 +1847,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       <div className="page-transition" style={{ 
         minHeight: '100vh', 
         fontFamily: 'system-ui, -apple-system, sans-serif',
-        background: 'url("/background.gif") center center / cover no-repeat fixed',
+        background: 'url("/basic-bg.gif") center center / cover no-repeat fixed',
         position: 'relative'
       }}>
         <div style={{
@@ -1932,7 +1932,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                 }}
               />
             </div>
-            {fileLoading && <div style={{ marginTop: '10px', color: '#0078d4', fontWeight: 'bold' }}>Loading...</div>}
+            {fileLoading && <div style={{ marginTop: '10px', color: '#0078d4', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}><img src="/refresh.gif" alt="Loading" style={{ width: '20px', height: '20px' }} />Loading...</div>}
             {fileError && <div style={{ marginTop: '10px', color: '#e53e3e', fontSize: '12px', fontWeight: 'bold' }}>{fileError}</div>}
             
             {/* Sheet Selector for Excel files */}
@@ -2020,7 +2020,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                   cursor: 'pointer'
                 }}
               >
-                {isProcessing ? 'Processing...' : 'Submit'}
+                {isProcessing ? <><img src="/refresh.gif" alt="Processing" style={{ width: '16px', height: '16px', marginRight: '8px' }} />Processing...</> : 'Submit'}
               </button>
             </div>
           </div>
