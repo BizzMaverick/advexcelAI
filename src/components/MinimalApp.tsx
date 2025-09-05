@@ -394,7 +394,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     // SUMIF function - Enhanced pattern matching
     const sumifPatterns = [
       /sumif\s+([a-z0-9]+)\s+([><=!]+)\s*([^\s]+)\s+([a-z0-9]+)/i,
-      /sumif\s+([a-z0-9]+)\s+([><=!]+)\s*([^\s]+)/i,
+      /sumif\s+([a-z0-9]+)\s*([><=!]+)\s*([^\s]+)/i,
       /sum\s+(?:of\s+)?(?:column\s+)?([a-z0-9]+)\s+(?:where|if)\s+([a-z0-9]+)\s+([><=!]+)\s*([^\s]+)/i
     ];
     
@@ -407,7 +407,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           // Pattern: SUMIF A > 7 B
           [, criteriaCol, operator, criteriaValue, sumCol] = sumifMatch;
         } else if (sumifMatch.length === 4) {
-          // Pattern: SUMIF E >7 (sum same column)
+          // Pattern: SUMIF E>7 or SUMIF E >7 (sum same column)
           [, criteriaCol, operator, criteriaValue] = sumifMatch;
           sumCol = criteriaCol;
         } else {
@@ -462,8 +462,8 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       }
     }
     
-    // COUNTIF function
-    const countifMatch = prompt.match(/countif\s+([a-z0-9]+)\s+([><=!]+)\s*([^\s]+)/i);
+    // COUNTIF function - handle both spaced and non-spaced formats
+    const countifMatch = prompt.match(/countif\s+([a-z0-9]+)\s*([><=!]+)\s*([^\s]+)/i);
     if (countifMatch) {
       const [, criteriaCol, operator, criteriaValue] = countifMatch;
       const criteriaIndex = getColumnIndex(criteriaCol);
@@ -504,8 +504,8 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       }
     }
     
-    // AVERAGEIF function
-    const averageifMatch = prompt.match(/averageif\s+([a-z0-9]+)\s+([><=!]+)\s*([^\s]+)\s+([a-z0-9]+)/i);
+    // AVERAGEIF function - handle both spaced and non-spaced formats
+    const averageifMatch = prompt.match(/averageif\s+([a-z0-9]+)\s*([><=!]+)\s*([^\s]+)\s+([a-z0-9]+)/i);
     if (averageifMatch) {
       const [, criteriaCol, operator, criteriaValue, avgCol] = averageifMatch;
       const criteriaIndex = getColumnIndex(criteriaCol);
@@ -1012,10 +1012,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     if (cellMulMatch) return performCellOperation(cellMulMatch, 'multiply', '*');
     if (cellDivMatch) return performCellOperation(cellDivMatch, 'divide', '/');
     
-    // Handle "sum of numbers in column X which are greater than Y" pattern
-    const conditionalSumMatch = prompt.match(/sum\s+(?:of\s+)?(?:numbers\s+in\s+)?column\s+([a-z])\s+(?:which\s+are\s+|that\s+are\s+)?([><=!]+)\s*([0-9.]+)/i);
+    // Handle "sum of numbers in column X which are greater than Y" pattern and SUMIF E>5 format
+    const conditionalSumMatch = prompt.match(/(?:sum\s+(?:of\s+)?(?:numbers\s+in\s+)?column\s+([a-z])\s+(?:which\s+are\s+|that\s+are\s+)?([><=!]+)\s*([0-9.]+)|sumif\s+([a-z])\s*([><=!]+)\s*([0-9.]+))/i);
     if (conditionalSumMatch) {
-      const [, column, operator, value] = conditionalSumMatch;
+      // Handle both patterns: "sum column E > 5" and "sumif E>5"
+      const column = conditionalSumMatch[1] || conditionalSumMatch[4];
+      const operator = conditionalSumMatch[2] || conditionalSumMatch[5];
+      const value = conditionalSumMatch[3] || conditionalSumMatch[6];
+      
       const colIndex = getColumnIndex(column);
       const values = getColumnValues(colIndex);
       
@@ -1096,7 +1100,16 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       }
     }
     
-    // Handle local operations first
+    // Handle local operations first - check SUMIF patterns early
+    if (trimmedPrompt.toLowerCase().includes('sumif')) {
+      const cellOperationResult = handleCellOperations(trimmedPrompt, fileData);
+      if (cellOperationResult) {
+        setAiResponse(cellOperationResult);
+        setPrompt('');
+        return;
+      }
+    }
+    
     const columnSumResult = handleColumnSum(trimmedPrompt, fileData);
     if (columnSumResult) {
       setAiResponse(columnSumResult);
@@ -1114,7 +1127,8 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     // Handle conditional sum patterns that might bypass SUMIF
     const conditionalSumPatterns = [
       /sum\s+(?:of\s+)?(?:numbers\s+in\s+)?column\s+([a-z])\s+(?:which\s+are\s+|that\s+are\s+)?([><=!]+)\s*([0-9.]+)/i,
-      /sum\s+(?:all\s+)?(?:values\s+in\s+)?([a-z])\s+(?:where\s+|if\s+)([a-z])\s+([><=!]+)\s*([0-9.]+)/i
+      /sum\s+(?:all\s+)?(?:values\s+in\s+)?([a-z])\s+(?:where\s+|if\s+)([a-z])\s+([><=!]+)\s*([0-9.]+)/i,
+      /sumif\s+([a-z])\s*([><=!]+)\s*([0-9.]+)/i
     ];
     
     for (const pattern of conditionalSumPatterns) {
