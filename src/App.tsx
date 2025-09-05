@@ -154,7 +154,7 @@ function App() {
                   promptsRemaining={trialStatus.promptsRemaining || 0}
                   promptsUsed={trialStatus.promptsUsed || 0}
                   onUpgrade={() => {
-                    alert('Upgrade feature temporarily disabled to prevent data loss. Please contact support.');
+                    window.location.href = '/payment';
                   }}
                   onRefresh={handleTrialRefresh}
                 />
