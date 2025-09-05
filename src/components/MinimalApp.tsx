@@ -2117,7 +2117,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                 </div>
               )}
             </div>
-            <div style={{ display: 'flex', gap: '10px', position: 'relative' }}>
+            <div style={{ display: 'flex', gap: '10px' }}>
               <div style={{ flex: 1, position: 'relative' }}>
                 <input 
                   type="text"
