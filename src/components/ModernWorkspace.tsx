@@ -2575,19 +2575,40 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
 
             {/* File Status */}
             {selectedFile && (
-              <div style={{
-                background: 'rgba(78, 205, 196, 0.2)',
-                border: '1px solid rgba(78, 205, 196, 0.4)',
-                borderRadius: '12px',
-                padding: '16px',
-                marginBottom: '32px'
+              <div className="glass-morphism" style={{
+                background: 'linear-gradient(135deg, rgba(120, 219, 255, 0.1) 0%, rgba(255, 119, 198, 0.1) 100%)',
+                border: '1px solid rgba(120, 219, 255, 0.4)',
+                borderRadius: '16px',
+                padding: '20px',
+                marginBottom: '32px',
+                boxShadow: '0 0 30px rgba(120, 219, 255, 0.2)'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ fontSize: '20px' }}>✅</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <div style={{ 
+                    fontSize: '24px',
+                    background: 'linear-gradient(135deg, #78dbff 0%, #ff77c6 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    filter: 'drop-shadow(0 0 10px rgba(120, 219, 255, 0.8))'
+                  }}>⚡</div>
                   <div>
-                    <div style={{ fontWeight: '600', fontSize: '14px' }}>{selectedFile.name}</div>
-                    <div style={{ fontSize: '12px', opacity: 0.8 }}>
-                      {spreadsheetData.length} rows • {dataStructure?.detectedFormat || 'Processing...'}
+                    <div style={{ 
+                      fontWeight: '700', 
+                      fontSize: '16px',
+                      background: 'linear-gradient(135deg, #78dbff 0%, #ff77c6 100%)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      letterSpacing: '-0.5px'
+                    }}>{selectedFile.name}</div>
+                    <div style={{ 
+                      fontSize: '11px', 
+                      opacity: 0.7,
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                      fontWeight: '500',
+                      marginTop: '4px'
+                    }}>
+                      {spreadsheetData.length} Neural Nodes • {dataStructure?.detectedFormat || 'Quantum Processing...'}
                     </div>
                   </div>
                 </div>
@@ -2597,24 +2618,64 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
             {/* Quick Actions */}
             {spreadsheetData.length > 0 && (
               <div style={{ marginBottom: '32px' }}>
-                <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600' }}>
-                  ⚡ Quick Actions
+                <h4 style={{ 
+                  margin: '0 0 20px 0', 
+                  fontSize: '18px', 
+                  fontWeight: '700',
+                  background: 'linear-gradient(135deg, #78dbff 0%, #ff77c6 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px'
+                }}>
+                  <span style={{ 
+                    fontSize: '20px',
+                    background: 'linear-gradient(135deg, #78dbff 0%, #ff77c6 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    filter: 'drop-shadow(0 0 8px rgba(120, 219, 255, 0.6))'
+                  }}>🚀</span>
+                  Neural Commands
                 </h4>
-                <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth <= 480 ? '1fr' : '1fr 1fr', gap: '8px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth <= 480 ? '1fr' : '1fr 1fr', gap: '12px' }}>
                   <button
                     onClick={() => setShowChart(!showChart)}
+                    className="hover-lift"
                     style={{
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
-                      borderRadius: '8px',
-                      padding: '8px 12px',
+                      background: 'linear-gradient(135deg, rgba(120, 219, 255, 0.15) 0%, rgba(255, 119, 198, 0.15) 100%)',
+                      border: '1px solid rgba(120, 219, 255, 0.4)',
+                      borderRadius: '12px',
+                      padding: '12px 16px',
                       color: 'white',
                       cursor: 'pointer',
-                      fontSize: '12px',
-                      fontWeight: '500'
+                      fontSize: '11px',
+                      fontWeight: '600',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      boxShadow: '0 0 20px rgba(120, 219, 255, 0.2)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.boxShadow = '0 0 30px rgba(120, 219, 255, 0.4)';
+                      e.currentTarget.style.background = 'linear-gradient(135deg, rgba(120, 219, 255, 0.25) 0%, rgba(255, 119, 198, 0.25) 100%)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.boxShadow = '0 0 20px rgba(120, 219, 255, 0.2)';
+                      e.currentTarget.style.background = 'linear-gradient(135deg, rgba(120, 219, 255, 0.15) 0%, rgba(255, 119, 198, 0.15) 100%)';
                     }}
                   >
-                    📊 {showChart ? 'Hide' : 'Show'} Chart
+                    <span style={{
+                      background: 'linear-gradient(135deg, #78dbff 0%, #ff77c6 100%)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent'
+                    }}>🧠</span>
+                    {showChart ? 'Deactivate' : 'Activate'} Viz
                   </button>
                   <div style={{ position: 'relative' }}>
                     <button
@@ -2978,10 +3039,29 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
 
             {/* Custom Analysis */}
             <div>
-              <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600' }}>
-                📝 Custom Analysis
+              <h4 style={{ 
+                margin: '0 0 20px 0', 
+                fontSize: '18px', 
+                fontWeight: '700',
+                background: 'linear-gradient(135deg, #78dbff 0%, #ff77c6 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                textTransform: 'uppercase',
+                letterSpacing: '1px'
+              }}>
+                <span style={{ 
+                  fontSize: '20px',
+                  background: 'linear-gradient(135deg, #78dbff 0%, #ff77c6 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  filter: 'drop-shadow(0 0 8px rgba(120, 219, 255, 0.6))'
+                }}>🧠</span>
+                Neural Interface
               </h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
@@ -2991,38 +3071,70 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                       handleCustomAnalysis();
                     }
                   }}
-                  placeholder="Ask anything with natural language...\ne.g., 'what patterns exist?', 'rank countries by economy', 'show employees by salary', 'create pivot table'"
+                  placeholder="Initialize neural query...\ne.g., 'analyze quantum patterns', 'rank data nodes by performance', 'generate predictive matrix'"
+                  className="glass-morphism neon-border"
                   style={{
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    borderRadius: '12px',
-                    padding: '16px',
+                    borderRadius: '16px',
+                    padding: '20px',
                     color: 'white',
                     fontSize: '14px',
                     fontFamily: 'inherit',
                     resize: 'vertical',
-                    minHeight: '80px',
+                    minHeight: '100px',
                     outline: 'none',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    fontWeight: '400',
+                    letterSpacing: '0.5px',
+                    lineHeight: '1.6'
                   }}
                 />
                 <button
                   onClick={handleCustomAnalysis}
                   disabled={!prompt.trim() || !spreadsheetData.length || aiLoading}
+                  className="hover-lift"
                   style={{
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    borderRadius: '12px',
-                    padding: '16px',
+                    background: aiLoading 
+                      ? 'linear-gradient(135deg, rgba(255, 119, 198, 0.3) 0%, rgba(120, 219, 255, 0.3) 100%)'
+                      : 'linear-gradient(135deg, rgba(120, 219, 255, 0.2) 0%, rgba(255, 119, 198, 0.2) 100%)',
+                    border: '1px solid rgba(120, 219, 255, 0.5)',
+                    borderRadius: '16px',
+                    padding: '20px',
                     color: 'white',
-                    fontSize: '14px',
-                    fontWeight: '600',
+                    fontSize: '13px',
+                    fontWeight: '700',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1px',
                     cursor: aiLoading || !prompt.trim() || !spreadsheetData.length ? 'not-allowed' : 'pointer',
-                    transition: 'all 0.3s ease',
-                    opacity: (!prompt.trim() || !spreadsheetData.length || aiLoading) ? 0.5 : 1
+                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                    opacity: (!prompt.trim() || !spreadsheetData.length || aiLoading) ? 0.6 : 1,
+                    boxShadow: aiLoading 
+                      ? '0 0 40px rgba(255, 119, 198, 0.4)'
+                      : '0 0 30px rgba(120, 219, 255, 0.3)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '12px'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!aiLoading && prompt.trim() && spreadsheetData.length) {
+                      e.currentTarget.style.boxShadow = '0 0 50px rgba(120, 219, 255, 0.6)';
+                      e.currentTarget.style.background = 'linear-gradient(135deg, rgba(120, 219, 255, 0.3) 0%, rgba(255, 119, 198, 0.3) 100%)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!aiLoading) {
+                      e.currentTarget.style.boxShadow = '0 0 30px rgba(120, 219, 255, 0.3)';
+                      e.currentTarget.style.background = 'linear-gradient(135deg, rgba(120, 219, 255, 0.2) 0%, rgba(255, 119, 198, 0.2) 100%)';
+                    }
                   }}
                 >
-                  {aiLoading ? '🔄 Processing...' : '🔍 Custom Analysis'}
+                  <span style={{
+                    background: 'linear-gradient(135deg, #78dbff 0%, #ff77c6 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    fontSize: '16px'
+                  }}>{aiLoading ? '✨' : '🧠'}</span>
+                  {aiLoading ? 'Neural Processing...' : 'Execute Analysis'}
                 </button>
               </div>
             </div>
@@ -3600,15 +3712,24 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
       </main>
       
       {/* Footer with Legal Pages */}
-      <footer style={{
-        background: 'rgba(255, 255, 255, 0.1)',
-        backdropFilter: 'blur(20px)',
-        borderTop: '1px solid rgba(255, 255, 255, 0.2)',
+      <footer className="glass-morphism" style={{
+        borderTop: '1px solid rgba(120, 219, 255, 0.3)',
         color: 'white',
         padding: '40px',
-        textAlign: 'center'
+        textAlign: 'center',
+        position: 'relative',
+        zIndex: 100
       }}>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: window.innerWidth <= 768 ? '16px' : '32px', flexWrap: 'wrap', marginBottom: '20px' }}>
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '1px',
+          background: 'linear-gradient(90deg, transparent 0%, #78dbff 25%, #ff77c6 75%, transparent 100%)',
+          animation: 'pulse 3s ease-in-out infinite'
+        }} />
+        <div style={{ display: 'flex', justifyContent: 'center', gap: window.innerWidth <= 768 ? '20px' : '40px', flexWrap: 'wrap', marginBottom: '24px' }}>
           <a onClick={() => {
             setLegalContent({ 
               title: 'About Us', 
@@ -3654,10 +3775,30 @@ Contact Us:
 Have questions or feedback? We'd love to hear from you! Contact us at contact@advexcel.online` 
             });
             setShowLegalModal(true);
-          }} style={{ color: 'white', textDecoration: 'none', fontSize: '16px', cursor: 'pointer', opacity: 0.8, transition: 'opacity 0.3s ease' }}
-          onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
-          onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}
-          >About Us</a>
+          }} style={{ 
+            color: 'white', 
+            textDecoration: 'none', 
+            fontSize: '13px', 
+            cursor: 'pointer', 
+            fontWeight: '600',
+            textTransform: 'uppercase',
+            letterSpacing: '1px',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            padding: '8px 16px',
+            borderRadius: '20px',
+            border: '1px solid transparent'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'linear-gradient(135deg, rgba(120, 219, 255, 0.2) 0%, rgba(255, 119, 198, 0.2) 100%)';
+            e.currentTarget.style.border = '1px solid rgba(120, 219, 255, 0.4)';
+            e.currentTarget.style.boxShadow = '0 0 20px rgba(120, 219, 255, 0.3)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'transparent';
+            e.currentTarget.style.border = '1px solid transparent';
+            e.currentTarget.style.boxShadow = 'none';
+          }}
+          >Neural Info</a>
           
           <a onClick={() => window.location.href = '/payments'} style={{ color: 'white', textDecoration: 'none', fontSize: '16px', cursor: 'pointer', opacity: 0.8, transition: 'opacity 0.3s ease' }}
           onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
@@ -3895,8 +4036,18 @@ We're committed to excellent support and continuous improvement based on your fe
           onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}
           >Contact Us</a>
         </div>
-        <p style={{ margin: 0, fontSize: '14px', opacity: 0.7 }}>
-          © 2024 AdvExcel AI. All rights reserved. | Powered by AWS
+        <p style={{ 
+          margin: 0, 
+          fontSize: '11px', 
+          opacity: 0.6,
+          textTransform: 'uppercase',
+          letterSpacing: '2px',
+          fontWeight: '500',
+          background: 'linear-gradient(135deg, #78dbff 0%, #ff77c6 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent'
+        }}>
+          © 2024 Neural Systems • Quantum Powered by AWS Cloud
         </p>
       </footer>
       
