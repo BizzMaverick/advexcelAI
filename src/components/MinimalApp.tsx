@@ -1517,7 +1517,8 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     // Handle chart generation (Phase 1 - Redirect to Advanced)
     if (lowerPrompt.includes('chart') || lowerPrompt.includes('graph') || lowerPrompt.includes('plot')) {
       const hasAdvancedAccess = trialStatus?.hasValidPayment || trialStatus?.isAdmin;
-      const hasBasicPaid = trialStatus?.hasValidPayment; // User paid ₹49 for basic
+      const hasBasicPaid = trialStatus?.hasValidPayment;
+      const inTrial = trialStatus?.inTrial;
       
       if (hasAdvancedAccess) {
         setAiResponse(`
@@ -1545,6 +1546,23 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             style="background: #6c757d; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px;"
           >
             ℹ️ Learn More
+          </button>
+        `);
+      } else if (inTrial) {
+        setAiResponse(`
+          <strong>🎉 Chart Feature - Trial User</strong><br><br>
+          You have 5 free advanced prompts. Upgrade for unlimited charts!<br><br>
+          <button 
+            onclick="window.open('https://buy.stripe.com/basic-49', '_blank')"
+            style="background: #0078d4; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; margin-right: 10px;"
+          >
+            💼 Basic Plan (₹49)
+          </button>
+          <button 
+            onclick="window.open('https://buy.stripe.com/full-199', '_blank')"
+            style="background: #10b981; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;"
+          >
+            🚀 Full Plan (₹199) - Best Value!
           </button>
         `);
       } else {
@@ -1576,6 +1594,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     if (isAnalysisRequest) {
       const hasAdvancedAccess = trialStatus?.hasValidPayment || trialStatus?.isAdmin;
       const hasBasicPaid = trialStatus?.hasValidPayment;
+      const inTrial = trialStatus?.inTrial;
       
       if (hasAdvancedAccess) {
         setAiResponse(`
@@ -1597,6 +1616,23 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             style="background: #10b981; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;"
           >
             💳 Upgrade to Advanced (₹179)
+          </button>
+        `);
+      } else if (inTrial) {
+        setAiResponse(`
+          <strong>🎉 Advanced Analytics - Trial User</strong><br><br>
+          You have 5 free advanced prompts. Upgrade for unlimited analytics!<br><br>
+          <button 
+            onclick="window.open('https://buy.stripe.com/basic-49', '_blank')"
+            style="background: #0078d4; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; margin-right: 10px;"
+          >
+            💼 Basic Plan (₹49)
+          </button>
+          <button 
+            onclick="window.open('https://buy.stripe.com/full-199', '_blank')"
+            style="background: #10b981; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;"
+          >
+            🚀 Full Plan (₹199) - Best Value!
           </button>
         `);
       } else {
@@ -1693,7 +1729,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             <span style={{ fontSize: '16px', fontWeight: '600' }}>AdvExcel</span>
           </div>
           <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-            <span style={{ fontSize: '14px' }}>Welcome, {user.name} {trialStatus?.hasValidPayment ? '(Paid)' : '(Free)'}</span>
+            <span style={{ fontSize: '14px' }}>Welcome, {user.name} {trialStatus?.hasValidPayment ? '(Paid)' : trialStatus?.inTrial ? '(Free Trial)' : '(Free)'}</span>
             <button
               onClick={() => {
                 if (trialStatus?.hasValidPayment || trialStatus?.isAdmin || user.email === 'katragadda225@gmail.com' || user.email?.includes('@advexcel.online')) {
@@ -1785,7 +1821,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                   fontSize: '12px', 
                   fontWeight: '500'
                 }}>
-                  {trialStatus.hasValidPayment ? 'Paid User' : `Free: ${trialStatus.promptsRemaining || 0} prompts left`}
+                  {trialStatus.hasValidPayment ? 'Paid User' : trialStatus.inTrial ? `Trial: ${trialStatus.promptsRemaining || 25} prompts left today` : 'Free User'}
                 </div>
               )}
             </div>
