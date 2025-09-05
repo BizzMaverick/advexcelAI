@@ -1869,13 +1869,13 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                     <strong>🚀 Upgrade to Access Advanced Features</strong><br><br>
                     Choose your plan:<br><br>
                     <button 
-                      onclick="window.open('https://buy.stripe.com/basic-49', '_blank')"
+                      onclick="window.location.replace('/payment')"
                       style="background: #0078d4; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; margin-right: 10px;"
                     >
                       💼 Basic Plan (₹49)
                     </button>
                     <button 
-                      onclick="window.open('https://buy.stripe.com/full-199', '_blank')"
+                      onclick="window.location.replace('/payment')"
                       style="background: #10b981; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;"
                     >
                       🚀 Full Plan (₹199) - Save ₹29!
