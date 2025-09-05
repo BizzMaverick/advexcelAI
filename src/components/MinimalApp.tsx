@@ -1693,7 +1693,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             <span style={{ fontSize: '16px', fontWeight: '600' }}>AdvExcel</span>
           </div>
           <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-            <span style={{ fontSize: '14px' }}>Welcome, {user.name} {trialStatus?.hasValidPayment ? '(Paid)' : '(Free Trial)'}</span>
+            <span style={{ fontSize: '14px' }}>Welcome, {user.name} {trialStatus?.hasValidPayment ? '(Paid)' : '(Free)'}</span>
             <button
               onClick={() => {
                 if (trialStatus?.hasValidPayment || trialStatus?.isAdmin || user.email === 'katragadda225@gmail.com' || user.email?.includes('@advexcel.online')) {
@@ -1785,7 +1785,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                   fontSize: '12px', 
                   fontWeight: '500'
                 }}>
-                  {trialStatus.hasValidPayment ? 'Paid User' : `Free Trial: ${trialStatus.promptsRemaining || 0} prompts left`}
+                  {trialStatus.hasValidPayment ? 'Paid User' : `Free: ${trialStatus.promptsRemaining || 0} prompts left`}
                 </div>
               )}
             </div>

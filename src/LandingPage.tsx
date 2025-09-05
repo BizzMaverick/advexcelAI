@@ -627,6 +627,31 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
               Sign in or create your account
             </p>
           </div>
+          
+          {/* Festival Season Offer */}
+          <div style={{
+            background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+            color: 'white',
+            padding: '16px 20px',
+            textAlign: 'center',
+            fontSize: '16px',
+            fontWeight: '600'
+          }}>
+            🎉 Festival Season Offer!
+          </div>
+          <div style={{
+            background: '#fef3c7',
+            border: '1px solid #f59e0b',
+            padding: '12px 20px',
+            fontSize: '13px',
+            color: '#92400e',
+            lineHeight: '1.4',
+            textAlign: 'center'
+          }}>
+            <strong>Special Pricing Until Jan 16, 2025:</strong><br/>
+            ✨ Basic Plan: ₹49 | Full Plan: ₹199 (Save ₹29!)<br/>
+            🚀 3-day free trial + 5 advanced prompts
+          </div>
         
         {/* Login/Signup Form */}
         <div style={{ padding: '30px 20px', textAlign: 'center' }}>
