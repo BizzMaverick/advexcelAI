@@ -360,6 +360,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       return `<strong>Column ${colLetter} Sum:</strong><br><br>No numeric values found in column ${colLetter} (${columnName})`;
     }
     
+    // Create result data with sum added to next row
+    const resultData = [...data];
+    const newRow = new Array(data[0].length).fill('');
+    newRow[colIndex] = sum;
+    resultData.push(newRow);
+    setLastAiResult(resultData);
+    setShowUseResultButton(true);
+    
     return `<strong>Column ${colLetter} Sum Result:</strong><br><br>Sum of ${columnName}: <strong>${sum.toLocaleString()}</strong><br>Cells processed: ${count}`;
   };
 
@@ -440,6 +448,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             }
           });
           
+          // Create result data with sum added to next row
+          const resultData = [...data];
+          const newRow = new Array(data[0].length).fill('');
+          newRow[sumIndex] = sum;
+          resultData.push(newRow);
+          setLastAiResult(resultData);
+          setShowUseResultButton(true);
+          
           return `<strong>SUMIF Result:</strong><br><br>Sum where ${headers[criteriaIndex]} ${operator} ${criteriaValue}: <strong>${sum.toFixed(2)}</strong><br>Matching rows: ${count}`;
         }
         break;
@@ -475,6 +491,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           
           if (matches) count++;
         });
+        
+        // Create result data with count added to next row
+        const resultData = [...data];
+        const newRow = new Array(data[0].length).fill('');
+        newRow[criteriaIndex] = count;
+        resultData.push(newRow);
+        setLastAiResult(resultData);
+        setShowUseResultButton(true);
         
         return `<strong>COUNTIF Result:</strong><br><br>Count where ${headers[criteriaIndex]} ${operator} ${criteriaValue}: <strong>${count}</strong>`;
       }
@@ -518,6 +542,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
         });
         
         const avg = count > 0 ? sum / count : 0;
+        // Create result data with average added to next row
+        const resultData = [...data];
+        const newRow = new Array(data[0].length).fill('');
+        newRow[avgIndex] = avg;
+        resultData.push(newRow);
+        setLastAiResult(resultData);
+        setShowUseResultButton(true);
+        
         return `<strong>AVERAGEIF Result:</strong><br><br>Average where ${headers[criteriaIndex]} ${operator} ${criteriaValue}: <strong>${avg.toFixed(2)}</strong><br>Matching rows: ${count}`;
       }
     }
@@ -534,6 +566,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
         const value = parseFloat(String(data[rowIndex][colIndex]));
         if (!isNaN(value)) {
           const rounded = Math.round(value * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces);
+          // Create result data with rounded value added to next row
+          const resultData = [...data];
+          const newRow = new Array(data[0].length).fill('');
+          newRow[colIndex] = rounded;
+          resultData.push(newRow);
+          setLastAiResult(resultData);
+          setShowUseResultButton(true);
+          
           return `<strong>ROUND Result:</strong><br><br>ROUND(${col}${row}, ${decimals}) = ${rounded}`;
         }
       }
@@ -550,6 +590,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
         const value = parseFloat(String(data[rowIndex][colIndex]));
         if (!isNaN(value)) {
           const absolute = Math.abs(value);
+          // Create result data with absolute value added to next row
+          const resultData = [...data];
+          const newRow = new Array(data[0].length).fill('');
+          newRow[colIndex] = absolute;
+          resultData.push(newRow);
+          setLastAiResult(resultData);
+          setShowUseResultButton(true);
+          
           return `<strong>ABS Result:</strong><br><br>ABS(${col}${row}) = ${absolute}`;
         }
       }
@@ -569,6 +617,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
         const val1 = String(data[rowIndex1][colIndex1] || '');
         const val2 = String(data[rowIndex2][colIndex2] || '');
         const result = val1 + val2;
+        // Create result data with concatenated value added to next row
+        const resultData = [...data];
+        const newRow = new Array(data[0].length).fill('');
+        newRow[colIndex1] = result;
+        resultData.push(newRow);
+        setLastAiResult(resultData);
+        setShowUseResultButton(true);
+        
         return `<strong>CONCATENATE Result:</strong><br><br>CONCATENATE(${col1}${row1}, ${col2}${row2}) = "${result}"`;
       }
     }
@@ -584,6 +640,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       if (rowIndex >= 0 && rowIndex < data.length && colIndex >= 0 && colIndex < (data[rowIndex]?.length || 0)) {
         const text = String(data[rowIndex][colIndex] || '');
         const result = text.substring(0, numChars);
+        // Create result data with LEFT result added to next row
+        const resultData = [...data];
+        const newRow = new Array(data[0].length).fill('');
+        newRow[colIndex] = result;
+        resultData.push(newRow);
+        setLastAiResult(resultData);
+        setShowUseResultButton(true);
+        
         return `<strong>LEFT Result:</strong><br><br>LEFT(${col}${row}, ${length}) = "${result}"`;
       }
     }
@@ -599,6 +663,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       if (rowIndex >= 0 && rowIndex < data.length && colIndex >= 0 && colIndex < (data[rowIndex]?.length || 0)) {
         const text = String(data[rowIndex][colIndex] || '');
         const result = text.substring(text.length - numChars);
+        // Create result data with RIGHT result added to next row
+        const resultData = [...data];
+        const newRow = new Array(data[0].length).fill('');
+        newRow[colIndex] = result;
+        resultData.push(newRow);
+        setLastAiResult(resultData);
+        setShowUseResultButton(true);
+        
         return `<strong>RIGHT Result:</strong><br><br>RIGHT(${col}${row}, ${length}) = "${result}"`;
       }
     }
@@ -615,6 +687,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       if (rowIndex >= 0 && rowIndex < data.length && colIndex >= 0 && colIndex < (data[rowIndex]?.length || 0)) {
         const text = String(data[rowIndex][colIndex] || '');
         const result = text.substring(startPos, startPos + numChars);
+        // Create result data with MID result added to next row
+        const resultData = [...data];
+        const newRow = new Array(data[0].length).fill('');
+        newRow[colIndex] = result;
+        resultData.push(newRow);
+        setLastAiResult(resultData);
+        setShowUseResultButton(true);
+        
         return `<strong>MID Result:</strong><br><br>MID(${col}${row}, ${start}, ${length}) = "${result}"`;
       }
     }
@@ -629,6 +709,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       if (rowIndex >= 0 && rowIndex < data.length && colIndex >= 0 && colIndex < (data[rowIndex]?.length || 0)) {
         const text = String(data[rowIndex][colIndex] || '');
         const result = text.toUpperCase();
+        // Create result data with UPPER result added to next row
+        const resultData = [...data];
+        const newRow = new Array(data[0].length).fill('');
+        newRow[colIndex] = result;
+        resultData.push(newRow);
+        setLastAiResult(resultData);
+        setShowUseResultButton(true);
+        
         return `<strong>UPPER Result:</strong><br><br>UPPER(${col}${row}) = "${result}"`;
       }
     }
@@ -643,6 +731,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       if (rowIndex >= 0 && rowIndex < data.length && colIndex >= 0 && colIndex < (data[rowIndex]?.length || 0)) {
         const text = String(data[rowIndex][colIndex] || '');
         const result = text.toLowerCase();
+        // Create result data with LOWER result added to next row
+        const resultData = [...data];
+        const newRow = new Array(data[0].length).fill('');
+        newRow[colIndex] = result;
+        resultData.push(newRow);
+        setLastAiResult(resultData);
+        setShowUseResultButton(true);
+        
         return `<strong>LOWER Result:</strong><br><br>LOWER(${col}${row}) = "${result}"`;
       }
     }
@@ -657,6 +753,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       if (rowIndex >= 0 && rowIndex < data.length && colIndex >= 0 && colIndex < (data[rowIndex]?.length || 0)) {
         const text = String(data[rowIndex][colIndex] || '');
         const result = text.toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+        // Create result data with PROPER result added to next row
+        const resultData = [...data];
+        const newRow = new Array(data[0].length).fill('');
+        newRow[colIndex] = result;
+        resultData.push(newRow);
+        setLastAiResult(resultData);
+        setShowUseResultButton(true);
+        
         return `<strong>PROPER Result:</strong><br><br>PROPER(${col}${row}) = "${result}"`;
       }
     }
@@ -671,6 +775,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       if (rowIndex >= 0 && rowIndex < data.length && colIndex >= 0 && colIndex < (data[rowIndex]?.length || 0)) {
         const text = String(data[rowIndex][colIndex] || '');
         const result = text.trim();
+        // Create result data with TRIM result added to next row
+        const resultData = [...data];
+        const newRow = new Array(data[0].length).fill('');
+        newRow[colIndex] = result;
+        resultData.push(newRow);
+        setLastAiResult(resultData);
+        setShowUseResultButton(true);
+        
         return `<strong>TRIM Result:</strong><br><br>TRIM(${col}${row}) = "${result}"`;
       }
     }
@@ -679,12 +791,28 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     const todayMatch = prompt.match(/today/i);
     if (todayMatch) {
       const today = new Date().toLocaleDateString();
+      // Create result data with TODAY result added to next row
+      const resultData = [...data];
+      const newRow = new Array(data[0].length).fill('');
+      newRow[0] = today; // Add to first column
+      resultData.push(newRow);
+      setLastAiResult(resultData);
+      setShowUseResultButton(true);
+      
       return `<strong>TODAY Result:</strong><br><br>TODAY() = ${today}`;
     }
     
     const nowMatch = prompt.match(/now/i);
     if (nowMatch) {
       const now = new Date().toLocaleString();
+      // Create result data with NOW result added to next row
+      const resultData = [...data];
+      const newRow = new Array(data[0].length).fill('');
+      newRow[0] = now; // Add to first column
+      resultData.push(newRow);
+      setLastAiResult(resultData);
+      setShowUseResultButton(true);
+      
       return `<strong>NOW Result:</strong><br><br>NOW() = ${now}`;
     }
     
@@ -699,6 +827,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
         const date = new Date(dateStr);
         if (!isNaN(date.getTime())) {
           const year = date.getFullYear();
+          // Create result data with YEAR result added to next row
+          const resultData = [...data];
+          const newRow = new Array(data[0].length).fill('');
+          newRow[colIndex] = year;
+          resultData.push(newRow);
+          setLastAiResult(resultData);
+          setShowUseResultButton(true);
+          
           return `<strong>YEAR Result:</strong><br><br>YEAR(${col}${row}) = ${year}`;
         }
       }
@@ -715,6 +851,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
         const date = new Date(dateStr);
         if (!isNaN(date.getTime())) {
           const month = date.getMonth() + 1;
+          // Create result data with MONTH result added to next row
+          const resultData = [...data];
+          const newRow = new Array(data[0].length).fill('');
+          newRow[colIndex] = month;
+          resultData.push(newRow);
+          setLastAiResult(resultData);
+          setShowUseResultButton(true);
+          
           return `<strong>MONTH Result:</strong><br><br>MONTH(${col}${row}) = ${month}`;
         }
       }
@@ -731,6 +875,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
         const date = new Date(dateStr);
         if (!isNaN(date.getTime())) {
           const day = date.getDate();
+          // Create result data with DAY result added to next row
+          const resultData = [...data];
+          const newRow = new Array(data[0].length).fill('');
+          newRow[colIndex] = day;
+          resultData.push(newRow);
+          setLastAiResult(resultData);
+          setShowUseResultButton(true);
+          
           return `<strong>DAY Result:</strong><br><br>DAY(${col}${row}) = ${day}`;
         }
       }
@@ -744,6 +896,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
         const values = getColumnValues(colIndex);
         if (values.length > 0) {
           const avg = values.reduce((a, b) => a + b, 0) / values.length;
+            // Create result data with average added to next row
+          const resultData = [...data];
+          const newRow = new Array(data[0].length).fill('');
+          newRow[colIndex] = avg;
+          resultData.push(newRow);
+          setLastAiResult(resultData);
+          setShowUseResultButton(true);
+          
           return `<strong>Average Result:</strong><br><br>Average of ${headers[colIndex]}: <strong>${avg.toFixed(2)}</strong><br>Values processed: ${values.length}`;
         }
       }
@@ -754,6 +914,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       if (colMatch) {
         const colIndex = getColumnIndex(colMatch[1]);
         const values = getColumnValues(colIndex);
+        // Create result data with count added to next row
+        const resultData = [...data];
+        const newRow = new Array(data[0].length).fill('');
+        newRow[colIndex] = values.length;
+        resultData.push(newRow);
+        setLastAiResult(resultData);
+        setShowUseResultButton(true);
+        
         return `<strong>Count Result:</strong><br><br>Count of numeric values in ${headers[colIndex]}: <strong>${values.length}</strong>`;
       }
     }
@@ -765,6 +933,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
         const values = getColumnValues(colIndex);
         if (values.length > 0) {
           const max = Math.max(...values);
+            // Create result data with max added to next row
+          const resultData = [...data];
+          const newRow = new Array(data[0].length).fill('');
+          newRow[colIndex] = max;
+          resultData.push(newRow);
+          setLastAiResult(resultData);
+          setShowUseResultButton(true);
+          
           return `<strong>Maximum Result:</strong><br><br>Maximum value in ${headers[colIndex]}: <strong>${max}</strong>`;
         }
       }
@@ -777,6 +953,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
         const values = getColumnValues(colIndex);
         if (values.length > 0) {
           const min = Math.min(...values);
+            // Create result data with min added to next row
+          const resultData = [...data];
+          const newRow = new Array(data[0].length).fill('');
+          newRow[colIndex] = min;
+          resultData.push(newRow);
+          setLastAiResult(resultData);
+          setShowUseResultButton(true);
+          
           return `<strong>Minimum Result:</strong><br><br>Minimum value in ${headers[colIndex]}: <strong>${min}</strong>`;
         }
       }
@@ -809,6 +993,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             case 'multiply': result = val1 * val2; break;
             case 'divide': result = val2 !== 0 ? val1 / val2 : 'Error: Division by zero'; break;
           }
+          // Create result data with calculation result added to next row
+          const resultData = [...data];
+          const newRow = new Array(data[0].length).fill('');
+          newRow[colIndex1] = result;
+          resultData.push(newRow);
+          setLastAiResult(resultData);
+          setShowUseResultButton(true);
+          
           return `${col1}${row1} ${symbol} ${col2}${row2} = ${val1} ${symbol} ${val2} = ${result}`;
         }
       }
@@ -847,6 +1039,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             count++;
           }
         });
+        
+        // Create result data with sum added to next row
+        const resultData = [...data];
+        const newRow = new Array(data[0].length).fill('');
+        newRow[colIndex] = sum;
+        resultData.push(newRow);
+        setLastAiResult(resultData);
+        setShowUseResultButton(true);
         
         return `<strong>Conditional Sum Result:</strong><br><br>Sum of values in ${headers[colIndex]} where value ${operator} ${value}: <strong>${sum.toFixed(2)}</strong><br>Matching values: ${count}`;
       }
