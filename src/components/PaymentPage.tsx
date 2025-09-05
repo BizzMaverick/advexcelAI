@@ -10,7 +10,7 @@ interface PaymentPageProps {
 export default function PaymentPage({ userEmail, onPaymentSuccess, onBackToLogin, trialExpired = false }: PaymentPageProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isCheckingStatus, setIsCheckingStatus] = useState(true);
-  const [selectedPlan, setSelectedPlan] = useState<'basic' | 'full' | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<'basic' | 'advanced' | 'full' | null>(null);
   
   // Check if user already has valid payment
   useEffect(() => {
@@ -62,7 +62,7 @@ export default function PaymentPage({ userEmail, onPaymentSuccess, onBackToLogin
     try {
       if (!selectedPlan) return;
       
-      const amount = selectedPlan === 'full' ? 19900 : 4900; // ₹199 or ₹49 in paise
+      const amount = selectedPlan === 'full' ? 19900 : selectedPlan === 'advanced' ? 17900 : 4900; // ₹199, ₹179, or ₹49 in paise
       
       // Create order first
       const orderResponse = await fetch(process.env.REACT_APP_PAYMENT_API_URL!, {
@@ -89,7 +89,7 @@ export default function PaymentPage({ userEmail, onPaymentSuccess, onBackToLogin
         amount: amount,
         currency: 'INR',
         name: 'AdvExcel',
-        description: `${selectedPlan === 'full' ? 'Full' : 'Basic'} Plan - ₹${selectedPlan === 'full' ? '199' : '49'}`,
+        description: `${selectedPlan === 'full' ? 'Full Package' : selectedPlan === 'advanced' ? 'Advanced' : 'Basic'} Plan - ₹${selectedPlan === 'full' ? '199' : selectedPlan === 'advanced' ? '179' : '49'}`,
         order_id: orderResult.orderId,
         handler: async function (response: any) {
           console.log('Payment response:', response);
@@ -212,24 +212,38 @@ export default function PaymentPage({ userEmail, onPaymentSuccess, onBackToLogin
             padding: '20px',
             background: '#f8f9ff'
           }}>
-            <div style={{ display: 'flex', gap: '15px', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
               <div style={{
                 flex: 1,
                 border: selectedPlan === 'basic' ? '2px solid #0078d4' : '1px solid #ddd',
                 borderRadius: '8px',
-                padding: '15px',
+                padding: '12px',
                 background: selectedPlan === 'basic' ? '#e7f3ff' : 'white',
                 cursor: 'pointer'
               }} onClick={() => setSelectedPlan('basic')}>
-                <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#0078d4' }}>₹49</div>
-                <div style={{ fontSize: '12px', color: '#666' }}>Basic Plan</div>
+                <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#0078d4' }}>₹49</div>
+                <div style={{ fontSize: '11px', color: '#666' }}>Basic</div>
+                <div style={{ fontSize: '10px', color: '#888' }}>Excel processing</div>
+              </div>
+              
+              <div style={{
+                flex: 1,
+                border: selectedPlan === 'advanced' ? '2px solid #f59e0b' : '1px solid #ddd',
+                borderRadius: '8px',
+                padding: '12px',
+                background: selectedPlan === 'advanced' ? '#fef3c7' : 'white',
+                cursor: 'pointer'
+              }} onClick={() => setSelectedPlan('advanced')}>
+                <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#f59e0b' }}>₹179</div>
+                <div style={{ fontSize: '11px', color: '#666' }}>Advanced</div>
+                <div style={{ fontSize: '10px', color: '#888' }}>Charts & Analytics</div>
               </div>
               
               <div style={{
                 flex: 1,
                 border: selectedPlan === 'full' ? '2px solid #10b981' : '1px solid #ddd',
                 borderRadius: '8px',
-                padding: '15px',
+                padding: '12px',
                 background: selectedPlan === 'full' ? '#ecfdf5' : 'white',
                 cursor: 'pointer',
                 position: 'relative'
@@ -237,16 +251,31 @@ export default function PaymentPage({ userEmail, onPaymentSuccess, onBackToLogin
                 <div style={{
                   position: 'absolute',
                   top: '-8px',
-                  right: '8px',
+                  right: '4px',
                   background: '#10b981',
                   color: 'white',
-                  fontSize: '10px',
-                  padding: '2px 6px',
+                  fontSize: '9px',
+                  padding: '2px 4px',
                   borderRadius: '4px'
                 }}>SAVE ₹29</div>
-                <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#10b981' }}>₹199</div>
-                <div style={{ fontSize: '12px', color: '#666' }}>Full Plan</div>
+                <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#10b981' }}>₹199</div>
+                <div style={{ fontSize: '11px', color: '#666' }}>Full Package</div>
+                <div style={{ fontSize: '10px', color: '#888' }}>Basic + Advanced</div>
               </div>
+            </div>
+            
+            {/* Savings explanation */}
+            <div style={{
+              background: '#ecfdf5',
+              border: '1px solid #10b981',
+              borderRadius: '6px',
+              padding: '10px',
+              fontSize: '12px',
+              color: '#065f46',
+              textAlign: 'center'
+            }}>
+              💡 <strong>Smart Choice:</strong> Full Package = Basic (₹49) + Advanced (₹179) for just ₹199<br/>
+              <span style={{ fontSize: '11px' }}>Save ₹29/month vs buying separately!</span>
             </div>
           </div>
         </div>
@@ -267,7 +296,7 @@ export default function PaymentPage({ userEmail, onPaymentSuccess, onBackToLogin
             marginBottom: '20px'
           }}
         >
-          {isProcessing ? '🔄 Processing...' : `🔒 Pay ₹${selectedPlan === 'full' ? '199' : '49'} with Razorpay`}
+          {isProcessing ? '🔄 Processing...' : `🔒 Pay ₹${selectedPlan === 'full' ? '199' : selectedPlan === 'advanced' ? '179' : '49'} with Razorpay`}
         </button>
 
         <button

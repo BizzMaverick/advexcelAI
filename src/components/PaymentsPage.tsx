@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PaymentService from '../services/paymentService';
 
 export default function PaymentsPage() {
-  const [selectedPlan, setSelectedPlan] = useState<'basic' | 'full'>('full');
+  const [selectedPlan, setSelectedPlan] = useState<'basic' | 'advanced' | 'full'>('full');
   const [isProcessing, setIsProcessing] = useState(false);
   const [userEmail, setUserEmail] = useState('');
 
@@ -14,7 +14,7 @@ export default function PaymentsPage() {
 
     setIsProcessing(true);
     try {
-      const amount = selectedPlan === 'basic' ? 49 : 199;
+      const amount = selectedPlan === 'basic' ? 49 : selectedPlan === 'advanced' ? 179 : 199;
       const success = await PaymentService.initiatePayment(userEmail, amount, selectedPlan);
       
       if (success) {
@@ -123,50 +123,80 @@ export default function PaymentsPage() {
         </div>
 
         {/* Pricing Plans */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
           {/* Basic Plan */}
           <div style={{
             background: selectedPlan === 'basic' ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.1)',
             backdropFilter: 'blur(20px)',
-            borderRadius: '24px',
-            padding: '32px',
+            borderRadius: '20px',
+            padding: '28px',
             border: selectedPlan === 'basic' ? '2px solid #4ecdc4' : '1px solid rgba(255, 255, 255, 0.2)',
             cursor: 'pointer',
             transition: 'all 0.3s ease'
           }}
           onClick={() => setSelectedPlan('basic')}>
-            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-              <h3 style={{ margin: '0 0 8px 0', fontSize: '24px', fontWeight: '600' }}>Basic Plan</h3>
-              <div style={{ fontSize: '48px', fontWeight: '700', color: '#4ecdc4' }}>₹49</div>
+            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+              <h3 style={{ margin: '0 0 8px 0', fontSize: '20px', fontWeight: '600' }}>Basic</h3>
+              <div style={{ fontSize: '40px', fontWeight: '700', color: '#4ecdc4' }}>₹49</div>
               <p style={{ margin: '4px 0 0 0', fontSize: '14px', opacity: 0.8 }}>per month</p>
             </div>
             
-            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px 0' }}>
-              <li style={{ padding: '8px 0', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ color: '#4ecdc4' }}>✓</span> 3-day free trial
+            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 20px 0' }}>
+              <li style={{ padding: '6px 0', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: '#4ecdc4' }}>✓</span> Basic Excel processing
               </li>
-              <li style={{ padding: '8px 0', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ color: '#4ecdc4' }}>✓</span> 25 prompts per day
-              </li>
-              <li style={{ padding: '8px 0', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ color: '#4ecdc4' }}>✓</span> Basic Excel functions
-              </li>
-              <li style={{ padding: '8px 0', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <li style={{ padding: '6px 0', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ color: '#4ecdc4' }}>✓</span> Data sorting & filtering
               </li>
-              <li style={{ padding: '8px 0', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <li style={{ padding: '6px 0', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: '#4ecdc4' }}>✓</span> 25 prompts per day
+              </li>
+              <li style={{ padding: '6px 0', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ color: '#4ecdc4' }}>✓</span> Email support
               </li>
             </ul>
           </div>
 
-          {/* Full Plan */}
+          {/* Advanced Plan */}
+          <div style={{
+            background: selectedPlan === 'advanced' ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(20px)',
+            borderRadius: '20px',
+            padding: '28px',
+            border: selectedPlan === 'advanced' ? '2px solid #f59e0b' : '1px solid rgba(255, 255, 255, 0.2)',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease'
+          }}
+          onClick={() => setSelectedPlan('advanced')}>
+            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+              <h3 style={{ margin: '0 0 8px 0', fontSize: '20px', fontWeight: '600' }}>Advanced</h3>
+              <div style={{ fontSize: '40px', fontWeight: '700', color: '#f59e0b' }}>₹179</div>
+              <p style={{ margin: '4px 0 0 0', fontSize: '14px', opacity: 0.8 }}>per month</p>
+            </div>
+            
+            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 20px 0' }}>
+              <li style={{ padding: '6px 0', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: '#f59e0b' }}>✓</span> Charts & visualizations
+              </li>
+              <li style={{ padding: '6px 0', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: '#f59e0b' }}>✓</span> Advanced analytics
+              </li>
+              <li style={{ padding: '6px 0', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: '#f59e0b' }}>✓</span> Pivot tables
+              </li>
+              <li style={{ padding: '6px 0', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: '#f59e0b' }}>✓</span> Statistical analysis
+              </li>
+            </ul>
+          </div>
+
+          {/* Full Package */}
           <div style={{
             background: selectedPlan === 'full' ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.1)',
             backdropFilter: 'blur(20px)',
-            borderRadius: '24px',
-            padding: '32px',
-            border: selectedPlan === 'full' ? '2px solid #4ecdc4' : '1px solid rgba(255, 255, 255, 0.2)',
+            borderRadius: '20px',
+            padding: '28px',
+            border: selectedPlan === 'full' ? '2px solid #10b981' : '1px solid rgba(255, 255, 255, 0.2)',
             cursor: 'pointer',
             transition: 'all 0.3s ease',
             position: 'relative'
@@ -174,50 +204,59 @@ export default function PaymentsPage() {
           onClick={() => setSelectedPlan('full')}>
             <div style={{
               position: 'absolute',
-              top: '-12px',
+              top: '-10px',
               left: '50%',
               transform: 'translateX(-50%)',
-              background: '#4ecdc4',
-              color: '#333',
-              padding: '4px 16px',
+              background: '#10b981',
+              color: 'white',
+              padding: '4px 12px',
               borderRadius: '12px',
-              fontSize: '12px',
+              fontSize: '11px',
               fontWeight: '600'
             }}>
-              RECOMMENDED
+              SAVE ₹29
             </div>
             
-            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-              <h3 style={{ margin: '0 0 8px 0', fontSize: '24px', fontWeight: '600' }}>Full Plan</h3>
-              <div style={{ fontSize: '48px', fontWeight: '700', color: '#4ecdc4' }}>₹199</div>
+            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+              <h3 style={{ margin: '0 0 8px 0', fontSize: '20px', fontWeight: '600' }}>Full Package</h3>
+              <div style={{ fontSize: '40px', fontWeight: '700', color: '#10b981' }}>₹199</div>
               <p style={{ margin: '4px 0 0 0', fontSize: '14px', opacity: 0.8 }}>per month</p>
-              <p style={{ margin: '8px 0 0 0', fontSize: '12px', color: '#4ecdc4' }}>Save ₹29!</p>
+              <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#10b981' }}>Basic + Advanced</p>
             </div>
             
-            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px 0' }}>
-              <li style={{ padding: '8px 0', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ color: '#4ecdc4' }}>✓</span> Everything in Basic
+            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 20px 0' }}>
+              <li style={{ padding: '6px 0', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: '#10b981' }}>✓</span> Everything in Basic
               </li>
-              <li style={{ padding: '8px 0', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ color: '#4ecdc4' }}>✓</span> Unlimited prompts
+              <li style={{ padding: '6px 0', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: '#10b981' }}>✓</span> Everything in Advanced
               </li>
-              <li style={{ padding: '8px 0', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ color: '#4ecdc4' }}>✓</span> Advanced AI analytics
+              <li style={{ padding: '6px 0', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: '#10b981' }}>✓</span> Unlimited prompts
               </li>
-              <li style={{ padding: '8px 0', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ color: '#4ecdc4' }}>✓</span> Charts & visualizations
-              </li>
-              <li style={{ padding: '8px 0', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ color: '#4ecdc4' }}>✓</span> Pivot tables
-              </li>
-              <li style={{ padding: '8px 0', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ color: '#4ecdc4' }}>✓</span> Statistical analysis
-              </li>
-              <li style={{ padding: '8px 0', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ color: '#4ecdc4' }}>✓</span> Priority support
+              <li style={{ padding: '6px 0', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: '#10b981' }}>✓</span> Priority support
               </li>
             </ul>
           </div>
+        </div>
+        
+        {/* Savings Explanation */}
+        <div style={{
+          background: 'rgba(16, 185, 129, 0.1)',
+          border: '1px solid rgba(16, 185, 129, 0.3)',
+          borderRadius: '12px',
+          padding: '20px',
+          marginTop: '24px',
+          textAlign: 'center'
+        }}>
+          <h4 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: '600', color: '#10b981' }}>
+            💡 Smart Savings with Full Package
+          </h4>
+          <p style={{ margin: 0, fontSize: '14px', opacity: 0.9 }}>
+            Basic (₹49) + Advanced (₹179) = ₹228/month<br/>
+            <strong>Full Package = ₹199/month (Save ₹29!)</strong>
+          </p>
         </div>
 
         {/* Payment Button */}
@@ -237,7 +276,7 @@ export default function PaymentsPage() {
               transition: 'all 0.3s ease'
             }}
           >
-            {isProcessing ? 'Processing...' : `Pay ₹${selectedPlan === 'basic' ? '49' : '199'} - ${selectedPlan === 'basic' ? 'Basic' : 'Full'} Plan`}
+            {isProcessing ? 'Processing...' : `Pay ₹${selectedPlan === 'basic' ? '49' : selectedPlan === 'advanced' ? '179' : '199'} - ${selectedPlan === 'basic' ? 'Basic' : selectedPlan === 'advanced' ? 'Advanced' : 'Full Package'}`}
           </button>
           
           <p style={{ margin: '16px 0 0 0', fontSize: '14px', opacity: 0.7 }}>
