@@ -216,13 +216,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
             }
           </button>
           
-          <div style={{
-            fontSize: '11px',
-            color: '#6b7280',
-            fontStyle: 'italic'
-          }}>
-            🎊 Limited time offer expires January 16, 2026
-          </div>
+
         </div>
       </div>
     </div>
