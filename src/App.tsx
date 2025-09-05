@@ -140,7 +140,17 @@ function AppContent() {
         <Route path="/about" element={<AboutUs />} />
         
         {/* Payments Page */}
-        <Route path="/payments" element={<PaymentsPage />} />
+        <Route path="/payments" element={
+          user ? (
+            <PaymentsPage 
+              user={user}
+              onPaymentSuccess={handlePaymentSuccess}
+              onBackToLogin={handleLogout}
+            />
+          ) : (
+            <LandingPage onLogin={handleLogin} />
+          )
+        } />
         
         {/* Main App Routes */}
         <Route path="/" element={

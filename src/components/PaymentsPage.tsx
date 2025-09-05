@@ -1,25 +1,25 @@
 import React, { useState } from 'react';
 import PaymentService from '../services/paymentService';
 
-export default function PaymentsPage() {
+interface PaymentsPageProps {
+  user: { name: string; email: string };
+  onPaymentSuccess: () => void;
+  onBackToLogin: () => void;
+}
+
+export default function PaymentsPage({ user, onPaymentSuccess, onBackToLogin }: PaymentsPageProps) {
   const [selectedPlan, setSelectedPlan] = useState<'basic' | 'advanced' | 'full'>('full');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [userEmail, setUserEmail] = useState('');
 
   const handlePayment = async () => {
-    if (!userEmail.trim()) {
-      alert('Please enter your email address');
-      return;
-    }
-
     setIsProcessing(true);
     try {
       const amount = selectedPlan === 'basic' ? 49 : selectedPlan === 'advanced' ? 179 : 199;
-      const success = await PaymentService.initiatePayment(userEmail, amount, selectedPlan);
+      const success = await PaymentService.initiatePayment(user.email, amount, selectedPlan);
       
       if (success) {
         alert('Payment successful! You can now access all features.');
-        window.location.href = '/';
+        onPaymentSuccess();
       } else {
         alert('Payment failed. Please try again.');
       }
@@ -55,21 +55,31 @@ export default function PaymentsPage() {
             <p style={{ margin: 0, fontSize: '14px', opacity: 0.8 }}>Choose Your Plan</p>
           </div>
         </div>
-        <button
-          onClick={() => window.location.href = '/'}
-          style={{
-            background: 'rgba(255, 255, 255, 0.2)',
-            border: 'none',
-            color: 'white',
-            padding: '10px 20px',
-            borderRadius: '25px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            fontWeight: '500'
-          }}
-        >
-          Back to App
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.1)',
+            padding: '8px 16px',
+            borderRadius: '20px',
+            fontSize: '14px'
+          }}>
+            Welcome, {user.name}
+          </div>
+          <button
+            onClick={onBackToLogin}
+            style={{
+              background: 'rgba(255, 255, 255, 0.2)',
+              border: 'none',
+              color: 'white',
+              padding: '10px 20px',
+              borderRadius: '25px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '500'
+            }}
+          >
+            Back to App
+          </button>
+        </div>
       </header>
 
       {/* Main Content */}
@@ -91,36 +101,7 @@ export default function PaymentsPage() {
           </p>
         </div>
 
-        {/* Email Input */}
-        <div style={{
-          background: 'rgba(255, 255, 255, 0.1)',
-          backdropFilter: 'blur(20px)',
-          borderRadius: '16px',
-          padding: '24px',
-          marginBottom: '32px',
-          border: '1px solid rgba(255, 255, 255, 0.2)'
-        }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontSize: '16px', fontWeight: '500' }}>
-            Email Address
-          </label>
-          <input
-            type="email"
-            value={userEmail}
-            onChange={(e) => setUserEmail(e.target.value)}
-            placeholder="Enter your email address"
-            style={{
-              width: '100%',
-              padding: '12px 16px',
-              borderRadius: '8px',
-              border: '1px solid rgba(255, 255, 255, 0.3)',
-              background: 'rgba(255, 255, 255, 0.1)',
-              color: 'white',
-              fontSize: '16px',
-              outline: 'none',
-              boxSizing: 'border-box'
-            }}
-          />
-        </div>
+
 
         {/* Pricing Plans */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
@@ -263,14 +244,14 @@ export default function PaymentsPage() {
         <div style={{ textAlign: 'center', marginTop: '40px' }}>
           <button
             onClick={handlePayment}
-            disabled={isProcessing || !userEmail.trim()}
+            disabled={isProcessing}
             style={{
-              background: isProcessing || !userEmail.trim() ? 'rgba(255, 255, 255, 0.3)' : '#4ecdc4',
-              color: isProcessing || !userEmail.trim() ? 'rgba(255, 255, 255, 0.7)' : '#333',
+              background: isProcessing ? 'rgba(255, 255, 255, 0.3)' : '#4ecdc4',
+              color: isProcessing ? 'rgba(255, 255, 255, 0.7)' : '#333',
               border: 'none',
               padding: '16px 48px',
               borderRadius: '25px',
-              cursor: isProcessing || !userEmail.trim() ? 'not-allowed' : 'pointer',
+              cursor: isProcessing ? 'not-allowed' : 'pointer',
               fontSize: '18px',
               fontWeight: '600',
               transition: 'all 0.3s ease'
