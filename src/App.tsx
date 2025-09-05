@@ -17,6 +17,7 @@ import PaymentService from './services/paymentService';
 import authService from './services/authService';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
 import AboutUs from './components/AboutUs';
+import PaymentsPage from './components/PaymentsPage';
 
 function AppContent() {
   const navigate = useNavigate();
@@ -138,6 +139,9 @@ function AppContent() {
         {/* About Us Page */}
         <Route path="/about" element={<AboutUs />} />
         
+        {/* Payments Page */}
+        <Route path="/payments" element={<PaymentsPage />} />
+        
         {/* Main App Routes */}
         <Route path="/" element={
           !user ? (
@@ -157,7 +161,7 @@ function AppContent() {
                   promptsRemaining={trialStatus.promptsRemaining || 0}
                   promptsUsed={trialStatus.promptsUsed || 0}
                   onUpgrade={() => {
-                    navigate('/payment');
+                    window.location.href = '/payments';
                   }}
                   onRefresh={handleTrialRefresh}
                 />
