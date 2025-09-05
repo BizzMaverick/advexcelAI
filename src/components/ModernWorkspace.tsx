@@ -2255,7 +2255,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'url("/advanced-bg.gif") center center / cover no-repeat fixed',
+      background: 'url("/basic-bg.gif") center center / cover no-repeat fixed',
       fontFamily: '"Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
       color: '#ffffff',
       position: 'relative',
