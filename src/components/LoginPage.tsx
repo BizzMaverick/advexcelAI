@@ -51,9 +51,36 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
           }}>
             🤖 Excel AI Assistant
           </h1>
-          <p style={{ color: '#6b7280' }}>
-            {isSignUp ? 'Create your account' : 'Sign in to continue'}
+          <p style={{ color: '#6b7280', marginBottom: '16px' }}>
+            {isSignUp ? 'Create your account & claim offer' : 'Sign in to continue'}
           </p>
+          
+          {/* Festival Season Offer */}
+          <div style={{
+            background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+            color: 'white',
+            padding: '12px 16px',
+            borderRadius: '8px',
+            marginBottom: '8px',
+            fontSize: '14px',
+            fontWeight: '600',
+            boxShadow: '0 4px 6px rgba(245, 158, 11, 0.3)'
+          }}>
+            🎉 Festival Season Offer!
+          </div>
+          <div style={{
+            background: '#fef3c7',
+            border: '1px solid #f59e0b',
+            borderRadius: '6px',
+            padding: '10px',
+            fontSize: '12px',
+            color: '#92400e',
+            lineHeight: '1.4'
+          }}>
+            <strong>Special Pricing Until Jan 16, 2025:</strong><br/>
+            ✨ Basic Plan: ₹49 | Full Plan: ₹199 (Save ₹29!)<br/>
+            🚀 3-day free trial + 5 advanced prompts
+          </div>
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -179,7 +206,8 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
               border: 'none',
               color: '#3b82f6',
               cursor: 'pointer',
-              fontSize: '0.875rem'
+              fontSize: '0.875rem',
+              marginBottom: '12px'
             }}
           >
             {isSignUp 
@@ -187,6 +215,14 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
               : "Don't have an account? Sign up"
             }
           </button>
+          
+          <div style={{
+            fontSize: '11px',
+            color: '#6b7280',
+            fontStyle: 'italic'
+          }}>
+            🎊 Limited time offer expires January 16, 2025
+          </div>
         </div>
       </div>
     </div>
