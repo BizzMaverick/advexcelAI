@@ -2255,85 +2255,184 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      fontFamily: '"Poppins", -apple-system, BlinkMacSystemFont, sans-serif',
-      color: '#ffffff'
+      background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%)',
+      fontFamily: '"Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
+      color: '#ffffff',
+      position: 'relative',
+      overflow: 'hidden'
     }}>
+      {/* Animated Background Elements */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        background: 'radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%), radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%)',
+        animation: 'float 20s ease-in-out infinite'
+      }} />
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        background: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.02"%3E%3Ccircle cx="30" cy="30" r="1"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
+        opacity: 0.5
+      }} />
+      <style>
+        {`
+          @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(1deg); }
+            66% { transform: translateY(-10px) rotate(-1deg); }
+          }
+          @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(120, 219, 255, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(120, 219, 255, 0.6), 0 0 60px rgba(120, 219, 255, 0.3); }
+          }
+          @keyframes pulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+          }
+          .glass-morphism {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+          }
+          .neon-border {
+            border: 1px solid rgba(120, 219, 255, 0.5);
+            box-shadow: 0 0 20px rgba(120, 219, 255, 0.2), inset 0 0 20px rgba(120, 219, 255, 0.1);
+          }
+          .hover-lift {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          }
+          .hover-lift:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+          }
+        `}
+      </style>
       {/* Header */}
-      <header style={{
-        background: 'rgba(255, 255, 255, 0.1)',
-        backdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+      <header className="glass-morphism" style={{
+        borderBottom: '1px solid rgba(120, 219, 255, 0.3)',
         padding: window.innerWidth <= 768 ? '15px 20px' : '20px 40px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         flexWrap: 'wrap',
-        gap: '10px'
+        gap: '10px',
+        position: 'relative',
+        zIndex: 100
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <img src="/logo.png" alt="AdvExcel" style={{ height: '40px' }} />
+          <div style={{
+            width: '50px',
+            height: '50px',
+            background: 'linear-gradient(135deg, #78dbff 0%, #ff77c6 100%)',
+            borderRadius: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '24px',
+            fontWeight: '700',
+            color: '#000',
+            boxShadow: '0 0 30px rgba(120, 219, 255, 0.5)',
+            animation: 'glow 3s ease-in-out infinite'
+          }}>
+            AI
+          </div>
           <div>
-            <h1 style={{ margin: 0, fontSize: '24px', fontWeight: '600' }}>AdvExcel AI</h1>
-            <p style={{ margin: 0, fontSize: '14px', opacity: 0.8 }}>Intelligent Data Analysis</p>
+            <h1 style={{ 
+              margin: 0, 
+              fontSize: '28px', 
+              fontWeight: '700',
+              background: 'linear-gradient(135deg, #78dbff 0%, #ff77c6 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              letterSpacing: '-0.5px'
+            }}>AdvExcel AI</h1>
+            <p style={{ 
+              margin: 0, 
+              fontSize: '12px', 
+              opacity: 0.7,
+              textTransform: 'uppercase',
+              letterSpacing: '2px',
+              fontWeight: '500'
+            }}>Neural Data Intelligence</p>
           </div>
         </div>
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <div style={{
-            background: 'rgba(255, 255, 255, 0.1)',
+          <div className="glass-morphism neon-border" style={{
             padding: '8px 16px',
             borderRadius: '20px',
-            fontSize: '14px'
+            fontSize: '12px',
+            fontWeight: '500',
+            textTransform: 'uppercase',
+            letterSpacing: '1px'
           }}>
-            Welcome, {user.name}
+            Neural User: {user.name}
           </div>
           <button
             onClick={() => {
               localStorage.setItem('use_new_interface', 'false');
               window.location.reload();
             }}
+            className="hover-lift"
             style={{
-              background: 'rgba(255, 255, 255, 0.2)',
-              border: 'none',
+              background: 'linear-gradient(135deg, rgba(120, 219, 255, 0.2) 0%, rgba(255, 119, 198, 0.2) 100%)',
+              border: '1px solid rgba(120, 219, 255, 0.5)',
               color: 'white',
-              padding: '10px 20px',
+              padding: '12px 24px',
               borderRadius: '25px',
               cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: '500',
-              transition: 'all 0.3s ease'
+              fontSize: '12px',
+              fontWeight: '600',
+              textTransform: 'uppercase',
+              letterSpacing: '1px',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              boxShadow: '0 0 20px rgba(120, 219, 255, 0.3)'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
+              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(120, 219, 255, 0.4) 0%, rgba(255, 119, 198, 0.4) 100%)';
+              e.currentTarget.style.boxShadow = '0 0 30px rgba(120, 219, 255, 0.6)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(120, 219, 255, 0.2) 0%, rgba(255, 119, 198, 0.2) 100%)';
+              e.currentTarget.style.boxShadow = '0 0 20px rgba(120, 219, 255, 0.3)';
             }}
           >
-            Basic
+            Classic Mode
           </button>
           <button
             onClick={onLogout}
+            className="hover-lift"
             style={{
-              background: 'rgba(255, 255, 255, 0.2)',
-              border: 'none',
+              background: 'linear-gradient(135deg, rgba(255, 77, 77, 0.2) 0%, rgba(255, 119, 198, 0.2) 100%)',
+              border: '1px solid rgba(255, 77, 77, 0.5)',
               color: 'white',
-              padding: '10px 20px',
+              padding: '12px 24px',
               borderRadius: '25px',
               cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: '500',
-              transition: 'all 0.3s ease'
+              fontSize: '12px',
+              fontWeight: '600',
+              textTransform: 'uppercase',
+              letterSpacing: '1px',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              boxShadow: '0 0 20px rgba(255, 77, 77, 0.3)'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
+              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255, 77, 77, 0.4) 0%, rgba(255, 119, 198, 0.4) 100%)';
+              e.currentTarget.style.boxShadow = '0 0 30px rgba(255, 77, 77, 0.6)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255, 77, 77, 0.2) 0%, rgba(255, 119, 198, 0.2) 100%)';
+              e.currentTarget.style.boxShadow = '0 0 20px rgba(255, 77, 77, 0.3)';
             }}
           >
-            Logout
+            Disconnect
           </button>
         </div>
       </header>
@@ -2349,17 +2448,41 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           alignItems: 'stretch'
         }}>
           {/* Left Panel - Upload & AI */}
-          <div style={{
-            background: 'rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(20px)',
+          <div className="glass-morphism neon-border hover-lift" style={{
             borderRadius: '24px',
             padding: '32px',
-            border: '1px solid rgba(255, 255, 255, 0.2)'
+            position: 'relative',
+            overflow: 'hidden'
           }}>
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '2px',
+              background: 'linear-gradient(90deg, transparent 0%, #78dbff 50%, transparent 100%)',
+              animation: 'pulse 2s ease-in-out infinite'
+            }} />
             {/* File Upload */}
             <div style={{ marginBottom: '32px' }}>
-              <h3 style={{ margin: '0 0 20px 0', fontSize: '18px', fontWeight: '600' }}>
-                📁 Upload Your Data
+              <h3 style={{ 
+                margin: '0 0 20px 0', 
+                fontSize: '20px', 
+                fontWeight: '700',
+                background: 'linear-gradient(135deg, #78dbff 0%, #ff77c6 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px'
+              }}>
+                <span style={{ 
+                  fontSize: '24px',
+                  background: 'linear-gradient(135deg, #78dbff 0%, #ff77c6 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent'
+                }}>⚡</span>
+                Neural Data Input
               </h3>
               
               <input
@@ -2380,24 +2503,72 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                 onDragOver={handleDrag}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
+                className="hover-lift"
                 style={{
-                  border: `2px dashed ${dragActive ? '#4ecdc4' : 'rgba(255, 255, 255, 0.3)'}`,
-                  borderRadius: '16px',
+                  border: `2px dashed ${dragActive ? '#78dbff' : 'rgba(120, 219, 255, 0.3)'}`,
+                  borderRadius: '20px',
                   padding: '40px 20px',
                   textAlign: 'center',
                   cursor: 'pointer',
-                  background: dragActive ? 'rgba(78, 205, 196, 0.1)' : 'rgba(255, 255, 255, 0.05)',
-                  transition: 'all 0.3s ease'
+                  background: dragActive 
+                    ? 'radial-gradient(circle, rgba(120, 219, 255, 0.2) 0%, rgba(255, 119, 198, 0.1) 100%)' 
+                    : 'rgba(255, 255, 255, 0.02)',
+                  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                  boxShadow: dragActive 
+                    ? '0 0 40px rgba(120, 219, 255, 0.4), inset 0 0 40px rgba(120, 219, 255, 0.1)'
+                    : '0 0 20px rgba(120, 219, 255, 0.1)',
+                  position: 'relative',
+                  overflow: 'hidden'
                 }}
               >
-                <div style={{ fontSize: '48px', marginBottom: '16px' }}>
-                  {dragActive ? '📥' : '📊'}
+                {dragActive && (
+                  <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: '-100%',
+                    width: '100%',
+                    height: '100%',
+                    background: 'linear-gradient(90deg, transparent 0%, rgba(120, 219, 255, 0.3) 50%, transparent 100%)',
+                    animation: 'shimmer 1.5s ease-in-out infinite'
+                  }} />
+                )}
+                <style>
+                  {`
+                    @keyframes shimmer {
+                      0% { left: -100%; }
+                      100% { left: 100%; }
+                    }
+                  `}
+                </style>
+                <div style={{ 
+                  fontSize: '48px', 
+                  marginBottom: '16px',
+                  background: 'linear-gradient(135deg, #78dbff 0%, #ff77c6 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  filter: dragActive ? 'drop-shadow(0 0 10px rgba(120, 219, 255, 0.8))' : 'none'
+                }}>
+                  {dragActive ? '✨' : '🧠'}
                 </div>
-                <h4 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: '600' }}>
-                  {dragActive ? 'Drop your file here' : 'Drag & drop or click to upload'}
+                <h4 style={{ 
+                  margin: '0 0 8px 0', 
+                  fontSize: '18px', 
+                  fontWeight: '700',
+                  background: 'linear-gradient(135deg, #78dbff 0%, #ff77c6 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent'
+                }}>
+                  {dragActive ? 'Neural Link Established' : 'Initialize Data Stream'}
                 </h4>
-                <p style={{ margin: 0, fontSize: '14px', opacity: 0.7 }}>
-                  Excel (.xlsx, .xls) or CSV files
+                <p style={{ 
+                  margin: 0, 
+                  fontSize: '12px', 
+                  opacity: 0.7,
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px',
+                  fontWeight: '500'
+                }}>
+                  Excel (.xlsx, .xls) or CSV Quantum Files
                 </p>
               </div>
             </div>
@@ -2860,25 +3031,55 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           </div>
 
           {/* Right Panel - Data Display Only */}
-          <div style={{
-            background: 'rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(20px)',
+          <div className="glass-morphism neon-border hover-lift" style={{
             borderRadius: '24px',
             padding: '32px',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
             minHeight: '600px',
             display: 'flex',
             flexDirection: 'column',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            position: 'relative'
           }}>
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              right: 0,
+              width: '100%',
+              height: '2px',
+              background: 'linear-gradient(270deg, transparent 0%, #ff77c6 50%, transparent 100%)',
+              animation: 'pulse 2s ease-in-out infinite'
+            }} />
             {spreadsheetData.length > 0 ? (
               <>
                 <div style={{ marginBottom: '16px' }}>
-                  <h3 style={{ margin: '0 0 4px 0', fontSize: '18px', fontWeight: '600' }}>
-                    📊 Your Data
+                  <h3 style={{ 
+                    margin: '0 0 4px 0', 
+                    fontSize: '20px', 
+                    fontWeight: '700',
+                    background: 'linear-gradient(135deg, #78dbff 0%, #ff77c6 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px'
+                  }}>
+                    <span style={{ 
+                      fontSize: '24px',
+                      background: 'linear-gradient(135deg, #78dbff 0%, #ff77c6 100%)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent'
+                    }}>🧠</span>
+                    Neural Data Matrix
                   </h3>
-                  <p style={{ margin: 0, fontSize: '14px', opacity: 0.7 }}>
-                    {displayData.length - 1} rows × {displayData[0]?.length || 0} columns
+                  <p style={{ 
+                    margin: 0, 
+                    fontSize: '12px', 
+                    opacity: 0.7,
+                    textTransform: 'uppercase',
+                    letterSpacing: '1px',
+                    fontWeight: '500'
+                  }}>
+                    {displayData.length - 1} Data Nodes × {displayData[0]?.length || 0} Dimensions
                   </p>
                 </div>
                 
