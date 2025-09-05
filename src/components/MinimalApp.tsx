@@ -1861,18 +1861,9 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             <span style={{ fontSize: '14px' }}>Welcome, {user.name} {trialStatus?.hasValidPayment && !trialStatus?.inTrial ? '(Paid)' : trialStatus?.inTrial ? '(Free Trial)' : '(Free)'}</span>
             <button
               onClick={() => {
-                // Check if user can access Advanced interface
-                const canUseAdvanced = user.email === 'katragadda225@gmail.com' || user.email?.includes('@advexcel.online');
-                
-                if (canUseAdvanced) {
+                if (trialStatus?.hasValidPayment || trialStatus?.isAdmin || user.email === 'katragadda225@gmail.com' || user.email?.includes('@advexcel.online')) {
                   localStorage.setItem('use_new_interface', 'true');
                   window.location.reload();
-                } else if (trialStatus?.hasValidPayment && trialStatus?.inTrial) {
-                  // Trial users get message about Advanced features
-                  alert('Advanced interface is coming soon! For now, you can access advanced features through AI commands like "chart", "analysis", etc.');
-                } else if (trialStatus?.hasValidPayment && !trialStatus?.inTrial) {
-                  // Paid users get message about Advanced features
-                  alert('Advanced interface is coming soon! For now, you can access advanced features through AI commands like "chart", "analysis", etc.');
                 } else {
                   window.location.href = '/payment';
                 }

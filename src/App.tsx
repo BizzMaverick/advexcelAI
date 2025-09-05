@@ -43,7 +43,7 @@ function App() {
     return localStorage.getItem('use_new_interface') === 'true';
   });
   
-  const canUseNewInterface = user?.email === 'katragadda225@gmail.com' || user?.email?.includes('@advexcel.online');
+  const canUseNewInterface = user?.email === 'katragadda225@gmail.com' || user?.email?.includes('@advexcel.online') || trialStatus.hasValidPayment;
 
   // Check trial/payment status when user logs in
   useEffect(() => {
