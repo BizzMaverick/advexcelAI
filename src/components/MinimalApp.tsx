@@ -1514,22 +1514,79 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       }
     }
 
-    // Handle chart generation (Phase 1 Analytics)
+    // Handle chart generation (Phase 1 - Redirect to Advanced)
     if (lowerPrompt.includes('chart') || lowerPrompt.includes('graph') || lowerPrompt.includes('plot')) {
-      const chartHtml = generateAnalysisChart(fileData, trimmedPrompt);
-      setAiResponse(chartHtml);
+      const hasAdvancedAccess = trialStatus?.hasValidPayment || trialStatus?.isAdmin;
+      
+      if (hasAdvancedAccess) {
+        setAiResponse(`
+          <strong>📊 Chart Feature Available in Advanced Version</strong><br><br>
+          Charts and graphs are available in the Advanced interface.<br><br>
+          <button 
+            onclick="localStorage.setItem('use_new_interface', 'true'); window.location.reload();"
+            style="background: #0078d4; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;"
+          >
+            🚀 Switch to Advanced Interface
+          </button>
+        `);
+      } else {
+        setAiResponse(`
+          <strong>📊 Chart Feature - Upgrade Required</strong><br><br>
+          Charts and graphs are available in the Advanced version.<br><br>
+          <button 
+            onclick="window.open('https://buy.stripe.com/your-payment-link', '_blank')"
+            style="background: #10b981; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; margin-right: 10px;"
+          >
+            💳 Upgrade to Advanced
+          </button>
+          <button 
+            onclick="alert('Please upgrade to access advanced features including charts, pivot tables, and AI analytics.')"
+            style="background: #6c757d; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px;"
+          >
+            ℹ️ Learn More
+          </button>
+        `);
+      }
       setPrompt('');
       return;
     }
 
-    // HANDLE ANALYSIS REQUESTS - Generate charts instead of AWS calls
-    const analysisKeywords = ['analysis', 'analyze', 'compare', 'comparison', 'show me', 'visualize', 'display'];
+    // HANDLE ANALYSIS REQUESTS - Redirect to Advanced
+    const analysisKeywords = ['analysis', 'analyze', 'compare', 'comparison', 'visualize', 'display'];
     const isAnalysisRequest = analysisKeywords.some(keyword => lowerPrompt.includes(keyword));
     
     if (isAnalysisRequest) {
-      // Generate chart for analysis request
-      const chartHtml = generateAnalysisChart(fileData, trimmedPrompt);
-      setAiResponse(chartHtml);
+      const hasAdvancedAccess = trialStatus?.hasValidPayment || trialStatus?.isAdmin;
+      
+      if (hasAdvancedAccess) {
+        setAiResponse(`
+          <strong>🔬 Advanced Analytics Available</strong><br><br>
+          Advanced analysis features are available in the Advanced interface.<br><br>
+          <button 
+            onclick="localStorage.setItem('use_new_interface', 'true'); window.location.reload();"
+            style="background: #0078d4; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;"
+          >
+            🚀 Switch to Advanced Interface
+          </button>
+        `);
+      } else {
+        setAiResponse(`
+          <strong>🔬 Advanced Analytics - Upgrade Required</strong><br><br>
+          Advanced analysis features are available in the Advanced version.<br><br>
+          <button 
+            onclick="window.open('https://buy.stripe.com/your-payment-link', '_blank')"
+            style="background: #10b981; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; margin-right: 10px;"
+          >
+            💳 Upgrade to Advanced
+          </button>
+          <button 
+            onclick="alert('Advanced features include: Charts & Graphs, Pivot Tables, Statistical Analysis, Predictive Analytics, Data Quality Assessment, and AI-powered insights.')"
+            style="background: #6c757d; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px;"
+          >
+            ℹ️ Learn More
+          </button>
+        `);
+      }
       setPrompt('');
       return;
     }
@@ -1606,13 +1663,16 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             <span style={{ fontSize: '16px', fontWeight: '600' }}>AdvExcel</span>
           </div>
           <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-            <span style={{ fontSize: '14px' }}>Welcome, {user.name}</span>
-            {(user.email === 'katragadda225@gmail.com' || user.email?.includes('@advexcel.online')) && (
+            <span style={{ fontSize: '14px' }}>Welcome, {user.name} {trialStatus?.hasValidPayment ? '(Premium)' : '(Basic)'}</span>
+            {(user.email === 'katragadda225@gmail.com' || user.email?.includes('@advexcel.online') || trialStatus?.hasValidPayment) && (
               <button
                 onClick={() => {
-                  const newValue = !localStorage.getItem('use_new_interface') || localStorage.getItem('use_new_interface') === 'false';
-                  localStorage.setItem('use_new_interface', newValue.toString());
-                  window.location.reload();
+                  if (trialStatus?.hasValidPayment || trialStatus?.isAdmin || user.email === 'katragadda225@gmail.com' || user.email?.includes('@advexcel.online')) {
+                    localStorage.setItem('use_new_interface', 'true');
+                    window.location.reload();
+                  } else {
+                    alert('Please upgrade to access the Advanced interface with charts, pivot tables, and AI analytics.');
+                  }
                 }}
                 style={{
                   background: 'rgba(255,255,255,0.2)',
@@ -1682,7 +1742,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                   fontSize: '12px', 
                   fontWeight: '500'
                 }}>
-                  Trial: {trialStatus.promptsRemaining || 0} prompts left today
+                  {trialStatus.hasValidPayment ? 'Premium User' : `Trial: ${trialStatus.promptsRemaining || 0} prompts left`}
                 </div>
               )}
             </div>
@@ -1699,7 +1759,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                     }
                   }
                 }}
-                placeholder="Try: SUMIF A > 100 B, CONCATENATE A1 B1, TODAY, UPPER A1..."
+                placeholder="Try: SUMIF A > 100 B, sum column A, lookup data, sort by column B..."
                 style={{ 
                   flex: 1, 
                   padding: '12px', 
