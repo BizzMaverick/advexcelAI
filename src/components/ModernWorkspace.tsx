@@ -2324,7 +2324,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
         `}
       </style>
       {/* Header */}
-      <header className="glass-morphism" style={{
+      <header style={{
         borderBottom: '1px solid rgba(120, 219, 255, 0.3)',
         padding: window.innerWidth <= 768 ? '15px 20px' : '20px 40px',
         display: 'flex',
@@ -2457,7 +2457,8 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           alignItems: 'stretch'
         }}>
           {/* Left Panel - Upload & AI */}
-          <div className="glass-morphism neon-border hover-lift" style={{
+          <div className="hover-lift" style={{
+            background: 'transparent',
             borderRadius: '24px',
             padding: '32px',
             position: 'relative',
@@ -3152,7 +3153,8 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           </div>
 
           {/* Right Panel - Data Display Only */}
-          <div className="glass-morphism neon-border hover-lift" style={{
+          <div className="hover-lift" style={{
+            background: 'transparent',
             borderRadius: '24px',
             padding: '32px',
             minHeight: '600px',
@@ -3721,7 +3723,8 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
       </main>
       
       {/* Footer with Legal Pages */}
-      <footer className="glass-morphism" style={{
+      <footer style={{
+        background: 'transparent',
         borderTop: '1px solid rgba(120, 219, 255, 0.3)',
         color: 'white',
         padding: '40px',

@@ -1860,8 +1860,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           zIndex: 1
         }} />
         <header style={{ 
-          background: 'rgba(0, 120, 212, 0.9)', 
-          backdropFilter: 'blur(20px)',
+          background: 'transparent',
           color: 'white', 
           padding: '10px', 
           display: 'flex', 
@@ -1910,7 +1909,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           </div>
         </header>
         
-        <main style={{ padding: '20px', background: 'rgba(245, 245, 245, 0.95)', backdropFilter: 'blur(10px)', minHeight: 'calc(100vh - 50px)', position: 'relative', zIndex: 100 }}>
+        <main style={{ padding: '20px', background: 'transparent', minHeight: 'calc(100vh - 50px)', position: 'relative', zIndex: 100 }}>
           {/* File Upload */}
           <div className="section-animate card-animate" style={{ background: 'white', borderRadius: '8px', padding: '20px', marginBottom: '20px', color: '#333' }}>
             <h3 style={{ margin: '0 0 15px 0', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -2518,8 +2517,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
         
         {/* Footer with Legal Pages */}
         <footer style={{
-          background: 'rgba(35, 47, 62, 0.9)',
-          backdropFilter: 'blur(20px)',
+          background: 'transparent',
           color: '#ffffff',
           padding: '20px',
           textAlign: 'center',
