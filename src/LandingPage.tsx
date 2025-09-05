@@ -981,9 +981,19 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
             </form>
           )}
           
+          <div style={{
+            fontSize: '11px',
+            color: '#6b7280',
+            fontStyle: 'italic',
+            textAlign: 'center',
+            marginBottom: '16px'
+          }}>
+            🎊 Limited time offer expires January 16, 2025
+          </div>
+          
           <p style={{ 
             textAlign: 'center', 
-            margin: '24px 0 0 0',
+            margin: '8px 0 0 0',
             fontSize: '13px',
             color: colors.textSecondary
           }}>
