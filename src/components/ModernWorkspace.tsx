@@ -3458,56 +3458,7 @@ Have questions or feedback? We'd love to hear from you! Contact us at contact@ad
           onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}
           >About Us</a>
           
-          <a onClick={() => {
-            setLegalContent({ 
-              title: 'Choose Your Plan', 
-              content: `Festival Season Pricing (Until January 16, 2026):
-
-Basic Plan - ₹49/month:
-• Basic Excel processing
-• Data sorting & filtering
-• 25 prompts per day
-• Email support
-
-Advanced Plan - ₹179/month:
-• Charts & visualizations
-• Advanced analytics
-• Pivot tables
-• Statistical analysis
-
-Full Package - ₹199/month (BEST VALUE!):
-• Everything in Basic + Advanced
-• Unlimited prompts
-• Priority support
-• SAVE ₹29/month vs buying separately!
-
-Smart Savings:
-Basic (₹49) + Advanced (₹179) = ₹228/month
-Full Package = ₹199/month
-You save ₹29 every month!
-
-All plans include:
-• 3-day free trial
-• Secure AWS cloud processing
-• Multi-sheet Excel support
-• Natural language AI processing
-• Data export capabilities
-
-Payment Methods:
-• Secure payment via Razorpay
-• All major credit/debit cards accepted
-• UPI and net banking supported
-• Instant activation after payment
-
-To subscribe:
-1. Choose your plan
-2. Complete secure payment
-3. Start using advanced features immediately
-
-Need help choosing? Contact us at contact@advexcel.online` 
-            });
-            setShowLegalModal(true);
-          }} style={{ color: 'white', textDecoration: 'none', fontSize: '16px', cursor: 'pointer', opacity: 0.8, transition: 'opacity 0.3s ease' }}
+          <a onClick={() => window.location.href = '/payments'} style={{ color: 'white', textDecoration: 'none', fontSize: '16px', cursor: 'pointer', opacity: 0.8, transition: 'opacity 0.3s ease' }}
           onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
           onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}
           >Pricing</a>
