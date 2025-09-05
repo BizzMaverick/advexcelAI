@@ -3408,31 +3408,109 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
         textAlign: 'center'
       }}>
         <div style={{ display: 'flex', justifyContent: 'center', gap: window.innerWidth <= 768 ? '16px' : '32px', flexWrap: 'wrap', marginBottom: '20px' }}>
-          <a 
-            href="#" 
-            onClick={(e) => {
-              e.preventDefault();
-              window.open('/about', '_blank');
-            }}
-            style={{ color: 'white', textDecoration: 'none', fontSize: '16px', cursor: 'pointer', opacity: 0.8, transition: 'opacity 0.3s ease' }}
-            onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
-            onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}
-          >
-            About Us
-          </a>
+          <a onClick={() => {
+            setLegalContent({ 
+              title: 'About Us', 
+              content: `About the Creator:
+
+Yadunandan Katragadda is a full-stack developer and AI enthusiast passionate about creating intelligent solutions that simplify complex data analysis. With expertise in cloud technologies and machine learning, he built AdvExcel AI to democratize advanced data analytics for everyone.
+
+As an AWS Solutions Architect and AI/ML Engineer, Yadunandan combines deep technical knowledge with a user-centric approach to deliver powerful yet accessible tools for data professionals and business users alike.
+
+His vision is to make advanced data analytics as simple as having a conversation, enabling anyone to unlock insights from their data without requiring technical expertise.
+
+About AdvExcel AI:
+
+AdvExcel AI is an intelligent data analysis platform that transforms how you work with Excel and CSV files. Powered by Amazon Web Services and advanced AI, it brings enterprise-level analytics to your fingertips.
+
+Our platform uses natural language processing to let you ask questions in plain English, get insights, create charts, and analyze patterns without complex formulas or technical expertise.
+
+Built on AWS infrastructure for reliability, security, and scalability, AdvExcel AI processes your data securely and never permanently stores your sensitive information.
+
+Key Features:
+• AI-powered natural language processing for plain English queries
+• Advanced pivot tables and statistical analysis
+• Beautiful charts and data visualizations
+• Predictive insights and trend analysis
+• Data quality assessment and cleaning suggestions
+• Multi-sheet Excel workbook support
+• Secure cloud processing with AWS infrastructure
+
+Our Mission:
+
+To democratize advanced data analytics by making AI-powered insights accessible to everyone, regardless of technical background.
+
+We believe that powerful data analysis shouldn't require years of training or expensive software. AdvExcel AI empowers businesses and individuals to make data-driven decisions effortlessly.
+
+Technology Stack:
+• Amazon Web Services (AWS) for cloud infrastructure
+• AWS Bedrock for AI and machine learning capabilities
+• React and TypeScript for the user interface
+• AWS Cognito for secure user authentication
+• Razorpay for secure payment processing
+
+Contact Us:
+Have questions or feedback? We'd love to hear from you! Contact us at contact@advexcel.online` 
+            });
+            setShowLegalModal(true);
+          }} style={{ color: 'white', textDecoration: 'none', fontSize: '16px', cursor: 'pointer', opacity: 0.8, transition: 'opacity 0.3s ease' }}
+          onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+          onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}
+          >About Us</a>
           
-          <a 
-            href="#" 
-            onClick={(e) => {
-              e.preventDefault();
-              window.open('/payments', '_blank');
-            }}
-            style={{ color: 'white', textDecoration: 'none', fontSize: '16px', cursor: 'pointer', opacity: 0.8, transition: 'opacity 0.3s ease' }}
-            onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
-            onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}
-          >
-            Pricing
-          </a>
+          <a onClick={() => {
+            setLegalContent({ 
+              title: 'Choose Your Plan', 
+              content: `Festival Season Pricing (Until January 16, 2026):
+
+Basic Plan - ₹49/month:
+• Basic Excel processing
+• Data sorting & filtering
+• 25 prompts per day
+• Email support
+
+Advanced Plan - ₹179/month:
+• Charts & visualizations
+• Advanced analytics
+• Pivot tables
+• Statistical analysis
+
+Full Package - ₹199/month (BEST VALUE!):
+• Everything in Basic + Advanced
+• Unlimited prompts
+• Priority support
+• SAVE ₹29/month vs buying separately!
+
+Smart Savings:
+Basic (₹49) + Advanced (₹179) = ₹228/month
+Full Package = ₹199/month
+You save ₹29 every month!
+
+All plans include:
+• 3-day free trial
+• Secure AWS cloud processing
+• Multi-sheet Excel support
+• Natural language AI processing
+• Data export capabilities
+
+Payment Methods:
+• Secure payment via Razorpay
+• All major credit/debit cards accepted
+• UPI and net banking supported
+• Instant activation after payment
+
+To subscribe:
+1. Choose your plan
+2. Complete secure payment
+3. Start using advanced features immediately
+
+Need help choosing? Contact us at contact@advexcel.online` 
+            });
+            setShowLegalModal(true);
+          }} style={{ color: 'white', textDecoration: 'none', fontSize: '16px', cursor: 'pointer', opacity: 0.8, transition: 'opacity 0.3s ease' }}
+          onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+          onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}
+          >Pricing</a>
           
           <a onClick={() => {
             setLegalContent({ 
