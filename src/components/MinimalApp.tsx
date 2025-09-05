@@ -227,6 +227,9 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
   const [showChart, setShowChart] = useState(false);
   const [chartType, setChartType] = useState<'bar' | 'line' | 'pie'>('bar');
   const [analysisCountry, setAnalysisCountry] = useState<string>('');
+  const [promptHistory, setPromptHistory] = useState<string[]>([]);
+  const [showPromptDropdown, setShowPromptDropdown] = useState(false);
+  const [lastPromptResult, setLastPromptResult] = useState<string>('');
 
   // Generate device fingerprint for single device login
   const getDeviceFingerprint = () => {
@@ -1155,6 +1158,11 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       return;
     }
 
+    // Add to prompt history
+    if (!promptHistory.includes(trimmedPrompt)) {
+      setPromptHistory(prev => [trimmedPrompt, ...prev.slice(0, 9)]); // Keep last 10 prompts
+    }
+
     // Check if user can use a prompt (trial/payment limits)
     if (!trialStatus?.isAdmin) {
       const deviceId = localStorage.getItem('device_id') || getDeviceFingerprint();
@@ -1262,6 +1270,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     const columnSumResult = handleColumnSum(trimmedPrompt, fileData);
     if (columnSumResult) {
       setAiResponse(columnSumResult);
+      setLastPromptResult(trimmedPrompt);
       setPrompt('');
       return;
     }
@@ -1826,7 +1835,20 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
 
   const applyChangesToMainSheet = () => {
     if (lastAiResult.length > 0) {
-      setFileData([...lastAiResult]);
+      // Find the result row and add function description
+      const resultData = [...lastAiResult];
+      const lastRowIndex = resultData.length - 1;
+      const lastRow = resultData[lastRowIndex];
+      
+      // Find the column with the result value
+      const resultColIndex = lastRow.findIndex(cell => cell !== '');
+      if (resultColIndex >= 0 && lastPromptResult) {
+        // Replace just the value with function description + value
+        const value = lastRow[resultColIndex];
+        resultData[lastRowIndex][resultColIndex] = `${lastPromptResult}: ${value}`;
+      }
+      
+      setFileData(resultData);
       setShowUseResultButton(false);
       setAiResponse(prev => prev + '<br><br><p style="color: #10b981; font-weight: bold;">✅ Changes applied to main sheet!</p>');
     }
@@ -1984,6 +2006,97 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             )}
           </div>
 
+          {/* File Data */}
+          {fileData.length > 0 && (
+            <div style={{ background: 'white', borderRadius: '8px', marginBottom: '20px', overflow: 'hidden' }}>
+              <div style={{ padding: '15px', background: '#0078d4', color: 'white' }}>
+                <h3 style={{ margin: 0, fontSize: '16px' }}>
+                  {selectedFile?.name}{selectedSheet && ` - ${selectedSheet}`}
+                </h3>
+                <p style={{ margin: '5px 0 0 0', fontSize: '12px', opacity: 0.9 }}>
+                  {fileData.length} rows × {fileData[0]?.length || 0} columns
+                  {sheetNames.length > 1 && ` | Sheet ${sheetNames.indexOf(selectedSheet) + 1} of ${sheetNames.length}`}
+                </p>
+              </div>
+              <div style={{ maxHeight: '400px', overflow: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ background: '#e6f3ff', borderBottom: '2px solid #0078d4' }}>
+                      <th style={{ padding: '8px', fontSize: '11px', fontWeight: 'bold', color: '#0078d4', border: '1px solid #ddd' }}>#</th>
+                      {fileData[0] && fileData[0].map((_, colIndex) => (
+                        <th key={colIndex} style={{ padding: '8px', fontSize: '11px', fontWeight: 'bold', color: '#0078d4', border: '1px solid #ddd' }}>
+                          {String.fromCharCode(65 + colIndex)}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {fileData.map((row, i) => (
+                      <tr key={i}>
+                        <td style={{ 
+                          padding: '8px', 
+                          borderRight: '1px solid #eee',
+                          fontWeight: 'bold',
+                          fontSize: '11px',
+                          color: '#0078d4',
+                          background: '#f8f9ff',
+                          textAlign: 'center'
+                        }}>
+                          {i + 1}
+                        </td>
+                        {Array.isArray(row) && row.length > 0 ? row.map((cell, j) => (
+                          <td 
+                            key={j}
+                            onClick={(e) => {
+                              const cellId = `${i}-${j}`;
+                              
+                              if (formatPainterActive && copiedFormat) {
+                                // Apply copied format to clicked cell
+                                saveToUndoStack(cellFormatting);
+                                const newFormatting = { ...cellFormatting };
+                                newFormatting[cellId] = { ...copiedFormat };
+                                setCellFormatting(newFormatting);
+                                setFormatPainterActive(false);
+                                setCopiedFormat(null);
+                                return;
+                              }
+                              
+                              // Multiple cell selection with Ctrl+click
+                              if (e.ctrlKey || e.metaKey) {
+                                if (selectedCells.includes(cellId)) {
+                                  setSelectedCells(selectedCells.filter(id => id !== cellId));
+                                } else {
+                                  setSelectedCells([...selectedCells, cellId]);
+                                }
+                              } else {
+                                // Single cell selection
+                                setSelectedCells([cellId]);
+                              }
+                            }}
+                            style={{ 
+                              padding: '8px', 
+                              borderRight: '1px solid #eee',
+                              fontWeight: i === 0 ? 'bold' : 'normal',
+                              color: '#333',
+                              cursor: 'pointer',
+                              backgroundColor: selectedCells.includes(`${i}-${j}`) ? '#cce7ff' : 
+                                              (i % 2 === 0 ? '#fafafa' : 'white'),
+                              ...cellFormatting[`${i}-${j}`]
+                            }}
+                          >
+                            {String(cell || '')}
+                          </td>
+                        )) : (
+                          <td style={{ padding: '8px', color: '#666', fontStyle: 'italic' }}>No data</td>
+                        )}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
           {/* AI Command */}
           <div className="section-animate card-animate" style={{ background: 'white', borderRadius: '8px', padding: '20px', marginBottom: '20px', color: '#333' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
@@ -2004,29 +2117,70 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                 </div>
               )}
             </div>
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <input 
-                type="text"
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    if (!isProcessing && selectedFile && prompt.trim()) {
-                      handleProcessAI();
+            <div style={{ display: 'flex', gap: '10px', position: 'relative' }}>
+              <div style={{ flex: 1, position: 'relative' }}>
+                <input 
+                  type="text"
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  onFocus={() => setShowPromptDropdown(true)}
+                  onBlur={() => setTimeout(() => setShowPromptDropdown(false), 200)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      if (!isProcessing && selectedFile && prompt.trim()) {
+                        handleProcessAI();
+                      }
                     }
-                  }
-                }}
-                placeholder="Try: SUMIF A > 100 B, sum column A, lookup data, sort by column B..."
-                style={{ 
-                  flex: 1, 
-                  padding: '12px', 
-                  border: '1px solid #ddd', 
-                  borderRadius: '6px',
-                  color: '#333',
-                  backgroundColor: '#ffffff'
-                }}
-              />
+                  }}
+                  placeholder="Try: SUMIF A > 100 B, sum column A, lookup data, sort by column B..."
+                  style={{ 
+                    width: '100%', 
+                    padding: '12px', 
+                    border: '1px solid #ddd', 
+                    borderRadius: '6px',
+                    color: '#333',
+                    backgroundColor: '#ffffff'
+                  }}
+                />
+                {showPromptDropdown && promptHistory.length > 0 && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '100%',
+                    left: 0,
+                    right: 0,
+                    background: 'white',
+                    border: '1px solid #ddd',
+                    borderTop: 'none',
+                    borderRadius: '0 0 6px 6px',
+                    maxHeight: '200px',
+                    overflowY: 'auto',
+                    zIndex: 1000,
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                  }}>
+                    {promptHistory.map((historyPrompt, index) => (
+                      <div
+                        key={index}
+                        onClick={() => {
+                          setPrompt(historyPrompt);
+                          setShowPromptDropdown(false);
+                        }}
+                        style={{
+                          padding: '8px 12px',
+                          cursor: 'pointer',
+                          borderBottom: index < promptHistory.length - 1 ? '1px solid #eee' : 'none',
+                          fontSize: '14px',
+                          color: '#333'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = '#f5f5f5'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
+                      >
+                        {historyPrompt}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
               <button 
                 className="btn-animate"
                 onClick={handleProcessAI}
