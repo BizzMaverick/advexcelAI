@@ -1008,6 +1008,35 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
           
 
           
+          {/* Navigation Links */}
+          <div style={{
+            textAlign: 'center',
+            margin: '16px 0 8px 0',
+            fontSize: '13px',
+            color: colors.textSecondary
+          }}>
+            <a 
+              href="#" 
+              style={{ color: colors.primary, textDecoration: 'none', marginRight: '16px' }}
+              onClick={(e) => {
+                e.preventDefault();
+                window.open('/about', '_blank');
+              }}
+            >
+              About Us
+            </a>
+            <a 
+              href="#" 
+              style={{ color: colors.primary, textDecoration: 'none' }}
+              onClick={(e) => {
+                e.preventDefault();
+                window.open('/payments', '_blank');
+              }}
+            >
+              Pricing
+            </a>
+          </div>
+          
           <p style={{ 
             textAlign: 'center', 
             margin: '8px 0 0 0',

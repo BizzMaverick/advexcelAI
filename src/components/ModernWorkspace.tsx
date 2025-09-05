@@ -3408,6 +3408,32 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
         textAlign: 'center'
       }}>
         <div style={{ display: 'flex', justifyContent: 'center', gap: window.innerWidth <= 768 ? '16px' : '32px', flexWrap: 'wrap', marginBottom: '20px' }}>
+          <a 
+            href="#" 
+            onClick={(e) => {
+              e.preventDefault();
+              window.open('/about', '_blank');
+            }}
+            style={{ color: 'white', textDecoration: 'none', fontSize: '16px', cursor: 'pointer', opacity: 0.8, transition: 'opacity 0.3s ease' }}
+            onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+            onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}
+          >
+            About Us
+          </a>
+          
+          <a 
+            href="#" 
+            onClick={(e) => {
+              e.preventDefault();
+              window.open('/payments', '_blank');
+            }}
+            style={{ color: 'white', textDecoration: 'none', fontSize: '16px', cursor: 'pointer', opacity: 0.8, transition: 'opacity 0.3s ease' }}
+            onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+            onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}
+          >
+            Pricing
+          </a>
+          
           <a onClick={() => {
             setLegalContent({ 
               title: 'Privacy Policy', 

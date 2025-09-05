@@ -2507,6 +2507,26 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           borderTop: '1px solid #e1e5e9'
         }}>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', flexWrap: 'wrap', marginBottom: '12px' }}>
+            <a 
+              href="#" 
+              onClick={(e) => {
+                e.preventDefault();
+                window.open('/about', '_blank');
+              }}
+              style={{ color: '#ffffff', textDecoration: 'none', fontSize: '14px', cursor: 'pointer' }}
+            >
+              About Us
+            </a>
+            <a 
+              href="#" 
+              onClick={(e) => {
+                e.preventDefault();
+                window.open('/payments', '_blank');
+              }}
+              style={{ color: '#ffffff', textDecoration: 'none', fontSize: '14px', cursor: 'pointer' }}
+            >
+              Pricing
+            </a>
             <a onClick={() => {
               setLegalContent({ 
                 title: 'Privacy Policy', 
