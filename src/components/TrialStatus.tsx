@@ -60,30 +60,7 @@ export default function TrialStatus({
         </div>
 
         <div className="trial-buttons" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <button
-            onClick={onUpgrade}
-            style={{
-              background: '#10b981',
-              border: 'none',
-              color: 'white',
-              padding: '8px 16px',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontSize: '13px',
-              fontWeight: '600',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-            }}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="white" strokeWidth="2" fill="white"/>
-              <path d="M2 17L12 22L22 17" stroke="white" strokeWidth="2"/>
-              <path d="M2 12L12 17L22 12" stroke="white" strokeWidth="2"/>
-            </svg>
-            Upgrade to Pro - ₹199/month
-          </button>
+
           
 
         </div>
