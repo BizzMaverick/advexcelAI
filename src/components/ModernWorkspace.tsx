@@ -2551,14 +2551,10 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   `}
                 </style>
                 <div style={{ 
-                  fontSize: '48px', 
                   marginBottom: '16px',
-                  background: 'linear-gradient(135deg, #78dbff 0%, #ff77c6 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
                   filter: dragActive ? 'drop-shadow(0 0 10px rgba(120, 219, 255, 0.8))' : 'none'
                 }}>
-                  {dragActive ? '✨' : '🧠'}
+                  <img src="/upload-icon.gif" alt="Upload" style={{ width: '64px', height: '64px' }} />
                 </div>
                 <h4 style={{ 
                   margin: '0 0 8px 0', 
@@ -3144,7 +3140,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                     WebkitTextFillColor: 'transparent',
                     fontSize: '16px'
                   }}>{aiLoading ? '✨' : '🧠'}</span>
-                  {aiLoading ? <><img src="/refresh.gif" alt="Processing" style={{ width: '16px', height: '16px' }} />Neural Processing...</> : 'Execute Analysis'}
+                  {aiLoading ? <><img src="/refresh-new.gif" alt="Processing" style={{ width: '16px', height: '16px' }} />Neural Processing...</> : 'Execute Analysis'}
                 </button>
               </div>
             </div>
