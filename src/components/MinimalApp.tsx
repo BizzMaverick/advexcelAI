@@ -1516,8 +1516,8 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
 
     // Handle chart generation (Phase 1 - Redirect to Advanced)
     if (lowerPrompt.includes('chart') || lowerPrompt.includes('graph') || lowerPrompt.includes('plot')) {
-      const hasAdvancedAccess = trialStatus?.hasValidPayment || trialStatus?.isAdmin;
-      const hasBasicPaid = trialStatus?.hasValidPayment;
+      const hasAdvancedAccess = (trialStatus?.hasValidPayment && !trialStatus?.inTrial) || trialStatus?.isAdmin;
+      const hasBasicPaid = trialStatus?.hasValidPayment && !trialStatus?.inTrial;
       const inTrial = trialStatus?.inTrial;
       
       if (hasAdvancedAccess) {
@@ -1592,8 +1592,8 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     const isAnalysisRequest = analysisKeywords.some(keyword => lowerPrompt.includes(keyword));
     
     if (isAnalysisRequest) {
-      const hasAdvancedAccess = trialStatus?.hasValidPayment || trialStatus?.isAdmin;
-      const hasBasicPaid = trialStatus?.hasValidPayment;
+      const hasAdvancedAccess = (trialStatus?.hasValidPayment && !trialStatus?.inTrial) || trialStatus?.isAdmin;
+      const hasBasicPaid = trialStatus?.hasValidPayment && !trialStatus?.inTrial;
       const inTrial = trialStatus?.inTrial;
       
       if (hasAdvancedAccess) {
@@ -1729,10 +1729,10 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             <span style={{ fontSize: '16px', fontWeight: '600' }}>AdvExcel</span>
           </div>
           <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-            <span style={{ fontSize: '14px' }}>Welcome, {user.name} {trialStatus?.hasValidPayment ? '(Paid)' : trialStatus?.inTrial ? '(Free Trial)' : '(Free)'}</span>
+            <span style={{ fontSize: '14px' }}>Welcome, {user.name} {trialStatus?.hasValidPayment && !trialStatus?.inTrial ? '(Paid)' : trialStatus?.inTrial ? '(Free Trial)' : '(Free)'}</span>
             <button
               onClick={() => {
-                if (trialStatus?.hasValidPayment || trialStatus?.isAdmin || user.email === 'katragadda225@gmail.com' || user.email?.includes('@advexcel.online')) {
+                if ((trialStatus?.hasValidPayment && !trialStatus?.inTrial) || trialStatus?.isAdmin || user.email === 'katragadda225@gmail.com' || user.email?.includes('@advexcel.online')) {
                   localStorage.setItem('use_new_interface', 'true');
                   window.location.reload();
                 } else {
