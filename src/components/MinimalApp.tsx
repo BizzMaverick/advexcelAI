@@ -1517,6 +1517,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     // Handle chart generation (Phase 1 - Redirect to Advanced)
     if (lowerPrompt.includes('chart') || lowerPrompt.includes('graph') || lowerPrompt.includes('plot')) {
       const hasAdvancedAccess = trialStatus?.hasValidPayment || trialStatus?.isAdmin;
+      const hasBasicPaid = trialStatus?.hasValidPayment; // User paid ₹49 for basic
       
       if (hasAdvancedAccess) {
         setAiResponse(`
@@ -1529,21 +1530,38 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             🚀 Switch to Advanced Interface
           </button>
         `);
-      } else {
+      } else if (hasBasicPaid) {
         setAiResponse(`
-          <strong>📊 Chart Feature - Upgrade Required</strong><br><br>
-          Charts and graphs are available in the Advanced version.<br><br>
+          <strong>📊 Chart Feature - Advanced Upgrade</strong><br><br>
+          You have Basic access (₹49). Upgrade to Advanced for charts and analytics.<br><br>
           <button 
-            onclick="window.open('https://buy.stripe.com/your-payment-link', '_blank')"
+            onclick="window.open('https://buy.stripe.com/advanced-upgrade-179', '_blank')"
             style="background: #10b981; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; margin-right: 10px;"
           >
-            💳 Upgrade to Advanced
+            💳 Upgrade to Advanced (₹179)
           </button>
           <button 
-            onclick="alert('Please upgrade to access advanced features including charts, pivot tables, and AI analytics.')"
+            onclick="alert('Advanced features: Charts, Pivot Tables, Statistical Analysis, Predictive Analytics, AI Insights')"
             style="background: #6c757d; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px;"
           >
             ℹ️ Learn More
+          </button>
+        `);
+      } else {
+        setAiResponse(`
+          <strong>📊 Chart Feature - Subscription Required</strong><br><br>
+          Choose your plan to access charts and advanced features:<br><br>
+          <button 
+            onclick="window.open('https://buy.stripe.com/basic-49', '_blank')"
+            style="background: #0078d4; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; margin-right: 10px;"
+          >
+            💼 Basic Plan (₹49)
+          </button>
+          <button 
+            onclick="window.open('https://buy.stripe.com/full-199', '_blank')"
+            style="background: #10b981; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;"
+          >
+            🚀 Full Plan (₹199) - Save ₹29!
           </button>
         `);
       }
@@ -1557,6 +1575,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     
     if (isAnalysisRequest) {
       const hasAdvancedAccess = trialStatus?.hasValidPayment || trialStatus?.isAdmin;
+      const hasBasicPaid = trialStatus?.hasValidPayment;
       
       if (hasAdvancedAccess) {
         setAiResponse(`
@@ -1569,21 +1588,32 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             🚀 Switch to Advanced Interface
           </button>
         `);
-      } else {
+      } else if (hasBasicPaid) {
         setAiResponse(`
           <strong>🔬 Advanced Analytics - Upgrade Required</strong><br><br>
-          Advanced analysis features are available in the Advanced version.<br><br>
+          You have Basic access. Upgrade to Advanced for analytics and AI insights.<br><br>
           <button 
-            onclick="window.open('https://buy.stripe.com/your-payment-link', '_blank')"
-            style="background: #10b981; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; margin-right: 10px;"
+            onclick="window.open('https://buy.stripe.com/advanced-upgrade-179', '_blank')"
+            style="background: #10b981; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;"
           >
-            💳 Upgrade to Advanced
+            💳 Upgrade to Advanced (₹179)
+          </button>
+        `);
+      } else {
+        setAiResponse(`
+          <strong>🔬 Advanced Analytics - Subscription Required</strong><br><br>
+          Choose your plan to access advanced analytics:<br><br>
+          <button 
+            onclick="window.open('https://buy.stripe.com/basic-49', '_blank')"
+            style="background: #0078d4; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; margin-right: 10px;"
+          >
+            💼 Basic Plan (₹49)
           </button>
           <button 
-            onclick="alert('Advanced features include: Charts & Graphs, Pivot Tables, Statistical Analysis, Predictive Analytics, Data Quality Assessment, and AI-powered insights.')"
-            style="background: #6c757d; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px;"
+            onclick="window.open('https://buy.stripe.com/full-199', '_blank')"
+            style="background: #10b981; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;"
           >
-            ℹ️ Learn More
+            🚀 Full Plan (₹199) - Best Value!
           </button>
         `);
       }
@@ -1663,29 +1693,42 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             <span style={{ fontSize: '16px', fontWeight: '600' }}>AdvExcel</span>
           </div>
           <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-            <span style={{ fontSize: '14px' }}>Welcome, {user.name} {trialStatus?.hasValidPayment ? '(Premium)' : '(Basic)'}</span>
-            {(user.email === 'katragadda225@gmail.com' || user.email?.includes('@advexcel.online') || trialStatus?.hasValidPayment) && (
-              <button
-                onClick={() => {
-                  if (trialStatus?.hasValidPayment || trialStatus?.isAdmin || user.email === 'katragadda225@gmail.com' || user.email?.includes('@advexcel.online')) {
-                    localStorage.setItem('use_new_interface', 'true');
-                    window.location.reload();
-                  } else {
-                    alert('Please upgrade to access the Advanced interface with charts, pivot tables, and AI analytics.');
-                  }
-                }}
-                style={{
-                  background: 'rgba(255,255,255,0.2)',
-                  border: 'none',
-                  color: 'white',
-                  padding: '6px 12px',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
-                }}
-              >
-                Advanced
-              </button>
-            )}
+            <span style={{ fontSize: '14px' }}>Welcome, {user.name} {trialStatus?.hasValidPayment ? '(Paid)' : '(Free Trial)'}</span>
+            <button
+              onClick={() => {
+                if (trialStatus?.hasValidPayment || trialStatus?.isAdmin || user.email === 'katragadda225@gmail.com' || user.email?.includes('@advexcel.online')) {
+                  localStorage.setItem('use_new_interface', 'true');
+                  window.location.reload();
+                } else {
+                  setAiResponse(`
+                    <strong>🚀 Upgrade to Access Advanced Features</strong><br><br>
+                    Choose your plan:<br><br>
+                    <button 
+                      onclick="window.open('https://buy.stripe.com/basic-49', '_blank')"
+                      style="background: #0078d4; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; margin-right: 10px;"
+                    >
+                      💼 Basic Plan (₹49)
+                    </button>
+                    <button 
+                      onclick="window.open('https://buy.stripe.com/full-199', '_blank')"
+                      style="background: #10b981; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;"
+                    >
+                      🚀 Full Plan (₹199) - Save ₹29!
+                    </button>
+                  `);
+                }
+              }}
+              style={{
+                background: 'rgba(255,255,255,0.2)',
+                border: 'none',
+                color: 'white',
+                padding: '6px 12px',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Advanced
+            </button>
             <button onClick={onLogout} style={{ 
               background: 'rgba(255,255,255,0.2)', 
               border: 'none', 
@@ -1742,7 +1785,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                   fontSize: '12px', 
                   fontWeight: '500'
                 }}>
-                  {trialStatus.hasValidPayment ? 'Premium User' : `Trial: ${trialStatus.promptsRemaining || 0} prompts left`}
+                  {trialStatus.hasValidPayment ? 'Paid User' : `Free Trial: ${trialStatus.promptsRemaining || 0} prompts left`}
                 </div>
               )}
             </div>
