@@ -154,7 +154,7 @@ export default function PaymentsPage({ user, onPaymentSuccess, onBackToLogin }: 
 
 
         {/* Pricing Plans */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
+        <div style={{ display: 'flex', gap: '20px', justifyContent: 'space-between' }}>
           {/* Basic Plan */}
           <div style={{
             background: selectedPlan === 'basic' ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.1)',
