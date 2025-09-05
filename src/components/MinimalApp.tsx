@@ -211,6 +211,9 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
   const [showUseResultButton, setShowUseResultButton] = useState(false);
   const [lastAiResult, setLastAiResult] = useState<any[][]>([]);
   const [originalFileData, setOriginalFileData] = useState<any[][]>([]);
+  const [workbook, setWorkbook] = useState<any>(null);
+  const [sheetNames, setSheetNames] = useState<string[]>([]);
+  const [selectedSheet, setSelectedSheet] = useState<string>('');
   const [selectedCells, setSelectedCells] = useState<string[]>([]);
   const [cellFormatting, setCellFormatting] = useState<{ [key: string]: any }>({});
   const [copiedFormat, setCopiedFormat] = useState<any>(null);
@@ -292,27 +295,33 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
-        let parsedData: any[][];
-        
         if (file.name.endsWith('.csv')) {
           const text = e.target?.result as string;
-          parsedData = text.split('\n')
+          const parsedData = text.split('\n')
             .map(row => row.split(',').map(cell => cell.trim()))
             .filter(row => row.some(cell => cell.length > 0));
+          
+          if (parsedData.length > 1000) {
+            parsedData.splice(1000);
+            setFileError('File truncated to 1000 rows for performance');
+          }
+          
+          setFileData(parsedData);
+          setOriginalFileData([...parsedData]);
+          setSheetNames([]);
+          setSelectedSheet('');
+          setWorkbook(null);
         } else {
           const data = new Uint8Array(e.target?.result as ArrayBuffer);
-          const workbook = XLSX.read(data, { type: 'array' });
-          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-          parsedData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 }) as any[][];
+          const wb = XLSX.read(data, { type: 'array' });
+          setWorkbook(wb);
+          setSheetNames(wb.SheetNames);
+          
+          // Load first sheet by default
+          const firstSheetName = wb.SheetNames[0];
+          setSelectedSheet(firstSheetName);
+          loadSheetData(wb, firstSheetName);
         }
-
-        if (parsedData.length > 1000) {
-          parsedData = parsedData.slice(0, 1000);
-          setFileError('File truncated to 1000 rows for performance');
-        }
-
-        setFileData(parsedData);
-        setOriginalFileData([...parsedData]);
       } catch (error) {
         setFileError('Error reading file. Please ensure it is a valid Excel or CSV file.');
       } finally {
@@ -329,6 +338,27 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       reader.readAsText(file);
     } else {
       reader.readAsArrayBuffer(file);
+    }
+  };
+
+  const loadSheetData = (wb: any, sheetName: string) => {
+    const sheet = wb.Sheets[sheetName];
+    let parsedData = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as any[][];
+    
+    if (parsedData.length > 1000) {
+      parsedData = parsedData.slice(0, 1000);
+      setFileError('Sheet truncated to 1000 rows for performance');
+    }
+    
+    setFileData(parsedData);
+    setOriginalFileData([...parsedData]);
+  };
+
+  const handleSheetChange = (sheetName: string) => {
+    if (workbook && sheetName) {
+      setSelectedSheet(sheetName);
+      loadSheetData(workbook, sheetName);
+      setFileError('');
     }
   };
 
@@ -1803,6 +1833,34 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             </div>
             {fileLoading && <div style={{ marginTop: '10px', color: '#0078d4', fontWeight: 'bold' }}>Loading...</div>}
             {fileError && <div style={{ marginTop: '10px', color: '#e53e3e', fontSize: '12px', fontWeight: 'bold' }}>{fileError}</div>}
+            
+            {/* Sheet Selector for Excel files */}
+            {sheetNames.length > 1 && (
+              <div style={{ marginTop: '15px' }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#333' }}>
+                  📊 Select Sheet ({sheetNames.length} sheets available):
+                </label>
+                <select
+                  value={selectedSheet}
+                  onChange={(e) => handleSheetChange(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    backgroundColor: '#ffffff',
+                    color: '#333'
+                  }}
+                >
+                  {sheetNames.map((name, index) => (
+                    <option key={index} value={name}>
+                      {name} {index === 0 ? '(Default)' : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
 
           {/* AI Command */}
@@ -2220,9 +2278,12 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           {fileData.length > 0 && (
             <div style={{ background: 'white', borderRadius: '8px', marginBottom: '20px', overflow: 'hidden' }}>
               <div style={{ padding: '15px', background: '#0078d4', color: 'white' }}>
-                <h3 style={{ margin: 0, fontSize: '16px' }}>{selectedFile?.name}</h3>
+                <h3 style={{ margin: 0, fontSize: '16px' }}>
+                  {selectedFile?.name}{selectedSheet && ` - ${selectedSheet}`}
+                </h3>
                 <p style={{ margin: '5px 0 0 0', fontSize: '12px', opacity: 0.9 }}>
                   {fileData.length} rows × {fileData[0]?.length || 0} columns
+                  {sheetNames.length > 1 && ` | Sheet ${sheetNames.indexOf(selectedSheet) + 1} of ${sheetNames.length}`}
                 </p>
               </div>
               <div style={{ maxHeight: '400px', overflow: 'auto' }}>
