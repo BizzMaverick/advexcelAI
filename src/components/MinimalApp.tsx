@@ -1861,7 +1861,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             <span style={{ fontSize: '14px' }}>Welcome, {user.name} {trialStatus?.hasValidPayment && !trialStatus?.inTrial ? '(Paid)' : trialStatus?.inTrial ? '(Free Trial)' : '(Free)'}</span>
             <button
               onClick={() => {
-                if ((trialStatus?.hasValidPayment && !trialStatus?.inTrial) || trialStatus?.isAdmin || user.email === 'katragadda225@gmail.com' || user.email?.includes('@advexcel.online')) {
+                if (trialStatus?.hasValidPayment || trialStatus?.isAdmin || user.email === 'katragadda225@gmail.com' || user.email?.includes('@advexcel.online')) {
                   localStorage.setItem('use_new_interface', 'true');
                   window.location.reload();
                 } else {
