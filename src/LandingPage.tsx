@@ -648,7 +648,7 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
             lineHeight: '1.4',
             textAlign: 'center'
           }}>
-            <strong>Special Pricing Until Jan 16, 2025:</strong><br/>
+            <strong>Special Pricing Until Jan 16, 2026:</strong><br/>
             ✨ Basic Plan: ₹49 | Full Plan: ₹199 (Save ₹29!)<br/>
             🚀 3-day free trial + 5 advanced prompts
           </div>
@@ -1013,7 +1013,7 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
             textAlign: 'center',
             marginBottom: '16px'
           }}>
-            🎊 Limited time offer expires January 16, 2025
+            🎊 Limited time offer expires January 16, 2026
           </div>
           
           <p style={{ 
