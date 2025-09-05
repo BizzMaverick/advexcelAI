@@ -16,6 +16,7 @@ import TrialStatus from './components/TrialStatus';
 import PaymentService from './services/paymentService';
 import authService from './services/authService';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
+import AboutUs from './components/AboutUs';
 
 function AppContent() {
   const navigate = useNavigate();
@@ -133,6 +134,9 @@ function AppContent() {
         
         {/* Analytics Dashboard - Admin only */}
         <Route path="/analytics" element={<AnalyticsDashboard />} />
+        
+        {/* About Us Page */}
+        <Route path="/about" element={<AboutUs />} />
         
         {/* Main App Routes */}
         <Route path="/" element={
