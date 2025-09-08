@@ -1354,24 +1354,24 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
       let response = `<strong>Data sorted by ${sortColumnName}:</strong><br><br>`;
       response += '<table style="width: 100%; border-collapse: collapse;">';
       response += '<thead>';
-      response += '<tr style="background: #e6f3ff; border-bottom: 2px solid #0078d4;">';
-      response += '<th style="padding: 8px; font-size: 11px; font-weight: bold; color: #0078d4; border: 1px solid #ddd;">#</th>';
+      response += '<tr style="background: rgba(255, 255, 255, 0.1); border-bottom: 2px solid white;">';
+      response += '<th style="padding: 8px; font-size: 11px; font-weight: bold; color: white; border: 1px solid rgba(255, 255, 255, 0.2);">#</th>';
       headers.forEach((header, index) => {
         const colLetter = String.fromCharCode(65 + index);
-        response += `<th style="padding: 8px; font-size: 11px; font-weight: bold; color: #0078d4; border: 1px solid #ddd;">${colLetter}</th>`;
+        response += `<th style="padding: 8px; font-size: 11px; font-weight: bold; color: white; border: 1px solid rgba(255, 255, 255, 0.2);">${colLetter}</th>`;
       });
       response += '</tr></thead><tbody>';
       response += '<tr>';
-      response += '<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; font-size: 11px; color: #0078d4; background: #f8f9ff; text-align: center;">1</td>';
+      response += '<td style="padding: 8px; border-right: 1px solid rgba(255, 255, 255, 0.2); font-weight: bold; font-size: 11px; color: white; background: rgba(255, 255, 255, 0.1); text-align: center;">1</td>';
       headers.forEach(header => {
-        response += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; color: #333;">${header}</td>`;
+        response += `<td style="padding: 8px; border-right: 1px solid rgba(255, 255, 255, 0.2); font-weight: bold; color: white;">${header}</td>`;
       });
       response += '</tr>';
       dataRows.forEach((row, index) => {
         response += '<tr>';
-        response += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; font-size: 11px; color: #0078d4; background: #f8f9ff; text-align: center;">${index + 2}</td>`;
+        response += `<td style="padding: 8px; border-right: 1px solid rgba(255, 255, 255, 0.2); font-weight: bold; font-size: 11px; color: white; background: rgba(255, 255, 255, 0.1); text-align: center;">${index + 2}</td>`;
         row.forEach(cell => {
-          response += `<td style="padding: 8px; border-right: 1px solid #eee; color: #333;">${cell || 'N/A'}</td>`;
+          response += `<td style="padding: 8px; border-right: 1px solid rgba(255, 255, 255, 0.2); color: white;">${cell || 'N/A'}</td>`;
         });
         response += '</tr>';
       });
@@ -1408,24 +1408,24 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
         let response = `<strong>Found ${duplicates.length} duplicate rows:</strong><br><br>`;
         response += '<table style="width: 100%; border-collapse: collapse;">';
         response += '<thead>';
-        response += '<tr style="background: #e6f3ff; border-bottom: 2px solid #0078d4;">';
-        response += '<th style="padding: 8px; font-size: 11px; font-weight: bold; color: #0078d4; border: 1px solid #ddd;">#</th>';
+        response += '<tr style="background: rgba(255, 255, 255, 0.1); border-bottom: 2px solid white;">';
+        response += '<th style="padding: 8px; font-size: 11px; font-weight: bold; color: white; border: 1px solid rgba(255, 255, 255, 0.2);">#</th>';
         headers.forEach((header, index) => {
           const colLetter = String.fromCharCode(65 + index);
-          response += `<th style="padding: 8px; font-size: 11px; font-weight: bold; color: #0078d4; border: 1px solid #ddd;">${colLetter}</th>`;
+          response += `<th style="padding: 8px; font-size: 11px; font-weight: bold; color: white; border: 1px solid rgba(255, 255, 255, 0.2);">${colLetter}</th>`;
         });
         response += '</tr></thead><tbody>';
         response += '<tr>';
-        response += '<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; font-size: 11px; color: #0078d4; background: #f8f9ff; text-align: center;">1</td>';
+        response += '<td style="padding: 8px; border-right: 1px solid rgba(255, 255, 255, 0.2); font-weight: bold; font-size: 11px; color: white; background: rgba(255, 255, 255, 0.1); text-align: center;">1</td>';
         headers.forEach(header => {
-          response += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; color: #333;">${header}</td>`;
+          response += `<td style="padding: 8px; border-right: 1px solid rgba(255, 255, 255, 0.2); font-weight: bold; color: white;">${header}</td>`;
         });
         response += '</tr>';
         duplicates.forEach((row, index) => {
           response += '<tr>';
-          response += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; font-size: 11px; color: #0078d4; background: #f8f9ff; text-align: center;">${index + 2}</td>`;
+          response += `<td style="padding: 8px; border-right: 1px solid rgba(255, 255, 255, 0.2); font-weight: bold; font-size: 11px; color: white; background: rgba(255, 255, 255, 0.1); text-align: center;">${index + 2}</td>`;
           row.forEach(cell => {
-            response += `<td style="padding: 8px; border-right: 1px solid #eee; color: #333;">${cell || 'N/A'}</td>`;
+            response += `<td style="padding: 8px; border-right: 1px solid rgba(255, 255, 255, 0.2); color: white;">${cell || 'N/A'}</td>`;
           });
           response += '</tr>';
         });
@@ -1533,24 +1533,24 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           let response = `<strong>Lookup results for '${searchDisplay}' - Found ${matchingRows.length} matches:</strong><br><br>`;
           response += '<table style="width: 100%; border-collapse: collapse;">';
           response += '<thead>';
-          response += '<tr style="background: #e6f3ff; border-bottom: 2px solid #0078d4;">';
-          response += '<th style="padding: 8px; font-size: 11px; font-weight: bold; color: #0078d4; border: 1px solid #ddd;">#</th>';
+          response += '<tr style="background: rgba(255, 255, 255, 0.1); border-bottom: 2px solid white;">';
+          response += '<th style="padding: 8px; font-size: 11px; font-weight: bold; color: white; border: 1px solid rgba(255, 255, 255, 0.2);">#</th>';
           headers.forEach((header, index) => {
             const colLetter = String.fromCharCode(65 + index);
-            response += `<th style="padding: 8px; font-size: 11px; font-weight: bold; color: #0078d4; border: 1px solid #ddd;">${colLetter}</th>`;
+            response += `<th style="padding: 8px; font-size: 11px; font-weight: bold; color: white; border: 1px solid rgba(255, 255, 255, 0.2);">${colLetter}</th>`;
           });
           response += '</tr></thead><tbody>';
           response += '<tr>';
-          response += '<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; font-size: 11px; color: #0078d4; background: #f8f9ff; text-align: center;">1</td>';
+          response += '<td style="padding: 8px; border-right: 1px solid rgba(255, 255, 255, 0.2); font-weight: bold; font-size: 11px; color: white; background: rgba(255, 255, 255, 0.1); text-align: center;">1</td>';
           headers.forEach(header => {
-            response += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; color: #333;">${header}</td>`;
+            response += `<td style="padding: 8px; border-right: 1px solid rgba(255, 255, 255, 0.2); font-weight: bold; color: white;">${header}</td>`;
           });
           response += '</tr>';
           matchingRows.forEach((row, index) => {
             response += '<tr>';
-            response += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; font-size: 11px; color: #0078d4; background: #f8f9ff; text-align: center;">${index + 2}</td>`;
+            response += `<td style="padding: 8px; border-right: 1px solid rgba(255, 255, 255, 0.2); font-weight: bold; font-size: 11px; color: white; background: rgba(255, 255, 255, 0.1); text-align: center;">${index + 2}</td>`;
             row.forEach(cell => {
-              response += `<td style="padding: 8px; border-right: 1px solid #eee; color: #333;">${cell || 'N/A'}</td>`;
+              response += `<td style="padding: 8px; border-right: 1px solid rgba(255, 255, 255, 0.2); color: white;">${cell || 'N/A'}</td>`;
             });
             response += '</tr>';
           });
@@ -1639,24 +1639,24 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           let response = `<strong>Lookup results for '${filterValue}' - Found ${matchingRows.length} matches:</strong><br><br>`;
           response += '<table style="width: 100%; border-collapse: collapse;">';
           response += '<thead>';
-          response += '<tr style="background: #e6f3ff; border-bottom: 2px solid #0078d4;">';
-          response += '<th style="padding: 8px; font-size: 11px; font-weight: bold; color: #0078d4; border: 1px solid #ddd;">#</th>';
+          response += '<tr style="background: rgba(255, 255, 255, 0.1); border-bottom: 2px solid white;">';
+          response += '<th style="padding: 8px; font-size: 11px; font-weight: bold; color: white; border: 1px solid rgba(255, 255, 255, 0.2);">#</th>';
           headers.forEach((header, index) => {
             const colLetter = String.fromCharCode(65 + index);
-            response += `<th style="padding: 8px; font-size: 11px; font-weight: bold; color: #0078d4; border: 1px solid #ddd;">${colLetter}</th>`;
+            response += `<th style="padding: 8px; font-size: 11px; font-weight: bold; color: white; border: 1px solid rgba(255, 255, 255, 0.2);">${colLetter}</th>`;
           });
           response += '</tr></thead><tbody>';
           response += '<tr>';
-          response += '<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; font-size: 11px; color: #0078d4; background: #f8f9ff; text-align: center;">1</td>';
+          response += '<td style="padding: 8px; border-right: 1px solid rgba(255, 255, 255, 0.2); font-weight: bold; font-size: 11px; color: white; background: rgba(255, 255, 255, 0.1); text-align: center;">1</td>';
           headers.forEach(header => {
-            response += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; color: #333;">${header}</td>`;
+            response += `<td style="padding: 8px; border-right: 1px solid rgba(255, 255, 255, 0.2); font-weight: bold; color: white;">${header}</td>`;
           });
           response += '</tr>';
           matchingRows.forEach((row, index) => {
             response += '<tr>';
-            response += `<td style="padding: 8px; border-right: 1px solid #eee; font-weight: bold; font-size: 11px; color: #0078d4; background: #f8f9ff; text-align: center;">${index + 2}</td>`;
+            response += `<td style="padding: 8px; border-right: 1px solid rgba(255, 255, 255, 0.2); font-weight: bold; font-size: 11px; color: white; background: rgba(255, 255, 255, 0.1); text-align: center;">${index + 2}</td>`;
             row.forEach(cell => {
-              response += `<td style="padding: 8px; border-right: 1px solid #eee; color: #333;">${cell || 'N/A'}</td>`;
+              response += `<td style="padding: 8px; border-right: 1px solid rgba(255, 255, 255, 0.2); color: white;">${cell || 'N/A'}</td>`;
             });
             response += '</tr>';
           });
@@ -1685,7 +1685,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           Charts and graphs are available in the Advanced interface.<br><br>
           <button 
             onclick="localStorage.setItem('use_new_interface', 'true'); window.location.reload();"
-            style="background: #0078d4; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;"
+            style="background: white; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;"
           >
             🚀 Switch to Advanced Interface
           </button>
@@ -1713,7 +1713,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           You have 5 free advanced prompts. Upgrade for unlimited charts!<br><br>
           <button 
             onclick="window.open('https://buy.stripe.com/basic-49', '_blank')"
-            style="background: #0078d4; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; margin-right: 10px;"
+            style="background: white; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; margin-right: 10px;"
           >
             💼 Basic Plan (₹49)
           </button>
@@ -1730,7 +1730,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           Choose your plan to access charts and advanced features:<br><br>
           <button 
             onclick="window.open('https://buy.stripe.com/basic-49', '_blank')"
-            style="background: #0078d4; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; margin-right: 10px;"
+            style="background: white; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; margin-right: 10px;"
           >
             💼 Basic Plan (₹49)
           </button>
@@ -1761,7 +1761,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           Advanced analysis features are available in the Advanced interface.<br><br>
           <button 
             onclick="localStorage.setItem('use_new_interface', 'true'); window.location.reload();"
-            style="background: #0078d4; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;"
+            style="background: white; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;"
           >
             🚀 Switch to Advanced Interface
           </button>
@@ -1783,7 +1783,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           You have 5 free advanced prompts. Upgrade for unlimited analytics!<br><br>
           <button 
             onclick="window.open('https://buy.stripe.com/basic-49', '_blank')"
-            style="background: #0078d4; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; margin-right: 10px;"
+            style="background: white; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; margin-right: 10px;"
           >
             💼 Basic Plan (₹49)
           </button>
@@ -1800,7 +1800,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           Choose your plan to access advanced analytics:<br><br>
           <button 
             onclick="window.open('https://buy.stripe.com/basic-49', '_blank')"
-            style="background: #0078d4; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; margin-right: 10px;"
+            style="background: white; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; margin-right: 10px;"
           >
             💼 Basic Plan (₹49)
           </button>
@@ -2017,7 +2017,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                   }}
                 >
                   {sheetNames.map((name, index) => (
-                    <option key={index} value={name} style={{ color: '#333' }}>
+                    <option key={index} value={name} style={{ color: 'white' }}>
                       {name} {index === 0 ? '(Default)' : ''}
                     </option>
                   ))}
@@ -2081,7 +2081,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                     left: 0,
                     right: 0,
                     background: 'white',
-                    border: '1px solid #ddd',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
                     borderTop: 'none',
                     borderRadius: '0 0 6px 6px',
                     maxHeight: '120px',
@@ -2101,7 +2101,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                           cursor: 'pointer',
                           borderBottom: index < promptHistory.length - 1 ? '1px solid #f0f0f0' : 'none',
                           fontSize: '12px',
-                          color: '#333'
+                          color: 'white'
                         }}
                         onMouseEnter={(e) => e.currentTarget.style.background = '#f5f5f5'}
                         onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
@@ -2622,12 +2622,12 @@ We're committed to excellent support and continuous improvement based on your fe
                   ×
                 </button>
               </div>
-              <div style={{ color: '#333', lineHeight: '1.6', margin: 0, whiteSpace: 'pre-line', fontSize: '14px' }}>{legalContent.content}</div>
+              <div style={{ color: 'white', lineHeight: '1.6', margin: 0, whiteSpace: 'pre-line', fontSize: '14px' }}>{legalContent.content}</div>
               <div style={{ marginTop: '20px', textAlign: 'right' }}>
                 <button
                   onClick={() => setShowLegalModal(false)}
                   style={{
-                    background: '#0078d4',
+                    background: 'white',
                     color: 'white',
                     border: 'none',
                     padding: '8px 16px',
@@ -2683,9 +2683,9 @@ We're committed to excellent support and continuous improvement based on your fe
               borderRadius: '8px',
               boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
               padding: '20px',
-              border: '1px solid #ddd'
+              border: '1px solid rgba(255, 255, 255, 0.2)'
             }}>
-              <h4 style={{ margin: '0 0 12px 0', color: '#333', fontSize: '16px' }}>Send Feedback</h4>
+              <h4 style={{ margin: '0 0 12px 0', color: 'white', fontSize: '16px' }}>Send Feedback</h4>
               <textarea
                 value={feedbackText}
                 onChange={(e) => setFeedbackText(e.target.value)}
@@ -2729,7 +2729,7 @@ We're committed to excellent support and continuous improvement based on your fe
                     }
                   }}
                   style={{
-                    background: '#0078d4',
+                    background: 'white',
                     color: 'white',
                     border: 'none',
                     padding: '8px 16px',
@@ -2748,8 +2748,8 @@ We're committed to excellent support and continuous improvement based on your fe
                   }}
                   style={{
                     background: '#f5f5f5',
-                    color: '#333',
-                    border: '1px solid #ddd',
+                    color: 'white',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
                     padding: '8px 16px',
                     borderRadius: '4px',
                     cursor: 'pointer',
