@@ -2141,31 +2141,19 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             {/* Data Table - Full Width */}
             {fileData.length > 0 && (
               <div style={{ 
-                background: 'transparent',
-                overflow: 'hidden'
+                background: 'transparent'
               }}>
                 <div style={{ 
-                  padding: '20px 24px', 
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  color: 'white',
-                  position: 'relative',
-                  overflow: 'hidden'
+                  padding: '24px', 
+                  background: 'transparent',
+                  color: 'white'
                 }}>
-                  <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    background: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.1"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat',
-                    opacity: 0.3
-                  }} />
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px', position: 'relative' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
                     <div style={{
                       width: '40px',
                       height: '40px',
                       borderRadius: '10px',
-                      background: 'rgba(255, 255, 255, 0.2)',
+                      background: 'transparent',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -2177,11 +2165,11 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                       {selectedFile?.name}{selectedSheet && ` - ${selectedSheet}`}
                     </h3>
                   </div>
-                  <p style={{ margin: 0, fontSize: '14px', opacity: 0.9, fontWeight: '500', position: 'relative' }}>
+                  <p style={{ margin: 0, fontSize: '14px', opacity: 0.9, fontWeight: '500' }}>
                     {fileData.length} rows × {fileData[0]?.length || 0} columns
                   </p>
                 </div>
-                <div style={{ height: 'auto', overflow: 'auto', background: 'rgba(0, 0, 0, 0.3)', backdropFilter: 'blur(20px)', padding: '24px' }}>
+                <div style={{ height: 'auto', overflow: 'auto', background: 'transparent', padding: '24px' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
                       <tr style={{ background: 'rgba(255, 255, 255, 0.1)', borderBottom: '2px solid rgba(255, 255, 255, 0.2)', position: 'sticky', top: 0 }}>
@@ -2262,31 +2250,19 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             {aiResponse && (
               <div style={{ 
                 marginTop: '24px',
-                background: 'transparent',
-                overflow: 'hidden'
+                background: 'transparent'
               }}>
                 <div style={{ 
-                  padding: '20px 24px', 
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  color: 'white',
-                  position: 'relative',
-                  overflow: 'hidden'
+                  padding: '24px', 
+                  background: 'transparent',
+                  color: 'white'
                 }}>
-                  <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    background: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.1"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat',
-                    opacity: 0.3
-                  }} />
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px', position: 'relative' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
                     <div style={{
                       width: '40px',
                       height: '40px',
                       borderRadius: '10px',
-                      background: 'rgba(255, 255, 255, 0.2)',
+                      background: 'transparent',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -2300,29 +2276,29 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                   </div>
                   
                   {showUseResultButton && (
-                    <div style={{ display: 'flex', gap: '8px', marginTop: '16px', position: 'relative' }}>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
                       <button 
                         onClick={applyChangesToMainSheet}
-                        style={{ background: 'rgba(255, 255, 255, 0.2)', border: '1px solid rgba(255, 255, 255, 0.3)', color: 'white', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px', fontWeight: '500' }}
+                        style={{ background: 'transparent', border: '1px solid white', color: 'white', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px', fontWeight: '500' }}
                       >
                         Apply
                       </button>
                       <button 
                         onClick={createNewSheet}
-                        style={{ background: 'rgba(255, 255, 255, 0.2)', border: '1px solid rgba(255, 255, 255, 0.3)', color: 'white', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px', fontWeight: '500' }}
+                        style={{ background: 'transparent', border: '1px solid white', color: 'white', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px', fontWeight: '500' }}
                       >
                         Download
                       </button>
                       <button 
                         onClick={resetToOriginal}
-                        style={{ background: 'rgba(255, 255, 255, 0.2)', border: '1px solid rgba(255, 255, 255, 0.3)', color: 'white', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px', fontWeight: '500' }}
+                        style={{ background: 'transparent', border: '1px solid white', color: 'white', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px', fontWeight: '500' }}
                       >
                         Reset
                       </button>
                     </div>
                   )}
                 </div>
-                <div style={{ height: 'auto', overflow: 'auto', background: 'rgba(0, 0, 0, 0.3)', backdropFilter: 'blur(20px)', padding: '24px' }}>
+                <div style={{ height: 'auto', overflow: 'auto', background: 'transparent', padding: '24px' }}>
                   <div dangerouslySetInnerHTML={{ __html: aiResponse }} style={{ fontSize: '14px', lineHeight: '1.6', color: 'white' }} />
                 </div>
               </div>
