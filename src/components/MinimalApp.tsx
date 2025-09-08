@@ -1971,9 +1971,15 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
               gridRow: '1',
               height: '120px',
               width: '380px',
+              background: 'rgba(0, 0, 0, 0.3)', 
+              backdropFilter: 'blur(20px)',
+              borderRadius: '16px', 
+              padding: '24px',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'center',
+              boxSizing: 'border-box'
             }}>
               
               <input 
@@ -1983,14 +1989,13 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                 disabled={fileLoading}
                 style={{ 
                   width: '100%',
-                  padding: '16px', 
-                  border: '2px dashed #e2e8f0', 
-                  borderRadius: '12px',
-                  color: '#475569',
-                  backgroundColor: 'rgba(248, 250, 252, 0.8)',
+                  padding: '12px', 
+                  border: '1px solid rgba(255, 255, 255, 0.3)', 
+                  borderRadius: '8px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  color: 'white',
                   fontSize: '14px',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease'
+                  cursor: 'pointer'
                 }}
               />
               
@@ -2103,9 +2108,15 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
               gridRow: '1',
               height: '120px',
               width: '380px',
+              background: 'rgba(0, 0, 0, 0.3)', 
+              backdropFilter: 'blur(20px)',
+              borderRadius: '16px', 
+              padding: '24px',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'center',
+              boxSizing: 'border-box'
             }}>
               <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '20px' }}>
                 {trialStatus?.inTrial && (
