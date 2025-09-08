@@ -2046,11 +2046,17 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
               <div style={{ 
                 gridColumn: '2', 
                 gridRow: '1',
+                height: '120px',
+                width: '100%',
                 background: 'rgba(0, 0, 0, 0.3)', 
                 backdropFilter: 'blur(20px)',
                 borderRadius: '16px', 
                 padding: '24px',
-                border: '1px solid rgba(255, 255, 255, 0.1)'
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxSizing: 'border-box'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexWrap: 'wrap' }}>
                   
@@ -2225,10 +2231,10 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
               </div>
             </div>
 
-            {/* Data Table - Bottom Left & Center */}
+            {/* Data Table - Full Width */}
             {fileData.length > 0 && (
               <div style={{ 
-                gridColumn: '1 / 3', 
+                gridColumn: '1 / 4', 
                 gridRow: '2 / 4',
                 background: 'rgba(0, 0, 0, 0.3)', 
                 backdropFilter: 'blur(20px)',
@@ -2351,18 +2357,22 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
               </div>
             )}
 
-            {/* AI Response - Bottom Right */}
+            {/* AI Response - Overlay */}
             {aiResponse && (
               <div style={{ 
-                gridColumn: '3', 
-                gridRow: '2 / 4',
-                background: 'rgba(0, 0, 0, 0.3)', 
+                position: 'absolute',
+                top: '150px',
+                right: '24px',
+                width: '380px',
+                maxHeight: 'calc(100vh - 200px)',
+                background: 'rgba(0, 0, 0, 0.9)', 
                 backdropFilter: 'blur(20px)',
                 borderRadius: '16px', 
                 overflow: 'hidden',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
                 display: 'flex',
-                flexDirection: 'column'
+                flexDirection: 'column',
+                zIndex: 1000
               }}>
                 {showUseResultButton && (
                   <div style={{ padding: '12px', background: '#e3f2fd', border: '1px solid #2196f3', margin: '12px', borderRadius: '6px' }}>
