@@ -1956,7 +1956,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           {/* File Upload */}
           <div className="section-animate card-animate" style={{ background: 'white', borderRadius: '8px', padding: '20px', marginBottom: '20px', color: '#333' }}>
             <h3 style={{ margin: '0 0 15px 0', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <img src="/upload.gif" alt="Upload" style={{ width: '32px', height: '32px' }} />
+              <img src="/upload.gif" alt="Upload" style={{ width: '48px', height: '48px', background: 'transparent' }} />
               Upload File
             </h3>
             <div style={{ display: 'flex', gap: '10px' }}>
