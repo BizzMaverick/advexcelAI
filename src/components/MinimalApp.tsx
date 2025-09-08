@@ -1969,12 +1969,9 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             <div style={{ 
               gridColumn: '1', 
               gridRow: '1',
-              background: 'rgba(0, 0, 0, 0.3)', 
-              backdropFilter: 'blur(20px)',
-              borderRadius: '16px', 
-              padding: '24px',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              height: 'fit-content'
+              height: '120px',
+              display: 'flex',
+              alignItems: 'center'
             }}>
               
               <input 
@@ -2102,12 +2099,10 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             <div style={{ 
               gridColumn: '3', 
               gridRow: '1',
-              background: 'rgba(0, 0, 0, 0.3)', 
-              backdropFilter: 'blur(20px)',
-              borderRadius: '16px', 
-              padding: '24px',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              height: 'fit-content'
+              height: '120px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center'
             }}>
               <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '20px' }}>
                 {trialStatus?.inTrial && (
