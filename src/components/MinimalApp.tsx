@@ -1970,8 +1970,10 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
               gridColumn: '1', 
               gridRow: '1',
               height: '120px',
+              width: '320px',
               display: 'flex',
-              alignItems: 'center'
+              alignItems: 'center',
+              justifyContent: 'center'
             }}>
               
               <input 
@@ -2100,8 +2102,9 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
               gridColumn: '3', 
               gridRow: '1',
               height: '120px',
+              width: '380px',
               display: 'flex',
-              flexDirection: 'column',
+              alignItems: 'center',
               justifyContent: 'center'
             }}>
               <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '20px' }}>
