@@ -2041,6 +2041,19 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                   }} style={{ background: '#ffffff', color: '#232f3e', border: '1px solid #d5d9d9', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}>Italic</button>
                   <button onClick={handleUndo} disabled={undoStack.length === 0} style={{ background: undoStack.length > 0 ? '#ffffff' : '#f5f5f5', color: undoStack.length > 0 ? '#232f3e' : '#999', border: '1px solid #d5d9d9', padding: '8px 12px', borderRadius: '6px', cursor: undoStack.length > 0 ? 'pointer' : 'not-allowed', fontSize: '16px' }} title="Undo">↶</button>
                   <button onClick={handleRedo} disabled={redoStack.length === 0} style={{ background: redoStack.length > 0 ? '#ffffff' : '#f5f5f5', color: redoStack.length > 0 ? '#232f3e' : '#999', border: '1px solid #d5d9d9', padding: '8px 12px', borderRadius: '6px', cursor: redoStack.length > 0 ? 'pointer' : 'not-allowed', fontSize: '16px' }} title="Redo">↷</button>
+                  <button onClick={() => {
+                    if (!formatPainterActive) {
+                      if (selectedCells.length === 1) {
+                        const cellId = selectedCells[0];
+                        const format = cellFormatting[cellId] || {};
+                        setCopiedFormat(format);
+                        setFormatPainterActive(true);
+                      }
+                    } else {
+                      setFormatPainterActive(false);
+                      setCopiedFormat(null);
+                    }
+                  }} style={{ background: formatPainterActive ? '#e7f3ff' : '#ffffff', color: '#232f3e', border: formatPainterActive ? '2px solid #007185' : '1px solid #d5d9d9', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '16px' }} title={formatPainterActive ? 'Click cells to apply format' : 'Format Painter'}>🖌️</button>
                 </div>
                 <div style={{ width: '1px', height: '32px', background: '#e7e7e7' }}></div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -2058,6 +2071,41 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                     <option value="#e74c3c">🟥 Red</option>
                     <option value="#3498db">🟦 Blue</option>
                     <option value="#2ecc71">🟩 Green</option>
+                  </select>
+                </div>
+                <div style={{ width: '1px', height: '32px', background: '#e7e7e7' }}></div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '14px', fontWeight: '500', color: '#232f3e', minWidth: '70px' }}>Cell Color</span>
+                  <select onChange={(e) => {
+                    if (selectedCells.length === 0) return;
+                    saveToUndoStack(cellFormatting);
+                    const backgroundColor = e.target.value;
+                    const newFormatting = { ...cellFormatting };
+                    selectedCells.forEach(cellId => { newFormatting[cellId] = { ...newFormatting[cellId], backgroundColor }; });
+                    setCellFormatting(newFormatting);
+                  }} style={{ background: '#ffffff', color: '#232f3e', border: '1px solid #d5d9d9', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', minWidth: '120px' }}>
+                    <option value="">Cell Color</option>
+                    <option value="#ffffff">⬜ White</option>
+                    <option value="#e74c3c">🟥 Red</option>
+                    <option value="#3498db">🟦 Blue</option>
+                    <option value="#2ecc71">🟩 Green</option>
+                  </select>
+                </div>
+                <div style={{ width: '1px', height: '32px', background: '#e7e7e7' }}></div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '14px', fontWeight: '500', color: '#232f3e', minWidth: '70px' }}>Alignment</span>
+                  <select onChange={(e) => {
+                    if (selectedCells.length === 0) return;
+                    saveToUndoStack(cellFormatting);
+                    const align = e.target.value;
+                    const newFormatting = { ...cellFormatting };
+                    selectedCells.forEach(cellId => { newFormatting[cellId] = { ...newFormatting[cellId], textAlign: align }; });
+                    setCellFormatting(newFormatting);
+                  }} style={{ background: '#ffffff', color: '#232f3e', border: '1px solid #d5d9d9', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', minWidth: '120px' }}>
+                    <option value="">Choose Align</option>
+                    <option value="left">Left</option>
+                    <option value="center">Center</option>
+                    <option value="right">Right</option>
                   </select>
                 </div>
                 <div style={{ marginLeft: 'auto', fontSize: '13px', color: '#565959', background: selectedCells.length > 0 ? '#e7f3ff' : '#f7f8f8', padding: '8px 12px', borderRadius: '6px', border: '1px solid ' + (selectedCells.length > 0 ? '#007185' : '#e7e7e7'), fontWeight: '500' }}>
