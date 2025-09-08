@@ -117,7 +117,7 @@ function AppContent() {
         fontFamily: 'system-ui, -apple-system, sans-serif'
       }}>
         <div className="loading-pulse" style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '24px', marginBottom: '16px' }}>🔄</div>
+          <img src="/refresh-new.gif" alt="Loading" style={{ width: '48px', height: '48px', marginBottom: '16px' }} />
           <div>Checking your account status...</div>
         </div>
       </div>
