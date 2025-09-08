@@ -3663,7 +3663,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
             maxWidth: '1200px',
             margin: '40px auto 0',
             background: 'transparent',
-            ,
+
             borderRadius: '24px',
             padding: '32px',
             border: '1px solid rgba(255, 255, 255, 0.2)'
