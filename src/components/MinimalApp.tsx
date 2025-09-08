@@ -1957,7 +1957,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           {/* Ultra Modern Grid Layout */}
           <div style={{ 
             display: 'grid', 
-            gridTemplateColumns: '320px 1fr 380px', 
+            gridTemplateColumns: '380px 1fr 380px', 
             gridTemplateRows: 'auto auto 1fr', 
             gap: '24px',
             height: 'calc(100vh - 98px)',
@@ -1970,7 +1970,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
               gridColumn: '1', 
               gridRow: '1',
               height: '120px',
-              width: '320px',
+              width: '380px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
