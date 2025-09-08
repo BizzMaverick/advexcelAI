@@ -1,0 +1,6 @@
+1. We know your work is not basic. Let's switch to advanced to get the job done.
+2. multiple sheets in advanced 
+3. auto correct spelling
+4. detailed package details in the pricing page and remove 25 prompts per day and put unlimited prompts.
+5. whne applied to main sheet it should show complete answer Sum of C2:C10: 409,356
+6. dropdown of prompt history and pull down the ask ai t bottom of the page also give edit option

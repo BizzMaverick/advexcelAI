@@ -2117,7 +2117,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                 </div>
               )}
             </div>
-            <div style={{ display: 'flex', gap: '10px' }}>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
               <div style={{ flex: 1, position: 'relative' }}>
                 <input 
                   type="text"
@@ -2140,7 +2140,8 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                     border: '1px solid #ddd', 
                     borderRadius: '6px',
                     color: '#333',
-                    backgroundColor: '#ffffff'
+                    backgroundColor: '#ffffff',
+                    boxSizing: 'border-box'
                   }}
                 />
                 {showPromptDropdown && promptHistory.length > 0 && (
@@ -2191,7 +2192,9 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                   border: 'none',
                   padding: '12px 20px',
                   borderRadius: '6px',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  minWidth: 'auto'
                 }}
               >
                 {isProcessing ? <><img src="/refresh-new.gif" alt="Processing" style={{ width: '16px', height: '16px', marginRight: '8px' }} />Processing...</> : 'Submit'}
@@ -3032,7 +3035,7 @@ We're committed to excellent support and continuous improvement based on your fe
             style={{
               width: '60px',
               height: '60px',
-              borderRadius: '8px',
+              borderRadius: '50%',
               background: '#0078d4',
               color: 'white',
               cursor: 'pointer',
@@ -3040,9 +3043,12 @@ We're committed to excellent support and continuous improvement based on your fe
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '24px',
               border: 'none',
-              transition: 'all 0.3s ease'
+              transition: 'all 0.3s ease',
+              backgroundImage: 'url(/feedback.png)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat'
             }}
             onMouseEnter={(e) => {
               const target = e.target as HTMLElement;
@@ -3056,7 +3062,6 @@ We're committed to excellent support and continuous improvement based on your fe
             }}
             title="Give Feedback"
           >
-            👍
           </div>
           
           {showFeedbackBox && (
