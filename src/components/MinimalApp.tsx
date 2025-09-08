@@ -2141,9 +2141,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             {/* Data Table - Full Width */}
             {fileData.length > 0 && (
               <div style={{ 
-                background: 'transparent',
-                borderRadius: '16px', 
-                overflow: 'hidden'
+                background: 'transparent'
               }}>
                 <div style={{ 
                   padding: '24px', 
@@ -2153,16 +2151,6 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                   position: 'relative',
                   overflow: 'hidden'
                 }}>
-                  <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    right: 0,
-                    width: '100px',
-                    height: '100px',
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    borderRadius: '50%',
-                    transform: 'translate(30px, -30px)'
-                  }} />
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
                     <div style={{
                       width: '40px',
@@ -2184,7 +2172,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                     {fileData.length} rows × {fileData[0]?.length || 0} columns
                   </p>
                 </div>
-                <div style={{ height: 'calc(100% - 70px)', overflow: 'auto' }}>
+                <div style={{ height: 'auto', overflow: 'auto', background: 'rgba(0, 0, 0, 0.3)', backdropFilter: 'blur(20px)', padding: '24px' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
                       <tr style={{ background: 'rgba(255, 255, 255, 0.1)', borderBottom: '2px solid rgba(255, 255, 255, 0.2)', position: 'sticky', top: 0 }}>
