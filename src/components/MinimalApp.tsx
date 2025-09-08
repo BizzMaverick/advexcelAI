@@ -2141,11 +2141,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             {/* Data Table - Full Width */}
             {fileData.length > 0 && (
               <div style={{ 
-                background: 'rgba(255, 255, 255, 0.95)',
-                borderRadius: '12px',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                backdropFilter: 'blur(20px)',
+                background: 'transparent',
                 overflow: 'hidden'
               }}>
                 <div style={{ 
@@ -2185,13 +2181,13 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                     {fileData.length} rows × {fileData[0]?.length || 0} columns
                   </p>
                 </div>
-                <div style={{ height: 'auto', overflow: 'auto', background: 'white', padding: '0' }}>
+                <div style={{ height: 'auto', overflow: 'auto', background: 'rgba(0, 0, 0, 0.3)', backdropFilter: 'blur(20px)', padding: '24px' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
-                      <tr style={{ background: '#e6f3ff', borderBottom: '2px solid #0078d4', position: 'sticky', top: 0 }}>
-                        <th style={{ padding: '10px 8px', fontSize: '12px', fontWeight: '600', color: '#0078d4', border: '1px solid #ddd', minWidth: '40px' }}>#</th>
+                      <tr style={{ background: 'rgba(255, 255, 255, 0.1)', borderBottom: '2px solid rgba(255, 255, 255, 0.2)', position: 'sticky', top: 0 }}>
+                        <th style={{ padding: '10px 8px', fontSize: '12px', fontWeight: '600', color: 'white', border: '1px solid rgba(255, 255, 255, 0.2)', minWidth: '40px' }}>#</th>
                         {fileData[0] && fileData[0].map((_, colIndex) => (
-                          <th key={colIndex} style={{ padding: '10px 8px', fontSize: '12px', fontWeight: '600', color: '#0078d4', border: '1px solid #ddd', minWidth: '80px' }}>
+                          <th key={colIndex} style={{ padding: '10px 8px', fontSize: '12px', fontWeight: '600', color: 'white', border: '1px solid rgba(255, 255, 255, 0.2)', minWidth: '80px' }}>
                             {String.fromCharCode(65 + colIndex)}
                           </th>
                         ))}
@@ -2202,11 +2198,11 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                         <tr key={i}>
                           <td style={{ 
                             padding: '8px', 
-                            borderRight: '1px solid #eee',
+                            borderRight: '1px solid rgba(255, 255, 255, 0.2)',
                             fontWeight: '600',
                             fontSize: '11px',
-                            color: '#0078d4',
-                            background: '#f8f9ff',
+                            color: 'white',
+                            background: 'rgba(255, 255, 255, 0.1)',
                             textAlign: 'center'
                           }}>
                             {i + 1}
@@ -2239,12 +2235,12 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                               }}
                               style={{ 
                                 padding: '8px', 
-                                borderRight: '1px solid #eee',
+                                borderRight: '1px solid rgba(255, 255, 255, 0.2)',
                                 fontWeight: i === 0 ? '600' : '400',
-                                color: '#333',
+                                color: 'white',
                                 cursor: 'pointer',
-                                backgroundColor: selectedCells.includes(`${i}-${j}`) ? '#e6f3ff' : 
-                                                (i % 2 === 0 ? 'white' : '#f8f9fa'),
+                                backgroundColor: selectedCells.includes(`${i}-${j}`) ? 'rgba(255, 255, 255, 0.3)' : 
+                                                (i % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.05)'),
                                 fontSize: '13px',
                                 ...cellFormatting[`${i}-${j}`]
                               }}
@@ -2252,7 +2248,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                               {String(cell || '')}
                             </td>
                           )) : (
-                            <td style={{ padding: '8px', color: '#333', fontStyle: 'italic' }}>No data</td>
+                            <td style={{ padding: '8px', color: 'white', fontStyle: 'italic' }}>No data</td>
                           )}
                         </tr>
                       ))}
@@ -2266,11 +2262,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             {aiResponse && (
               <div style={{ 
                 marginTop: '24px',
-                background: 'rgba(255, 255, 255, 0.95)',
-                borderRadius: '12px',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                backdropFilter: 'blur(20px)',
+                background: 'transparent',
                 overflow: 'hidden'
               }}>
                 <div style={{ 
@@ -2330,8 +2322,8 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                     </div>
                   )}
                 </div>
-                <div style={{ height: 'auto', overflow: 'auto', background: 'white', padding: '24px' }}>
-                  <div dangerouslySetInnerHTML={{ __html: aiResponse }} style={{ fontSize: '14px', lineHeight: '1.6', color: '#333' }} />
+                <div style={{ height: 'auto', overflow: 'auto', background: 'rgba(0, 0, 0, 0.3)', backdropFilter: 'blur(20px)', padding: '24px' }}>
+                  <div dangerouslySetInnerHTML={{ __html: aiResponse }} style={{ fontSize: '14px', lineHeight: '1.6', color: 'white' }} />
                 </div>
               </div>
             )}
