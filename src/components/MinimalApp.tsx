@@ -2141,17 +2141,30 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             {/* Data Table - Full Width */}
             {fileData.length > 0 && (
               <div style={{ 
-                background: 'transparent'
+                background: 'rgba(255, 255, 255, 0.95)',
+                borderRadius: '12px',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                backdropFilter: 'blur(20px)',
+                overflow: 'hidden'
               }}>
                 <div style={{ 
-                  padding: '24px', 
-                  background: 'rgba(0, 0, 0, 0.3)', 
-                  backdropFilter: 'blur(20px)',
+                  padding: '20px 24px', 
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                   color: 'white',
                   position: 'relative',
                   overflow: 'hidden'
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                  <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    background: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.1"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat',
+                    opacity: 0.3
+                  }} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px', position: 'relative' }}>
                     <div style={{
                       width: '40px',
                       height: '40px',
@@ -2168,17 +2181,17 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                       {selectedFile?.name}{selectedSheet && ` - ${selectedSheet}`}
                     </h3>
                   </div>
-                  <p style={{ margin: 0, fontSize: '14px', opacity: 0.9, fontWeight: '500' }}>
+                  <p style={{ margin: 0, fontSize: '14px', opacity: 0.9, fontWeight: '500', position: 'relative' }}>
                     {fileData.length} rows × {fileData[0]?.length || 0} columns
                   </p>
                 </div>
-                <div style={{ height: 'auto', overflow: 'auto', background: 'rgba(0, 0, 0, 0.3)', backdropFilter: 'blur(20px)', padding: '24px' }}>
+                <div style={{ height: 'auto', overflow: 'auto', background: 'white', padding: '0' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
-                      <tr style={{ background: 'rgba(255, 255, 255, 0.1)', borderBottom: '2px solid rgba(255, 255, 255, 0.2)', position: 'sticky', top: 0 }}>
-                        <th style={{ padding: '10px 8px', fontSize: '12px', fontWeight: '600', color: 'white', border: '1px solid rgba(255, 255, 255, 0.2)', minWidth: '40px' }}>#</th>
+                      <tr style={{ background: '#e6f3ff', borderBottom: '2px solid #0078d4', position: 'sticky', top: 0 }}>
+                        <th style={{ padding: '10px 8px', fontSize: '12px', fontWeight: '600', color: '#0078d4', border: '1px solid #ddd', minWidth: '40px' }}>#</th>
                         {fileData[0] && fileData[0].map((_, colIndex) => (
-                          <th key={colIndex} style={{ padding: '10px 8px', fontSize: '12px', fontWeight: '600', color: 'white', border: '1px solid rgba(255, 255, 255, 0.2)', minWidth: '80px' }}>
+                          <th key={colIndex} style={{ padding: '10px 8px', fontSize: '12px', fontWeight: '600', color: '#0078d4', border: '1px solid #ddd', minWidth: '80px' }}>
                             {String.fromCharCode(65 + colIndex)}
                           </th>
                         ))}
@@ -2189,11 +2202,11 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                         <tr key={i}>
                           <td style={{ 
                             padding: '8px', 
-                            borderRight: '1px solid rgba(255, 255, 255, 0.2)',
+                            borderRight: '1px solid #eee',
                             fontWeight: '600',
                             fontSize: '11px',
-                            color: 'white',
-                            background: 'rgba(255, 255, 255, 0.1)',
+                            color: '#0078d4',
+                            background: '#f8f9ff',
                             textAlign: 'center'
                           }}>
                             {i + 1}
@@ -2226,12 +2239,12 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                               }}
                               style={{ 
                                 padding: '8px', 
-                                borderRight: '1px solid rgba(255, 255, 255, 0.2)',
+                                borderRight: '1px solid #eee',
                                 fontWeight: i === 0 ? '600' : '400',
-                                color: 'white',
+                                color: '#333',
                                 cursor: 'pointer',
-                                backgroundColor: selectedCells.includes(`${i}-${j}`) ? 'rgba(255, 255, 255, 0.3)' : 
-                                                (i % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.05)'),
+                                backgroundColor: selectedCells.includes(`${i}-${j}`) ? '#e6f3ff' : 
+                                                (i % 2 === 0 ? 'white' : '#f8f9fa'),
                                 fontSize: '13px',
                                 ...cellFormatting[`${i}-${j}`]
                               }}
@@ -2239,7 +2252,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                               {String(cell || '')}
                             </td>
                           )) : (
-                            <td style={{ padding: '8px', color: 'white', fontStyle: 'italic' }}>No data</td>
+                            <td style={{ padding: '8px', color: '#333', fontStyle: 'italic' }}>No data</td>
                           )}
                         </tr>
                       ))}
@@ -2253,17 +2266,30 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             {aiResponse && (
               <div style={{ 
                 marginTop: '24px',
-                background: 'transparent'
+                background: 'rgba(255, 255, 255, 0.95)',
+                borderRadius: '12px',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                backdropFilter: 'blur(20px)',
+                overflow: 'hidden'
               }}>
                 <div style={{ 
-                  padding: '24px', 
-                  background: 'rgba(0, 0, 0, 0.3)', 
-                  backdropFilter: 'blur(20px)',
+                  padding: '20px 24px', 
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                   color: 'white',
                   position: 'relative',
                   overflow: 'hidden'
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                  <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    background: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.1"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat',
+                    opacity: 0.3
+                  }} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px', position: 'relative' }}>
                     <div style={{
                       width: '40px',
                       height: '40px',
@@ -2282,30 +2308,30 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                   </div>
                   
                   {showUseResultButton && (
-                    <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '16px', position: 'relative' }}>
                       <button 
                         onClick={applyChangesToMainSheet}
-                        style={{ background: 'transparent', border: '1px solid white', color: 'white', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px' }}
+                        style={{ background: 'rgba(255, 255, 255, 0.2)', border: '1px solid rgba(255, 255, 255, 0.3)', color: 'white', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px', fontWeight: '500' }}
                       >
                         Apply
                       </button>
                       <button 
                         onClick={createNewSheet}
-                        style={{ background: 'transparent', border: '1px solid white', color: 'white', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px' }}
+                        style={{ background: 'rgba(255, 255, 255, 0.2)', border: '1px solid rgba(255, 255, 255, 0.3)', color: 'white', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px', fontWeight: '500' }}
                       >
                         Download
                       </button>
                       <button 
                         onClick={resetToOriginal}
-                        style={{ background: 'transparent', border: '1px solid white', color: 'white', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px' }}
+                        style={{ background: 'rgba(255, 255, 255, 0.2)', border: '1px solid rgba(255, 255, 255, 0.3)', color: 'white', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px', fontWeight: '500' }}
                       >
                         Reset
                       </button>
                     </div>
                   )}
                 </div>
-                <div style={{ height: 'auto', overflow: 'auto', background: 'rgba(0, 0, 0, 0.3)', backdropFilter: 'blur(20px)', padding: '24px', color: 'white' }}>
-                  <div dangerouslySetInnerHTML={{ __html: aiResponse }} style={{ fontSize: '14px', lineHeight: '1.6' }} />
+                <div style={{ height: 'auto', overflow: 'auto', background: 'white', padding: '24px' }}>
+                  <div dangerouslySetInnerHTML={{ __html: aiResponse }} style={{ fontSize: '14px', lineHeight: '1.6', color: '#333' }} />
                 </div>
               </div>
             )}
