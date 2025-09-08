@@ -2006,6 +2006,67 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             )}
           </div>
 
+          {/* Formatting Toolbar */}
+          {fileData.length > 0 && (
+            <div style={{ 
+              background: '#ffffff', 
+              padding: '12px 16px', 
+              marginBottom: '20px', 
+              border: '1px solid #e7e7e7',
+              borderRadius: '8px',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.08)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '14px', fontWeight: '500', color: '#232f3e', minWidth: '70px' }}>Text Style</span>
+                  <button onClick={() => {
+                    if (selectedCells.length === 0) return;
+                    saveToUndoStack(cellFormatting);
+                    const newFormatting = { ...cellFormatting };
+                    selectedCells.forEach(cellId => {
+                      const currentWeight = newFormatting[cellId]?.fontWeight;
+                      newFormatting[cellId] = { ...newFormatting[cellId], fontWeight: currentWeight === 'bold' ? 'normal' : 'bold' };
+                    });
+                    setCellFormatting(newFormatting);
+                  }} style={{ background: '#ffffff', color: '#232f3e', border: '1px solid #d5d9d9', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}>Bold</button>
+                  <button onClick={() => {
+                    if (selectedCells.length === 0) return;
+                    saveToUndoStack(cellFormatting);
+                    const newFormatting = { ...cellFormatting };
+                    selectedCells.forEach(cellId => {
+                      const currentStyle = newFormatting[cellId]?.fontStyle;
+                      newFormatting[cellId] = { ...newFormatting[cellId], fontStyle: currentStyle === 'italic' ? 'normal' : 'italic' };
+                    });
+                    setCellFormatting(newFormatting);
+                  }} style={{ background: '#ffffff', color: '#232f3e', border: '1px solid #d5d9d9', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}>Italic</button>
+                  <button onClick={handleUndo} disabled={undoStack.length === 0} style={{ background: undoStack.length > 0 ? '#ffffff' : '#f5f5f5', color: undoStack.length > 0 ? '#232f3e' : '#999', border: '1px solid #d5d9d9', padding: '8px 12px', borderRadius: '6px', cursor: undoStack.length > 0 ? 'pointer' : 'not-allowed', fontSize: '16px' }} title="Undo">↶</button>
+                  <button onClick={handleRedo} disabled={redoStack.length === 0} style={{ background: redoStack.length > 0 ? '#ffffff' : '#f5f5f5', color: redoStack.length > 0 ? '#232f3e' : '#999', border: '1px solid #d5d9d9', padding: '8px 12px', borderRadius: '6px', cursor: redoStack.length > 0 ? 'pointer' : 'not-allowed', fontSize: '16px' }} title="Redo">↷</button>
+                </div>
+                <div style={{ width: '1px', height: '32px', background: '#e7e7e7' }}></div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '14px', fontWeight: '500', color: '#232f3e', minWidth: '70px' }}>Text Color</span>
+                  <select onChange={(e) => {
+                    if (selectedCells.length === 0) return;
+                    saveToUndoStack(cellFormatting);
+                    const color = e.target.value;
+                    const newFormatting = { ...cellFormatting };
+                    selectedCells.forEach(cellId => { newFormatting[cellId] = { ...newFormatting[cellId], color }; });
+                    setCellFormatting(newFormatting);
+                  }} style={{ background: '#ffffff', color: '#232f3e', border: '1px solid #d5d9d9', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', minWidth: '120px' }}>
+                    <option value="">Text Color</option>
+                    <option value="#000000">⬛ Black</option>
+                    <option value="#e74c3c">🟥 Red</option>
+                    <option value="#3498db">🟦 Blue</option>
+                    <option value="#2ecc71">🟩 Green</option>
+                  </select>
+                </div>
+                <div style={{ marginLeft: 'auto', fontSize: '13px', color: '#565959', background: selectedCells.length > 0 ? '#e7f3ff' : '#f7f8f8', padding: '8px 12px', borderRadius: '6px', border: '1px solid ' + (selectedCells.length > 0 ? '#007185' : '#e7e7e7'), fontWeight: '500' }}>
+                  {selectedCells.length > 0 ? `${selectedCells.length} cell${selectedCells.length > 1 ? 's' : ''} selected` : 'Select cells to format'}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* File Data */}
           {fileData.length > 0 && (
             <div style={{ background: 'white', borderRadius: '8px', marginBottom: '20px', overflow: 'hidden' }}>
