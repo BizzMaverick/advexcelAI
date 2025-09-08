@@ -4076,7 +4076,7 @@ We're committed to excellent support and continuous improvement based on your fe
         }}>
           <div style={{
             background: 'rgba(255, 255, 255, 0.95)',
-            ,
+
             borderRadius: '20px',
             padding: '32px',
             maxWidth: window.innerWidth <= 768 ? '95%' : '600px',
