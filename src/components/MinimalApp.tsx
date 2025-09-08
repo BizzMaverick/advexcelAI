@@ -2552,96 +2552,6 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             </div>
           )}
 
-          {/* File Data */}
-          {fileData.length > 0 && (
-            <div style={{ background: 'white', borderRadius: '8px', marginBottom: '20px', overflow: 'hidden' }}>
-              <div style={{ padding: '15px', background: '#0078d4', color: 'white' }}>
-                <h3 style={{ margin: 0, fontSize: '16px' }}>
-                  {selectedFile?.name}{selectedSheet && ` - ${selectedSheet}`}
-                </h3>
-                <p style={{ margin: '5px 0 0 0', fontSize: '12px', opacity: 0.9 }}>
-                  {fileData.length} rows × {fileData[0]?.length || 0} columns
-                  {sheetNames.length > 1 && ` | Sheet ${sheetNames.indexOf(selectedSheet) + 1} of ${sheetNames.length}`}
-                </p>
-              </div>
-              <div style={{ maxHeight: '400px', overflow: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                  <thead>
-                    <tr style={{ background: '#e6f3ff', borderBottom: '2px solid #0078d4' }}>
-                      <th style={{ padding: '8px', fontSize: '11px', fontWeight: 'bold', color: '#0078d4', border: '1px solid #ddd' }}>#</th>
-                      {fileData[0] && fileData[0].map((_, colIndex) => (
-                        <th key={colIndex} style={{ padding: '8px', fontSize: '11px', fontWeight: 'bold', color: '#0078d4', border: '1px solid #ddd' }}>
-                          {String.fromCharCode(65 + colIndex)}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {fileData.map((row, i) => (
-                      <tr key={i}>
-                        <td style={{ 
-                          padding: '8px', 
-                          borderRight: '1px solid #eee',
-                          fontWeight: 'bold',
-                          fontSize: '11px',
-                          color: '#0078d4',
-                          background: '#f8f9ff',
-                          textAlign: 'center'
-                        }}>
-                          {i + 1}
-                        </td>
-                        {Array.isArray(row) && row.length > 0 ? row.map((cell, j) => (
-                          <td 
-                            key={j}
-                            onClick={(e) => {
-                              const cellId = `${i}-${j}`;
-                              
-                              if (formatPainterActive && copiedFormat) {
-                                // Apply copied format to clicked cell
-                                saveToUndoStack(cellFormatting);
-                                const newFormatting = { ...cellFormatting };
-                                newFormatting[cellId] = { ...copiedFormat };
-                                setCellFormatting(newFormatting);
-                                setFormatPainterActive(false);
-                                setCopiedFormat(null);
-                                return;
-                              }
-                              
-                              // Multiple cell selection with Ctrl+click
-                              if (e.ctrlKey || e.metaKey) {
-                                if (selectedCells.includes(cellId)) {
-                                  setSelectedCells(selectedCells.filter(id => id !== cellId));
-                                } else {
-                                  setSelectedCells([...selectedCells, cellId]);
-                                }
-                              } else {
-                                // Single cell selection
-                                setSelectedCells([cellId]);
-                              }
-                            }}
-                            style={{ 
-                              padding: '8px', 
-                              borderRight: '1px solid #eee',
-                              fontWeight: i === 0 ? 'bold' : 'normal',
-                              color: '#333',
-                              cursor: 'pointer',
-                              backgroundColor: selectedCells.includes(`${i}-${j}`) ? '#cce7ff' : 
-                                              (i % 2 === 0 ? '#fafafa' : 'white'),
-                              ...cellFormatting[`${i}-${j}`]
-                            }}
-                          >
-                            {String(cell || '')}
-                          </td>
-                        )) : (
-                          <td style={{ padding: '8px', color: '#666', fontStyle: 'italic' }}>No data</td>
-                        )}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
           
           {/* AI Response */}
           {aiResponse && (
@@ -3033,8 +2943,8 @@ We're committed to excellent support and continuous improvement based on your fe
           <div 
             onClick={() => setShowFeedbackBox(!showFeedbackBox)}
             style={{
-              width: '60px',
-              height: '60px',
+              width: '80px',
+              height: '80px',
               background: 'transparent',
               cursor: 'pointer',
               display: 'flex',
