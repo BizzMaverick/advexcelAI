@@ -1955,7 +1955,21 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
           {/* File Upload */}
           <div className="section-animate card-animate" style={{ background: 'white', borderRadius: '8px', padding: '20px', marginBottom: '20px', color: '#333' }}>
             <h3 style={{ margin: '0 0 15px 0', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '18px' }}>📁</span>
+              <svg width="20" height="20" viewBox="0 0 100 100">
+                <defs>
+                  <clipPath id="clipIt">
+                    <circle fill="black" r="35" cy="50" cx="50" />
+                  </clipPath>
+                </defs>
+                <path className="utveckling" d="M 49.99955,21.646452 A 28.35355,28.353548 0 0 0 21.646,50 28.35355,28.353548 0 0 0 49.99955,78.353548 28.35355,28.353548 0 0 0 78.3531,50 28.35355,28.353548 0 0 0 49.99955,21.646452 Z" />
+                <g className="cut" clipPath="url(#clipIt)">
+                  <circle r="35" cy="50" cx="50" style={{opacity:1, fill:'#1939ff', fillOpacity:1, stroke:'none', strokeWidth:12.9174}} />
+                  <g className="pil">
+                    <path d="m 40.056531,47.971893 9.914191,-9.514425 9.994144,9.514425" style={{fill:'none', stroke:'#ffffff', strokeWidth:3.8, strokeLinecap:'round', strokeLinejoin:'miter', strokeOpacity:1, strokeMiterlimit:4, strokeDasharray:'none'}} />
+                    <path d="M 49.970722,38.457468 V 61.56393" style={{fill:'none', stroke:'#ffffff', strokeWidth:3.8, strokeLinecap:'round', strokeLinejoin:'miter', strokeOpacity:1, strokeMiterlimit:4, strokeDasharray:'none'}} />
+                  </g>
+                </g>
+              </svg>
               Upload File
             </h3>
             <div style={{ display: 'flex', gap: '10px' }}>
