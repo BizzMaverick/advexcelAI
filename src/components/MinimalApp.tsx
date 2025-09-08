@@ -1953,47 +1953,70 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
         
 
         <main style={{ padding: '20px', background: 'transparent', minHeight: 'calc(100vh - 50px)', position: 'relative', zIndex: 100 }}>
-          {/* File Upload */}
-          <div className="section-animate card-animate" style={{ background: 'white', borderRadius: '8px', padding: '20px', marginBottom: '20px', color: '#333' }}>
-            <h3 style={{ margin: '0 0 15px 0', color: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <img src="/upload.gif" alt="Upload" style={{ width: '64px', height: '64px', background: 'transparent' }} />
-            </h3>
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <input 
-                type="file" 
-                accept=".xlsx,.xls,.csv" 
-                onChange={handleFileUpload}
-                disabled={fileLoading}
-                style={{ 
-                  flex: 1,
-                  padding: '12px', 
-                  border: '1px solid #ddd', 
-                  borderRadius: '6px',
-                  color: '#333',
-                  backgroundColor: '#ffffff'
-                }}
-              />
+          {/* F-Pattern Layout Implementation */}
+          
+          {/* Horizontal Bar 1: Upload Section */}
+          <div style={{ 
+            background: 'white', 
+            borderRadius: '8px', 
+            padding: '20px', 
+            marginBottom: '20px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '20px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+              <img src="/upload.gif" alt="Upload" style={{ width: '60px', height: '60px' }} />
+              <div>
+                <h3 style={{ margin: '0 0 8px 0', color: '#333', fontSize: '18px' }}>Upload Your File</h3>
+                <input 
+                  type="file" 
+                  accept=".xlsx,.xls,.csv" 
+                  onChange={handleFileUpload}
+                  disabled={fileLoading}
+                  style={{ 
+                    padding: '10px', 
+                    border: '1px solid #ddd', 
+                    borderRadius: '6px',
+                    color: '#333',
+                    backgroundColor: '#ffffff',
+                    minWidth: '300px'
+                  }}
+                />
+              </div>
             </div>
-            {fileLoading && <div style={{ marginTop: '10px', color: '#0078d4', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}><img src="/refresh-new.gif" alt="Loading" style={{ width: '20px', height: '20px' }} />Loading...</div>}
-            {fileError && <div style={{ marginTop: '10px', color: '#e53e3e', fontSize: '12px', fontWeight: 'bold' }}>{fileError}</div>}
             
-            {/* Sheet Selector for Excel files */}
+            {fileLoading && (
+              <div style={{ color: '#0078d4', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <img src="/refresh-new.gif" alt="Loading" style={{ width: '20px', height: '20px' }} />
+                Loading...
+              </div>
+            )}
+            
+            {fileError && (
+              <div style={{ color: '#e53e3e', fontSize: '14px', fontWeight: 'bold' }}>
+                {fileError}
+              </div>
+            )}
+            
+            {/* Sheet Selector */}
             {sheetNames.length > 1 && (
-              <div style={{ marginTop: '15px' }}>
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#333' }}>
-                  📊 Select Sheet ({sheetNames.length} sheets available):
+              <div style={{ marginLeft: 'auto' }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#333', fontSize: '14px' }}>
+                  📊 Select Sheet ({sheetNames.length} available):
                 </label>
                 <select
                   value={selectedSheet}
                   onChange={(e) => handleSheetChange(e.target.value)}
                   style={{
-                    width: '100%',
                     padding: '10px',
                     border: '1px solid #ddd',
                     borderRadius: '6px',
                     fontSize: '14px',
                     backgroundColor: '#ffffff',
-                    color: '#333'
+                    color: '#333',
+                    minWidth: '200px'
                   }}
                 >
                   {sheetNames.map((name, index) => (
@@ -2006,19 +2029,18 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             )}
           </div>
 
-          {/* Formatting Toolbar */}
+          {/* Horizontal Bar 2: Toolbar */}
           {fileData.length > 0 && (
             <div style={{ 
               background: '#ffffff', 
-              padding: '12px 16px', 
-              marginBottom: '20px', 
-              border: '1px solid #e7e7e7',
+              padding: '15px 20px', 
               borderRadius: '8px',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.08)'
+              marginBottom: '20px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '14px', fontWeight: '500', color: '#232f3e', minWidth: '70px' }}>Text Style</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span style={{ fontSize: '16px', fontWeight: '600', color: '#232f3e' }}>Format:</span>
                   <button onClick={() => {
                     if (selectedCells.length === 0) return;
                     saveToUndoStack(cellFormatting);
@@ -2028,7 +2050,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                       newFormatting[cellId] = { ...newFormatting[cellId], fontWeight: currentWeight === 'bold' ? 'normal' : 'bold' };
                     });
                     setCellFormatting(newFormatting);
-                  }} style={{ background: '#ffffff', color: '#232f3e', border: '1px solid #d5d9d9', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}>Bold</button>
+                  }} style={{ background: '#ffffff', color: '#232f3e', border: '1px solid #d5d9d9', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '14px' }}>Bold</button>
                   <button onClick={() => {
                     if (selectedCells.length === 0) return;
                     saveToUndoStack(cellFormatting);
@@ -2038,26 +2060,17 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                       newFormatting[cellId] = { ...newFormatting[cellId], fontStyle: currentStyle === 'italic' ? 'normal' : 'italic' };
                     });
                     setCellFormatting(newFormatting);
-                  }} style={{ background: '#ffffff', color: '#232f3e', border: '1px solid #d5d9d9', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}>Italic</button>
+                  }} style={{ background: '#ffffff', color: '#232f3e', border: '1px solid #d5d9d9', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '14px' }}>Italic</button>
+                </div>
+                
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span style={{ fontSize: '16px', fontWeight: '600', color: '#232f3e' }}>Actions:</span>
                   <button onClick={handleUndo} disabled={undoStack.length === 0} style={{ background: undoStack.length > 0 ? '#ffffff' : '#f5f5f5', color: undoStack.length > 0 ? '#232f3e' : '#999', border: '1px solid #d5d9d9', padding: '8px 12px', borderRadius: '6px', cursor: undoStack.length > 0 ? 'pointer' : 'not-allowed', fontSize: '16px' }} title="Undo">↶</button>
                   <button onClick={handleRedo} disabled={redoStack.length === 0} style={{ background: redoStack.length > 0 ? '#ffffff' : '#f5f5f5', color: redoStack.length > 0 ? '#232f3e' : '#999', border: '1px solid #d5d9d9', padding: '8px 12px', borderRadius: '6px', cursor: redoStack.length > 0 ? 'pointer' : 'not-allowed', fontSize: '16px' }} title="Redo">↷</button>
-                  <button onClick={() => {
-                    if (!formatPainterActive) {
-                      if (selectedCells.length === 1) {
-                        const cellId = selectedCells[0];
-                        const format = cellFormatting[cellId] || {};
-                        setCopiedFormat(format);
-                        setFormatPainterActive(true);
-                      }
-                    } else {
-                      setFormatPainterActive(false);
-                      setCopiedFormat(null);
-                    }
-                  }} style={{ background: formatPainterActive ? '#e7f3ff' : '#ffffff', color: '#232f3e', border: formatPainterActive ? '2px solid #007185' : '1px solid #d5d9d9', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '16px' }} title={formatPainterActive ? 'Click cells to apply format' : 'Format Painter'}>🖌️</button>
                 </div>
-                <div style={{ width: '1px', height: '32px', background: '#e7e7e7' }}></div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '14px', fontWeight: '500', color: '#232f3e', minWidth: '70px' }}>Text Color</span>
+                
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span style={{ fontSize: '16px', fontWeight: '600', color: '#232f3e' }}>Color:</span>
                   <select onChange={(e) => {
                     if (selectedCells.length === 0) return;
                     saveToUndoStack(cellFormatting);
@@ -2065,300 +2078,300 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                     const newFormatting = { ...cellFormatting };
                     selectedCells.forEach(cellId => { newFormatting[cellId] = { ...newFormatting[cellId], color }; });
                     setCellFormatting(newFormatting);
-                  }} style={{ background: '#ffffff', color: '#232f3e', border: '1px solid #d5d9d9', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', minWidth: '120px' }}>
-                    <option value="">Text Color</option>
+                  }} style={{ background: '#ffffff', color: '#232f3e', border: '1px solid #d5d9d9', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '14px' }}>
+                    <option value="">Select Color</option>
                     <option value="#000000">⬛ Black</option>
                     <option value="#e74c3c">🟥 Red</option>
                     <option value="#3498db">🟦 Blue</option>
                     <option value="#2ecc71">🟩 Green</option>
                   </select>
                 </div>
-                <div style={{ width: '1px', height: '32px', background: '#e7e7e7' }}></div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '14px', fontWeight: '500', color: '#232f3e', minWidth: '70px' }}>Cell Color</span>
-                  <select onChange={(e) => {
-                    if (selectedCells.length === 0) return;
-                    saveToUndoStack(cellFormatting);
-                    const backgroundColor = e.target.value;
-                    const newFormatting = { ...cellFormatting };
-                    selectedCells.forEach(cellId => { newFormatting[cellId] = { ...newFormatting[cellId], backgroundColor }; });
-                    setCellFormatting(newFormatting);
-                  }} style={{ background: '#ffffff', color: '#232f3e', border: '1px solid #d5d9d9', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', minWidth: '120px' }}>
-                    <option value="">Cell Color</option>
-                    <option value="#ffffff">⬜ White</option>
-                    <option value="#e74c3c">🟥 Red</option>
-                    <option value="#3498db">🟦 Blue</option>
-                    <option value="#2ecc71">🟩 Green</option>
-                  </select>
-                </div>
-                <div style={{ width: '1px', height: '32px', background: '#e7e7e7' }}></div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '14px', fontWeight: '500', color: '#232f3e', minWidth: '70px' }}>Alignment</span>
-                  <select onChange={(e) => {
-                    if (selectedCells.length === 0) return;
-                    saveToUndoStack(cellFormatting);
-                    const align = e.target.value;
-                    const newFormatting = { ...cellFormatting };
-                    selectedCells.forEach(cellId => { newFormatting[cellId] = { ...newFormatting[cellId], textAlign: align }; });
-                    setCellFormatting(newFormatting);
-                  }} style={{ background: '#ffffff', color: '#232f3e', border: '1px solid #d5d9d9', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', minWidth: '120px' }}>
-                    <option value="">Choose Align</option>
-                    <option value="left">Left</option>
-                    <option value="center">Center</option>
-                    <option value="right">Right</option>
-                  </select>
-                </div>
-                <div style={{ marginLeft: 'auto', fontSize: '13px', color: '#565959', background: selectedCells.length > 0 ? '#e7f3ff' : '#f7f8f8', padding: '8px 12px', borderRadius: '6px', border: '1px solid ' + (selectedCells.length > 0 ? '#007185' : '#e7e7e7'), fontWeight: '500' }}>
+                
+                <div style={{ marginLeft: 'auto', fontSize: '14px', color: '#565959', background: selectedCells.length > 0 ? '#e7f3ff' : '#f7f8f8', padding: '10px 15px', borderRadius: '6px', border: '1px solid ' + (selectedCells.length > 0 ? '#007185' : '#e7e7e7'), fontWeight: '500' }}>
                   {selectedCells.length > 0 ? `${selectedCells.length} cell${selectedCells.length > 1 ? 's' : ''} selected` : 'Select cells to format'}
                 </div>
               </div>
             </div>
           )}
 
-          {/* File Data */}
-          {fileData.length > 0 && (
-            <div style={{ background: 'white', borderRadius: '8px', marginBottom: '20px', overflow: 'hidden' }}>
-              <div style={{ padding: '15px', background: '#0078d4', color: 'white' }}>
-                <h3 style={{ margin: 0, fontSize: '16px' }}>
-                  {selectedFile?.name}{selectedSheet && ` - ${selectedSheet}`}
-                </h3>
-                <p style={{ margin: '5px 0 0 0', fontSize: '12px', opacity: 0.9 }}>
-                  {fileData.length} rows × {fileData[0]?.length || 0} columns
-                  {sheetNames.length > 1 && ` | Sheet ${sheetNames.indexOf(selectedSheet) + 1} of ${sheetNames.length}`}
-                </p>
-              </div>
-              <div style={{ maxHeight: '400px', overflow: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                  <thead>
-                    <tr style={{ background: '#e6f3ff', borderBottom: '2px solid #0078d4' }}>
-                      <th style={{ padding: '8px', fontSize: '11px', fontWeight: 'bold', color: '#0078d4', border: '1px solid #ddd' }}>#</th>
-                      {fileData[0] && fileData[0].map((_, colIndex) => (
-                        <th key={colIndex} style={{ padding: '8px', fontSize: '11px', fontWeight: 'bold', color: '#0078d4', border: '1px solid #ddd' }}>
-                          {String.fromCharCode(65 + colIndex)}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {fileData.map((row, i) => (
-                      <tr key={i}>
-                        <td style={{ 
-                          padding: '8px', 
-                          borderRight: '1px solid #eee',
-                          fontWeight: 'bold',
-                          fontSize: '11px',
-                          color: '#0078d4',
-                          background: '#f8f9ff',
-                          textAlign: 'center'
-                        }}>
-                          {i + 1}
-                        </td>
-                        {Array.isArray(row) && row.length > 0 ? row.map((cell, j) => (
-                          <td 
-                            key={j}
-                            onClick={(e) => {
-                              const cellId = `${i}-${j}`;
-                              
-                              if (formatPainterActive && copiedFormat) {
-                                // Apply copied format to clicked cell
-                                saveToUndoStack(cellFormatting);
-                                const newFormatting = { ...cellFormatting };
-                                newFormatting[cellId] = { ...copiedFormat };
-                                setCellFormatting(newFormatting);
-                                setFormatPainterActive(false);
-                                setCopiedFormat(null);
-                                return;
-                              }
-                              
-                              // Multiple cell selection with Ctrl+click
-                              if (e.ctrlKey || e.metaKey) {
-                                if (selectedCells.includes(cellId)) {
-                                  setSelectedCells(selectedCells.filter(id => id !== cellId));
-                                } else {
-                                  setSelectedCells([...selectedCells, cellId]);
-                                }
-                              } else {
-                                // Single cell selection
-                                setSelectedCells([cellId]);
-                              }
-                            }}
-                            style={{ 
-                              padding: '8px', 
-                              borderRight: '1px solid #eee',
-                              fontWeight: i === 0 ? 'bold' : 'normal',
-                              color: '#333',
-                              cursor: 'pointer',
-                              backgroundColor: selectedCells.includes(`${i}-${j}`) ? '#cce7ff' : 
-                                              (i % 2 === 0 ? '#fafafa' : 'white'),
-                              ...cellFormatting[`${i}-${j}`]
-                            }}
-                          >
-                            {String(cell || '')}
-                          </td>
-                        )) : (
-                          <td style={{ padding: '8px', color: '#666', fontStyle: 'italic' }}>No data</td>
-                        )}
+          {/* F-Pattern Main Content: Left (Data) + Right (AI) */}
+          <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
+            
+            {/* Left Vertical Section: File Data */}
+            {fileData.length > 0 && (
+              <div style={{ 
+                flex: '1 1 65%', 
+                background: 'white', 
+                borderRadius: '8px', 
+                overflow: 'hidden',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+              }}>
+                <div style={{ padding: '20px', background: '#0078d4', color: 'white' }}>
+                  <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>
+                    📊 {selectedFile?.name}{selectedSheet && ` - ${selectedSheet}`}
+                  </h3>
+                  <p style={{ margin: '8px 0 0 0', fontSize: '14px', opacity: 0.9 }}>
+                    {fileData.length} rows × {fileData[0]?.length || 0} columns
+                    {sheetNames.length > 1 && ` | Sheet ${sheetNames.indexOf(selectedSheet) + 1} of ${sheetNames.length}`}
+                  </p>
+                </div>
+                <div style={{ maxHeight: '600px', overflow: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ background: '#e6f3ff', borderBottom: '2px solid #0078d4', position: 'sticky', top: 0 }}>
+                        <th style={{ padding: '12px 8px', fontSize: '12px', fontWeight: 'bold', color: '#0078d4', border: '1px solid #ddd', minWidth: '50px' }}>#</th>
+                        {fileData[0] && fileData[0].map((_, colIndex) => (
+                          <th key={colIndex} style={{ padding: '12px 8px', fontSize: '12px', fontWeight: 'bold', color: '#0078d4', border: '1px solid #ddd', minWidth: '100px' }}>
+                            {String.fromCharCode(65 + colIndex)}
+                          </th>
+                        ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {fileData.map((row, i) => (
+                        <tr key={i} style={{ borderBottom: '1px solid #f0f0f0' }}>
+                          <td style={{ 
+                            padding: '10px 8px', 
+                            borderRight: '1px solid #eee',
+                            fontWeight: 'bold',
+                            fontSize: '12px',
+                            color: '#0078d4',
+                            background: '#f8f9ff',
+                            textAlign: 'center',
+                            position: 'sticky',
+                            left: 0
+                          }}>
+                            {i + 1}
+                          </td>
+                          {Array.isArray(row) && row.length > 0 ? row.map((cell, j) => (
+                            <td 
+                              key={j}
+                              onClick={(e) => {
+                                const cellId = `${i}-${j}`;
+                                
+                                if (formatPainterActive && copiedFormat) {
+                                  saveToUndoStack(cellFormatting);
+                                  const newFormatting = { ...cellFormatting };
+                                  newFormatting[cellId] = { ...copiedFormat };
+                                  setCellFormatting(newFormatting);
+                                  setFormatPainterActive(false);
+                                  setCopiedFormat(null);
+                                  return;
+                                }
+                                
+                                if (e.ctrlKey || e.metaKey) {
+                                  if (selectedCells.includes(cellId)) {
+                                    setSelectedCells(selectedCells.filter(id => id !== cellId));
+                                  } else {
+                                    setSelectedCells([...selectedCells, cellId]);
+                                  }
+                                } else {
+                                  setSelectedCells([cellId]);
+                                }
+                              }}
+                              style={{ 
+                                padding: '10px 8px', 
+                                borderRight: '1px solid #eee',
+                                fontWeight: i === 0 ? 'bold' : 'normal',
+                                color: '#333',
+                                cursor: 'pointer',
+                                backgroundColor: selectedCells.includes(`${i}-${j}`) ? '#cce7ff' : 
+                                                (i % 2 === 0 ? '#fafafa' : 'white'),
+                                fontSize: '14px',
+                                transition: 'background-color 0.2s ease',
+                                ...cellFormatting[`${i}-${j}`]
+                              }}
+                            >
+                              {String(cell || '')}
+                            </td>
+                          )) : (
+                            <td style={{ padding: '10px 8px', color: '#666', fontStyle: 'italic' }}>No data</td>
+                          )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* AI Command */}
-          <div className="section-animate card-animate" style={{ background: 'white', borderRadius: '8px', padding: '20px', marginBottom: '20px', color: '#333' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-              <h3 style={{ margin: 0, color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '18px' }}>🤖</span>
-                Ask AI
-              </h3>
-              {trialStatus?.inTrial && (
+            {/* Right Vertical Section: AI Interface */}
+            <div style={{ flex: '1 1 35%', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              
+              {/* AI Command Input */}
+              <div style={{ 
+                background: 'white', 
+                borderRadius: '8px', 
+                padding: '20px', 
+                color: '#333',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                  <h3 style={{ margin: 0, color: '#333', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '18px', fontWeight: '600' }}>
+                    🤖 Ask AI Assistant
+                  </h3>
+                  {trialStatus?.inTrial && (
+                    <div style={{ 
+                      background: '#e7f3ff', 
+                      color: '#0078d4', 
+                      padding: '6px 12px', 
+                      borderRadius: '12px', 
+                      fontSize: '12px', 
+                      fontWeight: '500'
+                    }}>
+                      Trial: {trialStatus.promptsRemaining || 25} left
+                    </div>
+                  )}
+                </div>
+                
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                  <div style={{ flex: 1, position: 'relative' }}>
+                    <input 
+                      type="text"
+                      value={prompt}
+                      onChange={(e) => setPrompt(e.target.value)}
+                      onFocus={() => setShowPromptDropdown(true)}
+                      onBlur={() => setTimeout(() => setShowPromptDropdown(false), 200)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          if (!isProcessing && selectedFile && prompt.trim()) {
+                            handleProcessAI();
+                          }
+                        }
+                      }}
+                      placeholder="Try: sum column A, sort by B, find duplicates..."
+                      style={{ 
+                        width: '100%', 
+                        padding: '12px', 
+                        border: '2px solid #ddd', 
+                        borderRadius: '8px',
+                        color: '#333',
+                        backgroundColor: '#ffffff',
+                        boxSizing: 'border-box',
+                        fontSize: '14px',
+                        transition: 'border-color 0.2s ease'
+                      }}
+                      onFocus={(e) => e.target.style.borderColor = '#0078d4'}
+                      onBlur={(e) => e.target.style.borderColor = '#ddd'}
+                    />
+                    
+                    {showPromptDropdown && promptHistory.length > 0 && (
+                      <div style={{
+                        position: 'absolute',
+                        top: '100%',
+                        left: 0,
+                        right: 0,
+                        background: 'white',
+                        border: '1px solid #ddd',
+                        borderTop: 'none',
+                        borderRadius: '0 0 8px 8px',
+                        maxHeight: '200px',
+                        overflowY: 'auto',
+                        zIndex: 1000,
+                        boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+                      }}>
+                        {promptHistory.map((historyPrompt, index) => (
+                          <div
+                            key={index}
+                            onClick={() => {
+                              setPrompt(historyPrompt);
+                              setShowPromptDropdown(false);
+                            }}
+                            style={{
+                              padding: '10px 12px',
+                              cursor: 'pointer',
+                              borderBottom: index < promptHistory.length - 1 ? '1px solid #eee' : 'none',
+                              fontSize: '14px',
+                              color: '#333',
+                              transition: 'background-color 0.2s ease'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.background = '#f5f5f5'}
+                            onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
+                          >
+                            {historyPrompt}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  
+                  <button 
+                    onClick={handleProcessAI}
+                    disabled={isProcessing || !selectedFile || !prompt.trim()}
+                    style={{ 
+                      background: isProcessing || !selectedFile || !prompt.trim() ? '#ccc' : '#0078d4',
+                      color: 'white',
+                      border: 'none',
+                      padding: '12px 20px',
+                      borderRadius: '8px',
+                      cursor: isProcessing || !selectedFile || !prompt.trim() ? 'not-allowed' : 'pointer',
+                      flexShrink: 0,
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      transition: 'background-color 0.2s ease'
+                    }}
+                  >
+                    {isProcessing ? (
+                      <>
+                        <img src="/refresh-new.gif" alt="Processing" style={{ width: '16px', height: '16px', marginRight: '8px' }} />
+                        Processing...
+                      </>
+                    ) : 'Ask AI'}
+                  </button>
+                </div>
+              </div>
+
+              {/* AI Response */}
+              {aiResponse && (
                 <div style={{ 
-                  background: '#e7f3ff', 
-                  color: '#0078d4', 
-                  padding: '4px 12px', 
-                  borderRadius: '12px', 
-                  fontSize: '12px', 
-                  fontWeight: '500'
+                  background: 'white', 
+                  borderRadius: '8px', 
+                  overflow: 'hidden',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
                 }}>
-                  Trial: {trialStatus.promptsRemaining || 25} prompts left today
+                  {showUseResultButton && (
+                    <div style={{ padding: '15px', background: '#f0f8ff', border: '1px solid #0078d4', margin: '15px', borderRadius: '8px' }}>
+                      <p style={{ margin: '0 0 12px 0', fontSize: '14px', color: '#333', fontWeight: '500' }}>
+                        📊 Results ready! Choose an action:
+                      </p>
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                        <button 
+                          onClick={applyChangesToMainSheet}
+                          style={{ background: '#10b981', color: 'white', border: 'none', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px' }}
+                        >
+                          📋 Apply
+                        </button>
+                        <button 
+                          onClick={createNewSheet}
+                          style={{ background: '#0078d4', color: 'white', border: 'none', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px' }}
+                        >
+                          📄 Download
+                        </button>
+                        <button 
+                          onClick={resetToOriginal}
+                          style={{ background: '#6c757d', color: 'white', border: 'none', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px' }}
+                        >
+                          🔄 Reset
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div style={{ padding: '20px', background: '#0078d4', color: 'white' }}>
+                    <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>🎯 AI Response</h3>
+                    <p style={{ margin: '8px 0 0 0', fontSize: '12px', opacity: 0.9 }}>
+                      {aiResponse.split('<br><br>')[0]?.replace(/<[^>]*>/g, '') || aiResponse.split('<table')[0]?.replace(/<[^>]*>/g, '') || 'Analysis complete'}
+                    </p>
+                  </div>
+                  
+                  <div style={{ maxHeight: '400px', overflow: 'auto', padding: '20px', color: '#333' }}>
+                    <div dangerouslySetInnerHTML={{ __html: aiResponse.includes('<table') ? aiResponse.split('<br><br>').slice(1).join('<br><br>') : aiResponse.split('<br><br>').slice(1).join('<br><br>') || aiResponse }} />
+                  </div>
                 </div>
               )}
-            </div>
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-              <div style={{ flex: 1, position: 'relative' }}>
-                <input 
-                  type="text"
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  onFocus={() => setShowPromptDropdown(true)}
-                  onBlur={() => setTimeout(() => setShowPromptDropdown(false), 200)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      if (!isProcessing && selectedFile && prompt.trim()) {
-                        handleProcessAI();
-                      }
-                    }
-                  }}
-                  placeholder="Try: SUMIF A > 100 B, sum column A, lookup data, sort by column B..."
-                  style={{ 
-                    width: '100%', 
-                    padding: '12px', 
-                    border: '1px solid #ddd', 
-                    borderRadius: '6px',
-                    color: '#333',
-                    backgroundColor: '#ffffff',
-                    boxSizing: 'border-box'
-                  }}
-                />
-                {showPromptDropdown && promptHistory.length > 0 && (
-                  <div style={{
-                    position: 'absolute',
-                    top: '100%',
-                    left: 0,
-                    right: 0,
-                    background: 'white',
-                    border: '1px solid #ddd',
-                    borderTop: 'none',
-                    borderRadius: '0 0 6px 6px',
-                    maxHeight: '200px',
-                    overflowY: 'auto',
-                    zIndex: 1000,
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                  }}>
-                    {promptHistory.map((historyPrompt, index) => (
-                      <div
-                        key={index}
-                        onClick={() => {
-                          setPrompt(historyPrompt);
-                          setShowPromptDropdown(false);
-                        }}
-                        style={{
-                          padding: '8px 12px',
-                          cursor: 'pointer',
-                          borderBottom: index < promptHistory.length - 1 ? '1px solid #eee' : 'none',
-                          fontSize: '14px',
-                          color: '#333'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.background = '#f5f5f5'}
-                        onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
-                      >
-                        {historyPrompt}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-              <button 
-                className="btn-animate"
-                onClick={handleProcessAI}
-                disabled={isProcessing || !selectedFile || !prompt.trim()}
-                style={{ 
-                  background: '#0078d4',
-                  color: 'white',
-                  border: 'none',
-                  padding: '12px 20px',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  flexShrink: 0,
-                  minWidth: 'auto'
-                }}
-              >
-                {isProcessing ? <><img src="/refresh-new.gif" alt="Processing" style={{ width: '16px', height: '16px', marginRight: '8px' }} />Processing...</> : 'Submit'}
-              </button>
             </div>
           </div>
-
-          
-          {/* AI Response */}
-          {aiResponse && (
-            <div style={{ background: 'white', borderRadius: '8px', marginBottom: '20px', overflow: 'hidden' }}>
-              {showUseResultButton && (
-                <div style={{ marginBottom: '15px', padding: '10px', background: '#f0f8ff', borderRadius: '4px', border: '1px solid #0078d4' }}>
-                  <p style={{ margin: '0 0 10px 0', fontSize: '14px', color: '#333' }}>
-                    📊 <strong>Results ready!</strong> Choose an action:
-                  </p>
-                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                    <button 
-                      onClick={applyChangesToMainSheet}
-                      style={{ background: '#10b981', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}
-                    >
-                      📋 Apply to Main Sheet
-                    </button>
-                    <button 
-                      onClick={createNewSheet}
-                      style={{ background: '#0078d4', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}
-                    >
-                      📄 Download Results Only
-                    </button>
-                    <button 
-                      onClick={downloadCurrentSheet}
-                      style={{ background: '#f59e0b', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}
-                    >
-                      📥 Download Full Data
-                    </button>
-                    <button 
-                      onClick={resetToOriginal}
-                      style={{ background: '#6c757d', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}
-                    >
-                      🔄 Reset to Original
-                    </button>
-                  </div>
-                </div>
-              )}
-              <div style={{ padding: '15px', background: '#0078d4', color: 'white' }}>
-                <h3 style={{ margin: 0, fontSize: '16px' }}>AI Response</h3>
-                <p style={{ margin: '5px 0 0 0', fontSize: '12px', opacity: 0.9 }}>
-                  {aiResponse.split('<br><br>')[0]?.replace(/<[^>]*>/g, '') || aiResponse.split('<table')[0]?.replace(/<[^>]*>/g, '') || 'Processing completed'}
-                </p>
-              </div>
-              <div style={{ maxHeight: '400px', overflow: 'auto', padding: '20px', color: '#333' }}>
-                <div dangerouslySetInnerHTML={{ __html: aiResponse.includes('<table') ? aiResponse.split('<br><br>').slice(1).join('<br><br>') : aiResponse.split('<br><br>').slice(1).join('<br><br>') || aiResponse }} />
-              </div>
-            </div>
-          )}
         </main>
         
         {/* Footer with Legal Pages */}
