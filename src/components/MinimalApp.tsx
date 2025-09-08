@@ -3035,11 +3035,8 @@ We're committed to excellent support and continuous improvement based on your fe
             style={{
               width: '60px',
               height: '60px',
-              borderRadius: '50%',
-              background: '#0078d4',
-              color: 'white',
+              background: 'transparent',
               cursor: 'pointer',
-              boxShadow: '0 4px 8px rgba(0, 120, 212, 0.3)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -3053,12 +3050,10 @@ We're committed to excellent support and continuous improvement based on your fe
             onMouseEnter={(e) => {
               const target = e.target as HTMLElement;
               target.style.transform = 'translateY(-2px)';
-              target.style.boxShadow = '0 6px 12px rgba(0, 120, 212, 0.4)';
             }}
             onMouseLeave={(e) => {
               const target = e.target as HTMLElement;
               target.style.transform = 'translateY(0)';
-              target.style.boxShadow = '0 4px 8px rgba(0, 120, 212, 0.3)';
             }}
             title="Give Feedback"
           >
