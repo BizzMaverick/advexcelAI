@@ -1954,34 +1954,22 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
         
 
         <main style={{ padding: '24px', background: 'transparent', minHeight: 'calc(100vh - 50px)', position: 'relative', zIndex: 100 }}>
-          {/* Ultra Modern Grid Layout */}
+          {/* Simplified Top Bar Layout */}
           <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: '380px 1fr 380px', 
-            gridTemplateRows: 'auto auto 1fr', 
-            gap: '24px',
-            height: 'calc(100vh - 98px)',
+            display: 'flex', 
+            gap: '16px',
+            marginBottom: '24px',
             maxWidth: '1600px',
-            margin: '0 auto'
+            margin: '0 auto 24px auto'
           }}>
             
-            {/* Upload Section - Top Left */}
+            {/* File Upload - Left */}
             <div style={{ 
-              gridColumn: '1', 
-              gridRow: '1',
-              height: '120px',
-              width: '380px',
-              background: 'rgba(0, 0, 0, 0.3)', 
-              backdropFilter: 'blur(20px)',
-              borderRadius: '16px', 
-              padding: '4px',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
+              width: '300px',
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxSizing: 'border-box'
+              flexDirection: 'column',
+              gap: '8px'
             }}>
-              
               <input 
                 type="file" 
                 accept=".xlsx,.xls,.csv" 
@@ -1990,252 +1978,169 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                 style={{ 
                   width: '100%',
                   padding: '12px', 
-                  border: '1px solid rgba(255, 255, 255, 0.3)', 
-                  borderRadius: '8px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  border: '1px solid white', 
+                  borderRadius: '6px',
+                  backgroundColor: 'transparent',
                   color: 'white',
                   fontSize: '14px',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  boxSizing: 'border-box'
                 }}
               />
               
               {fileLoading && (
-                <div style={{ marginTop: '10px', color: '#0078d4', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ color: 'white', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px' }}>
                   <img src="/refresh-new.gif" alt="Loading" style={{ width: '16px', height: '16px' }} />
                   Loading...
                 </div>
               )}
               
               {fileError && (
-                <div style={{ marginTop: '10px', color: '#dc2626', fontSize: '12px', fontWeight: '500' }}>
+                <div style={{ color: '#ff6b6b', fontSize: '12px', fontWeight: '500' }}>
                   {fileError}
                 </div>
               )}
               
               {/* Sheet Selector */}
               {sheetNames.length > 1 && (
-                <div style={{ marginTop: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#333', fontSize: '14px' }}>
-                    📊 Select Sheet:
-                  </label>
-                  <select
-                    value={selectedSheet}
-                    onChange={(e) => handleSheetChange(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '8px',
-                      border: '1px solid #ddd',
-                      borderRadius: '6px',
-                      fontSize: '14px',
-                      backgroundColor: '#ffffff',
-                      color: '#333'
-                    }}
-                  >
-                    {sheetNames.map((name, index) => (
-                      <option key={index} value={name}>
-                        {name} {index === 0 ? '(Default)' : ''}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <select
+                  value={selectedSheet}
+                  onChange={(e) => handleSheetChange(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '8px',
+                    border: '1px solid white',
+                    borderRadius: '6px',
+                    fontSize: '12px',
+                    backgroundColor: 'transparent',
+                    color: 'white'
+                  }}
+                >
+                  {sheetNames.map((name, index) => (
+                    <option key={index} value={name} style={{ color: '#333' }}>
+                      {name} {index === 0 ? '(Default)' : ''}
+                    </option>
+                  ))}
+                </select>
               )}
             </div>
 
-            {/* Toolbar - Top Center */}
-            {fileData.length > 0 && (
-              <div style={{ 
-                gridColumn: '2', 
-                gridRow: '1',
-                height: '120px',
-                width: '100%',
-                background: 'rgba(0, 0, 0, 0.3)', 
-                backdropFilter: 'blur(20px)',
-                borderRadius: '16px', 
-                padding: '4px',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxSizing: 'border-box'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexWrap: 'wrap' }}>
-                  
-                  <button onClick={() => {
-                    if (selectedCells.length === 0) return;
-                    saveToUndoStack(cellFormatting);
-                    const newFormatting = { ...cellFormatting };
-                    selectedCells.forEach(cellId => {
-                      const currentWeight = newFormatting[cellId]?.fontWeight;
-                      newFormatting[cellId] = { ...newFormatting[cellId], fontWeight: currentWeight === 'bold' ? 'normal' : 'bold' };
-                    });
-                    setCellFormatting(newFormatting);
-                  }} style={{ background: '#f8f9fa', color: '#333', border: '1px solid #ddd', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '14px' }}>B</button>
-                  
-                  <button onClick={() => {
-                    if (selectedCells.length === 0) return;
-                    saveToUndoStack(cellFormatting);
-                    const newFormatting = { ...cellFormatting };
-                    selectedCells.forEach(cellId => {
-                      const currentStyle = newFormatting[cellId]?.fontStyle;
-                      newFormatting[cellId] = { ...newFormatting[cellId], fontStyle: currentStyle === 'italic' ? 'normal' : 'italic' };
-                    });
-                    setCellFormatting(newFormatting);
-                  }} style={{ background: '#f8f9fa', color: '#333', border: '1px solid #ddd', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '14px', fontStyle: 'italic' }}>I</button>
-                  
-                  <button onClick={handleUndo} disabled={undoStack.length === 0} style={{ background: undoStack.length > 0 ? '#f8f9fa' : '#f5f5f5', color: undoStack.length > 0 ? '#333' : '#999', border: '1px solid #ddd', padding: '6px 10px', borderRadius: '4px', cursor: undoStack.length > 0 ? 'pointer' : 'not-allowed', fontSize: '14px' }} title="Undo">↶</button>
-                  
-                  <button onClick={handleRedo} disabled={redoStack.length === 0} style={{ background: redoStack.length > 0 ? '#f8f9fa' : '#f5f5f5', color: redoStack.length > 0 ? '#333' : '#999', border: '1px solid #ddd', padding: '6px 10px', borderRadius: '4px', cursor: redoStack.length > 0 ? 'pointer' : 'not-allowed', fontSize: '14px' }} title="Redo">↷</button>
-                  
-                  <select onChange={(e) => {
-                    if (selectedCells.length === 0) return;
-                    saveToUndoStack(cellFormatting);
-                    const color = e.target.value;
-                    const newFormatting = { ...cellFormatting };
-                    selectedCells.forEach(cellId => { newFormatting[cellId] = { ...newFormatting[cellId], color }; });
-                    setCellFormatting(newFormatting);
-                  }} style={{ background: '#f8f9fa', color: '#333', border: '1px solid #ddd', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '14px' }}>
-                    <option value="">Color</option>
-                    <option value="#000000">Black</option>
-                    <option value="#dc2626">Red</option>
-                    <option value="#2563eb">Blue</option>
-                    <option value="#16a34a">Green</option>
-                  </select>
-                  
-                  <div style={{ marginLeft: 'auto', fontSize: '12px', color: '#666', background: selectedCells.length > 0 ? '#e3f2fd' : '#f5f5f5', padding: '6px 10px', borderRadius: '4px', border: '1px solid #ddd' }}>
-                    {selectedCells.length > 0 ? `${selectedCells.length} selected` : 'Select cells'}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* AI Input - Top Right */}
+            {/* AI Input - Right (takes remaining space) */}
             <div style={{ 
-              gridColumn: '3', 
-              gridRow: '1',
-              height: '120px',
-              width: '380px',
-              background: 'rgba(0, 0, 0, 0.3)', 
-              backdropFilter: 'blur(20px)',
-              borderRadius: '16px', 
-              padding: '4px',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
+              flex: 1,
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              boxSizing: 'border-box'
+              gap: '12px'
             }}>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '20px' }}>
-                {trialStatus?.inTrial && (
-                  <div style={{ 
-                    background: 'rgba(255, 255, 255, 0.2)', 
-                    color: 'white', 
-                    padding: '6px 12px', 
-                    borderRadius: '8px', 
-                    fontSize: '12px', 
-                    fontWeight: '600',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)'
+              {trialStatus?.inTrial && (
+                <div style={{ 
+                  color: 'white', 
+                  padding: '6px 12px', 
+                  border: '1px solid white',
+                  borderRadius: '6px', 
+                  fontSize: '12px', 
+                  fontWeight: '600',
+                  whiteSpace: 'nowrap'
+                }}>
+                  ⚡ {trialStatus.promptsRemaining || 25}
+                </div>
+              )}
+              
+              <div style={{ flex: 1, position: 'relative' }}>
+                <input 
+                  type="text"
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  onFocus={() => setShowPromptDropdown(true)}
+                  onBlur={() => setTimeout(() => setShowPromptDropdown(false), 200)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      if (!isProcessing && selectedFile && prompt.trim()) {
+                        handleProcessAI();
+                      }
+                    }
+                  }}
+                  placeholder="sum A, sort by B..."
+                  style={{ 
+                    width: '100%', 
+                    padding: '12px', 
+                    border: '1px solid white', 
+                    borderRadius: '6px',
+                    color: 'white',
+                    backgroundColor: 'transparent',
+                    boxSizing: 'border-box',
+                    fontSize: '14px'
+                  }}
+                />
+                
+                {showPromptDropdown && promptHistory.length > 0 && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '100%',
+                    left: 0,
+                    right: 0,
+                    background: 'white',
+                    border: '1px solid #ddd',
+                    borderTop: 'none',
+                    borderRadius: '0 0 6px 6px',
+                    maxHeight: '120px',
+                    overflowY: 'auto',
+                    zIndex: 1000,
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
                   }}>
-                    ⚡ {trialStatus.promptsRemaining || 25}
+                    {promptHistory.map((historyPrompt, index) => (
+                      <div
+                        key={index}
+                        onClick={() => {
+                          setPrompt(historyPrompt);
+                          setShowPromptDropdown(false);
+                        }}
+                        style={{
+                          padding: '6px 10px',
+                          cursor: 'pointer',
+                          borderBottom: index < promptHistory.length - 1 ? '1px solid #f0f0f0' : 'none',
+                          fontSize: '12px',
+                          color: '#333'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = '#f5f5f5'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
+                      >
+                        {historyPrompt}
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
               
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <div style={{ flex: 1, position: 'relative' }}>
-                  <input 
-                    type="text"
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    onFocus={() => setShowPromptDropdown(true)}
-                    onBlur={() => setTimeout(() => setShowPromptDropdown(false), 200)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        if (!isProcessing && selectedFile && prompt.trim()) {
-                          handleProcessAI();
-                        }
-                      }
-                    }}
-                    placeholder="sum A, sort by B..."
-                    style={{ 
-                      width: '100%', 
-                      padding: '10px', 
-                      border: '1px solid #ddd', 
-                      borderRadius: '6px',
-                      color: '#333',
-                      backgroundColor: '#ffffff',
-                      boxSizing: 'border-box',
-                      fontSize: '14px'
-                    }}
-                  />
-                  
-                  {showPromptDropdown && promptHistory.length > 0 && (
-                    <div style={{
-                      position: 'absolute',
-                      top: '100%',
-                      left: 0,
-                      right: 0,
-                      background: 'white',
-                      border: '1px solid #ddd',
-                      borderTop: 'none',
-                      borderRadius: '0 0 6px 6px',
-                      maxHeight: '120px',
-                      overflowY: 'auto',
-                      zIndex: 1000,
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                    }}>
-                      {promptHistory.map((historyPrompt, index) => (
-                        <div
-                          key={index}
-                          onClick={() => {
-                            setPrompt(historyPrompt);
-                            setShowPromptDropdown(false);
-                          }}
-                          style={{
-                            padding: '6px 10px',
-                            cursor: 'pointer',
-                            borderBottom: index < promptHistory.length - 1 ? '1px solid #f0f0f0' : 'none',
-                            fontSize: '12px',
-                            color: '#333'
-                          }}
-                          onMouseEnter={(e) => e.currentTarget.style.background = '#f5f5f5'}
-                          onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
-                        >
-                          {historyPrompt}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                
-                <button 
-                  className="modern-button"
-                  onClick={handleProcessAI}
-                  disabled={isProcessing || !selectedFile || !prompt.trim()}
-                  style={{ 
-                    background: isProcessing || !selectedFile || !prompt.trim() ? 
-                      'rgba(148, 163, 184, 0.5)' : 
-                      'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                    padding: '12px 20px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    boxShadow: isProcessing || !selectedFile || !prompt.trim() ? 
-                      'none' : 
-                      '0 4px 16px rgba(16, 185, 129, 0.3)',
-                    cursor: isProcessing || !selectedFile || !prompt.trim() ? 'not-allowed' : 'pointer'
-                  }}
-                >
-                  {isProcessing ? 'Processing...' : 'Ask'}
-                </button>
-              </div>
+              <button 
+                onClick={handleProcessAI}
+                disabled={isProcessing || !selectedFile || !prompt.trim()}
+                style={{ 
+                  background: 'transparent',
+                  border: '1px solid white',
+                  color: 'white',
+                  padding: '12px 20px',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: isProcessing || !selectedFile || !prompt.trim() ? 'not-allowed' : 'pointer',
+                  opacity: isProcessing || !selectedFile || !prompt.trim() ? 0.5 : 1
+                }}
+              >
+                {isProcessing ? 'Processing...' : 'Ask'}
+              </button>
             </div>
+          </div>
+
+          <div style={{ 
+            maxWidth: '1600px',
+            margin: '0 auto'
+          }}>
 
             {/* Data Table - Full Width */}
             {fileData.length > 0 && (
               <div style={{ 
-                gridColumn: '1 / 4', 
-                gridRow: '2 / 4',
                 background: 'transparent',
                 borderRadius: '16px', 
                 overflow: 'hidden'
