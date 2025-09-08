@@ -4142,7 +4142,6 @@ We're committed to excellent support and continuous improvement based on your fe
             height: '60px',
             borderRadius: '50%',
             background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1))',
-            ,
             border: '1px solid rgba(255, 255, 255, 0.3)',
             color: 'white',
             cursor: 'pointer',
