@@ -1969,33 +1969,13 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             <div style={{ 
               gridColumn: '1', 
               gridRow: '1',
-              background: 'rgba(255, 255, 255, 0.95)', 
+              background: 'rgba(0, 0, 0, 0.3)', 
               backdropFilter: 'blur(20px)',
               borderRadius: '16px', 
               padding: '24px',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-                <div style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '24px',
-                  boxShadow: '0 4px 16px rgba(102, 126, 234, 0.3)'
-                }}>
-                  📁
-                </div>
-                <div>
-                  <h3 style={{ margin: 0, color: '#1a1a1a', fontSize: '18px', fontWeight: '700' }}>Upload File</h3>
-                  <p style={{ margin: '2px 0 0 0', color: '#64748b', fontSize: '13px' }}>Excel or CSV files</p>
-                </div>
-              </div>
               
               <input 
                 type="file" 
@@ -2062,13 +2042,13 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
               <div style={{ 
                 gridColumn: '2', 
                 gridRow: '1',
-                background: 'white', 
-                borderRadius: '8px', 
-                padding: '20px',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                background: 'rgba(0, 0, 0, 0.3)', 
+                backdropFilter: 'blur(20px)',
+                borderRadius: '16px', 
+                padding: '24px',
+                border: '1px solid rgba(255, 255, 255, 0.1)'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexWrap: 'wrap' }}>
-                  <h3 style={{ margin: 0, color: '#333', fontSize: '16px', fontWeight: '600' }}>🎨 Format</h3>
                   
                   <button onClick={() => {
                     if (selectedCells.length === 0) return;
@@ -2119,38 +2099,28 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             )}
 
             {/* AI Input - Top Right */}
-            <div className="glass-card" style={{ 
+            <div style={{ 
               gridColumn: '3', 
               gridRow: '1',
+              background: 'rgba(0, 0, 0, 0.3)', 
+              backdropFilter: 'blur(20px)',
               borderRadius: '16px', 
               padding: '24px',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)'
+              border: '1px solid rgba(255, 255, 255, 0.1)'
             }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div className="icon-gradient" style={{
-                    width: '48px',
-                    height: '48px',
-                    fontSize: '24px'
-                  }}>
-                    🤖
-                  </div>
-                  <div>
-                    <h3 style={{ margin: 0, color: '#1a1a1a', fontSize: '18px', fontWeight: '700' }}>AI Assistant</h3>
-                    <p style={{ margin: '2px 0 0 0', color: '#64748b', fontSize: '13px' }}>Ask anything</p>
-                  </div>
-                </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '20px' }}>
                 {trialStatus?.inTrial && (
                   <div style={{ 
-                    background: 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)', 
-                    color: '#1e40af', 
+                    background: 'rgba(255, 255, 255, 0.2)', 
+                    color: 'white', 
                     padding: '6px 12px', 
                     borderRadius: '8px', 
                     fontSize: '12px', 
                     fontWeight: '600',
-                    boxShadow: '0 2px 8px rgba(30, 64, 175, 0.2)'
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)'
                   }}>
-                    ⚡ {trialStatus.promptsRemaining || 25} left
+                    ⚡ {trialStatus.promptsRemaining || 25}
                   </div>
                 )}
               </div>
@@ -2247,12 +2217,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
 
             {/* Data Table - Bottom Left & Center */}
             {fileData.length > 0 && (
-              <div className="glass-card" style={{ 
+              <div style={{ 
                 gridColumn: '1 / 3', 
                 gridRow: '2 / 4',
+                background: 'rgba(0, 0, 0, 0.3)', 
+                backdropFilter: 'blur(20px)',
                 borderRadius: '16px', 
                 overflow: 'hidden',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)'
+                border: '1px solid rgba(255, 255, 255, 0.1)'
               }}>
                 <div style={{ 
                   padding: '24px', 
@@ -2374,10 +2346,11 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
               <div style={{ 
                 gridColumn: '3', 
                 gridRow: '2 / 4',
-                background: 'white', 
-                borderRadius: '8px', 
+                background: 'rgba(0, 0, 0, 0.3)', 
+                backdropFilter: 'blur(20px)',
+                borderRadius: '16px', 
                 overflow: 'hidden',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
                 display: 'flex',
                 flexDirection: 'column'
               }}>
