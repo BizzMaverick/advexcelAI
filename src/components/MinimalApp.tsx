@@ -2047,32 +2047,51 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
               )}
               
               <div style={{ flex: 1, position: 'relative' }}>
-                <input 
-                  type="text"
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  onFocus={() => setShowPromptDropdown(true)}
-                  onBlur={() => setTimeout(() => setShowPromptDropdown(false), 200)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      if (!isProcessing && selectedFile && prompt.trim()) {
-                        handleProcessAI();
+                <div style={{ position: 'relative' }}>
+                  <input 
+                    type="text"
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (!isProcessing && selectedFile && prompt.trim()) {
+                          handleProcessAI();
+                        }
                       }
-                    }
-                  }}
-                  placeholder="sum A, sort by B..."
-                  style={{ 
-                    width: '100%', 
-                    padding: '12px', 
-                    border: '1px solid white', 
-                    borderRadius: '6px',
-                    color: 'white',
-                    backgroundColor: 'transparent',
-                    boxSizing: 'border-box',
-                    fontSize: '14px'
-                  }}
-                />
+                    }}
+                    placeholder="sum A, sort by B..."
+                    style={{ 
+                      width: '100%', 
+                      padding: '12px 40px 12px 12px', 
+                      border: '1px solid white', 
+                      borderRadius: '6px',
+                      color: 'white',
+                      backgroundColor: 'transparent',
+                      boxSizing: 'border-box',
+                      fontSize: '14px'
+                    }}
+                  />
+                  {promptHistory.length > 0 && (
+                    <button
+                      onClick={() => setShowPromptDropdown(!showPromptDropdown)}
+                      style={{
+                        position: 'absolute',
+                        right: '8px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'transparent',
+                        border: 'none',
+                        color: 'white',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        padding: '4px'
+                      }}
+                    >
+                      {showPromptDropdown ? '▲' : '▼'}
+                    </button>
+                  )}
+                </div>
                 
                 {showPromptDropdown && promptHistory.length > 0 && (
                   <div style={{
@@ -2080,14 +2099,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                     top: '100%',
                     left: 0,
                     right: 0,
-                    background: 'white',
+                    background: 'rgba(0, 0, 0, 0.8)',
+                    backdropFilter: 'blur(10px)',
                     border: '1px solid rgba(255, 255, 255, 0.2)',
                     borderTop: 'none',
                     borderRadius: '0 0 6px 6px',
                     maxHeight: '120px',
                     overflowY: 'auto',
-                    zIndex: 1000,
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                    zIndex: 1000
                   }}>
                     {promptHistory.map((historyPrompt, index) => (
                       <div
@@ -2097,14 +2116,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                           setShowPromptDropdown(false);
                         }}
                         style={{
-                          padding: '6px 10px',
+                          padding: '8px 12px',
                           cursor: 'pointer',
-                          borderBottom: index < promptHistory.length - 1 ? '1px solid #f0f0f0' : 'none',
+                          borderBottom: index < promptHistory.length - 1 ? '1px solid rgba(255, 255, 255, 0.1)' : 'none',
                           fontSize: '12px',
                           color: 'white'
                         }}
-                        onMouseEnter={(e) => e.currentTarget.style.background = '#f5f5f5'}
-                        onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
+                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                       >
                         {historyPrompt}
                       </div>
