@@ -2261,60 +2261,63 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
               </div>
             )}
 
-            {/* AI Response - Overlay */}
+            {/* AI Response */}
             {aiResponse && (
               <div style={{ 
-                position: 'absolute',
-                top: '150px',
-                right: '24px',
-                width: '380px',
-                maxHeight: 'calc(100vh - 200px)',
-                background: 'rgba(0, 0, 0, 0.9)', 
-                backdropFilter: 'blur(20px)',
-                borderRadius: '16px', 
-                overflow: 'hidden',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                display: 'flex',
-                flexDirection: 'column',
-                zIndex: 1000
+                marginTop: '24px',
+                background: 'transparent'
               }}>
-                {showUseResultButton && (
-                  <div style={{ padding: '12px', background: '#e3f2fd', border: '1px solid #2196f3', margin: '12px', borderRadius: '6px' }}>
-                    <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#1565c0', fontWeight: '500' }}>
-                      ✨ Results ready!
-                    </p>
-                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                <div style={{ 
+                  padding: '24px', 
+                  background: 'rgba(0, 0, 0, 0.3)', 
+                  backdropFilter: 'blur(20px)',
+                  color: 'white',
+                  position: 'relative',
+                  overflow: 'hidden'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                    <div style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '10px',
+                      background: 'rgba(255, 255, 255, 0.2)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '20px'
+                    }}>
+                      🎯
+                    </div>
+                    <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '700' }}>
+                      AI Response
+                    </h3>
+                  </div>
+                  
+                  {showUseResultButton && (
+                    <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
                       <button 
                         onClick={applyChangesToMainSheet}
-                        style={{ background: '#4caf50', color: 'white', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '11px' }}
+                        style={{ background: 'transparent', border: '1px solid white', color: 'white', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px' }}
                       >
                         Apply
                       </button>
                       <button 
                         onClick={createNewSheet}
-                        style={{ background: '#2196f3', color: 'white', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '11px' }}
+                        style={{ background: 'transparent', border: '1px solid white', color: 'white', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px' }}
                       >
                         Download
                       </button>
                       <button 
                         onClick={resetToOriginal}
-                        style={{ background: '#757575', color: 'white', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '11px' }}
+                        style={{ background: 'transparent', border: '1px solid white', color: 'white', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px' }}
                       >
                         Reset
                       </button>
                     </div>
-                  </div>
-                )}
-                
-                <div style={{ padding: '15px', background: '#4caf50', color: 'white' }}>
-                  <h3 style={{ margin: 0, fontSize: '14px', fontWeight: '600' }}>🎯 AI Response</h3>
-                  <p style={{ margin: '5px 0 0 0', fontSize: '11px', opacity: 0.9 }}>
-                    {aiResponse.split('<br><br>')[0]?.replace(/<[^>]*>/g, '') || 'Complete'}
-                  </p>
+                  )}
                 </div>
-                
-                <div style={{ flex: 1, overflow: 'auto', padding: '15px', color: '#333', fontSize: '13px' }}>
-                  <div dangerouslySetInnerHTML={{ __html: aiResponse.includes('<table') ? aiResponse.split('<br><br>').slice(1).join('<br><br>') : aiResponse.split('<br><br>').slice(1).join('<br><br>') || aiResponse }} />
+                <div style={{ height: 'auto', overflow: 'auto', background: 'rgba(0, 0, 0, 0.3)', backdropFilter: 'blur(20px)', padding: '24px', color: 'white' }}>
+                  <div dangerouslySetInnerHTML={{ __html: aiResponse }} style={{ fontSize: '14px', lineHeight: '1.6' }} />
                 </div>
               </div>
             )}
