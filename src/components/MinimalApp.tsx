@@ -6,6 +6,7 @@ import logo from '../assets/logo.png';
 import bedrockService from '../services/bedrockService';
 import PaymentService from '../services/paymentService';
 import ErrorBoundary from './ErrorBoundary';
+import '../animations.css';
 
 import {
   Chart as ChartJS,
@@ -1952,26 +1953,50 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
         </header>
         
 
-        <main style={{ padding: '20px', background: 'transparent', minHeight: 'calc(100vh - 50px)', position: 'relative', zIndex: 100 }}>
-          {/* Grid Layout */}
+        <main style={{ padding: '24px', background: 'transparent', minHeight: 'calc(100vh - 50px)', position: 'relative', zIndex: 100 }}>
+          {/* Ultra Modern Grid Layout */}
           <div style={{ 
             display: 'grid', 
-            gridTemplateColumns: '300px 1fr 350px', 
+            gridTemplateColumns: '320px 1fr 380px', 
             gridTemplateRows: 'auto auto 1fr', 
-            gap: '20px',
-            height: 'calc(100vh - 90px)'
+            gap: '24px',
+            height: 'calc(100vh - 98px)',
+            maxWidth: '1600px',
+            margin: '0 auto'
           }}>
             
             {/* Upload Section - Top Left */}
             <div style={{ 
               gridColumn: '1', 
               gridRow: '1',
-              background: 'white', 
-              borderRadius: '8px', 
-              padding: '20px',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+              background: 'rgba(255, 255, 255, 0.95)', 
+              backdropFilter: 'blur(20px)',
+              borderRadius: '16px', 
+              padding: '24px',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
             }}>
-              <h3 style={{ margin: '0 0 15px 0', color: '#333', fontSize: '16px', fontWeight: '600' }}>📁 Upload File</h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '24px',
+                  boxShadow: '0 4px 16px rgba(102, 126, 234, 0.3)'
+                }}>
+                  📁
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, color: '#1a1a1a', fontSize: '18px', fontWeight: '700' }}>Upload File</h3>
+                  <p style={{ margin: '2px 0 0 0', color: '#64748b', fontSize: '13px' }}>Excel or CSV files</p>
+                </div>
+              </div>
+              
               <input 
                 type="file" 
                 accept=".xlsx,.xls,.csv" 
@@ -1979,12 +2004,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                 disabled={fileLoading}
                 style={{ 
                   width: '100%',
-                  padding: '10px', 
-                  border: '1px solid #ddd', 
-                  borderRadius: '6px',
-                  color: '#333',
-                  backgroundColor: '#ffffff',
-                  fontSize: '14px'
+                  padding: '16px', 
+                  border: '2px dashed #e2e8f0', 
+                  borderRadius: '12px',
+                  color: '#475569',
+                  backgroundColor: 'rgba(248, 250, 252, 0.8)',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
                 }}
               />
               
@@ -2092,26 +2119,38 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             )}
 
             {/* AI Input - Top Right */}
-            <div style={{ 
+            <div className="glass-card" style={{ 
               gridColumn: '3', 
               gridRow: '1',
-              background: 'white', 
-              borderRadius: '8px', 
-              padding: '20px',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+              borderRadius: '16px', 
+              padding: '24px',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)'
             }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                <h3 style={{ margin: 0, color: '#333', fontSize: '16px', fontWeight: '600' }}>🤖 Ask AI</h3>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div className="icon-gradient" style={{
+                    width: '48px',
+                    height: '48px',
+                    fontSize: '24px'
+                  }}>
+                    🤖
+                  </div>
+                  <div>
+                    <h3 style={{ margin: 0, color: '#1a1a1a', fontSize: '18px', fontWeight: '700' }}>AI Assistant</h3>
+                    <p style={{ margin: '2px 0 0 0', color: '#64748b', fontSize: '13px' }}>Ask anything</p>
+                  </div>
+                </div>
                 {trialStatus?.inTrial && (
                   <div style={{ 
-                    background: '#e3f2fd', 
-                    color: '#1976d2', 
-                    padding: '2px 8px', 
-                    borderRadius: '4px', 
-                    fontSize: '11px', 
-                    fontWeight: '500'
+                    background: 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)', 
+                    color: '#1e40af', 
+                    padding: '6px 12px', 
+                    borderRadius: '8px', 
+                    fontSize: '12px', 
+                    fontWeight: '600',
+                    boxShadow: '0 2px 8px rgba(30, 64, 175, 0.2)'
                   }}>
-                    {trialStatus.promptsRemaining || 25} left
+                    ⚡ {trialStatus.promptsRemaining || 25} left
                   </div>
                 )}
               </div>
@@ -2185,39 +2224,71 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                 </div>
                 
                 <button 
+                  className="modern-button"
                   onClick={handleProcessAI}
                   disabled={isProcessing || !selectedFile || !prompt.trim()}
                   style={{ 
-                    background: isProcessing || !selectedFile || !prompt.trim() ? '#ccc' : '#0078d4',
-                    color: 'white',
-                    border: 'none',
-                    padding: '10px 12px',
-                    borderRadius: '6px',
-                    cursor: isProcessing || !selectedFile || !prompt.trim() ? 'not-allowed' : 'pointer',
+                    background: isProcessing || !selectedFile || !prompt.trim() ? 
+                      'rgba(148, 163, 184, 0.5)' : 
+                      'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                    padding: '12px 20px',
                     fontSize: '14px',
-                    fontWeight: '500'
+                    fontWeight: '600',
+                    boxShadow: isProcessing || !selectedFile || !prompt.trim() ? 
+                      'none' : 
+                      '0 4px 16px rgba(16, 185, 129, 0.3)',
+                    cursor: isProcessing || !selectedFile || !prompt.trim() ? 'not-allowed' : 'pointer'
                   }}
                 >
-                  {isProcessing ? '⏳' : 'Go'}
+                  {isProcessing ? '🔄 Processing...' : '🚀 Ask AI'}
                 </button>
               </div>
             </div>
 
             {/* Data Table - Bottom Left & Center */}
             {fileData.length > 0 && (
-              <div style={{ 
+              <div className="glass-card" style={{ 
                 gridColumn: '1 / 3', 
                 gridRow: '2 / 4',
-                background: 'white', 
-                borderRadius: '8px', 
+                borderRadius: '16px', 
                 overflow: 'hidden',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)'
               }}>
-                <div style={{ padding: '15px', background: '#0078d4', color: 'white' }}>
-                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>
-                    📊 {selectedFile?.name}{selectedSheet && ` - ${selectedSheet}`}
-                  </h3>
-                  <p style={{ margin: '5px 0 0 0', fontSize: '12px', opacity: 0.9 }}>
+                <div style={{ 
+                  padding: '24px', 
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', 
+                  color: 'white',
+                  position: 'relative',
+                  overflow: 'hidden'
+                }}>
+                  <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    right: 0,
+                    width: '100px',
+                    height: '100px',
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    borderRadius: '50%',
+                    transform: 'translate(30px, -30px)'
+                  }} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                    <div style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '10px',
+                      background: 'rgba(255, 255, 255, 0.2)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '20px'
+                    }}>
+                      📊
+                    </div>
+                    <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '700' }}>
+                      {selectedFile?.name}{selectedSheet && ` - ${selectedSheet}`}
+                    </h3>
+                  </div>
+                  <p style={{ margin: 0, fontSize: '14px', opacity: 0.9, fontWeight: '500' }}>
                     {fileData.length} rows × {fileData[0]?.length || 0} columns
                   </p>
                 </div>
