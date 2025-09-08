@@ -1974,7 +1974,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
               background: 'rgba(0, 0, 0, 0.3)', 
               backdropFilter: 'blur(20px)',
               borderRadius: '16px', 
-              padding: '24px',
+              padding: '12px',
               border: '1px solid rgba(255, 255, 255, 0.1)',
               display: 'flex',
               alignItems: 'center',
@@ -2051,7 +2051,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                 background: 'rgba(0, 0, 0, 0.3)', 
                 backdropFilter: 'blur(20px)',
                 borderRadius: '16px', 
-                padding: '24px',
+                padding: '12px',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
                 display: 'flex',
                 alignItems: 'center',
@@ -2117,7 +2117,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
               background: 'rgba(0, 0, 0, 0.3)', 
               backdropFilter: 'blur(20px)',
               borderRadius: '16px', 
-              padding: '24px',
+              padding: '12px',
               border: '1px solid rgba(255, 255, 255, 0.1)',
               display: 'flex',
               alignItems: 'center',
@@ -2236,15 +2236,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
               <div style={{ 
                 gridColumn: '1 / 4', 
                 gridRow: '2 / 4',
-                background: 'rgba(0, 0, 0, 0.3)', 
-                backdropFilter: 'blur(20px)',
+                background: 'transparent',
                 borderRadius: '16px', 
-                overflow: 'hidden',
-                border: '1px solid rgba(255, 255, 255, 0.1)'
+                overflow: 'hidden'
               }}>
                 <div style={{ 
                   padding: '24px', 
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', 
+                  background: 'rgba(0, 0, 0, 0.3)', 
+                  backdropFilter: 'blur(20px)',
                   color: 'white',
                   position: 'relative',
                   overflow: 'hidden'
@@ -2283,10 +2282,10 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                 <div style={{ height: 'calc(100% - 70px)', overflow: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
-                      <tr style={{ background: '#f8f9fa', borderBottom: '2px solid #dee2e6', position: 'sticky', top: 0 }}>
-                        <th style={{ padding: '10px 8px', fontSize: '12px', fontWeight: '600', color: '#495057', border: '1px solid #dee2e6', minWidth: '40px' }}>#</th>
+                      <tr style={{ background: 'rgba(255, 255, 255, 0.1)', borderBottom: '2px solid rgba(255, 255, 255, 0.2)', position: 'sticky', top: 0 }}>
+                        <th style={{ padding: '10px 8px', fontSize: '12px', fontWeight: '600', color: 'white', border: '1px solid rgba(255, 255, 255, 0.2)', minWidth: '40px' }}>#</th>
                         {fileData[0] && fileData[0].map((_, colIndex) => (
-                          <th key={colIndex} style={{ padding: '10px 8px', fontSize: '12px', fontWeight: '600', color: '#495057', border: '1px solid #dee2e6', minWidth: '80px' }}>
+                          <th key={colIndex} style={{ padding: '10px 8px', fontSize: '12px', fontWeight: '600', color: 'white', border: '1px solid rgba(255, 255, 255, 0.2)', minWidth: '80px' }}>
                             {String.fromCharCode(65 + colIndex)}
                           </th>
                         ))}
@@ -2297,11 +2296,11 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                         <tr key={i}>
                           <td style={{ 
                             padding: '8px', 
-                            borderRight: '1px solid #dee2e6',
+                            borderRight: '1px solid rgba(255, 255, 255, 0.2)',
                             fontWeight: '600',
                             fontSize: '11px',
-                            color: '#6c757d',
-                            background: '#f8f9fa',
+                            color: 'white',
+                            background: 'rgba(255, 255, 255, 0.1)',
                             textAlign: 'center'
                           }}>
                             {i + 1}
@@ -2334,12 +2333,12 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                               }}
                               style={{ 
                                 padding: '8px', 
-                                borderRight: '1px solid #dee2e6',
+                                borderRight: '1px solid rgba(255, 255, 255, 0.2)',
                                 fontWeight: i === 0 ? '600' : '400',
-                                color: '#212529',
+                                color: 'white',
                                 cursor: 'pointer',
-                                backgroundColor: selectedCells.includes(`${i}-${j}`) ? '#cce7ff' : 
-                                                (i % 2 === 0 ? '#ffffff' : '#f8f9fa'),
+                                backgroundColor: selectedCells.includes(`${i}-${j}`) ? 'rgba(255, 255, 255, 0.3)' : 
+                                                (i % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.05)'),
                                 fontSize: '13px',
                                 ...cellFormatting[`${i}-${j}`]
                               }}
@@ -2347,7 +2346,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                               {String(cell || '')}
                             </td>
                           )) : (
-                            <td style={{ padding: '8px', color: '#6c757d', fontStyle: 'italic' }}>No data</td>
+                            <td style={{ padding: '8px', color: 'white', fontStyle: 'italic' }}>No data</td>
                           )}
                         </tr>
                       ))}
