@@ -2694,7 +2694,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                         setShowPivotDropdown(!showPivotDropdown);
                       }}
                       style={{
-                        background: 'rgba(255, 255, 255, 0.1)',
+                        background: 'transparent',
                         border: '1px solid rgba(255, 255, 255, 0.2)',
                         borderRadius: '8px',
                         padding: '8px 12px',
@@ -2715,7 +2715,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                         left: 0,
                         right: 0,
                         background: 'rgba(255, 255, 255, 0.95)',
-                        backdropFilter: 'blur(20px)',
+                        ,
                         borderRadius: '8px',
                         border: '1px solid rgba(255, 255, 255, 0.3)',
                         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
@@ -2778,7 +2778,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                       }
                     }}
                     style={{
-                      background: 'rgba(255, 255, 255, 0.1)',
+                      background: 'transparent',
                       border: '1px solid rgba(255, 255, 255, 0.2)',
                       borderRadius: '8px',
                       padding: '8px 12px',
@@ -2825,7 +2825,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                       }
                     }}
                     style={{
-                      background: 'rgba(255, 255, 255, 0.1)',
+                      background: 'transparent',
                       border: '1px solid rgba(255, 255, 255, 0.2)',
                       borderRadius: '8px',
                       padding: '8px 12px',
@@ -2874,7 +2874,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                       }
                     }}
                     style={{
-                      background: 'rgba(255, 255, 255, 0.1)',
+                      background: 'transparent',
                       border: '1px solid rgba(255, 255, 255, 0.2)',
                       borderRadius: '8px',
                       padding: '8px 12px',
@@ -2890,7 +2890,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                     <button
                       onClick={() => setShowExportDropdown(!showExportDropdown)}
                       style={{
-                        background: 'rgba(255, 255, 255, 0.1)',
+                        background: 'transparent',
                         border: '1px solid rgba(255, 255, 255, 0.2)',
                         borderRadius: '8px',
                         padding: '8px 12px',
@@ -2911,7 +2911,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                         left: 0,
                         right: 0,
                         background: 'rgba(255, 255, 255, 0.95)',
-                        backdropFilter: 'blur(20px)',
+                        ,
                         borderRadius: '8px',
                         border: '1px solid rgba(255, 255, 255, 0.3)',
                         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
@@ -3025,7 +3025,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                     onClick={() => performAlternativeAnalysis(spreadsheetData)}
                     disabled={aiLoading}
                     style={{
-                      background: 'rgba(255, 255, 255, 0.1)',
+                      background: 'transparent',
                       border: '1px solid rgba(255, 255, 255, 0.2)',
                       borderRadius: '12px',
                       padding: '12px 16px',
@@ -3203,7 +3203,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                 </div>
                 
                 <div style={{
-                  background: 'rgba(255, 255, 255, 0.05)',
+                  background: 'transparent',
                   borderRadius: '12px',
                   overflowX: 'scroll',
                   overflowY: 'scroll',
@@ -3219,7 +3219,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                     tableLayout: 'auto'
                   }}>
                     <thead>
-                      <tr style={{ background: 'rgba(255, 255, 255, 0.1)' }}>
+                      <tr style={{ background: 'transparent' }}>
                         {displayData[0]?.map((header, index) => (
                           <th key={index} 
                             onClick={() => handleSort(index)}
@@ -3312,7 +3312,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
             {aiResponse && (
               <div style={{
                 marginTop: '32px',
-                background: 'rgba(255, 255, 255, 0.05)',
+                background: 'transparent',
                 borderRadius: '12px',
                 padding: '24px'
               }}>
@@ -3320,7 +3320,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   💬 Custom Analytics Response
                 </h4>
                 <div style={{
-                  background: 'rgba(255, 255, 255, 0.05)',
+                  background: 'transparent',
                   borderRadius: '8px',
                   padding: '16px',
                   fontSize: '13px',
@@ -3341,10 +3341,10 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
             {analyticsData?.top5 && (
               <div style={{
                 marginTop: '32px',
-                background: 'rgba(76, 205, 196, 0.1)',
+                background: 'transparent',
                 borderRadius: '12px',
                 padding: '24px',
-                border: '1px solid rgba(76, 205, 196, 0.3)'
+                border: '1px solid rgba(255, 255, 255, 0.2)'
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                   <h4 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: '#4ecdc4' }}>
@@ -3356,7 +3356,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                       downloadExcel(top5Data, 'top5_analysis.xlsx');
                     }}
                     style={{
-                      background: 'rgba(255, 255, 255, 0.1)',
+                      background: 'transparent',
                       border: '1px solid rgba(255, 255, 255, 0.2)',
                       borderRadius: '6px',
                       padding: '6px 12px',
@@ -3404,10 +3404,10 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
             {analyticsData?.bottom5 && (
               <div style={{
                 marginTop: '20px',
-                background: 'rgba(255, 107, 107, 0.1)',
+                background: 'transparent',
                 borderRadius: '12px',
                 padding: '24px',
-                border: '1px solid rgba(255, 107, 107, 0.3)'
+                border: '1px solid rgba(255, 255, 255, 0.2)'
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                   <h4 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: '#ff6b6b' }}>
@@ -3419,7 +3419,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                       downloadExcel(bottom5Data, 'bottom5_analysis.xlsx');
                     }}
                     style={{
-                      background: 'rgba(255, 255, 255, 0.1)',
+                      background: 'transparent',
                       border: '1px solid rgba(255, 255, 255, 0.2)',
                       borderRadius: '6px',
                       padding: '6px 12px',
@@ -3467,7 +3467,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
             {analyticsData?.comparison && (
               <div style={{
                 marginTop: '20px',
-                background: 'rgba(255, 255, 255, 0.05)',
+                background: 'transparent',
                 borderRadius: '12px',
                 padding: '24px'
               }}>
@@ -3504,7 +3504,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
             {selectedPivot !== null && pivotTables[selectedPivot] && (
               <div style={{
                 marginTop: '32px',
-                background: 'rgba(255, 255, 255, 0.05)',
+                background: 'transparent',
                 borderRadius: '12px',
                 padding: '24px'
               }}>
@@ -3518,7 +3518,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                       <button
                         onClick={() => setShowAdvancedPivot(!showAdvancedPivot)}
                         style={{
-                          background: 'rgba(255, 255, 255, 0.1)',
+                          background: 'transparent',
                           border: '1px solid rgba(255, 255, 255, 0.2)',
                           borderRadius: '6px',
                           padding: '6px 12px',
@@ -3534,7 +3534,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                     <button
                       onClick={() => downloadExcel(pivotTables[selectedPivot].data, `${pivotTables[selectedPivot].title.replace(/\s+/g, '_').toLowerCase()}_pivot.xlsx`)}
                       style={{
-                        background: 'rgba(255, 255, 255, 0.1)',
+                        background: 'transparent',
                         border: '1px solid rgba(255, 255, 255, 0.2)',
                         borderRadius: '6px',
                         padding: '8px 16px',
@@ -3552,7 +3552,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                 {/* Dynamic Filters */}
                 {showAdvancedPivot && pivotTables[selectedPivot].type === 'multidimensional' && (
                   <div style={{
-                    background: 'rgba(255, 255, 255, 0.05)',
+                    background: 'transparent',
                     borderRadius: '8px',
                     padding: '16px',
                     marginBottom: '16px'
@@ -3572,7 +3572,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                               setPivotTables(newPivots);
                             }}
                             style={{
-                              background: 'rgba(255, 255, 255, 0.1)',
+                              background: 'transparent',
                               border: '1px solid rgba(255, 255, 255, 0.2)',
                               borderRadius: '4px',
                               padding: '4px 8px',
@@ -3593,7 +3593,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                 )}
                 
                 <div style={{
-                  background: 'rgba(255, 255, 255, 0.05)',
+                  background: 'transparent',
                   borderRadius: '8px',
                   overflow: 'auto',
                   maxHeight: '500px',
@@ -3603,7 +3603,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                 }} className="custom-scrollbar">
                   <table style={{ borderCollapse: 'collapse', width: '100%' }}>
                     <thead>
-                      <tr style={{ background: 'rgba(255, 255, 255, 0.1)' }}>
+                      <tr style={{ background: 'transparent' }}>
                         {pivotTables[selectedPivot].data[0]?.map((header: string, index: number) => (
                           <th key={index} style={{
                             padding: '12px 16px',
@@ -3662,8 +3662,8 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           <div style={{
             maxWidth: '1200px',
             margin: '40px auto 0',
-            background: 'rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(20px)',
+            background: 'transparent',
+            ,
             borderRadius: '24px',
             padding: '32px',
             border: '1px solid rgba(255, 255, 255, 0.2)'
@@ -3678,7 +3678,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                     key={type}
                     onClick={() => setChartType(type)}
                     style={{
-                      background: 'rgba(255, 255, 255, 0.1)',
+                      background: 'transparent',
                       border: '1px solid rgba(255, 255, 255, 0.2)',
                       borderRadius: '8px',
                       padding: '6px 12px',
@@ -3695,7 +3695,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                 ))}
               </div>
             </div>
-            <div style={{ background: 'rgba(255, 255, 255, 0.05)', borderRadius: '12px', padding: '24px' }}>
+            <div style={{ background: 'transparent', borderRadius: '12px', padding: '24px' }}>
               {chartType === 'scatter' ? (
                 <ScatterPlotComponent data={spreadsheetData} />
               ) : chartType === 'histogram' ? (
@@ -4076,7 +4076,7 @@ We're committed to excellent support and continuous improvement based on your fe
         }}>
           <div style={{
             background: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(20px)',
+            ,
             borderRadius: '20px',
             padding: '32px',
             maxWidth: window.innerWidth <= 768 ? '95%' : '600px',
@@ -4115,7 +4115,7 @@ We're committed to excellent support and continuous improvement based on your fe
               <button
                 onClick={() => setShowLegalModal(false)}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.1)',
+                  background: 'transparent',
                   color: 'white',
                   border: '1px solid rgba(255, 255, 255, 0.2)',
                   padding: '12px 24px',
@@ -4142,7 +4142,7 @@ We're committed to excellent support and continuous improvement based on your fe
             height: '60px',
             borderRadius: '50%',
             background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1))',
-            backdropFilter: 'blur(20px)',
+            ,
             border: '1px solid rgba(255, 255, 255, 0.3)',
             color: 'white',
             cursor: 'pointer',
@@ -4175,7 +4175,7 @@ We're committed to excellent support and continuous improvement based on your fe
             right: '0',
             width: window.innerWidth <= 480 ? '250px' : '300px',
             background: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(20px)',
+            ,
             borderRadius: '16px',
             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
             padding: '20px',
@@ -4227,7 +4227,7 @@ We're committed to excellent support and continuous improvement based on your fe
                   }
                 }}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.1)',
+                  background: 'transparent',
                   color: 'white',
                   border: '1px solid rgba(255, 255, 255, 0.2)',
                   padding: '10px 16px',
