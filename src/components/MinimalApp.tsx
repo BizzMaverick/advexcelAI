@@ -1953,37 +1953,25 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
         
 
         <main style={{ padding: '20px', background: 'transparent', minHeight: 'calc(100vh - 50px)', position: 'relative', zIndex: 100 }}>
-          {/* Dashboard Layout - Card-based sections */}
-          
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+          {/* Grid Layout */}
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: '300px 1fr 350px', 
+            gridTemplateRows: 'auto auto 1fr', 
+            gap: '20px',
+            height: 'calc(100vh - 90px)'
+          }}>
             
-            {/* Upload Card */}
+            {/* Upload Section - Top Left */}
             <div style={{ 
+              gridColumn: '1', 
+              gridRow: '1',
               background: 'white', 
-              borderRadius: '12px', 
-              padding: '24px', 
-              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-              border: '1px solid #e1e5e9'
+              borderRadius: '8px', 
+              padding: '20px',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
-                <div style={{ 
-                  width: '48px', 
-                  height: '48px', 
-                  borderRadius: '12px', 
-                  background: 'linear-gradient(135deg, #0078d4, #106ebe)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '24px'
-                }}>
-                  📁
-                </div>
-                <div>
-                  <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: '#1a1a1a' }}>Upload File</h3>
-                  <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: '#666' }}>Excel or CSV files</p>
-                </div>
-              </div>
-              
+              <h3 style={{ margin: '0 0 15px 0', color: '#333', fontSize: '16px', fontWeight: '600' }}>📁 Upload File</h3>
               <input 
                 type="file" 
                 accept=".xlsx,.xls,.csv" 
@@ -1991,63 +1979,136 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                 disabled={fileLoading}
                 style={{ 
                   width: '100%',
-                  padding: '12px', 
-                  border: '2px dashed #d1d5db', 
-                  borderRadius: '8px',
+                  padding: '10px', 
+                  border: '1px solid #ddd', 
+                  borderRadius: '6px',
                   color: '#333',
-                  backgroundColor: '#f9fafb',
-                  cursor: 'pointer',
+                  backgroundColor: '#ffffff',
                   fontSize: '14px'
                 }}
               />
               
               {fileLoading && (
-                <div style={{ marginTop: '12px', color: '#0078d4', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <img src="/refresh-new.gif" alt="Loading" style={{ width: '20px', height: '20px' }} />
-                  Processing file...
+                <div style={{ marginTop: '10px', color: '#0078d4', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <img src="/refresh-new.gif" alt="Loading" style={{ width: '16px', height: '16px' }} />
+                  Loading...
                 </div>
               )}
               
               {fileError && (
-                <div style={{ marginTop: '12px', color: '#dc2626', fontSize: '14px', fontWeight: '500' }}>
-                  ⚠️ {fileError}
+                <div style={{ marginTop: '10px', color: '#dc2626', fontSize: '12px', fontWeight: '500' }}>
+                  {fileError}
+                </div>
+              )}
+              
+              {/* Sheet Selector */}
+              {sheetNames.length > 1 && (
+                <div style={{ marginTop: '15px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#333', fontSize: '14px' }}>
+                    📊 Select Sheet:
+                  </label>
+                  <select
+                    value={selectedSheet}
+                    onChange={(e) => handleSheetChange(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '8px',
+                      border: '1px solid #ddd',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      backgroundColor: '#ffffff',
+                      color: '#333'
+                    }}
+                  >
+                    {sheetNames.map((name, index) => (
+                      <option key={index} value={name}>
+                        {name} {index === 0 ? '(Default)' : ''}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               )}
             </div>
 
-            {/* AI Assistant Card */}
+            {/* Toolbar - Top Center */}
+            {fileData.length > 0 && (
+              <div style={{ 
+                gridColumn: '2', 
+                gridRow: '1',
+                background: 'white', 
+                borderRadius: '8px', 
+                padding: '20px',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexWrap: 'wrap' }}>
+                  <h3 style={{ margin: 0, color: '#333', fontSize: '16px', fontWeight: '600' }}>🎨 Format</h3>
+                  
+                  <button onClick={() => {
+                    if (selectedCells.length === 0) return;
+                    saveToUndoStack(cellFormatting);
+                    const newFormatting = { ...cellFormatting };
+                    selectedCells.forEach(cellId => {
+                      const currentWeight = newFormatting[cellId]?.fontWeight;
+                      newFormatting[cellId] = { ...newFormatting[cellId], fontWeight: currentWeight === 'bold' ? 'normal' : 'bold' };
+                    });
+                    setCellFormatting(newFormatting);
+                  }} style={{ background: '#f8f9fa', color: '#333', border: '1px solid #ddd', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '14px' }}>B</button>
+                  
+                  <button onClick={() => {
+                    if (selectedCells.length === 0) return;
+                    saveToUndoStack(cellFormatting);
+                    const newFormatting = { ...cellFormatting };
+                    selectedCells.forEach(cellId => {
+                      const currentStyle = newFormatting[cellId]?.fontStyle;
+                      newFormatting[cellId] = { ...newFormatting[cellId], fontStyle: currentStyle === 'italic' ? 'normal' : 'italic' };
+                    });
+                    setCellFormatting(newFormatting);
+                  }} style={{ background: '#f8f9fa', color: '#333', border: '1px solid #ddd', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '14px', fontStyle: 'italic' }}>I</button>
+                  
+                  <button onClick={handleUndo} disabled={undoStack.length === 0} style={{ background: undoStack.length > 0 ? '#f8f9fa' : '#f5f5f5', color: undoStack.length > 0 ? '#333' : '#999', border: '1px solid #ddd', padding: '6px 10px', borderRadius: '4px', cursor: undoStack.length > 0 ? 'pointer' : 'not-allowed', fontSize: '14px' }} title="Undo">↶</button>
+                  
+                  <button onClick={handleRedo} disabled={redoStack.length === 0} style={{ background: redoStack.length > 0 ? '#f8f9fa' : '#f5f5f5', color: redoStack.length > 0 ? '#333' : '#999', border: '1px solid #ddd', padding: '6px 10px', borderRadius: '4px', cursor: redoStack.length > 0 ? 'pointer' : 'not-allowed', fontSize: '14px' }} title="Redo">↷</button>
+                  
+                  <select onChange={(e) => {
+                    if (selectedCells.length === 0) return;
+                    saveToUndoStack(cellFormatting);
+                    const color = e.target.value;
+                    const newFormatting = { ...cellFormatting };
+                    selectedCells.forEach(cellId => { newFormatting[cellId] = { ...newFormatting[cellId], color }; });
+                    setCellFormatting(newFormatting);
+                  }} style={{ background: '#f8f9fa', color: '#333', border: '1px solid #ddd', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '14px' }}>
+                    <option value="">Color</option>
+                    <option value="#000000">Black</option>
+                    <option value="#dc2626">Red</option>
+                    <option value="#2563eb">Blue</option>
+                    <option value="#16a34a">Green</option>
+                  </select>
+                  
+                  <div style={{ marginLeft: 'auto', fontSize: '12px', color: '#666', background: selectedCells.length > 0 ? '#e3f2fd' : '#f5f5f5', padding: '6px 10px', borderRadius: '4px', border: '1px solid #ddd' }}>
+                    {selectedCells.length > 0 ? `${selectedCells.length} selected` : 'Select cells'}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* AI Input - Top Right */}
             <div style={{ 
+              gridColumn: '3', 
+              gridRow: '1',
               background: 'white', 
-              borderRadius: '12px', 
-              padding: '24px', 
-              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-              border: '1px solid #e1e5e9'
+              borderRadius: '8px', 
+              padding: '20px',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
-                <div style={{ 
-                  width: '48px', 
-                  height: '48px', 
-                  borderRadius: '12px', 
-                  background: 'linear-gradient(135deg, #10b981, #059669)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '24px'
-                }}>
-                  🤖
-                </div>
-                <div>
-                  <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: '#1a1a1a' }}>AI Assistant</h3>
-                  <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: '#666' }}>Ask questions about your data</p>
-                </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                <h3 style={{ margin: 0, color: '#333', fontSize: '16px', fontWeight: '600' }}>🤖 Ask AI</h3>
                 {trialStatus?.inTrial && (
                   <div style={{ 
-                    marginLeft: 'auto',
-                    background: '#dbeafe', 
-                    color: '#1d4ed8', 
-                    padding: '4px 8px', 
-                    borderRadius: '6px', 
-                    fontSize: '12px', 
+                    background: '#e3f2fd', 
+                    color: '#1976d2', 
+                    padding: '2px 8px', 
+                    borderRadius: '4px', 
+                    fontSize: '11px', 
                     fontWeight: '500'
                   }}>
                     {trialStatus.promptsRemaining || 25} left
@@ -2071,12 +2132,12 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                         }
                       }
                     }}
-                    placeholder="sum column A, sort by B, find duplicates..."
+                    placeholder="sum A, sort by B..."
                     style={{ 
                       width: '100%', 
-                      padding: '12px', 
-                      border: '1px solid #d1d5db', 
-                      borderRadius: '8px',
+                      padding: '10px', 
+                      border: '1px solid #ddd', 
+                      borderRadius: '6px',
                       color: '#333',
                       backgroundColor: '#ffffff',
                       boxSizing: 'border-box',
@@ -2091,13 +2152,13 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                       left: 0,
                       right: 0,
                       background: 'white',
-                      border: '1px solid #d1d5db',
+                      border: '1px solid #ddd',
                       borderTop: 'none',
-                      borderRadius: '0 0 8px 8px',
-                      maxHeight: '150px',
+                      borderRadius: '0 0 6px 6px',
+                      maxHeight: '120px',
                       overflowY: 'auto',
                       zIndex: 1000,
-                      boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
                     }}>
                       {promptHistory.map((historyPrompt, index) => (
                         <div
@@ -2107,13 +2168,13 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                             setShowPromptDropdown(false);
                           }}
                           style={{
-                            padding: '8px 12px',
+                            padding: '6px 10px',
                             cursor: 'pointer',
-                            borderBottom: index < promptHistory.length - 1 ? '1px solid #f3f4f6' : 'none',
-                            fontSize: '13px',
-                            color: '#374151'
+                            borderBottom: index < promptHistory.length - 1 ? '1px solid #f0f0f0' : 'none',
+                            fontSize: '12px',
+                            color: '#333'
                           }}
-                          onMouseEnter={(e) => e.currentTarget.style.background = '#f9fafb'}
+                          onMouseEnter={(e) => e.currentTarget.style.background = '#f5f5f5'}
                           onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
                         >
                           {historyPrompt}
@@ -2127,163 +2188,46 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                   onClick={handleProcessAI}
                   disabled={isProcessing || !selectedFile || !prompt.trim()}
                   style={{ 
-                    background: isProcessing || !selectedFile || !prompt.trim() ? '#9ca3af' : '#0078d4',
+                    background: isProcessing || !selectedFile || !prompt.trim() ? '#ccc' : '#0078d4',
                     color: 'white',
                     border: 'none',
-                    padding: '12px 16px',
-                    borderRadius: '8px',
+                    padding: '10px 12px',
+                    borderRadius: '6px',
                     cursor: isProcessing || !selectedFile || !prompt.trim() ? 'not-allowed' : 'pointer',
                     fontSize: '14px',
                     fontWeight: '500'
                   }}
                 >
-                  {isProcessing ? '⏳' : '🚀'}
+                  {isProcessing ? '⏳' : 'Go'}
                 </button>
               </div>
             </div>
-          </div>
 
-          {/* Sheet Selector Card */}
-          {sheetNames.length > 1 && (
-            <div style={{ 
-              background: 'white', 
-              borderRadius: '12px', 
-              padding: '20px', 
-              marginBottom: '20px',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-              border: '1px solid #e1e5e9'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <div style={{ 
-                  width: '40px', 
-                  height: '40px', 
-                  borderRadius: '8px', 
-                  background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '20px'
-                }}>
-                  📊
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', fontSize: '16px', fontWeight: '600', color: '#1a1a1a', marginBottom: '8px' }}>
-                    Select Sheet ({sheetNames.length} available)
-                  </label>
-                  <select
-                    value={selectedSheet}
-                    onChange={(e) => handleSheetChange(e.target.value)}
-                    style={{
-                      padding: '10px 12px',
-                      border: '1px solid #d1d5db',
-                      borderRadius: '8px',
-                      fontSize: '14px',
-                      backgroundColor: '#ffffff',
-                      color: '#333',
-                      minWidth: '200px'
-                    }}
-                  >
-                    {sheetNames.map((name, index) => (
-                      <option key={index} value={name}>
-                        {name} {index === 0 ? '(Default)' : ''}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Formatting Toolbar Card */}
-          {fileData.length > 0 && (
-            <div style={{ 
-              background: 'white', 
-              borderRadius: '12px', 
-              padding: '20px', 
-              marginBottom: '20px',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-              border: '1px solid #e1e5e9'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <span style={{ fontSize: '16px', fontWeight: '600', color: '#1a1a1a' }}>Format:</span>
-                  <button onClick={() => {
-                    if (selectedCells.length === 0) return;
-                    saveToUndoStack(cellFormatting);
-                    const newFormatting = { ...cellFormatting };
-                    selectedCells.forEach(cellId => {
-                      const currentWeight = newFormatting[cellId]?.fontWeight;
-                      newFormatting[cellId] = { ...newFormatting[cellId], fontWeight: currentWeight === 'bold' ? 'normal' : 'bold' };
-                    });
-                    setCellFormatting(newFormatting);
-                  }} style={{ background: '#f3f4f6', color: '#374151', border: '1px solid #d1d5db', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '14px' }}>Bold</button>
-                  <button onClick={() => {
-                    if (selectedCells.length === 0) return;
-                    saveToUndoStack(cellFormatting);
-                    const newFormatting = { ...cellFormatting };
-                    selectedCells.forEach(cellId => {
-                      const currentStyle = newFormatting[cellId]?.fontStyle;
-                      newFormatting[cellId] = { ...newFormatting[cellId], fontStyle: currentStyle === 'italic' ? 'normal' : 'italic' };
-                    });
-                    setCellFormatting(newFormatting);
-                  }} style={{ background: '#f3f4f6', color: '#374151', border: '1px solid #d1d5db', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '14px' }}>Italic</button>
-                </div>
-                
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <button onClick={handleUndo} disabled={undoStack.length === 0} style={{ background: undoStack.length > 0 ? '#f3f4f6' : '#f9fafb', color: undoStack.length > 0 ? '#374151' : '#9ca3af', border: '1px solid #d1d5db', padding: '8px 10px', borderRadius: '6px', cursor: undoStack.length > 0 ? 'pointer' : 'not-allowed', fontSize: '16px' }} title="Undo">↶</button>
-                  <button onClick={handleRedo} disabled={redoStack.length === 0} style={{ background: redoStack.length > 0 ? '#f3f4f6' : '#f9fafb', color: redoStack.length > 0 ? '#374151' : '#9ca3af', border: '1px solid #d1d5db', padding: '8px 10px', borderRadius: '6px', cursor: redoStack.length > 0 ? 'pointer' : 'not-allowed', fontSize: '16px' }} title="Redo">↷</button>
-                </div>
-                
-                <select onChange={(e) => {
-                  if (selectedCells.length === 0) return;
-                  saveToUndoStack(cellFormatting);
-                  const color = e.target.value;
-                  const newFormatting = { ...cellFormatting };
-                  selectedCells.forEach(cellId => { newFormatting[cellId] = { ...newFormatting[cellId], color }; });
-                  setCellFormatting(newFormatting);
-                }} style={{ background: '#f3f4f6', color: '#374151', border: '1px solid #d1d5db', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '14px' }}>
-                  <option value="">Text Color</option>
-                  <option value="#000000">⬛ Black</option>
-                  <option value="#dc2626">🔴 Red</option>
-                  <option value="#2563eb">🔵 Blue</option>
-                  <option value="#16a34a">🟢 Green</option>
-                </select>
-                
-                <div style={{ marginLeft: 'auto', fontSize: '14px', color: '#6b7280', background: selectedCells.length > 0 ? '#dbeafe' : '#f9fafb', padding: '8px 12px', borderRadius: '6px', border: '1px solid ' + (selectedCells.length > 0 ? '#3b82f6' : '#e5e7eb'), fontWeight: '500' }}>
-                  {selectedCells.length > 0 ? `${selectedCells.length} cell${selectedCells.length > 1 ? 's' : ''} selected` : 'Select cells to format'}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Main Content Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: fileData.length > 0 ? '2fr 1fr' : '1fr', gap: '20px' }}>
-            
-            {/* Data Table Card */}
+            {/* Data Table - Bottom Left & Center */}
             {fileData.length > 0 && (
               <div style={{ 
+                gridColumn: '1 / 3', 
+                gridRow: '2 / 4',
                 background: 'white', 
-                borderRadius: '12px', 
+                borderRadius: '8px', 
                 overflow: 'hidden',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                border: '1px solid #e1e5e9'
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
               }}>
-                <div style={{ padding: '20px', background: 'linear-gradient(135deg, #0078d4, #106ebe)', color: 'white' }}>
-                  <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>
+                <div style={{ padding: '15px', background: '#0078d4', color: 'white' }}>
+                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>
                     📊 {selectedFile?.name}{selectedSheet && ` - ${selectedSheet}`}
                   </h3>
-                  <p style={{ margin: '8px 0 0 0', fontSize: '14px', opacity: 0.9 }}>
+                  <p style={{ margin: '5px 0 0 0', fontSize: '12px', opacity: 0.9 }}>
                     {fileData.length} rows × {fileData[0]?.length || 0} columns
-                    {sheetNames.length > 1 && ` | Sheet ${sheetNames.indexOf(selectedSheet) + 1} of ${sheetNames.length}`}
                   </p>
                 </div>
-                <div style={{ maxHeight: '600px', overflow: 'auto' }}>
+                <div style={{ height: 'calc(100% - 70px)', overflow: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
-                      <tr style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0', position: 'sticky', top: 0 }}>
-                        <th style={{ padding: '12px 8px', fontSize: '12px', fontWeight: '600', color: '#475569', border: '1px solid #e2e8f0', minWidth: '50px' }}>#</th>
+                      <tr style={{ background: '#f8f9fa', borderBottom: '2px solid #dee2e6', position: 'sticky', top: 0 }}>
+                        <th style={{ padding: '10px 8px', fontSize: '12px', fontWeight: '600', color: '#495057', border: '1px solid #dee2e6', minWidth: '40px' }}>#</th>
                         {fileData[0] && fileData[0].map((_, colIndex) => (
-                          <th key={colIndex} style={{ padding: '12px 8px', fontSize: '12px', fontWeight: '600', color: '#475569', border: '1px solid #e2e8f0', minWidth: '100px' }}>
+                          <th key={colIndex} style={{ padding: '10px 8px', fontSize: '12px', fontWeight: '600', color: '#495057', border: '1px solid #dee2e6', minWidth: '80px' }}>
                             {String.fromCharCode(65 + colIndex)}
                           </th>
                         ))}
@@ -2291,14 +2235,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                     </thead>
                     <tbody>
                       {fileData.map((row, i) => (
-                        <tr key={i} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                        <tr key={i}>
                           <td style={{ 
-                            padding: '10px 8px', 
-                            borderRight: '1px solid #f1f5f9',
+                            padding: '8px', 
+                            borderRight: '1px solid #dee2e6',
                             fontWeight: '600',
-                            fontSize: '12px',
-                            color: '#64748b',
-                            background: '#f8fafc',
+                            fontSize: '11px',
+                            color: '#6c757d',
+                            background: '#f8f9fa',
                             textAlign: 'center'
                           }}>
                             {i + 1}
@@ -2330,22 +2274,21 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                                 }
                               }}
                               style={{ 
-                                padding: '10px 8px', 
-                                borderRight: '1px solid #f1f5f9',
+                                padding: '8px', 
+                                borderRight: '1px solid #dee2e6',
                                 fontWeight: i === 0 ? '600' : '400',
-                                color: '#1e293b',
+                                color: '#212529',
                                 cursor: 'pointer',
-                                backgroundColor: selectedCells.includes(`${i}-${j}`) ? '#dbeafe' : 
-                                                (i % 2 === 0 ? '#ffffff' : '#f8fafc'),
-                                fontSize: '14px',
-                                transition: 'all 0.2s ease',
+                                backgroundColor: selectedCells.includes(`${i}-${j}`) ? '#cce7ff' : 
+                                                (i % 2 === 0 ? '#ffffff' : '#f8f9fa'),
+                                fontSize: '13px',
                                 ...cellFormatting[`${i}-${j}`]
                               }}
                             >
                               {String(cell || '')}
                             </td>
                           )) : (
-                            <td style={{ padding: '10px 8px', color: '#94a3b8', fontStyle: 'italic' }}>No data</td>
+                            <td style={{ padding: '8px', color: '#6c757d', fontStyle: 'italic' }}>No data</td>
                           )}
                         </tr>
                       ))}
@@ -2355,36 +2298,39 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
               </div>
             )}
 
-            {/* AI Response Card */}
+            {/* AI Response - Bottom Right */}
             {aiResponse && (
               <div style={{ 
+                gridColumn: '3', 
+                gridRow: '2 / 4',
                 background: 'white', 
-                borderRadius: '12px', 
+                borderRadius: '8px', 
                 overflow: 'hidden',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                border: '1px solid #e1e5e9'
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                display: 'flex',
+                flexDirection: 'column'
               }}>
                 {showUseResultButton && (
-                  <div style={{ padding: '16px', background: '#f0f9ff', border: '1px solid #0ea5e9', margin: '16px', borderRadius: '8px' }}>
-                    <p style={{ margin: '0 0 12px 0', fontSize: '14px', color: '#0c4a6e', fontWeight: '500' }}>
+                  <div style={{ padding: '12px', background: '#e3f2fd', border: '1px solid #2196f3', margin: '12px', borderRadius: '6px' }}>
+                    <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#1565c0', fontWeight: '500' }}>
                       ✨ Results ready!
                     </p>
-                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                       <button 
                         onClick={applyChangesToMainSheet}
-                        style={{ background: '#10b981', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px' }}
+                        style={{ background: '#4caf50', color: 'white', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '11px' }}
                       >
                         Apply
                       </button>
                       <button 
                         onClick={createNewSheet}
-                        style={{ background: '#0078d4', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px' }}
+                        style={{ background: '#2196f3', color: 'white', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '11px' }}
                       >
                         Download
                       </button>
                       <button 
                         onClick={resetToOriginal}
-                        style={{ background: '#6b7280', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px' }}
+                        style={{ background: '#757575', color: 'white', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '11px' }}
                       >
                         Reset
                       </button>
@@ -2392,14 +2338,14 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                   </div>
                 )}
                 
-                <div style={{ padding: '20px', background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white' }}>
-                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>🎯 AI Response</h3>
-                  <p style={{ margin: '8px 0 0 0', fontSize: '12px', opacity: 0.9 }}>
-                    {aiResponse.split('<br><br>')[0]?.replace(/<[^>]*>/g, '') || aiResponse.split('<table')[0]?.replace(/<[^>]*>/g, '') || 'Analysis complete'}
+                <div style={{ padding: '15px', background: '#4caf50', color: 'white' }}>
+                  <h3 style={{ margin: 0, fontSize: '14px', fontWeight: '600' }}>🎯 AI Response</h3>
+                  <p style={{ margin: '5px 0 0 0', fontSize: '11px', opacity: 0.9 }}>
+                    {aiResponse.split('<br><br>')[0]?.replace(/<[^>]*>/g, '') || 'Complete'}
                   </p>
                 </div>
                 
-                <div style={{ maxHeight: '400px', overflow: 'auto', padding: '20px', color: '#1e293b' }}>
+                <div style={{ flex: 1, overflow: 'auto', padding: '15px', color: '#333', fontSize: '13px' }}>
                   <div dangerouslySetInnerHTML={{ __html: aiResponse.includes('<table') ? aiResponse.split('<br><br>').slice(1).join('<br><br>') : aiResponse.split('<br><br>').slice(1).join('<br><br>') || aiResponse }} />
                 </div>
               </div>
