@@ -1968,13 +1968,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             {/* Upload Section - Top Left */}
             <div style={{ 
               gridColumn: '1', 
-              gridRow: '1',
-              background: 'rgba(0, 0, 0, 0.3)', 
-              backdropFilter: 'blur(20px)',
-              borderRadius: '16px', 
-              padding: '24px',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+              gridRow: '1'
             }}>
               
               <input 
@@ -2101,12 +2095,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
             {/* AI Input - Top Right */}
             <div style={{ 
               gridColumn: '3', 
-              gridRow: '1',
-              background: 'rgba(0, 0, 0, 0.3)', 
-              backdropFilter: 'blur(20px)',
-              borderRadius: '16px', 
-              padding: '24px',
-              border: '1px solid rgba(255, 255, 255, 0.1)'
+              gridRow: '1'
             }}>
               <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '20px' }}>
                 {trialStatus?.inTrial && (
@@ -2210,7 +2199,7 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
                     cursor: isProcessing || !selectedFile || !prompt.trim() ? 'not-allowed' : 'pointer'
                   }}
                 >
-                  {isProcessing ? '🔄 Processing...' : '🚀 Ask AI'}
+                  {isProcessing ? 'Processing...' : 'Ask'}
                 </button>
               </div>
             </div>
