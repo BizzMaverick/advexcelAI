@@ -63,6 +63,8 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
         const data = evt.target?.result;
         if (!data) throw new Error('No data read from file');
         
+        let dataForAnalysis = [];
+        
         if (file.name.endsWith('.csv')) {
           const text = data as string;
           let parsedData = text.split('\n')
@@ -74,9 +76,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           }
           
           setSpreadsheetData(parsedData);
-          
-          // Store parsedData for analysis
-          const currentData = parsedData;
+          dataForAnalysis = parsedData;
         } else {
           const workbook = XLSX.read(data, { type: 'binary' });
           const sheetName = workbook.SheetNames[0];
@@ -115,10 +115,8 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           }
           
           setSpreadsheetData(parsedData);
+          dataForAnalysis = parsedData;
         }
-        
-        // Store data for analysis
-        const dataForAnalysis = parsedData;
         
         // Auto-analyze data structure after state is set
         setTimeout(() => {
@@ -140,9 +138,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           } catch (err) {
             console.error('Data analysis failed:', err);
             // Fallback: generate basic analytics with current data
-            if (dataForAnalysis && dataForAnalysis.length > 0) {
-              generateBasicAnalytics(dataForAnalysis);
-            }
+            generateBasicAnalytics(dataForAnalysis);
           }
         }, 100);
       } catch (err) {
