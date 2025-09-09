@@ -65,6 +65,75 @@ export class EnhancedAiService {
     return kpis;
   }
   /**
+   * Generate industry-specific alerts and warnings
+   */
+  static generateIndustryAlerts(dataStructure: DataStructure): Array<{type: 'warning' | 'info' | 'success', message: string, priority: 'high' | 'medium' | 'low'}> {
+    const { detectedFormat, dataQuality } = dataStructure;
+    const alerts: Array<{type: 'warning' | 'info' | 'success', message: string, priority: 'high' | 'medium' | 'low'}> = [];
+    
+    // Data quality alerts
+    if (dataQuality.completeness < 0.8) {
+      alerts.push({
+        type: 'warning',
+        message: `Data completeness is ${Math.round(dataQuality.completeness * 100)}% - consider data cleaning`,
+        priority: 'high'
+      });
+    }
+    
+    if (dataQuality.duplicateRows > 0) {
+      alerts.push({
+        type: 'info',
+        message: `Found ${dataQuality.duplicateRows} duplicate records`,
+        priority: 'medium'
+      });
+    }
+    
+    // Industry-specific alerts
+    switch (detectedFormat) {
+      case 'restaurant':
+        alerts.push({
+          type: 'info',
+          message: 'Monitor food cost percentages and table turnover rates',
+          priority: 'medium'
+        });
+        break;
+        
+      case 'healthcare':
+        alerts.push({
+          type: 'warning',
+          message: 'Ensure HIPAA compliance for patient data',
+          priority: 'high'
+        });
+        break;
+        
+      case 'financial':
+        alerts.push({
+          type: 'warning',
+          message: 'Verify transaction integrity and audit trails',
+          priority: 'high'
+        });
+        break;
+        
+      case 'banking':
+        alerts.push({
+          type: 'warning',
+          message: 'Ensure regulatory compliance and risk assessment',
+          priority: 'high'
+        });
+        break;
+        
+      default:
+        alerts.push({
+          type: 'success',
+          message: 'Data structure looks good for analysis',
+          priority: 'low'
+        });
+    }
+    
+    return alerts;
+  }
+
+  /**
    * Generate industry benchmarks for comparison
    */
   static generateIndustryBenchmarks(dataStructure: DataStructure): Array<{metric: string, benchmark: string, status: 'good' | 'average' | 'needs_improvement'}> {
