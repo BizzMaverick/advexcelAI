@@ -3246,7 +3246,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
       </header>
 
       {/* Main Content */}
-      <main style={{ padding: window.innerWidth <= 768 ? '20px' : '40px', position: 'relative', zIndex: 100 }}>
+      <main style={{ padding: window.innerWidth <= 768 ? '20px' : '20px 40px', position: 'relative', zIndex: 100, overflow: 'hidden' }}>
         {/* Simplified Top Bar Layout */}
         <div style={{ 
           display: 'flex', 
@@ -3341,11 +3341,12 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
         </div>
 
         <div style={{
-          maxWidth: '1400px',
+          maxWidth: '1600px',
           margin: '0 auto',
           display: 'flex',
           flexDirection: window.innerWidth <= 768 ? 'column' : 'row',
-          gap: '20px'
+          gap: '20px',
+          width: '100%'
         }}>
           {/* Left Panel - Quick Actions */}
           <div style={{
@@ -3799,12 +3800,14 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           {/* Right Panel - Data Display */}
           <div style={{
             flex: 1,
+            minWidth: 0,
             background: 'rgba(255,255,255,0.05)',
             borderRadius: '16px',
             padding: '20px',
             border: '1px solid rgba(255,255,255,0.1)',
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            overflow: 'hidden'
           }}>
             <div style={{
               position: 'absolute',
