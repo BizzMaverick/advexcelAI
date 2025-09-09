@@ -129,12 +129,12 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
             setPivotTables(pivots);
             console.log('Auto-generated pivot tables on upload:', pivots.length);
             
-            // Generate automatic basic analytics immediately
-            console.log('Generating basic analytics for:', dataForAnalysis.length, 'rows');
-            generateBasicAnalytics(dataForAnalysis);
+            // Generate instant comprehensive analysis
+            console.log('Generating instant AI analysis for:', dataForAnalysis.length, 'rows');
+            performInstantAnalysis(dataForAnalysis);
             
-            // Automatically trigger comprehensive AI analysis
-            setTimeout(() => performAutoAnalysis(dataForAnalysis), 500);
+            // Automatically trigger AWS AI analysis
+            setTimeout(() => performAutoAnalysis(dataForAnalysis), 1000);
           } catch (err) {
             console.error('Data analysis failed:', err);
             // Fallback: generate basic analytics with current data
@@ -246,6 +246,85 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     } finally {
       setAiLoading(false);
     }
+  };
+
+  const performInstantAnalysis = (data: any[][]) => {
+    if (!data || data.length < 2) {
+      setAiResponse('⚠️ **Insufficient Data**: Need at least 2 rows for analysis.');
+      return;
+    }
+
+    const headers = data[0];
+    const rows = data.slice(1);
+    const fileName = selectedFile?.name || 'Unknown';
+    
+    // AI reads and understands the data structure
+    let analysis = `🧠 **AI COMPLETE DATA ANALYSIS**\n\n`;
+    analysis += `📄 **FILE UNDERSTANDING:**\n`;
+    analysis += `• File: ${fileName}\n`;
+    analysis += `• Structure: ${rows.length} records × ${headers.length} attributes\n`;
+    analysis += `• Data Type: ${detectDataContext(fileName, headers, rows).type}\n\n`;
+    
+    // Column-by-column AI analysis
+    analysis += `📋 **COLUMN INTELLIGENCE:**\n`;
+    headers.forEach((header, index) => {
+      const values = rows.map(row => row[index]).filter(v => v !== null && v !== undefined && v !== '');
+      const numericValues = values.filter(v => !isNaN(parseFloat(String(v)))).map(v => parseFloat(String(v)));
+      const uniqueValues = new Set(values);
+      const isNumeric = numericValues.length > values.length * 0.5;
+      
+      analysis += `• **${header}**: `;
+      if (isNumeric && numericValues.length > 0) {
+        const sum = numericValues.reduce((a, b) => a + b, 0);
+        const avg = sum / numericValues.length;
+        const min = Math.min(...numericValues);
+        const max = Math.max(...numericValues);
+        analysis += `NUMERIC - Range: ${min.toLocaleString()} to ${max.toLocaleString()}, Avg: ${avg.toLocaleString()}\n`;
+      } else {
+        const topValues = Array.from(uniqueValues).slice(0, 3).join(', ');
+        analysis += `CATEGORICAL - ${uniqueValues.size} categories (${topValues}...)\n`;
+      }
+    });
+    
+    // AI discovers patterns and insights
+    analysis += `\n🔍 **AI DISCOVERIES:**\n`;
+    
+    // Find the most important numeric column
+    const numericCols = headers.map((header, index) => {
+      const values = rows.map(row => parseFloat(row[index])).filter(v => !isNaN(v));
+      return values.length > rows.length * 0.5 ? { header, index, values, sum: values.reduce((a, b) => a + b, 0) } : null;
+    }).filter(Boolean);
+    
+    if (numericCols.length > 0) {
+      const mainCol = numericCols.reduce((a, b) => a.sum > b.sum ? a : b);
+      const sorted = [...mainCol.values].sort((a, b) => b - a);
+      analysis += `• **Key Metric**: ${mainCol.header} (Total: ${mainCol.sum.toLocaleString()})\n`;
+      analysis += `• **Top Performance**: ${sorted[0]?.toLocaleString()} (highest value)\n`;
+      analysis += `• **Performance Gap**: ${((sorted[0] - sorted[sorted.length - 1]) / sorted[0] * 100).toFixed(1)}% difference\n`;
+    }
+    
+    // Data quality AI assessment
+    const missingCount = rows.reduce((count, row) => 
+      count + row.filter(cell => cell === null || cell === undefined || cell === '').length, 0
+    );
+    const completeness = ((rows.length * headers.length - missingCount) / (rows.length * headers.length) * 100).toFixed(1);
+    
+    analysis += `• **Data Quality**: ${completeness}% complete (${missingCount} missing values)\n`;
+    
+    // AI recommendations
+    analysis += `\n🎯 **AI RECOMMENDATIONS:**\n`;
+    if (numericCols.length > 1) {
+      analysis += `• Compare ${numericCols[0].header} vs ${numericCols[1].header} for insights\n`;
+    }
+    if (parseFloat(completeness) < 95) {
+      analysis += `• Address ${missingCount} missing data points for better accuracy\n`;
+    }
+    analysis += `• Use pivot tables to explore ${headers.length} dimensions\n`;
+    analysis += `• Apply filters to focus on specific segments\n`;
+    
+    analysis += `\n✨ **AI is now ready for your questions!**`;
+    
+    setAiResponse(analysis);
   };
 
   const generateBasicAnalytics = (data: any[][]) => {
@@ -588,37 +667,47 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
 
   const performAutoAnalysis = async (data: any[][]) => {
     setAiLoading(true);
-    setAiResponse('🔄 Performing comprehensive data analysis...');
+    setAiResponse('🧠 AI is reading and understanding your data...');
     
     try {
-      const enhancedPrompt = `ANALYZE THIS DATA COMPLETELY. DO NOT just give a title. Provide FULL DETAILED ANALYSIS:
+      // Enhanced AI prompt for complete analysis
+      const enhancedPrompt = `You are an expert data analyst. Analyze this spreadsheet data completely and provide comprehensive insights.
 
-**MANDATORY SECTIONS - INCLUDE ALL:**
+**ANALYZE EVERY ASPECT:**
 
-1. **DATA SUMMARY:**
-   - Total rows: [number]
-   - Total columns: [number]
-   - Column names and data types
-   - Missing values count
+1. **COMPLETE DATA UNDERSTANDING:**
+   - Read and understand each column's purpose
+   - Identify data types, patterns, and relationships
+   - Detect the business context (sales, finance, HR, etc.)
+   - Total rows: ${data.length - 1}, Total columns: ${data[0]?.length || 0}
 
-2. **STATISTICAL ANALYSIS:**
-   - For EACH numeric column: min, max, average, median
-   - Calculate totals and subtotals
-   - Show percentage distributions
+2. **DETAILED COLUMN ANALYSIS:**
+   ${data[0]?.map((header, i) => {
+     const values = data.slice(1).map(row => row[i]).filter(v => v !== null && v !== undefined && v !== '');
+     const numericValues = values.filter(v => !isNaN(parseFloat(String(v))));
+     const isNumeric = numericValues.length > values.length * 0.5;
+     return `   Column ${i + 1} "${header}": ${isNumeric ? 'NUMERIC' : 'TEXT'} - ${values.length} values, ${new Set(values).size} unique`;
+   }).join('\n')}
 
-3. **KEY FINDINGS:**
-   - Top 5 highest values
-   - Top 5 lowest values
-   - Most significant trends
-   - Notable patterns
+3. **STATISTICAL DEEP DIVE:**
+   - Calculate statistics for ALL numeric columns
+   - Find correlations between variables
+   - Identify outliers and anomalies
+   - Show distributions and percentiles
 
-4. **INSIGHTS & RECOMMENDATIONS:**
-   - What the data reveals
-   - Actionable recommendations
-   - Areas of concern
-   - Opportunities identified
+4. **BUSINESS INSIGHTS:**
+   - What story does this data tell?
+   - Key performance indicators
+   - Trends and patterns discovered
+   - Critical business metrics
 
-**CRITICAL: Provide actual numbers, calculations, and detailed analysis. Do NOT just give titles or summaries. Show the work and results.**`;
+5. **ACTIONABLE RECOMMENDATIONS:**
+   - Specific actions based on findings
+   - Areas needing attention
+   - Opportunities for improvement
+   - Next steps for analysis
+
+**PROVIDE ACTUAL NUMBERS AND CALCULATIONS. BE SPECIFIC AND DETAILED.**`;
       
       const result = await bedrockService.processExcelData(data, enhancedPrompt, selectedFile?.name || 'data');
       
