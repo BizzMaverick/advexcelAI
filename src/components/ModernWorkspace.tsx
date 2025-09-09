@@ -2943,20 +2943,19 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
       {/* Main Content */}
       <main style={{ padding: window.innerWidth <= 768 ? '20px' : '40px', position: 'relative', zIndex: 100 }}>
         <div style={{
-          maxWidth: '1200px',
+          maxWidth: '1400px',
           margin: '0 auto',
-          display: 'grid',
-          gridTemplateColumns: window.innerWidth <= 768 ? '1fr' : '1fr 2fr',
-          gap: window.innerWidth <= 768 ? '20px' : '40px',
-          alignItems: 'stretch'
+          display: 'flex',
+          flexDirection: window.innerWidth <= 768 ? 'column' : 'row',
+          gap: '20px'
         }}>
           {/* Left Panel - Upload & AI */}
-          <div className="hover-lift" style={{
-            background: 'transparent',
-            borderRadius: '24px',
-            padding: '32px',
-            position: 'relative',
-            overflow: 'hidden'
+          <div style={{
+            width: window.innerWidth <= 768 ? '100%' : '350px',
+            background: 'rgba(255,255,255,0.05)',
+            borderRadius: '16px',
+            padding: '20px',
+            border: '1px solid rgba(255,255,255,0.1)'
           }}>
             <div style={{
               position: 'absolute',
@@ -2968,25 +2967,14 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
               animation: 'pulse 2s ease-in-out infinite'
             }} />
             {/* File Upload */}
-            <div style={{ marginBottom: '32px' }}>
+            <div style={{ marginBottom: '20px' }}>
               <h3 style={{ 
-                margin: '0 0 20px 0', 
-                fontSize: '20px', 
-                fontWeight: '700',
-                background: 'linear-gradient(135deg, #78dbff 0%, #ff77c6 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px'
+                margin: '0 0 12px 0', 
+                fontSize: '16px', 
+                fontWeight: '600',
+                color: 'white'
               }}>
-                <span style={{ 
-                  fontSize: '24px',
-                  background: 'linear-gradient(135deg, #78dbff 0%, #ff77c6 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent'
-                }}>⚡</span>
-                Data Upload
+                📁 Upload Data
               </h3>
               
               <input
@@ -3007,22 +2995,14 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                 onDragOver={handleDrag}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
-                className="hover-lift"
                 style={{
-                  border: `2px dashed ${dragActive ? '#78dbff' : 'rgba(120, 219, 255, 0.3)'}`,
-                  borderRadius: '20px',
-                  padding: '40px 20px',
+                  border: `1px dashed ${dragActive ? '#78dbff' : 'rgba(255,255,255,0.3)'}`,
+                  borderRadius: '8px',
+                  padding: '20px',
                   textAlign: 'center',
                   cursor: 'pointer',
-                  background: dragActive 
-                    ? 'radial-gradient(circle, rgba(120, 219, 255, 0.2) 0%, rgba(255, 119, 198, 0.1) 100%)' 
-                    : 'rgba(255, 255, 255, 0.02)',
-                  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                  boxShadow: dragActive 
-                    ? '0 0 40px rgba(120, 219, 255, 0.4), inset 0 0 40px rgba(120, 219, 255, 0.1)'
-                    : '0 0 20px rgba(120, 219, 255, 0.1)',
-                  position: 'relative',
-                  overflow: 'hidden'
+                  background: dragActive ? 'rgba(120,219,255,0.1)' : 'transparent',
+                  transition: 'all 0.3s ease'
                 }}
               >
                 {dragActive && (
@@ -3044,32 +3024,13 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                     }
                   `}
                 </style>
-                <div style={{ 
-                  marginBottom: '16px',
-                  filter: dragActive ? 'drop-shadow(0 0 10px rgba(120, 219, 255, 0.8))' : 'none'
-                }}>
-                  <img src="/upload-icon.gif" alt="Upload" style={{ width: '64px', height: '64px' }} />
+                <div style={{ fontSize: '32px', marginBottom: '8px' }}>📊</div>
+                <div style={{ fontSize: '14px', fontWeight: '500', color: 'white', marginBottom: '4px' }}>
+                  {dragActive ? 'Drop file here' : 'Click or drag file'}
                 </div>
-                <h4 style={{ 
-                  margin: '0 0 8px 0', 
-                  fontSize: '18px', 
-                  fontWeight: '700',
-                  background: 'linear-gradient(135deg, #78dbff 0%, #ff77c6 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent'
-                }}>
-                  {dragActive ? 'File Ready to Upload' : 'Upload Your Data'}
-                </h4>
-                <p style={{ 
-                  margin: 0, 
-                  fontSize: '12px', 
-                  opacity: 0.7,
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px',
-                  fontWeight: '500'
-                }}>
-                  Excel (.xlsx, .xls) or CSV Files
-                </p>
+                <div style={{ fontSize: '11px', opacity: 0.7 }}>
+                  Excel, CSV files
+                </div>
               </div>
             </div>
 
@@ -3117,65 +3078,31 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
 
             {/* Quick Actions */}
             {spreadsheetData.length > 0 && (
-              <div style={{ marginBottom: '32px' }}>
+              <div style={{ marginBottom: '20px' }}>
                 <h4 style={{ 
-                  margin: '0 0 20px 0', 
-                  fontSize: '18px', 
-                  fontWeight: '700',
-                  background: 'linear-gradient(135deg, #78dbff 0%, #ff77c6 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px'
+                  margin: '0 0 12px 0', 
+                  fontSize: '14px', 
+                  fontWeight: '600',
+                  color: 'white'
                 }}>
-                  <span style={{ 
-                    fontSize: '20px',
-                    background: 'linear-gradient(135deg, #78dbff 0%, #ff77c6 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    filter: 'drop-shadow(0 0 8px rgba(120, 219, 255, 0.6))'
-                  }}>🚀</span>
-                  Quick Actions
+                  🚀 Quick Actions
                 </h4>
-                <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth <= 480 ? '1fr' : '1fr 1fr', gap: '12px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <button
                     onClick={() => setShowChart(!showChart)}
-                    className="hover-lift"
                     style={{
-                      background: 'linear-gradient(135deg, rgba(120, 219, 255, 0.15) 0%, rgba(255, 119, 198, 0.15) 100%)',
-                      border: '1px solid rgba(120, 219, 255, 0.4)',
-                      borderRadius: '12px',
-                      padding: '12px 16px',
+                      background: 'rgba(255,255,255,0.1)',
+                      border: '1px solid rgba(255,255,255,0.2)',
+                      borderRadius: '6px',
+                      padding: '8px 12px',
                       color: 'white',
                       cursor: 'pointer',
-                      fontSize: '11px',
-                      fontWeight: '600',
-                      textTransform: 'uppercase',
-                      letterSpacing: '1px',
-                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                      boxShadow: '0 0 20px rgba(120, 219, 255, 0.2)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.boxShadow = '0 0 30px rgba(120, 219, 255, 0.4)';
-                      e.currentTarget.style.background = 'linear-gradient(135deg, rgba(120, 219, 255, 0.25) 0%, rgba(255, 119, 198, 0.25) 100%)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.boxShadow = '0 0 20px rgba(120, 219, 255, 0.2)';
-                      e.currentTarget.style.background = 'linear-gradient(135deg, rgba(120, 219, 255, 0.15) 0%, rgba(255, 119, 198, 0.15) 100%)';
+                      fontSize: '12px',
+                      fontWeight: '500',
+                      width: '100%'
                     }}
                   >
-                    <span style={{
-                      background: 'linear-gradient(135deg, #78dbff 0%, #ff77c6 100%)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent'
-                    }}>🧠</span>
-                    {showChart ? 'Deactivate' : 'Activate'} Viz
+                    📊 {showChart ? 'Hide' : 'Show'} Charts
                   </button>
                   <div style={{ position: 'relative' }}>
                     <button
@@ -3540,26 +3467,12 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
             {/* Custom Analysis */}
             <div>
               <h4 style={{ 
-                margin: '0 0 20px 0', 
-                fontSize: '18px', 
-                fontWeight: '700',
-                background: 'linear-gradient(135deg, #78dbff 0%, #ff77c6 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                textTransform: 'uppercase',
-                letterSpacing: '1px'
+                margin: '0 0 12px 0', 
+                fontSize: '14px', 
+                fontWeight: '600',
+                color: 'white'
               }}>
-                <span style={{ 
-                  fontSize: '20px',
-                  background: 'linear-gradient(135deg, #78dbff 0%, #ff77c6 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  filter: 'drop-shadow(0 0 8px rgba(120, 219, 255, 0.6))'
-                }}>🧠</span>
-                AI Assistant
+                🧠 AI Assistant
               </h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <textarea
@@ -3571,70 +3484,43 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                       handleCustomAnalysis();
                     }
                   }}
-                  placeholder="Initialize neural query...\ne.g., 'analyze quantum patterns', 'rank data nodes by performance', 'generate predictive matrix'"
-                  className="glass-morphism neon-border"
+                  placeholder="Ask AI about your data...\ne.g., 'analyze sales trends', 'find top performers', 'show insights'"
                   style={{
-                    borderRadius: '16px',
-                    padding: '20px',
+                    background: 'rgba(255,255,255,0.1)',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    borderRadius: '8px',
+                    padding: '12px',
                     color: 'white',
-                    fontSize: '14px',
+                    fontSize: '13px',
                     fontFamily: 'inherit',
                     resize: 'vertical',
-                    minHeight: '100px',
+                    minHeight: '80px',
                     outline: 'none',
-                    overflow: 'hidden',
-                    fontWeight: '400',
-                    letterSpacing: '0.5px',
-                    lineHeight: '1.6'
+                    width: '100%',
+                    boxSizing: 'border-box'
                   }}
                 />
                 <button
                   onClick={handleCustomAnalysis}
                   disabled={!prompt.trim() || !spreadsheetData.length || aiLoading}
-                  className="hover-lift"
                   style={{
-                    background: aiLoading 
-                      ? 'linear-gradient(135deg, rgba(255, 119, 198, 0.3) 0%, rgba(120, 219, 255, 0.3) 100%)'
-                      : 'linear-gradient(135deg, rgba(120, 219, 255, 0.2) 0%, rgba(255, 119, 198, 0.2) 100%)',
-                    border: '1px solid rgba(120, 219, 255, 0.5)',
-                    borderRadius: '16px',
-                    padding: '20px',
+                    background: aiLoading ? 'rgba(255,255,255,0.2)' : 'rgba(120,219,255,0.2)',
+                    border: '1px solid rgba(255,255,255,0.3)',
+                    borderRadius: '8px',
+                    padding: '12px',
                     color: 'white',
                     fontSize: '13px',
-                    fontWeight: '700',
-                    textTransform: 'uppercase',
-                    letterSpacing: '1px',
+                    fontWeight: '600',
                     cursor: aiLoading || !prompt.trim() || !spreadsheetData.length ? 'not-allowed' : 'pointer',
-                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                     opacity: (!prompt.trim() || !spreadsheetData.length || aiLoading) ? 0.6 : 1,
-                    boxShadow: aiLoading 
-                      ? '0 0 40px rgba(255, 119, 198, 0.4)'
-                      : '0 0 30px rgba(120, 219, 255, 0.3)',
+                    width: '100%',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '12px'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!aiLoading && prompt.trim() && spreadsheetData.length) {
-                      e.currentTarget.style.boxShadow = '0 0 50px rgba(120, 219, 255, 0.6)';
-                      e.currentTarget.style.background = 'linear-gradient(135deg, rgba(120, 219, 255, 0.3) 0%, rgba(255, 119, 198, 0.3) 100%)';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!aiLoading) {
-                      e.currentTarget.style.boxShadow = '0 0 30px rgba(120, 219, 255, 0.3)';
-                      e.currentTarget.style.background = 'linear-gradient(135deg, rgba(120, 219, 255, 0.2) 0%, rgba(255, 119, 198, 0.2) 100%)';
-                    }
+                    gap: '8px'
                   }}
                 >
-                  <span style={{
-                    background: 'linear-gradient(135deg, #78dbff 0%, #ff77c6 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    fontSize: '16px'
-                  }}>{aiLoading ? '✨' : '🧠'}</span>
-                  {aiLoading ? <><img src="/refresh-new.gif" alt="Processing" style={{ width: '16px', height: '16px' }} />Processing...</> : 'Execute Analysis'}
+                  {aiLoading ? '⚙️ Processing...' : '🧠 Analyze'}
                 </button>
               </div>
             </div>
@@ -3642,16 +3528,15 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
 
           </div>
 
-          {/* Right Panel - Data Display Only */}
-          <div className="hover-lift" style={{
-            background: 'transparent',
-            borderRadius: '24px',
-            padding: '32px',
-            minHeight: '600px',
+          {/* Right Panel - Data Display */}
+          <div style={{
+            flex: 1,
+            background: 'rgba(255,255,255,0.05)',
+            borderRadius: '16px',
+            padding: '20px',
+            border: '1px solid rgba(255,255,255,0.1)',
             display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-            position: 'relative'
+            flexDirection: 'column'
           }}>
             <div style={{
               position: 'absolute',
@@ -3664,35 +3549,21 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
             }} />
             {spreadsheetData.length > 0 ? (
               <>
-                <div style={{ marginBottom: '16px' }}>
+                <div style={{ marginBottom: '12px' }}>
                   <h3 style={{ 
                     margin: '0 0 4px 0', 
-                    fontSize: '20px', 
-                    fontWeight: '700',
-                    background: 'linear-gradient(135deg, #78dbff 0%, #ff77c6 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px'
+                    fontSize: '16px', 
+                    fontWeight: '600',
+                    color: 'white'
                   }}>
-                    <span style={{ 
-                      fontSize: '24px',
-                      background: 'linear-gradient(135deg, #78dbff 0%, #ff77c6 100%)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent'
-                    }}>🧠</span>
-                    Data View
+                    📊 {selectedFile?.name || 'Data'}
                   </h3>
                   <p style={{ 
                     margin: 0, 
                     fontSize: '12px', 
-                    opacity: 0.7,
-                    textTransform: 'uppercase',
-                    letterSpacing: '1px',
-                    fontWeight: '500'
+                    opacity: 0.7
                   }}>
-                    {displayData.length - 1} Rows × {displayData[0]?.length || 0} Columns
+                    {displayData.length - 1} rows × {displayData[0]?.length || 0} columns
                   </p>
                 </div>
                 
