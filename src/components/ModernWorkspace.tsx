@@ -3349,10 +3349,10 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
         }}>
           {/* Left Panel - Quick Actions */}
           <div style={{
-            width: window.innerWidth <= 768 ? '100%' : '350px',
+            width: window.innerWidth <= 768 ? '100%' : '280px',
             background: 'rgba(255,255,255,0.05)',
             borderRadius: '16px',
-            padding: '20px',
+            padding: '16px',
             border: '1px solid rgba(255,255,255,0.1)'
           }}>
 
@@ -3402,24 +3402,24 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
             {spreadsheetData.length > 0 && (
               <div style={{ marginBottom: '20px' }}>
                 <h4 style={{ 
-                  margin: '0 0 12px 0', 
-                  fontSize: '14px', 
+                  margin: '0 0 8px 0', 
+                  fontSize: '12px', 
                   fontWeight: '600',
                   color: 'white'
                 }}>
                   {dataStructure ? `${dataStructure.detectedFormat === 'ecommerce' ? 'E-Commerce' : dataStructure.detectedFormat.charAt(0).toUpperCase() + dataStructure.detectedFormat.slice(1)} Actions` : '🚀 Quick Actions'}
                 </h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                   <button
                     onClick={() => setShowChart(!showChart)}
                     style={{
                       background: 'rgba(255,255,255,0.1)',
                       border: '1px solid rgba(255,255,255,0.2)',
-                      borderRadius: '6px',
-                      padding: '8px 12px',
+                      borderRadius: '4px',
+                      padding: '6px 8px',
                       color: 'white',
                       cursor: 'pointer',
-                      fontSize: '12px',
+                      fontSize: '11px',
                       fontWeight: '500',
                       width: '100%'
                     }}
@@ -3765,21 +3765,21 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
             {/* Analysis Actions */}
             {spreadsheetData.length > 0 && (
               <div style={{ marginBottom: '32px' }}>
-                <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600' }}>
+                <h4 style={{ margin: '0 0 8px 0', fontSize: '12px', fontWeight: '600' }}>
                   🔄 Analysis Actions
                 </h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                   <button
                     onClick={() => performAlternativeAnalysis(spreadsheetData)}
                     disabled={aiLoading}
                     style={{
                       background: 'transparent',
                       border: '1px solid rgba(255, 255, 255, 0.2)',
-                      borderRadius: '12px',
-                      padding: '12px 16px',
+                      borderRadius: '4px',
+                      padding: '6px 8px',
                       color: 'white',
                       cursor: aiLoading ? 'not-allowed' : 'pointer',
-                      fontSize: '13px',
+                      fontSize: '11px',
                       fontWeight: '500',
                       transition: 'all 0.3s ease',
                       opacity: aiLoading ? 0.6 : 1
