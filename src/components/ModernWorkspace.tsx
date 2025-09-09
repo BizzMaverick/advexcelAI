@@ -126,12 +126,15 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
             console.log('Auto-generated pivot tables on upload:', pivots.length);
             
             // Generate automatic basic analytics immediately
+            console.log('Generating basic analytics for:', parsedData.length, 'rows');
             generateBasicAnalytics(parsedData);
             
             // Automatically trigger comprehensive AI analysis
             setTimeout(() => performAutoAnalysis(parsedData), 500);
           } catch (err) {
             console.error('Data analysis failed:', err);
+            // Fallback: generate basic analytics even if other analysis fails
+            generateBasicAnalytics(parsedData);
           }
         }, 100);
       } catch (err) {
@@ -242,11 +245,18 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
   };
 
   const generateBasicAnalytics = (data: any[][]) => {
-    if (!data || data.length < 2) return;
+    console.log('generateBasicAnalytics called with data:', data?.length, 'rows');
+    if (!data || data.length < 2) {
+      console.log('Insufficient data for analysis');
+      setAiResponse('⚠️ **Insufficient Data**: Need at least 2 rows (header + data) for analysis.');
+      return;
+    }
     
     const headers = data[0];
     const rows = data.slice(1);
     const fileName = selectedFile?.name || 'Unknown';
+    
+    console.log('Processing file:', fileName, 'with', headers.length, 'columns');
     
     // Analyze actual data content
     const columnAnalysis = headers.map((header, index) => {
@@ -271,6 +281,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     
     // Detect data context from filename and headers
     const context = detectDataContext(fileName, headers, rows);
+    console.log('Detected context:', context.type, context.title);
     
     let analysis = `📊 **${context.title.toUpperCase()} ANALYSIS**\n\n`;
     
@@ -362,6 +373,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
       analysis += `• Clean duplicate ${context.recordType} for accurate analysis\n`;
     }
     
+    console.log('Setting AI response with analysis:', analysis.substring(0, 100) + '...');
     setAiResponse(analysis);
   };
   
