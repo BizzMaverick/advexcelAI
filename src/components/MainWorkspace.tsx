@@ -6,6 +6,7 @@ import ChartComponent from './ChartComponent';
 import CountryAnalysisChart from './CountryAnalysisChart';
 import DataInsights from './DataInsights';
 import SmartFileUpload from './SmartFileUpload';
+import FeedbackWidget from './FeedbackWidget';
 import { AWSService } from '../services/awsService.js';
 import { DataDetectionService } from '../services/dataDetectionService';
 import { EnhancedAiService } from '../services/enhancedAiService';
@@ -1078,6 +1079,8 @@ export default function MainWorkspace({ user, onLogout }: MainWorkspaceProps) {
         isVisible={showShortcuts} 
         onClose={() => setShowShortcuts(false)} 
       />
+      
+      <FeedbackWidget />
     </div>
   );
 }
