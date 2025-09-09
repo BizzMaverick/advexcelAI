@@ -4174,7 +4174,6 @@ We're committed to excellent support and continuous improvement based on your fe
             right: '0',
             width: window.innerWidth <= 480 ? '250px' : '300px',
             background: 'rgba(255, 255, 255, 0.95)',
-            ,
             borderRadius: '16px',
             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
             padding: '20px',
