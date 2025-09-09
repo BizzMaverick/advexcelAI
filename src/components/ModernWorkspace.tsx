@@ -2367,7 +2367,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
               textTransform: 'uppercase',
               letterSpacing: '2px',
               fontWeight: '500'
-            }}>Neural Data Intelligence</p>
+            }}>Advanced Data Analytics</p>
           </div>
         </div>
         
@@ -2380,7 +2380,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
             textTransform: 'uppercase',
             letterSpacing: '1px'
           }}>
-            Neural User: {user.name}
+            User: {user.name}
           </div>
           <button
             onClick={() => {
@@ -2490,7 +2490,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent'
                 }}>⚡</span>
-                Neural Data Input
+                Data Upload
               </h3>
               
               <input
@@ -2562,7 +2562,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent'
                 }}>
-                  {dragActive ? 'Neural Link Established' : 'Initialize Data Stream'}
+                  {dragActive ? 'File Ready to Upload' : 'Upload Your Data'}
                 </h4>
                 <p style={{ 
                   margin: 0, 
@@ -2572,7 +2572,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   letterSpacing: '1px',
                   fontWeight: '500'
                 }}>
-                  Excel (.xlsx, .xls) or CSV Quantum Files
+                  Excel (.xlsx, .xls) or CSV Files
                 </p>
               </div>
             </div>
@@ -2612,7 +2612,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                       fontWeight: '500',
                       marginTop: '4px'
                     }}>
-                      {spreadsheetData.length} Neural Nodes • {dataStructure?.detectedFormat || 'Quantum Processing...'}
+                      {spreadsheetData.length} Records • {dataStructure?.detectedFormat || 'Processing...'}
                     </div>
                   </div>
                 </div>
@@ -2642,7 +2642,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                     WebkitTextFillColor: 'transparent',
                     filter: 'drop-shadow(0 0 8px rgba(120, 219, 255, 0.6))'
                   }}>🚀</span>
-                  Neural Commands
+                  Quick Actions
                 </h4>
                 <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth <= 480 ? '1fr' : '1fr 1fr', gap: '12px' }}>
                   <button
@@ -3063,7 +3063,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   WebkitTextFillColor: 'transparent',
                   filter: 'drop-shadow(0 0 8px rgba(120, 219, 255, 0.6))'
                 }}>🧠</span>
-                Neural Interface
+                AI Assistant
               </h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <textarea
@@ -3138,7 +3138,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                     WebkitTextFillColor: 'transparent',
                     fontSize: '16px'
                   }}>{aiLoading ? '✨' : '🧠'}</span>
-                  {aiLoading ? <><img src="/refresh-new.gif" alt="Processing" style={{ width: '16px', height: '16px' }} />Neural Processing...</> : 'Execute Analysis'}
+                  {aiLoading ? <><img src="/refresh-new.gif" alt="Processing" style={{ width: '16px', height: '16px' }} />Processing...</> : 'Execute Analysis'}
                 </button>
               </div>
             </div>
@@ -3186,7 +3186,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                       WebkitBackgroundClip: 'text',
                       WebkitTextFillColor: 'transparent'
                     }}>🧠</span>
-                    Neural Data Matrix
+                    Data View
                   </h3>
                   <p style={{ 
                     margin: 0, 
@@ -3196,7 +3196,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                     letterSpacing: '1px',
                     fontWeight: '500'
                   }}>
-                    {displayData.length - 1} Data Nodes × {displayData[0]?.length || 0} Dimensions
+                    {displayData.length - 1} Rows × {displayData[0]?.length || 0} Columns
                   </p>
                 </div>
                 
@@ -3804,7 +3804,7 @@ Have questions or feedback? We'd love to hear from you! Contact us at contact@ad
             e.currentTarget.style.border = '1px solid transparent';
             e.currentTarget.style.boxShadow = 'none';
           }}
-          >Neural Info</a>
+          >About</a>
           
           <a onClick={() => window.location.href = '/payments'} style={{ color: 'white', textDecoration: 'none', fontSize: '16px', cursor: 'pointer', opacity: 0.8, transition: 'opacity 0.3s ease' }}
           onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
@@ -4053,7 +4053,7 @@ We're committed to excellent support and continuous improvement based on your fe
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent'
         }}>
-          © 2024 Neural Systems • Quantum Powered by AWS Cloud
+          © 2024 AdvExcel AI • Powered by AWS Cloud
         </p>
       </footer>
       
