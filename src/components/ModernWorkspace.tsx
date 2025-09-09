@@ -74,6 +74,9 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           }
           
           setSpreadsheetData(parsedData);
+          
+          // Store parsedData for analysis
+          const currentData = parsedData;
         } else {
           const workbook = XLSX.read(data, { type: 'binary' });
           const sheetName = workbook.SheetNames[0];
@@ -114,27 +117,32 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           setSpreadsheetData(parsedData);
         }
         
+        // Store data for analysis
+        const dataForAnalysis = parsedData;
+        
         // Auto-analyze data structure after state is set
         setTimeout(() => {
           try {
-            const structure = DataDetectionService.analyzeData(parsedData);
+            const structure = DataDetectionService.analyzeData(dataForAnalysis);
             setDataStructure(structure);
             
             // Generate 5 sample pivot tables immediately
-            const pivots = generateAdvancedPivotTables(parsedData);
+            const pivots = generateAdvancedPivotTables(dataForAnalysis);
             setPivotTables(pivots);
             console.log('Auto-generated pivot tables on upload:', pivots.length);
             
             // Generate automatic basic analytics immediately
-            console.log('Generating basic analytics for:', parsedData.length, 'rows');
-            generateBasicAnalytics(parsedData);
+            console.log('Generating basic analytics for:', dataForAnalysis.length, 'rows');
+            generateBasicAnalytics(dataForAnalysis);
             
             // Automatically trigger comprehensive AI analysis
-            setTimeout(() => performAutoAnalysis(parsedData), 500);
+            setTimeout(() => performAutoAnalysis(dataForAnalysis), 500);
           } catch (err) {
             console.error('Data analysis failed:', err);
-            // Fallback: generate basic analytics even if other analysis fails
-            generateBasicAnalytics(parsedData);
+            // Fallback: generate basic analytics with current data
+            if (dataForAnalysis && dataForAnalysis.length > 0) {
+              generateBasicAnalytics(dataForAnalysis);
+            }
           }
         }, 100);
       } catch (err) {
