@@ -74,6 +74,9 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           setPivotTables(pivots);
           console.log('Auto-generated pivot tables on upload:', pivots.length);
           
+          // Generate automatic basic analytics immediately
+          generateBasicAnalytics(jsonData);
+          
           // Automatically trigger comprehensive AI analysis
           setTimeout(() => performAutoAnalysis(jsonData), 1000);
         } catch (err) {
@@ -179,6 +182,104 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     } finally {
       setAiLoading(false);
     }
+  };
+
+  const generateBasicAnalytics = (data: any[][]) => {
+    if (!data || data.length < 2) return;
+    
+    const analytics = performComprehensiveAnalytics(data);
+    const headers = data[0];
+    const rows = data.slice(1);
+    
+    let basicAnalysis = `📊 **AUTOMATIC DATA ANALYTICS**\n\n`;
+    
+    // Dataset Overview
+    basicAnalysis += `**📋 DATASET OVERVIEW:**\n`;
+    basicAnalysis += `• Total Records: ${rows.length.toLocaleString()}\n`;
+    basicAnalysis += `• Total Columns: ${headers.length}\n`;
+    basicAnalysis += `• Data Quality: ${analytics.duplicates === 0 ? 'Clean (No duplicates)' : `${analytics.duplicates} duplicates found`}\n`;
+    basicAnalysis += `• Missing Values: ${analytics.missingValues.toLocaleString()}\n\n`;
+    
+    // Column Analysis
+    basicAnalysis += `**📊 COLUMN ANALYSIS:**\n`;
+    const numericColumns = [];
+    const textColumns = [];
+    
+    headers.forEach((header, index) => {
+      const values = rows.map(row => row[index]).filter(val => val !== null && val !== undefined && val !== '');
+      const numericValues = values.filter(val => !isNaN(parseFloat(String(val))));
+      
+      if (numericValues.length > values.length * 0.7) {
+        numericColumns.push({ name: header, index, count: numericValues.length });
+      } else {
+        textColumns.push({ name: header, index, unique: new Set(values).size });
+      }
+    });
+    
+    basicAnalysis += `• Numeric Columns: ${numericColumns.length} (${((numericColumns.length / headers.length) * 100).toFixed(1)}%)\n`;
+    basicAnalysis += `• Text Columns: ${textColumns.length} (${((textColumns.length / headers.length) * 100).toFixed(1)}%)\n\n`;
+    
+    // Statistical Summary
+    if (analytics.top5.length > 0) {
+      basicAnalysis += `**📈 STATISTICAL SUMMARY:**\n`;
+      basicAnalysis += `• Highest Value: ${analytics.max.toFixed(2)}\n`;
+      basicAnalysis += `• Lowest Value: ${analytics.min.toFixed(2)}\n`;
+      basicAnalysis += `• Average Value: ${analytics.mean.toFixed(2)}\n`;
+      basicAnalysis += `• Data Range: ${analytics.range.toFixed(2)}\n`;
+      basicAnalysis += `• Standard Deviation: ${analytics.standardDeviation.toFixed(2)}\n\n`;
+    }
+    
+    // Top Performers
+    if (analytics.top5.length > 0) {
+      basicAnalysis += `**🏆 TOP 5 PERFORMERS:**\n`;
+      analytics.top5.forEach((item, index) => {
+        basicAnalysis += `${index + 1}. ${item.country || `Record ${item.index}`}: ${item.value.toFixed(2)}\n`;
+      });
+      basicAnalysis += `\n`;
+    }
+    
+    // Data Quality Assessment
+    const completeness = ((rows.length * headers.length - analytics.missingValues) / (rows.length * headers.length) * 100).toFixed(1);
+    basicAnalysis += `**🔍 DATA QUALITY ASSESSMENT:**\n`;
+    basicAnalysis += `• Data Completeness: ${completeness}%\n`;
+    basicAnalysis += `• Duplicate Records: ${analytics.duplicates}\n`;
+    basicAnalysis += `• Data Consistency: ${analytics.standardDeviation < analytics.mean ? 'Good' : 'Variable'}\n\n`;
+    
+    // Recommendations
+    basicAnalysis += `**💡 RECOMMENDATIONS:**\n`;
+    if (analytics.duplicates > 0) {
+      basicAnalysis += `• Remove ${analytics.duplicates} duplicate records\n`;
+    }
+    if (analytics.missingValues > 0) {
+      basicAnalysis += `• Address ${analytics.missingValues} missing values\n`;
+    }
+    if (numericColumns.length >= 2) {
+      basicAnalysis += `• Explore correlations between numeric columns\n`;
+    }
+    if (textColumns.length > 0) {
+      basicAnalysis += `• Consider categorical analysis for text columns\n`;
+    }
+    basicAnalysis += `• Use Quick Actions for detailed analysis\n`;
+    
+    // Set the analytics data for display
+    if (analytics.top5.length > 0 && analytics.bottom5.length > 0) {
+      const topAvg = analytics.top5.reduce((sum, item) => sum + item.value, 0) / analytics.top5.length;
+      const bottomAvg = analytics.bottom5.reduce((sum, item) => sum + item.value, 0) / analytics.bottom5.length;
+      const ratio = (topAvg / bottomAvg).toFixed(2);
+      
+      setAnalyticsData({
+        top5: analytics.top5,
+        bottom5: analytics.bottom5,
+        comparison: {
+          topAvg: topAvg.toFixed(2),
+          bottomAvg: bottomAvg.toFixed(2),
+          ratio,
+          gap: topAvg > bottomAvg * 2 ? 'High inequality' : 'Moderate gap'
+        }
+      });
+    }
+    
+    setAiResponse(basicAnalysis);
   };
 
   const performAutoAnalysis = async (data: any[][]) => {
