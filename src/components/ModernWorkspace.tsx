@@ -3247,6 +3247,99 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
 
       {/* Main Content */}
       <main style={{ padding: window.innerWidth <= 768 ? '20px' : '40px', position: 'relative', zIndex: 100 }}>
+        {/* Simplified Top Bar Layout */}
+        <div style={{ 
+          display: 'flex', 
+          gap: '16px',
+          marginBottom: '24px',
+          maxWidth: '1600px',
+          margin: '0 auto 24px auto'
+        }}>
+          
+          {/* File Upload - Left */}
+          <div style={{ 
+            width: '300px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px'
+          }}>
+            <input
+              ref={fileInputRef}
+              type="file" 
+              accept=".xlsx,.xls,.csv" 
+              onChange={(e) => {
+                if (e.target.files?.[0]) {
+                  handleFileUpload(e.target.files[0]);
+                }
+              }}
+              style={{ 
+                width: '100%',
+                padding: '12px', 
+                border: '1px solid white', 
+                borderRadius: '6px',
+                backgroundColor: 'transparent',
+                color: 'white',
+                fontSize: '14px',
+                cursor: 'pointer',
+                boxSizing: 'border-box'
+              }}
+            />
+          </div>
+
+          {/* AI Input - Right (takes remaining space) */}
+          <div style={{ 
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
+          }}>
+            <div style={{ flex: 1, position: 'relative' }}>
+              <input 
+                type="text"
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (!aiLoading && selectedFile && prompt.trim()) {
+                      handleCustomAnalysis();
+                    }
+                  }
+                }}
+                placeholder="Ask AI about your data..."
+                style={{ 
+                  width: '100%', 
+                  padding: '12px', 
+                  border: '1px solid white', 
+                  borderRadius: '6px',
+                  color: 'white',
+                  backgroundColor: 'transparent',
+                  boxSizing: 'border-box',
+                  fontSize: '14px'
+                }}
+              />
+            </div>
+            
+            <button 
+              onClick={handleCustomAnalysis}
+              disabled={aiLoading || !selectedFile || !prompt.trim()}
+              style={{ 
+                background: 'transparent',
+                border: '1px solid white',
+                color: 'white',
+                padding: '12px 20px',
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: aiLoading || !selectedFile || !prompt.trim() ? 'not-allowed' : 'pointer',
+                opacity: aiLoading || !selectedFile || !prompt.trim() ? 0.5 : 1
+              }}
+            >
+              {aiLoading ? 'Processing...' : 'Ask'}
+            </button>
+          </div>
+        </div>
+
         <div style={{
           maxWidth: '1400px',
           margin: '0 auto',
@@ -3254,7 +3347,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           flexDirection: window.innerWidth <= 768 ? 'column' : 'row',
           gap: '20px'
         }}>
-          {/* Left Panel - Upload & AI */}
+          {/* Left Panel - Quick Actions */}
           <div style={{
             width: window.innerWidth <= 768 ? '100%' : '350px',
             background: 'rgba(255,255,255,0.05)',
@@ -3262,82 +3355,6 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
             padding: '20px',
             border: '1px solid rgba(255,255,255,0.1)'
           }}>
-            <div style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '2px',
-              background: 'linear-gradient(90deg, transparent 0%, #78dbff 50%, transparent 100%)',
-              animation: 'pulse 2s ease-in-out infinite'
-            }} />
-            {/* File Upload */}
-            <div style={{ marginBottom: '20px' }}>
-              <h3 style={{ 
-                margin: '0 0 12px 0', 
-                fontSize: '16px', 
-                fontWeight: '600',
-                color: 'white'
-              }}>
-                📁 Upload Data
-              </h3>
-              
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".xlsx,.xls,.csv"
-                style={{ display: 'none' }}
-                onChange={(e) => {
-                  if (e.target.files?.[0]) {
-                    handleFileUpload(e.target.files[0]);
-                  }
-                }}
-              />
-              
-              <div
-                onDragEnter={handleDrag}
-                onDragLeave={handleDrag}
-                onDragOver={handleDrag}
-                onDrop={handleDrop}
-                onClick={() => fileInputRef.current?.click()}
-                style={{
-                  border: `1px dashed ${dragActive ? '#78dbff' : 'rgba(255,255,255,0.3)'}`,
-                  borderRadius: '8px',
-                  padding: '20px',
-                  textAlign: 'center',
-                  cursor: 'pointer',
-                  background: dragActive ? 'rgba(120,219,255,0.1)' : 'transparent',
-                  transition: 'all 0.3s ease'
-                }}
-              >
-                {dragActive && (
-                  <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: '-100%',
-                    width: '100%',
-                    height: '100%',
-                    background: 'linear-gradient(90deg, transparent 0%, rgba(120, 219, 255, 0.3) 50%, transparent 100%)',
-                    animation: 'shimmer 1.5s ease-in-out infinite'
-                  }} />
-                )}
-                <style>
-                  {`
-                    @keyframes shimmer {
-                      0% { left: -100%; }
-                      100% { left: 100%; }
-                    }
-                  `}
-                </style>
-                <div style={{ fontSize: '32px', marginBottom: '8px' }}>📊</div>
-                <div style={{ fontSize: '14px', fontWeight: '500', color: 'white', marginBottom: '4px' }}>
-                  {dragActive ? 'Drop file here' : 'Click or drag file'}
-                </div>
-                <div style={{ fontSize: '11px', opacity: 0.7 }}>
-                  Excel, CSV files
-                </div>
-              </div>
-            </div>
 
             {/* File Status */}
             {selectedFile && (
@@ -3774,66 +3791,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
               </div>
             )}
 
-            {/* Custom Analysis */}
-            <div>
-              <h4 style={{ 
-                margin: '0 0 12px 0', 
-                fontSize: '14px', 
-                fontWeight: '600',
-                color: 'white'
-              }}>
-                🧠 AI Assistant
-              </h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <textarea
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      handleCustomAnalysis();
-                    }
-                  }}
-                  placeholder="Ask AI about your data...\ne.g., 'analyze sales trends', 'find top performers', 'show insights'"
-                  style={{
-                    background: 'rgba(255,255,255,0.1)',
-                    border: '1px solid rgba(255,255,255,0.2)',
-                    borderRadius: '8px',
-                    padding: '12px',
-                    color: 'white',
-                    fontSize: '13px',
-                    fontFamily: 'inherit',
-                    resize: 'vertical',
-                    minHeight: '80px',
-                    outline: 'none',
-                    width: '100%',
-                    boxSizing: 'border-box'
-                  }}
-                />
-                <button
-                  onClick={handleCustomAnalysis}
-                  disabled={!prompt.trim() || !spreadsheetData.length || aiLoading}
-                  style={{
-                    background: aiLoading ? 'rgba(255,255,255,0.2)' : 'rgba(120,219,255,0.2)',
-                    border: '1px solid rgba(255,255,255,0.3)',
-                    borderRadius: '8px',
-                    padding: '12px',
-                    color: 'white',
-                    fontSize: '13px',
-                    fontWeight: '600',
-                    cursor: aiLoading || !prompt.trim() || !spreadsheetData.length ? 'not-allowed' : 'pointer',
-                    opacity: (!prompt.trim() || !spreadsheetData.length || aiLoading) ? 0.6 : 1,
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px'
-                  }}
-                >
-                  {aiLoading ? '⚙️ Processing...' : '🧠 Analyze'}
-                </button>
-              </div>
-            </div>
+
             
 
           </div>
