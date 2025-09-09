@@ -195,6 +195,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     
     const headers = data[0];
     const rows = data.slice(1);
+    const fileName = selectedFile?.name || 'Unknown';
     
     // Analyze actual data content
     const columnAnalysis = headers.map((header, index) => {
@@ -212,61 +213,70 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
         avg: numericValues.length > 0 ? numericValues.reduce((a, b) => a + b, 0) / numericValues.length : 0,
         min: numericValues.length > 0 ? Math.min(...numericValues) : 0,
         max: numericValues.length > 0 ? Math.max(...numericValues) : 0,
-        sampleValues: Array.from(uniqueValues).slice(0, 3)
+        sampleValues: Array.from(uniqueValues).slice(0, 3),
+        actualValues: values.slice(0, 5)
       };
     });
     
-    let analysis = `📊 **DATA ANALYSIS COMPLETE**\n\n`;
+    // Detect data context from filename and headers
+    const context = detectDataContext(fileName, headers, rows);
     
-    // Dataset summary with actual insights
-    analysis += `**📋 DATASET SUMMARY:**\n`;
-    analysis += `• ${rows.length.toLocaleString()} records across ${headers.length} columns\n`;
+    let analysis = `📊 **${context.title.toUpperCase()} ANALYSIS**\n\n`;
+    
+    // Context-specific summary
+    analysis += `**📋 ${context.type.toUpperCase()} OVERVIEW:**\n`;
+    analysis += `• File: ${fileName}\n`;
+    analysis += `• ${rows.length.toLocaleString()} ${context.recordType} across ${headers.length} attributes\n`;
     
     const numericCols = columnAnalysis.filter(col => col.isNumeric);
     const textCols = columnAnalysis.filter(col => !col.isNumeric);
     
-    if (numericCols.length > 0) {
-      analysis += `• ${numericCols.length} numeric columns: ${numericCols.map(col => col.name).join(', ')}\n`;
+    // Context-specific column analysis
+    if (context.keyColumns.length > 0) {
+      analysis += `• Key ${context.type} fields: ${context.keyColumns.join(', ')}\n`;
     }
-    if (textCols.length > 0) {
-      analysis += `• ${textCols.length} text columns: ${textCols.map(col => col.name).join(', ')}\n`;
+    if (numericCols.length > 0) {
+      analysis += `• Performance metrics: ${numericCols.map(col => col.name).join(', ')}\n`;
     }
     analysis += `\n`;
     
-    // Key findings from actual data
-    analysis += `**🔍 KEY FINDINGS:**\n`;
+    // Context-specific insights
+    analysis += `**🔍 ${context.type.toUpperCase()} INSIGHTS:**\n`;
     
-    // Find the column with highest values
-    const highestValueCol = numericCols.reduce((prev, current) => 
-      (current.max > prev.max) ? current : prev, numericCols[0] || { max: 0, name: 'None' }
-    );
+    // Find performance indicators
+    const performanceCol = numericCols.find(col => 
+      col.name.toLowerCase().includes('sales') || 
+      col.name.toLowerCase().includes('revenue') || 
+      col.name.toLowerCase().includes('amount') ||
+      col.name.toLowerCase().includes('value') ||
+      col.name.toLowerCase().includes('total')
+    ) || numericCols[0];
     
-    if (highestValueCol && highestValueCol.max > 0) {
-      analysis += `• Highest value found: ${highestValueCol.max.toLocaleString()} in ${highestValueCol.name}\n`;
-      analysis += `• Average ${highestValueCol.name}: ${highestValueCol.avg.toFixed(2)}\n`;
+    if (performanceCol) {
+      analysis += `• ${context.performanceMetric}: ${performanceCol.max.toLocaleString()} (highest), ${performanceCol.min.toLocaleString()} (lowest)\n`;
+      analysis += `• Average ${performanceCol.name}: ${performanceCol.avg.toLocaleString()}\n`;
+      analysis += `• Total ${performanceCol.name}: ${performanceCol.sum.toLocaleString()}\n`;
     }
     
-    // Find most diverse column
-    const mostDiverseCol = columnAnalysis.reduce((prev, current) => 
-      (current.uniqueCount > prev.uniqueCount) ? current : prev
-    );
+    // Category analysis
+    const categoryCol = textCols.find(col => 
+      col.name.toLowerCase().includes('category') ||
+      col.name.toLowerCase().includes('product') ||
+      col.name.toLowerCase().includes('region') ||
+      col.name.toLowerCase().includes('department') ||
+      col.name.toLowerCase().includes('type')
+    ) || textCols[0];
     
-    if (mostDiverseCol.uniqueCount > 1) {
-      analysis += `• Most diverse data: ${mostDiverseCol.name} (${mostDiverseCol.uniqueCount} unique values)\n`;
-      if (mostDiverseCol.sampleValues.length > 0) {
-        analysis += `  Examples: ${mostDiverseCol.sampleValues.join(', ')}\n`;
+    if (categoryCol) {
+      analysis += `• ${categoryCol.name} diversity: ${categoryCol.uniqueCount} different ${context.categoryType}\n`;
+      if (categoryCol.sampleValues.length > 0) {
+        analysis += `  Top ${context.categoryType}: ${categoryCol.sampleValues.slice(0, 3).join(', ')}\n`;
       }
     }
     
-    // Calculate totals for numeric columns
-    const totalSum = numericCols.reduce((sum, col) => sum + col.sum, 0);
-    if (totalSum > 0) {
-      analysis += `• Total sum across numeric columns: ${totalSum.toLocaleString()}\n`;
-    }
-    
     analysis += `\n`;
     
-    // Data quality insights
+    // Data quality with context
     const missingCount = rows.reduce((count, row) => 
       count + row.filter(cell => cell === null || cell === undefined || cell === '').length, 0
     );
@@ -274,36 +284,150 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     const completeness = ((totalCells - missingCount) / totalCells * 100).toFixed(1);
     
     analysis += `**✅ DATA QUALITY:**\n`;
-    analysis += `• Data completeness: ${completeness}%\n`;
+    analysis += `• ${context.type} data completeness: ${completeness}%\n`;
     if (missingCount > 0) {
-      analysis += `• ${missingCount} empty cells found\n`;
+      analysis += `• ${missingCount} missing data points found\n`;
     }
     
-    // Check for duplicates in first column (common identifier)
+    // Check for duplicates
     const firstColValues = rows.map(row => String(row[0] || '').toLowerCase());
     const duplicates = firstColValues.length - new Set(firstColValues).size;
     if (duplicates > 0) {
-      analysis += `• ${duplicates} potential duplicate records\n`;
+      analysis += `• ${duplicates} potential duplicate ${context.recordType}\n`;
     }
     
     analysis += `\n`;
     
-    // Actionable recommendations based on actual data
-    analysis += `**💡 NEXT STEPS:**\n`;
+    // Context-specific recommendations
+    analysis += `**💡 ${context.type.toUpperCase()} RECOMMENDATIONS:**\n`;
+    context.recommendations.forEach(rec => {
+      analysis += `• ${rec}\n`;
+    });
+    
     if (numericCols.length >= 2) {
-      analysis += `• Create charts to visualize ${numericCols[0].name} vs ${numericCols[1].name}\n`;
-    }
-    if (textCols.length > 0 && numericCols.length > 0) {
-      analysis += `• Analyze ${textCols[0].name} breakdown by ${numericCols[0].name}\n`;
+      analysis += `• Compare ${numericCols[0].name} vs ${numericCols[1].name} performance\n`;
     }
     if (duplicates > 0) {
-      analysis += `• Remove duplicate records for cleaner analysis\n`;
-    }
-    if (rows.length > 100) {
-      analysis += `• Use filters to focus on specific data segments\n`;
+      analysis += `• Clean duplicate ${context.recordType} for accurate analysis\n`;
     }
     
     setAiResponse(analysis);
+  };
+  
+  const detectDataContext = (fileName: string, headers: string[], rows: any[][]) => {
+    const fileNameLower = fileName.toLowerCase();
+    const headersLower = headers.map(h => String(h).toLowerCase());
+    
+    // Sales/Business data
+    if (fileNameLower.includes('sales') || fileNameLower.includes('revenue') || 
+        headersLower.some(h => h.includes('sales') || h.includes('revenue') || h.includes('amount'))) {
+      return {
+        type: 'Sales',
+        title: 'Sales Performance',
+        recordType: 'transactions',
+        categoryType: 'products/regions',
+        performanceMetric: 'Sales performance',
+        keyColumns: headers.filter((h, i) => headersLower[i].includes('product') || headersLower[i].includes('region') || headersLower[i].includes('customer')),
+        recommendations: [
+          'Identify top-performing products and regions',
+          'Analyze seasonal sales patterns',
+          'Focus marketing on high-value customers',
+          'Investigate underperforming segments'
+        ]
+      };
+    }
+    
+    // Employee/HR data
+    if (fileNameLower.includes('employee') || fileNameLower.includes('hr') || fileNameLower.includes('staff') ||
+        headersLower.some(h => h.includes('employee') || h.includes('salary') || h.includes('department'))) {
+      return {
+        type: 'HR',
+        title: 'Employee Analytics',
+        recordType: 'employees',
+        categoryType: 'departments',
+        performanceMetric: 'Employee metrics',
+        keyColumns: headers.filter((h, i) => headersLower[i].includes('name') || headersLower[i].includes('department') || headersLower[i].includes('position')),
+        recommendations: [
+          'Analyze salary distribution across departments',
+          'Identify high-performing employees',
+          'Review departmental headcount',
+          'Plan workforce optimization'
+        ]
+      };
+    }
+    
+    // Financial data
+    if (fileNameLower.includes('financial') || fileNameLower.includes('budget') || fileNameLower.includes('expense') ||
+        headersLower.some(h => h.includes('cost') || h.includes('budget') || h.includes('expense'))) {
+      return {
+        type: 'Financial',
+        title: 'Financial Analysis',
+        recordType: 'transactions',
+        categoryType: 'categories',
+        performanceMetric: 'Financial performance',
+        keyColumns: headers.filter((h, i) => headersLower[i].includes('category') || headersLower[i].includes('account') || headersLower[i].includes('department')),
+        recommendations: [
+          'Track budget vs actual spending',
+          'Identify cost-saving opportunities',
+          'Monitor expense trends',
+          'Optimize resource allocation'
+        ]
+      };
+    }
+    
+    // Inventory/Product data
+    if (fileNameLower.includes('inventory') || fileNameLower.includes('product') || fileNameLower.includes('stock') ||
+        headersLower.some(h => h.includes('product') || h.includes('inventory') || h.includes('stock'))) {
+      return {
+        type: 'Inventory',
+        title: 'Inventory Management',
+        recordType: 'items',
+        categoryType: 'products',
+        performanceMetric: 'Stock levels',
+        keyColumns: headers.filter((h, i) => headersLower[i].includes('product') || headersLower[i].includes('category') || headersLower[i].includes('supplier')),
+        recommendations: [
+          'Monitor low-stock items',
+          'Optimize inventory turnover',
+          'Identify fast-moving products',
+          'Plan procurement schedules'
+        ]
+      };
+    }
+    
+    // Customer data
+    if (fileNameLower.includes('customer') || fileNameLower.includes('client') ||
+        headersLower.some(h => h.includes('customer') || h.includes('client'))) {
+      return {
+        type: 'Customer',
+        title: 'Customer Analytics',
+        recordType: 'customers',
+        categoryType: 'segments',
+        performanceMetric: 'Customer value',
+        keyColumns: headers.filter((h, i) => headersLower[i].includes('customer') || headersLower[i].includes('segment') || headersLower[i].includes('region')),
+        recommendations: [
+          'Segment customers by value',
+          'Identify retention opportunities',
+          'Analyze customer lifetime value',
+          'Target high-value segments'
+        ]
+      };
+    }
+    
+    // Default generic analysis
+    return {
+      type: 'Business',
+      title: 'Data Analysis',
+      recordType: 'records',
+      categoryType: 'categories',
+      performanceMetric: 'Performance metrics',
+      keyColumns: headers.slice(0, 3),
+      recommendations: [
+        'Explore data relationships and patterns',
+        'Identify key performance indicators',
+        'Look for trends and anomalies',
+        'Create targeted action plans'
+      ]
+    };
   };
 
   const performAutoAnalysis = async (data: any[][]) => {
