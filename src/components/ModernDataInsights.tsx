@@ -39,10 +39,21 @@ export default function ModernDataInsights({ data, onPromptSelect }: ModernDataI
 
   const getFormatIcon = (format: string) => {
     switch (format) {
+      case 'restaurant': return '🍽️';
+      case 'healthcare': return '🏥';
       case 'financial': return '💰';
+      case 'sports': return '⚽';
+      case 'education': return '🎓';
+      case 'hr': return '👥';
+      case 'ecommerce': return '🛒';
+      case 'realestate': return '🏠';
+      case 'manufacturing': return '🏭';
+      case 'government': return '🏛️';
+      case 'media': return '📺';
+      case 'logistics': return '🚚';
       case 'survey': return '📊';
-      case 'inventory': return '📦';
       case 'analytics': return '📈';
+      case 'banking': return '🏦';
       default: return '📋';
     }
   };
@@ -155,7 +166,9 @@ export default function ModernDataInsights({ data, onPromptSelect }: ModernDataI
                 {getFormatIcon(structure.detectedFormat)}
               </div>
               <div style={{ fontSize: '12px', fontWeight: '500', marginBottom: '4px', textTransform: 'capitalize' }}>
-                {structure.detectedFormat}
+                {structure.detectedFormat === 'ecommerce' ? 'E-Commerce' : 
+                 structure.detectedFormat === 'realestate' ? 'Real Estate' : 
+                 structure.detectedFormat}
               </div>
               <div style={{ fontSize: '12px', opacity: 0.8 }}>Format</div>
             </div>
@@ -180,14 +193,14 @@ export default function ModernDataInsights({ data, onPromptSelect }: ModernDataI
             </div>
           </div>
 
-          {/* Smart Suggestions */}
+          {/* Industry Insights */}
           <div style={{ marginBottom: '24px' }}>
             <h4 style={{
               margin: '0 0 16px 0',
               fontSize: '16px',
               fontWeight: '600'
             }}>
-              💡 Smart Suggestions
+              {getFormatIcon(structure.detectedFormat)} Industry Insights
             </h4>
             <div style={{
               display: 'grid',

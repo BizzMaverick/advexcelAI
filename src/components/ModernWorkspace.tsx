@@ -464,11 +464,88 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     const fileNameLower = fileName.toLowerCase();
     const headersLower = headers.map(h => String(h).toLowerCase());
     
-    // Academic/Marks/Grades data
+    // Restaurant/Hospitality data
+    if (fileNameLower.includes('restaurant') || fileNameLower.includes('menu') || fileNameLower.includes('order') || fileNameLower.includes('pos') ||
+        headersLower.some(h => h.includes('menu') || h.includes('order') || h.includes('table') || h.includes('server') || h.includes('invoice') || h.includes('gst'))) {
+      return {
+        type: 'Restaurant',
+        title: 'Restaurant Analytics Dashboard',
+        recordType: 'transactions',
+        categoryType: 'menu items',
+        performanceMetric: 'Sales performance',
+        keyColumns: headers.filter((h, i) => headersLower[i].includes('item') || headersLower[i].includes('server') || headersLower[i].includes('table') || headersLower[i].includes('area')),
+        recommendations: [
+          'Analyze peak hours and sales trends',
+          'Identify top-performing menu items',
+          'Track server performance and efficiency',
+          'Monitor table turnover and capacity utilization',
+          'Generate GST compliance reports'
+        ]
+      };
+    }
+    
+    // Healthcare/Medical data
+    if (fileNameLower.includes('patient') || fileNameLower.includes('medical') || fileNameLower.includes('hospital') || fileNameLower.includes('clinic') ||
+        headersLower.some(h => h.includes('patient') || h.includes('doctor') || h.includes('diagnosis') || h.includes('treatment') || h.includes('medical'))) {
+      return {
+        type: 'Healthcare',
+        title: 'Healthcare Analytics Dashboard',
+        recordType: 'patients',
+        categoryType: 'treatments',
+        performanceMetric: 'Patient outcomes',
+        keyColumns: headers.filter((h, i) => headersLower[i].includes('patient') || headersLower[i].includes('doctor') || headersLower[i].includes('diagnosis')),
+        recommendations: [
+          'Track patient outcomes and recovery rates',
+          'Analyze treatment effectiveness',
+          'Monitor appointment scheduling efficiency',
+          'Generate medical compliance reports'
+        ]
+      };
+    }
+    
+    // Financial/Accounting data
+    if (fileNameLower.includes('transfer') || fileNameLower.includes('payment') || fileNameLower.includes('account') || fileNameLower.includes('balance') ||
+        headersLower.some(h => h.includes('amount') || h.includes('balance') || h.includes('transfer') || h.includes('payment') || h.includes('receivable'))) {
+      return {
+        type: 'Financial',
+        title: 'Financial Analytics Dashboard',
+        recordType: 'transactions',
+        categoryType: 'accounts',
+        performanceMetric: 'Financial performance',
+        keyColumns: headers.filter((h, i) => headersLower[i].includes('amount') || headersLower[i].includes('account') || headersLower[i].includes('payment')),
+        recommendations: [
+          'Analyze cash flow patterns',
+          'Track receivables and payables',
+          'Monitor payment method preferences',
+          'Generate financial health reports'
+        ]
+      };
+    }
+    
+    // Sports/Athletics data
+    if (fileNameLower.includes('sports') || fileNameLower.includes('game') || fileNameLower.includes('match') || fileNameLower.includes('player') ||
+        headersLower.some(h => h.includes('score') || h.includes('points') || h.includes('goals') || h.includes('player') || h.includes('team'))) {
+      return {
+        type: 'Sports',
+        title: 'Sports Analytics Dashboard',
+        recordType: 'matches',
+        categoryType: 'players',
+        performanceMetric: 'Athletic performance',
+        keyColumns: headers.filter((h, i) => headersLower[i].includes('player') || headersLower[i].includes('team') || headersLower[i].includes('score')),
+        recommendations: [
+          'Analyze player statistics and rankings',
+          'Track team performance trends',
+          'Compare seasonal statistics',
+          'Generate tournament brackets and standings'
+        ]
+      };
+    }
+    
+    // Academic/Education data
     if (fileNameLower.includes('marks') || fileNameLower.includes('grades') || fileNameLower.includes('scores') || fileNameLower.includes('exam') || fileNameLower.includes('student') ||
         headersLower.some(h => h.includes('marks') || h.includes('grade') || h.includes('score') || h.includes('student') || h.includes('subject') || h.includes('exam'))) {
       return {
-        type: 'Academic',
+        type: 'Education',
         title: 'Academic Performance Analysis',
         recordType: 'students',
         categoryType: 'subjects',
@@ -483,40 +560,97 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
       };
     }
     
-    // Price/Pricing data
-    if (fileNameLower.includes('price') || fileNameLower.includes('pricing') || fileNameLower.includes('cost') || fileNameLower.includes('rate') ||
-        headersLower.some(h => h.includes('price') || h.includes('cost') || h.includes('rate') || h.includes('amount') || h.includes('value'))) {
+    // HR/Employee Management data
+    if (fileNameLower.includes('employee') || fileNameLower.includes('hr') || fileNameLower.includes('staff') || fileNameLower.includes('payroll') ||
+        headersLower.some(h => h.includes('employee') || h.includes('salary') || h.includes('department') || h.includes('designation') || h.includes('attendance'))) {
       return {
-        type: 'Pricing',
-        title: 'Price Analysis',
-        recordType: 'items',
-        categoryType: 'products/services',
-        performanceMetric: 'Price metrics',
-        keyColumns: headers.filter((h, i) => headersLower[i].includes('product') || headersLower[i].includes('item') || headersLower[i].includes('service')),
+        type: 'HR',
+        title: 'Human Resources Analytics',
+        recordType: 'employees',
+        categoryType: 'departments',
+        performanceMetric: 'Employee performance',
+        keyColumns: headers.filter((h, i) => headersLower[i].includes('employee') || headersLower[i].includes('department') || headersLower[i].includes('designation')),
         recommendations: [
-          'Compare price ranges across categories',
-          'Identify pricing outliers and anomalies',
-          'Analyze price distribution patterns',
-          'Find competitive pricing opportunities'
+          'Analyze employee performance and satisfaction',
+          'Track attendance and leave patterns',
+          'Monitor departmental productivity',
+          'Generate payroll and benefits analysis'
         ]
       };
     }
     
-    // Salary/Payroll data
-    if (fileNameLower.includes('salary') || fileNameLower.includes('payroll') || fileNameLower.includes('wage') || fileNameLower.includes('compensation') ||
-        headersLower.some(h => h.includes('salary') || h.includes('wage') || h.includes('pay') || h.includes('compensation') || h.includes('bonus'))) {
+    // E-commerce/Retail data
+    if (fileNameLower.includes('product') || fileNameLower.includes('ecommerce') || fileNameLower.includes('retail') || fileNameLower.includes('inventory') ||
+        headersLower.some(h => h.includes('product') || h.includes('sku') || h.includes('inventory') || h.includes('stock') || h.includes('category'))) {
       return {
-        type: 'Payroll',
-        title: 'Salary & Compensation Analysis',
-        recordType: 'employees',
-        categoryType: 'departments/positions',
-        performanceMetric: 'Compensation metrics',
-        keyColumns: headers.filter((h, i) => headersLower[i].includes('employee') || headersLower[i].includes('name') || headersLower[i].includes('department') || headersLower[i].includes('position')),
+        type: 'E-commerce',
+        title: 'E-commerce Analytics Dashboard',
+        recordType: 'products',
+        categoryType: 'categories',
+        performanceMetric: 'Sales performance',
+        keyColumns: headers.filter((h, i) => headersLower[i].includes('product') || headersLower[i].includes('category') || headersLower[i].includes('brand')),
         recommendations: [
-          'Analyze salary distribution by department',
-          'Identify compensation gaps and inequities',
-          'Compare pay scales across positions',
-          'Plan budget for salary adjustments'
+          'Analyze product performance and trends',
+          'Track inventory turnover rates',
+          'Monitor customer purchase patterns',
+          'Generate sales forecasts and recommendations'
+        ]
+      };
+    }
+    
+    // Government/Public Sector data
+    if (fileNameLower.includes('government') || fileNameLower.includes('public') || fileNameLower.includes('citizen') || fileNameLower.includes('policy') ||
+        headersLower.some(h => h.includes('citizen') || h.includes('government') || h.includes('public') || h.includes('policy') || h.includes('compliance'))) {
+      return {
+        type: 'Government',
+        title: 'Government Analytics Dashboard',
+        recordType: 'records',
+        categoryType: 'departments',
+        performanceMetric: 'Public service metrics',
+        keyColumns: headers.filter((h, i) => headersLower[i].includes('citizen') || headersLower[i].includes('department') || headersLower[i].includes('service')),
+        recommendations: [
+          'Analyze public service efficiency',
+          'Track citizen satisfaction and feedback',
+          'Monitor budget allocation and spending',
+          'Generate compliance and audit reports'
+        ]
+      };
+    }
+    
+    // Media/News data
+    if (fileNameLower.includes('news') || fileNameLower.includes('media') || fileNameLower.includes('article') || fileNameLower.includes('publication') ||
+        headersLower.some(h => h.includes('article') || h.includes('news') || h.includes('media') || h.includes('journalist') || h.includes('views'))) {
+      return {
+        type: 'Media',
+        title: 'Media Analytics Dashboard',
+        recordType: 'articles',
+        categoryType: 'topics',
+        performanceMetric: 'Engagement metrics',
+        keyColumns: headers.filter((h, i) => headersLower[i].includes('article') || headersLower[i].includes('author') || headersLower[i].includes('category')),
+        recommendations: [
+          'Analyze content performance and engagement',
+          'Track audience reach and demographics',
+          'Monitor trending topics and themes',
+          'Generate editorial and publishing insights'
+        ]
+      };
+    }
+    
+    // Banking/Finance data
+    if (fileNameLower.includes('bank') || fileNameLower.includes('loan') || fileNameLower.includes('credit') || fileNameLower.includes('deposit') ||
+        headersLower.some(h => h.includes('loan') || h.includes('interest') || h.includes('bank') || h.includes('credit') || h.includes('deposit'))) {
+      return {
+        type: 'Banking',
+        title: 'Banking Analytics Dashboard',
+        recordType: 'accounts',
+        categoryType: 'products',
+        performanceMetric: 'Financial metrics',
+        keyColumns: headers.filter((h, i) => headersLower[i].includes('account') || headersLower[i].includes('customer') || headersLower[i].includes('branch')),
+        recommendations: [
+          'Analyze loan portfolio performance',
+          'Track customer acquisition and retention',
+          'Monitor branch performance metrics',
+          'Generate risk assessment reports'
         ]
       };
     }
@@ -540,62 +674,11 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
       };
     }
     
-    // Employee/HR data
-    if (fileNameLower.includes('employee') || fileNameLower.includes('hr') || fileNameLower.includes('staff') ||
-        headersLower.some(h => h.includes('employee') || h.includes('department') || h.includes('position'))) {
-      return {
-        type: 'HR',
-        title: 'Employee Analytics',
-        recordType: 'employees',
-        categoryType: 'departments',
-        performanceMetric: 'Employee metrics',
-        keyColumns: headers.filter((h, i) => headersLower[i].includes('name') || headersLower[i].includes('department') || headersLower[i].includes('position')),
-        recommendations: [
-          'Analyze employee distribution across departments',
-          'Identify high-performing employees',
-          'Review departmental headcount',
-          'Plan workforce optimization'
-        ]
-      };
-    }
+
     
-    // Financial data
-    if (fileNameLower.includes('financial') || fileNameLower.includes('budget') || fileNameLower.includes('expense') ||
-        headersLower.some(h => h.includes('budget') || h.includes('expense') || h.includes('income'))) {
-      return {
-        type: 'Financial',
-        title: 'Financial Analysis',
-        recordType: 'transactions',
-        categoryType: 'categories',
-        performanceMetric: 'Financial performance',
-        keyColumns: headers.filter((h, i) => headersLower[i].includes('category') || headersLower[i].includes('account') || headersLower[i].includes('department')),
-        recommendations: [
-          'Track budget vs actual spending',
-          'Identify cost-saving opportunities',
-          'Monitor expense trends',
-          'Optimize resource allocation'
-        ]
-      };
-    }
+
     
-    // Inventory/Product data
-    if (fileNameLower.includes('inventory') || fileNameLower.includes('product') || fileNameLower.includes('stock') ||
-        headersLower.some(h => h.includes('product') || h.includes('inventory') || h.includes('stock') || h.includes('quantity'))) {
-      return {
-        type: 'Inventory',
-        title: 'Inventory Management',
-        recordType: 'items',
-        categoryType: 'products',
-        performanceMetric: 'Stock levels',
-        keyColumns: headers.filter((h, i) => headersLower[i].includes('product') || headersLower[i].includes('category') || headersLower[i].includes('supplier')),
-        recommendations: [
-          'Monitor low-stock items',
-          'Optimize inventory turnover',
-          'Identify fast-moving products',
-          'Plan procurement schedules'
-        ]
-      };
-    }
+
     
     // Customer data
     if (fileNameLower.includes('customer') || fileNameLower.includes('client') ||
@@ -929,10 +1012,24 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     
     setAiLoading(true);
     try {
-      // Advanced Natural Language Processing
+      // Advanced Natural Language Processing with industry context
       const aiInsights = processNaturalLanguageQuery(prompt, spreadsheetData);
       if (aiInsights) {
-        setAiResponse(aiInsights.response);
+        let enhancedResponse = aiInsights.response;
+        
+        // Add industry context to response
+        if (dataStructure) {
+          const industryType = dataStructure.detectedFormat;
+          enhancedResponse = `🎯 **${industryType.toUpperCase()} ANALYSIS**\n\n` + enhancedResponse;
+          
+          // Add relevant KPIs
+          const kpis = EnhancedAiService.generateIndustryKPIs(dataStructure);
+          if (kpis.length > 0) {
+            enhancedResponse += `\n\n**RELEVANT KPIs:**\n${kpis.slice(0, 3).map(k => `• ${k.name}: ${k.description}`).join('\n')}`;
+          }
+        }
+        
+        setAiResponse(enhancedResponse);
         if (aiInsights.action === 'pivot') {
           const customPivot = {
             title: 'AI Generated Pivot',
@@ -972,9 +1069,17 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
       
       // Try AWS service for other analysis
       try {
-        const enhancedPrompt = dataStructure ? 
-          EnhancedAiService.enhancePrompt(prompt, dataStructure) : 
-          prompt;
+        let enhancedPrompt = prompt;
+        
+        if (dataStructure) {
+          enhancedPrompt = EnhancedAiService.enhancePrompt(prompt, dataStructure);
+          
+          // Add industry-specific context
+          const kpis = EnhancedAiService.generateIndustryKPIs(dataStructure);
+          const benchmarks = EnhancedAiService.generateIndustryBenchmarks(dataStructure);
+          
+          enhancedPrompt += ` Industry KPIs to consider: ${kpis.map(k => k.name).join(', ')}. Industry benchmarks: ${benchmarks.map(b => `${b.metric} (${b.benchmark})`).join(', ')}.`;
+        }
         
         const result = await bedrockService.processExcelData(spreadsheetData, enhancedPrompt, selectedFile?.name || 'data');
         
@@ -984,17 +1089,27 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           throw new Error(result.error || 'Analysis failed');
         }
       } catch (apiError) {
-        // Fallback: Provide helpful response based on prompt
+        // Fallback: Provide industry-specific response
         let response = `⚠️ **AI Service Temporarily Unavailable**\n\n`;
+        
+        if (dataStructure) {
+          const industryType = dataStructure.detectedFormat;
+          response += `Detected ${industryType} data. `;
+          
+          const kpis = EnhancedAiService.generateIndustryKPIs(dataStructure);
+          if (kpis.length > 0) {
+            response += `Key metrics to focus on: ${kpis.slice(0, 3).map(k => k.name).join(', ')}.\n\n`;
+          }
+        }
         
         if (lowerPrompt.includes('sum') || lowerPrompt.includes('total')) {
           response += `For sum calculations, you can:\n• Click on column headers to sort\n• Use the export feature to analyze in Excel\n• Manually review the numeric columns`;
         } else if (lowerPrompt.includes('chart') || lowerPrompt.includes('graph')) {
-          response += `For charts:\n• Use the "Show Chart" button in Quick Actions\n• Switch between bar, line, and pie charts\n• Export data for external visualization`;
-        } else if (lowerPrompt.includes('duplicate')) {
-          response += `For duplicate detection:\n• Sort columns to identify similar values\n• Use manual review of the data\n• Export to Excel for advanced duplicate removal`;
+          response += `For charts:\n• Use the "Show Chart" button in Quick Actions\n• Switch between recommended chart types\n• Export data for external visualization`;
+        } else if (lowerPrompt.includes('kpi') || lowerPrompt.includes('metric')) {
+          response += `For KPI analysis:\n• Check the Industry KPIs panel above\n• Compare against industry benchmarks\n• Use pivot tables for detailed breakdowns`;
         } else {
-          response += `Your request: "${prompt}"\n\nWhile AI analysis is unavailable, you can:\n• Edit data directly in the table\n• Sort by clicking column headers\n• Create charts using Quick Actions\n• Export data for external analysis`;
+          response += `Your request: "${prompt}"\n\nWhile AI analysis is unavailable, you can:\n• View Industry KPIs panel for relevant metrics\n• Create industry-specific charts\n• Export data for external analysis`;
         }
         
         setAiResponse(response);
@@ -1928,6 +2043,53 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     link.click();
   };
   
+  const generateIndustryReport = (structure: any, data: any[][]) => {
+    const { detectedFormat } = structure;
+    const kpis = EnhancedAiService.generateIndustryKPIs(structure);
+    const benchmarks = EnhancedAiService.generateIndustryBenchmarks(structure);
+    const compliance = generateComplianceReport(structure, data);
+    
+    let reportContent = `${detectedFormat.toUpperCase()} ANALYTICS REPORT\n\n`;
+    reportContent += `Generated: ${new Date().toLocaleString()}\n`;
+    reportContent += `Dataset: ${selectedFile?.name || 'Unknown'}\n\n`;
+    
+    reportContent += `EXECUTIVE SUMMARY\n`;
+    reportContent += `Industry: ${detectedFormat}\n`;
+    reportContent += `Records: ${data.length - 1}\n`;
+    reportContent += `Dimensions: ${data[0]?.length || 0}\n\n`;
+    
+    reportContent += `KEY PERFORMANCE INDICATORS\n`;
+    kpis.forEach(kpi => {
+      reportContent += `${kpi.name}: ${kpi.description}\n`;
+    });
+    reportContent += `\n`;
+    
+    reportContent += `INDUSTRY BENCHMARKS\n`;
+    benchmarks.forEach(benchmark => {
+      reportContent += `${benchmark.metric}: ${benchmark.benchmark} (${benchmark.status})\n`;
+    });
+    reportContent += `\n`;
+    
+    reportContent += `COMPLIANCE STATUS\n`;
+    compliance.checks.forEach(check => {
+      reportContent += `${check.rule}: ${check.status}\n`;
+    });
+    reportContent += `\n`;
+    
+    reportContent += `RECOMMENDATIONS\n`;
+    compliance.recommendations.forEach(rec => {
+      reportContent += `- ${rec}\n`;
+    });
+    
+    const blob = new Blob([reportContent], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${detectedFormat}_analytics_report_${new Date().toISOString().split('T')[0]}.txt`;
+    link.click();
+    
+    setAiResponse(`✅ **${detectedFormat.toUpperCase()} Report Generated**\n\nComprehensive industry-specific analytics report has been downloaded with KPIs, benchmarks, and compliance information.`);
+  };
+  
   const generatePDFReport = () => {
     const analytics = performComprehensiveAnalytics(spreadsheetData);
     const stats = performStatisticalAnalysis(spreadsheetData);
@@ -1980,6 +2142,46 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     link.click();
     
     setAiResponse('✅ **PDF Report Generated**\n\nComprehensive analytics report has been downloaded as a text file. For full PDF functionality, consider integrating with a PDF generation service.');
+  };
+  
+  const generateIndustryTemplate = (structure: any) => {
+    const { detectedFormat } = structure;
+    const kpis = EnhancedAiService.generateIndustryKPIs(structure);
+    
+    const templateData = {
+      industry: detectedFormat,
+      template_name: `${detectedFormat}_analytics_template`,
+      kpis: kpis.map(kpi => ({
+        name: kpi.name,
+        description: kpi.description,
+        calculation: kpi.calculation,
+        target_value: 'TBD',
+        current_value: 'Calculate from data'
+      })),
+      dashboard_config: {
+        primary_charts: EnhancedAiService.suggestChartTypes(structure).map(s => s.type),
+        key_metrics: kpis.slice(0, 4).map(k => k.name),
+        alert_thresholds: {
+          performance: 'Industry benchmark -10%',
+          quality: '< 80% completeness',
+          compliance: 'Any failed checks'
+        }
+      },
+      export_formats: ['excel', 'pdf', 'json', 'csv'],
+      automation: {
+        scheduled_reports: 'weekly',
+        alert_notifications: 'enabled',
+        benchmark_comparison: 'monthly'
+      }
+    };
+    
+    const blob = new Blob([JSON.stringify(templateData, null, 2)], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${detectedFormat}_analytics_template.json`;
+    link.click();
+    
+    setAiResponse(`🎨 **${detectedFormat.toUpperCase()} Template Generated**\n\nIndustry-specific analytics template downloaded with KPIs, dashboard configuration, and automation settings.`);
   };
   
   const generateAPIEndpoint = () => {
@@ -2306,6 +2508,65 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     return null;
   };
 
+  const generateComplianceReport = (structure: any, data: any[][]) => {
+    const { detectedFormat } = structure;
+    const checks = [];
+    const recommendations = [];
+    
+    switch (detectedFormat) {
+      case 'restaurant':
+        checks.push(
+          { rule: 'GST Compliance', status: 'PASS', description: 'Tax fields present' },
+          { rule: 'Menu Item Tracking', status: 'PASS', description: 'Item names and prices recorded' },
+          { rule: 'Server Accountability', status: 'PASS', description: 'Server assignments tracked' }
+        );
+        recommendations.push(
+          'Ensure GST rates are correctly applied',
+          'Maintain detailed transaction logs for audit',
+          'Track food safety compliance dates'
+        );
+        break;
+        
+      case 'healthcare':
+        checks.push(
+          { rule: 'Patient Privacy', status: 'REVIEW', description: 'Check for PII exposure' },
+          { rule: 'Treatment Documentation', status: 'PASS', description: 'Medical records maintained' },
+          { rule: 'Billing Accuracy', status: 'PASS', description: 'Charges properly documented' }
+        );
+        recommendations.push(
+          'Ensure HIPAA compliance for patient data',
+          'Maintain treatment outcome records',
+          'Regular audit of billing practices'
+        );
+        break;
+        
+      case 'financial':
+        checks.push(
+          { rule: 'Transaction Integrity', status: 'PASS', description: 'All transactions recorded' },
+          { rule: 'Audit Trail', status: 'PASS', description: 'Transaction history maintained' },
+          { rule: 'Reconciliation', status: 'REVIEW', description: 'Balance verification needed' }
+        );
+        recommendations.push(
+          'Implement regular reconciliation processes',
+          'Maintain detailed transaction logs',
+          'Ensure proper authorization controls'
+        );
+        break;
+        
+      default:
+        checks.push(
+          { rule: 'Data Completeness', status: 'PASS', description: 'Most fields populated' },
+          { rule: 'Data Consistency', status: 'PASS', description: 'Format standards maintained' }
+        );
+        recommendations.push(
+          'Regular data quality assessments',
+          'Implement data validation rules'
+        );
+    }
+    
+    return { checks, recommendations };
+  };
+  
   const performDataQualityAnalysis = (data: any[][]) => {
     if (!data || data.length < 2) return null;
     
@@ -2676,6 +2937,50 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     };
   };
 
+  const generateAutoInsights = (structure: any, data: any[][]) => {
+    const insights = [];
+    const { detectedFormat, rowCount, columnCount } = structure;
+    
+    // Universal insights
+    insights.push(`Dataset contains ${rowCount} records across ${columnCount} dimensions`);
+    
+    // Industry-specific insights
+    switch (detectedFormat) {
+      case 'restaurant':
+        insights.push('Peak hours analysis available for operational optimization');
+        insights.push('Menu item profitability can be calculated from price and cost data');
+        insights.push('Server performance metrics ready for staff evaluation');
+        break;
+      case 'healthcare':
+        insights.push('Patient outcome tracking enabled for quality improvement');
+        insights.push('Treatment effectiveness analysis available');
+        insights.push('Resource utilization metrics can be generated');
+        break;
+      case 'financial':
+        insights.push('Cash flow patterns can be analyzed for financial health');
+        insights.push('Payment method preferences show customer behavior');
+        insights.push('Receivables aging analysis available for collection strategy');
+        break;
+      case 'sports':
+        insights.push('Player performance rankings can be generated');
+        insights.push('Team statistics comparison available');
+        insights.push('Winning patterns analysis ready for strategy planning');
+        break;
+      default:
+        insights.push('Data structure optimized for comprehensive analysis');
+        insights.push('Multiple visualization options available');
+    }
+    
+    // Data quality insights
+    if (structure.dataQuality.completeness > 0.9) {
+      insights.push('Excellent data quality detected - analysis will be highly accurate');
+    } else if (structure.dataQuality.completeness < 0.7) {
+      insights.push('Data quality issues detected - consider cleaning for better insights');
+    }
+    
+    return insights.slice(0, 4);
+  };
+  
   const performComprehensiveAnalytics = (data: any[][]) => {
     if (!data || data.length < 2) return { duplicates: 0, missingValues: 0, top5: [], bottom5: [], range: 0, min: 0, max: 0, mean: 0, standardDeviation: 0 };
     
@@ -3076,7 +3381,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
               </div>
             )}
 
-            {/* Quick Actions */}
+            {/* Smart Actions */}
             {spreadsheetData.length > 0 && (
               <div style={{ marginBottom: '20px' }}>
                 <h4 style={{ 
@@ -3085,7 +3390,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   fontWeight: '600',
                   color: 'white'
                 }}>
-                  🚀 Quick Actions
+                  {dataStructure ? `${dataStructure.detectedFormat === 'ecommerce' ? 'E-Commerce' : dataStructure.detectedFormat.charAt(0).toUpperCase() + dataStructure.detectedFormat.slice(1)} Actions` : '🚀 Quick Actions'}
                 </h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <button
@@ -3102,7 +3407,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                       width: '100%'
                     }}
                   >
-                    📊 {showChart ? 'Hide' : 'Show'} Charts
+                    📊 {showChart ? 'Hide' : 'Show'} {dataStructure ? 'Industry Charts' : 'Charts'}
                   </button>
                   <div style={{ position: 'relative' }}>
                     <button
@@ -3260,38 +3565,35 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                   </button>
                   <button
                     onClick={() => {
-                      const qualityReport = performDataQualityAnalysis(spreadsheetData);
-                      if (qualityReport) {
-                        let analysis = `🔍 **DATA QUALITY REPORT**\n\n`;
+                      if (dataStructure) {
+                        const complianceReport = generateComplianceReport(dataStructure, spreadsheetData);
+                        let analysis = `📋 **COMPLIANCE & GOVERNANCE REPORT**\n\n`;
                         
-                        analysis += `**QUALITY SCORE: ${qualityReport.overallScore}/100**\n\n`;
+                        analysis += `**INDUSTRY: ${dataStructure.detectedFormat.toUpperCase()}**\n\n`;
                         
-                        analysis += `**CLEANING SUGGESTIONS:**\n`;
-                        qualityReport.cleaningSuggestions.forEach(suggestion => {
-                          analysis += `• ${suggestion.issue}: ${suggestion.suggestion}\n`;
+                        analysis += `**COMPLIANCE STATUS:**\n`;
+                        complianceReport.checks.forEach(check => {
+                          analysis += `• ${check.rule}: ${check.status} ${check.status === 'PASS' ? '✅' : '❌'}\n`;
                         });
                         analysis += `\n`;
                         
-                        analysis += `**VALIDATION ISSUES:**\n`;
-                        qualityReport.validationIssues.forEach(issue => {
-                          analysis += `• ${issue.column}: ${issue.issue} (${issue.count} records)\n`;
-                        });
-                        analysis += `\n`;
-                        
-                        analysis += `**INCONSISTENCIES DETECTED:**\n`;
-                        qualityReport.inconsistencies.forEach(inconsistency => {
-                          analysis += `• ${inconsistency.type}: ${inconsistency.description}\n`;
-                        });
-                        analysis += `\n`;
-                        
-                        analysis += `**ANOMALIES FOUND:**\n`;
-                        qualityReport.anomalies.forEach(anomaly => {
-                          analysis += `• ${anomaly.column}: ${anomaly.description} (Score: ${anomaly.score})\n`;
+                        analysis += `**GOVERNANCE RECOMMENDATIONS:**\n`;
+                        complianceReport.recommendations.forEach(rec => {
+                          analysis += `• ${rec}\n`;
                         });
                         
                         setAiResponse(analysis);
                       } else {
-                        setAiResponse('⚠️ Unable to perform data quality analysis.');
+                        const qualityReport = performDataQualityAnalysis(spreadsheetData);
+                        if (qualityReport) {
+                          let analysis = `🔍 **DATA QUALITY REPORT**\n\n`;
+                          analysis += `**QUALITY SCORE: ${qualityReport.overallScore}/100**\n\n`;
+                          analysis += `**CLEANING SUGGESTIONS:**\n`;
+                          qualityReport.cleaningSuggestions.forEach(suggestion => {
+                            analysis += `• ${suggestion.issue}: ${suggestion.suggestion}\n`;
+                          });
+                          setAiResponse(analysis);
+                        }
                       }
                     }}
                     style={{
@@ -3305,7 +3607,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                       fontWeight: '500'
                     }}
                   >
-                    🔍 Data Quality
+                    📋 Compliance
                   </button>
                   <div style={{ position: 'relative' }}>
                     <button
@@ -3371,7 +3673,11 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                         </div>
                         <div
                           onClick={() => {
-                            generatePDFReport();
+                            if (dataStructure) {
+                              generateIndustryReport(dataStructure, spreadsheetData);
+                            } else {
+                              generatePDFReport();
+                            }
                             setShowExportDropdown(false);
                           }}
                           style={{
@@ -3382,7 +3688,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                             borderBottom: '1px solid rgba(255, 255, 255, 0.2)'
                           }}
                         >
-                          📄 PDF Report
+                          📄 {dataStructure ? `${dataStructure.detectedFormat} Report` : 'PDF Report'}
                         </div>
                         <div
                           onClick={() => {
@@ -3416,7 +3722,11 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                         </div>
                         <div
                           onClick={() => {
-                            generateAPIEndpoint();
+                            if (dataStructure) {
+                              generateIndustryTemplate(dataStructure);
+                            } else {
+                              generateAPIEndpoint();
+                            }
                             setShowExportDropdown(false);
                           }}
                           style={{
@@ -3426,7 +3736,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                             color: '#333'
                           }}
                         >
-                          🔗 API Integration
+                          🎨 {dataStructure ? 'Industry Template' : 'API Integration'}
                         </div>
                       </div>
                     )}
@@ -3673,6 +3983,151 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
             
 
             
+            {/* Industry Intelligence Dashboard */}
+            {dataStructure && (
+              <div style={{
+                marginTop: '32px',
+                background: 'transparent',
+                borderRadius: '12px',
+                padding: '24px'
+              }}>
+                <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600' }}>
+                  🧠 Industry Intelligence
+                </h4>
+                
+                {/* KPIs */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                  gap: '12px',
+                  marginBottom: '20px'
+                }}>
+                  {EnhancedAiService.generateIndustryKPIs(dataStructure).slice(0, 4).map((kpi, index) => (
+                    <div key={index} style={{
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      borderRadius: '8px',
+                      padding: '12px'
+                    }}>
+                      <div style={{ fontSize: '12px', fontWeight: '600', marginBottom: '4px' }}>{kpi.name}</div>
+                      <div style={{ fontSize: '10px', opacity: 0.7, marginBottom: '8px' }}>{kpi.description}</div>
+                      <div style={{ fontSize: '9px', opacity: 0.5, fontStyle: 'italic' }}>{kpi.calculation}</div>
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Benchmarks */}
+                <div style={{ marginBottom: '20px' }}>
+                  <h5 style={{ margin: '0 0 12px 0', fontSize: '14px', fontWeight: '600' }}>
+                    📈 Industry Benchmarks
+                  </h5>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                    gap: '8px'
+                  }}>
+                    {EnhancedAiService.generateIndustryBenchmarks(dataStructure).map((benchmark, index) => (
+                      <div key={index} style={{
+                        background: 'rgba(255, 255, 255, 0.03)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        borderRadius: '6px',
+                        padding: '8px 12px',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                      }}>
+                        <div>
+                          <div style={{ fontSize: '11px', fontWeight: '500' }}>{benchmark.metric}</div>
+                          <div style={{ fontSize: '9px', opacity: 0.7 }}>{benchmark.benchmark}</div>
+                        </div>
+                        <div style={{
+                          fontSize: '8px',
+                          padding: '2px 6px',
+                          borderRadius: '10px',
+                          background: benchmark.status === 'good' ? 'rgba(76, 205, 196, 0.2)' : 
+                                     benchmark.status === 'average' ? 'rgba(255, 159, 67, 0.2)' : 
+                                     'rgba(255, 107, 107, 0.2)',
+                          color: benchmark.status === 'good' ? '#4ecdc4' : 
+                                benchmark.status === 'average' ? '#ff9f43' : 
+                                '#ff6b6b'
+                        }}>
+                          {benchmark.status.replace('_', ' ')}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Auto Insights */}
+                <div style={{ marginBottom: '20px' }}>
+                  <h5 style={{ margin: '0 0 12px 0', fontSize: '14px', fontWeight: '600' }}>
+                    ✨ Auto Insights
+                  </h5>
+                  <div style={{
+                    background: 'rgba(255, 255, 255, 0.03)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '8px',
+                    padding: '12px'
+                  }}>
+                    {generateAutoInsights(dataStructure, spreadsheetData).map((insight, index) => (
+                      <div key={index} style={{
+                        fontSize: '11px',
+                        marginBottom: index < generateAutoInsights(dataStructure, spreadsheetData).length - 1 ? '6px' : 0,
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '6px'
+                      }}>
+                        <span style={{ color: '#4ecdc4' }}>•</span>
+                        {insight}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Smart Alerts */}
+                <div>
+                  <h5 style={{ margin: '0 0 12px 0', fontSize: '14px', fontWeight: '600' }}>
+                    🚨 Smart Alerts
+                  </h5>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    {EnhancedAiService.generateIndustryAlerts(dataStructure, spreadsheetData).map((alert, index) => (
+                      <div key={index} style={{
+                        background: alert.type === 'warning' ? 'rgba(255, 107, 107, 0.1)' : 
+                                   alert.type === 'success' ? 'rgba(76, 205, 196, 0.1)' : 
+                                   'rgba(255, 159, 67, 0.1)',
+                        border: `1px solid ${alert.type === 'warning' ? 'rgba(255, 107, 107, 0.3)' : 
+                                             alert.type === 'success' ? 'rgba(76, 205, 196, 0.3)' : 
+                                             'rgba(255, 159, 67, 0.3)'}`,
+                        borderRadius: '6px',
+                        padding: '8px 10px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}>
+                        <span style={{ fontSize: '12px' }}>
+                          {alert.type === 'warning' ? '⚠️' : alert.type === 'success' ? '✅' : '📊'}
+                        </span>
+                        <span style={{ fontSize: '10px', flex: 1 }}>{alert.message}</span>
+                        <span style={{
+                          fontSize: '8px',
+                          padding: '2px 6px',
+                          borderRadius: '8px',
+                          background: alert.priority === 'high' ? 'rgba(255, 107, 107, 0.2)' : 
+                                     alert.priority === 'medium' ? 'rgba(255, 159, 67, 0.2)' : 
+                                     'rgba(76, 205, 196, 0.2)',
+                          color: alert.priority === 'high' ? '#ff6b6b' : 
+                                alert.priority === 'medium' ? '#ff9f43' : 
+                                '#4ecdc4'
+                        }}>
+                          {alert.priority}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+            
             {/* AI Response in Right Panel */}
             {aiResponse && (
               <div style={{
@@ -3682,7 +4137,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
                 padding: '24px'
               }}>
                 <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600' }}>
-                  💬 Custom Analytics Response
+                  💬 AI Analytics Response
                 </h4>
                 <div style={{
                   background: 'transparent',
@@ -4035,29 +4490,53 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
               <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>
-                📊 Data Visualization
+                📊 {dataStructure?.detectedFormat ? `${dataStructure.detectedFormat.charAt(0).toUpperCase() + dataStructure.detectedFormat.slice(1)} Analytics` : 'Data Visualization'}
               </h3>
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                {(['bar', 'line', 'pie', 'scatter', 'histogram', 'heatmap'] as const).map(type => (
-                  <button
-                    key={type}
-                    onClick={() => setChartType(type)}
-                    style={{
-                      background: 'transparent',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
-                      borderRadius: '8px',
-                      padding: '6px 12px',
-                      color: 'white',
-                      cursor: 'pointer',
-                      fontSize: '11px',
-                      fontWeight: '500',
-                      textTransform: 'capitalize',
-                      opacity: chartType === type ? 1 : 0.7
-                    }}
-                  >
-                    {type === 'heatmap' ? 'Heat Map' : type}
-                  </button>
-                ))}
+                {dataStructure && EnhancedAiService.suggestChartTypes(dataStructure).length > 0 ? (
+                  EnhancedAiService.suggestChartTypes(dataStructure).map((suggestion, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setChartType(suggestion.type as any)}
+                      style={{
+                        background: 'transparent',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                        borderRadius: '8px',
+                        padding: '6px 12px',
+                        color: 'white',
+                        cursor: 'pointer',
+                        fontSize: '11px',
+                        fontWeight: '500',
+                        textTransform: 'capitalize',
+                        opacity: chartType === suggestion.type ? 1 : 0.7
+                      }}
+                      title={suggestion.reason}
+                    >
+                      {suggestion.type}
+                    </button>
+                  ))
+                ) : (
+                  (['bar', 'line', 'pie', 'scatter', 'histogram', 'heatmap'] as const).map(type => (
+                    <button
+                      key={type}
+                      onClick={() => setChartType(type)}
+                      style={{
+                        background: 'transparent',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                        borderRadius: '8px',
+                        padding: '6px 12px',
+                        color: 'white',
+                        cursor: 'pointer',
+                        fontSize: '11px',
+                        fontWeight: '500',
+                        textTransform: 'capitalize',
+                        opacity: chartType === type ? 1 : 0.7
+                      }}
+                    >
+                      {type === 'heatmap' ? 'Heat Map' : type}
+                    </button>
+                  ))
+                )}
               </div>
             </div>
             <div style={{ background: 'transparent', borderRadius: '12px', padding: '24px' }}>

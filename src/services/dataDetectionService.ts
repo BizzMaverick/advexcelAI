@@ -23,7 +23,7 @@ export interface DataStructure {
     duplicateRows: number;
   };
   suggestedOperations: string[];
-  detectedFormat: 'financial' | 'survey' | 'inventory' | 'analytics' | 'general';
+  detectedFormat: 'restaurant' | 'healthcare' | 'financial' | 'sports' | 'education' | 'hr' | 'ecommerce' | 'realestate' | 'manufacturing' | 'government' | 'media' | 'logistics' | 'survey' | 'analytics' | 'banking' | 'general';
 }
 
 export class DataDetectionService {
@@ -226,38 +226,115 @@ export class DataDetectionService {
   }
 
   /**
-   * Detect the format/domain of the data
+   * Detect the format/domain of the data with enhanced industry recognition
    */
   private static detectDataFormat(columns: DataColumn[], data: (string | number | boolean | null | undefined)[][]): DataStructure['detectedFormat'] {
     const columnNames = columns.map(c => c.name.toLowerCase());
     const hasNumbers = columns.some(c => c.type === 'number');
     
-    // Financial data indicators
+    // Restaurant/Hospitality
     if (columnNames.some(name => 
-      ['price', 'cost', 'amount', 'revenue', 'profit', 'budget', 'salary'].some(keyword => name.includes(keyword))
+      ['menu', 'order', 'table', 'server', 'restaurant', 'food', 'beverage', 'covers', 'gst', 'invoice'].some(keyword => name.includes(keyword))
+    )) {
+      return 'restaurant';
+    }
+    
+    // Healthcare/Medical
+    if (columnNames.some(name => 
+      ['patient', 'doctor', 'diagnosis', 'treatment', 'medical', 'hospital', 'clinic', 'prescription', 'symptoms'].some(keyword => name.includes(keyword))
+    )) {
+      return 'healthcare';
+    }
+    
+    // Financial/Accounting
+    if (columnNames.some(name => 
+      ['amount', 'balance', 'transfer', 'payment', 'account', 'debit', 'credit', 'transaction', 'receivable'].some(keyword => name.includes(keyword))
     )) {
       return 'financial';
     }
     
-    // Survey data indicators
+    // Sports/Athletics
     if (columnNames.some(name => 
-      ['rating', 'score', 'satisfaction', 'response', 'survey'].some(keyword => name.includes(keyword))
+      ['score', 'points', 'goals', 'match', 'player', 'team', 'game', 'tournament', 'league', 'stats'].some(keyword => name.includes(keyword))
+    )) {
+      return 'sports';
+    }
+    
+    // Education/Academic
+    if (columnNames.some(name => 
+      ['student', 'grade', 'marks', 'exam', 'subject', 'class', 'school', 'college', 'course', 'semester'].some(keyword => name.includes(keyword))
+    )) {
+      return 'education';
+    }
+    
+    // HR/Employee Management
+    if (columnNames.some(name => 
+      ['employee', 'salary', 'department', 'designation', 'attendance', 'leave', 'performance', 'appraisal'].some(keyword => name.includes(keyword))
+    )) {
+      return 'hr';
+    }
+    
+    // E-commerce/Retail
+    if (columnNames.some(name => 
+      ['product', 'sku', 'inventory', 'stock', 'price', 'discount', 'category', 'brand', 'sales'].some(keyword => name.includes(keyword))
+    )) {
+      return 'ecommerce';
+    }
+    
+    // Real Estate
+    if (columnNames.some(name => 
+      ['property', 'rent', 'lease', 'tenant', 'landlord', 'area', 'location', 'broker', 'commission'].some(keyword => name.includes(keyword))
+    )) {
+      return 'realestate';
+    }
+    
+    // Manufacturing
+    if (columnNames.some(name => 
+      ['production', 'manufacturing', 'quality', 'defect', 'batch', 'machine', 'operator', 'shift'].some(keyword => name.includes(keyword))
+    )) {
+      return 'manufacturing';
+    }
+    
+    // Government/Public Sector
+    if (columnNames.some(name => 
+      ['citizen', 'government', 'public', 'policy', 'budget', 'tax', 'compliance', 'regulation'].some(keyword => name.includes(keyword))
+    )) {
+      return 'government';
+    }
+    
+    // Media/News
+    if (columnNames.some(name => 
+      ['article', 'news', 'media', 'journalist', 'publication', 'views', 'engagement', 'social'].some(keyword => name.includes(keyword))
+    )) {
+      return 'media';
+    }
+    
+    // Transportation/Logistics
+    if (columnNames.some(name => 
+      ['vehicle', 'driver', 'route', 'delivery', 'shipment', 'logistics', 'transport', 'fuel'].some(keyword => name.includes(keyword))
+    )) {
+      return 'logistics';
+    }
+    
+    // Survey/Research
+    if (columnNames.some(name => 
+      ['survey', 'response', 'rating', 'feedback', 'satisfaction', 'research', 'questionnaire'].some(keyword => name.includes(keyword))
     )) {
       return 'survey';
     }
     
-    // Inventory data indicators
-    if (columnNames.some(name => 
-      ['quantity', 'stock', 'inventory', 'sku', 'product'].some(keyword => name.includes(keyword))
-    )) {
-      return 'inventory';
-    }
-    
-    // Analytics data indicators
+    // Digital Marketing/Analytics
     if (hasNumbers && columnNames.some(name => 
-      ['views', 'clicks', 'conversion', 'traffic', 'users', 'sessions'].some(keyword => name.includes(keyword))
+      ['views', 'clicks', 'conversion', 'traffic', 'users', 'sessions', 'ctr', 'impressions'].some(keyword => name.includes(keyword))
     )) {
       return 'analytics';
+    }
+    
+    // Banking/Finance
+    if (columnNames.some(name => 
+      ['loan', 'interest', 'bank', 'credit', 'deposit', 'withdrawal', 'branch', 'customer'].some(keyword => name.includes(keyword))
+    )) {
+      return 'banking';
     }
     
     return 'general';
@@ -291,30 +368,60 @@ export class DataDetectionService {
       suggestions.push('Add filters to text columns for easy searching');
     }
     
-    // Format-specific suggestions
+    // Industry-specific suggestions
     switch (format) {
+      case 'restaurant':
+        suggestions.push('Analyze sales by menu items and time periods');
+        suggestions.push('Calculate server performance and table turnover');
+        suggestions.push('Generate GST and tax compliance reports');
+        break;
+        
+      case 'healthcare':
+        suggestions.push('Track patient outcomes and treatment effectiveness');
+        suggestions.push('Analyze appointment patterns and resource utilization');
+        suggestions.push('Generate medical compliance and billing reports');
+        break;
+        
       case 'financial':
-        suggestions.push('Calculate totals and percentages');
-        suggestions.push('Create budget vs actual analysis');
-        suggestions.push('Generate financial trend charts');
+        suggestions.push('Calculate cash flow and balance reconciliation');
+        suggestions.push('Analyze payment patterns and receivables');
+        suggestions.push('Generate financial health and risk assessments');
+        break;
+        
+      case 'sports':
+        suggestions.push('Calculate player statistics and team performance');
+        suggestions.push('Analyze game patterns and winning strategies');
+        suggestions.push('Generate league standings and tournament brackets');
+        break;
+        
+      case 'education':
+        suggestions.push('Analyze student performance and grade distributions');
+        suggestions.push('Track attendance patterns and academic progress');
+        suggestions.push('Generate report cards and academic analytics');
+        break;
+        
+      case 'hr':
+        suggestions.push('Analyze employee performance and satisfaction');
+        suggestions.push('Track attendance, leave patterns, and productivity');
+        suggestions.push('Generate payroll and benefits analysis');
+        break;
+        
+      case 'ecommerce':
+        suggestions.push('Analyze product performance and inventory turnover');
+        suggestions.push('Track customer behavior and purchase patterns');
+        suggestions.push('Generate sales forecasts and pricing optimization');
         break;
         
       case 'survey':
-        suggestions.push('Calculate response distributions');
-        suggestions.push('Create satisfaction score analysis');
-        suggestions.push('Generate response rate statistics');
-        break;
-        
-      case 'inventory':
-        suggestions.push('Calculate low stock alerts');
-        suggestions.push('Generate inventory turnover analysis');
-        suggestions.push('Create reorder point calculations');
+        suggestions.push('Calculate response distributions and satisfaction scores');
+        suggestions.push('Analyze feedback patterns and sentiment trends');
+        suggestions.push('Generate response rate and demographic analysis');
         break;
         
       case 'analytics':
-        suggestions.push('Calculate conversion rates');
-        suggestions.push('Generate traffic trend analysis');
-        suggestions.push('Create performance dashboards');
+        suggestions.push('Calculate conversion rates and user engagement');
+        suggestions.push('Analyze traffic patterns and performance metrics');
+        suggestions.push('Generate ROI and campaign effectiveness reports');
         break;
         
       default:
