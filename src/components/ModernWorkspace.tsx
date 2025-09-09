@@ -51,6 +51,12 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
   const handleFileUpload = async (file: File) => {
     setSelectedFile(file);
     
+    // Clear previous analytics data
+    setAnalyticsData(null);
+    setAiResponse('');
+    setPivotTables([]);
+    setSelectedPivot(null);
+    
     const reader = new FileReader();
     reader.onload = async (evt) => {
       try {
