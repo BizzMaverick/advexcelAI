@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import React from 'react';
 import * as XLSX from 'xlsx';
-
+import emailjs from '@emailjs/browser';
 import logo from '../assets/logo.png';
 import bedrockService from '../services/bedrockService';
 import PaymentService from '../services/paymentService';
 import ErrorBoundary from './ErrorBoundary';
 import '../animations.css';
-import FeedbackWidget from './FeedbackWidget';
 
 import {
   Chart as ChartJS,
@@ -222,7 +221,8 @@ export default function MinimalApp({ user, onLogout, trialStatus, onTrialRefresh
   const [formatPainterActive, setFormatPainterActive] = useState(false);
   const [undoStack, setUndoStack] = useState<{ [key: string]: any }[]>([]);
   const [redoStack, setRedoStack] = useState<{ [key: string]: any }[]>([]);
-
+  const [showFeedbackBox, setShowFeedbackBox] = useState(false);
+  const [feedbackText, setFeedbackText] = useState('');
   const [showLegalModal, setShowLegalModal] = useState(false);
   const [legalContent, setLegalContent] = useState({ title: '', content: '' });
   const [showChart, setShowChart] = useState(false);
@@ -2661,7 +2661,126 @@ We're committed to excellent support and continuous improvement based on your fe
           </div>
         )}
         
-        <FeedbackWidget />
+        {/* Floating Feedback Button */}
+        <div style={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 1000 }}>
+          <div 
+            onClick={() => setShowFeedbackBox(!showFeedbackBox)}
+            style={{
+              width: '80px',
+              height: '80px',
+              background: 'transparent',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: 'none',
+              transition: 'all 0.3s ease',
+              backgroundImage: 'url(/feedback.png)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat'
+            }}
+            onMouseEnter={(e) => {
+              const target = e.target as HTMLElement;
+              target.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              const target = e.target as HTMLElement;
+              target.style.transform = 'translateY(0)';
+            }}
+            title="Give Feedback"
+          >
+          </div>
+          
+          {showFeedbackBox && (
+            <div style={{
+              position: 'absolute',
+              bottom: '70px',
+              right: '0',
+              width: '300px',
+              background: 'white',
+              borderRadius: '8px',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+              padding: '20px',
+              border: '1px solid rgba(255, 255, 255, 0.2)'
+            }}>
+              <h4 style={{ margin: '0 0 12px 0', color: 'white', fontSize: '16px' }}>Send Feedback</h4>
+              <textarea
+                value={feedbackText}
+                onChange={(e) => setFeedbackText(e.target.value)}
+                placeholder="Share your thoughts about AdvExcel..."
+                style={{
+                  width: '100%',
+                  height: '80px',
+                  border: '1px solid #d5d9d9',
+                  borderRadius: '6px',
+                  padding: '8px',
+                  fontSize: '14px',
+                  fontFamily: 'system-ui, -apple-system, sans-serif',
+                  resize: 'none',
+                  outline: 'none',
+                  boxSizing: 'border-box'
+                }}
+              />
+              <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                <button
+                  onClick={async () => {
+                    if (feedbackText.trim()) {
+                      try {
+                        await emailjs.send(
+                          'service_gyuegyb',
+                          'template_16urb42',
+                          {
+                            user_email: user.email,
+                            user_name: user.name,
+                            message: feedbackText,
+                            to_email: 'contact@advexcel.online'
+                          },
+                          '3xCIlXaFmm79QkBaB'
+                        );
+                        alert('Thank you for your feedback! We have received your message and will respond soon.');
+                        setFeedbackText('');
+                        setShowFeedbackBox(false);
+                      } catch (error) {
+                        console.error('Failed to send feedback:', error);
+                        alert('Sorry, there was an error sending your feedback. Please try again or email us directly at contact@advexcel.online');
+                      }
+                    }
+                  }}
+                  style={{
+                    background: 'white',
+                    color: 'white',
+                    border: 'none',
+                    padding: '8px 16px',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '500'
+                  }}
+                >
+                  Send
+                </button>
+                <button
+                  onClick={() => {
+                    setShowFeedbackBox(false);
+                    setFeedbackText('');
+                  }}
+                  style={{
+                    background: '#f5f5f5',
+                    color: 'white',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    padding: '8px 16px',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '14px'
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
         
 
       </div>
