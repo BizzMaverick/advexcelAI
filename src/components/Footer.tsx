@@ -43,7 +43,7 @@ const Footer: React.FC = () => {
             <div>
               <h4 style={{ color: '#ffffff', marginBottom: '15px', fontSize: '1rem' }}>Quick Links</h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <button onClick={() => setShowPolicy('about')} style={{ background: 'none', border: 'none', color: '#cbd5e1', cursor: 'pointer', textAlign: 'left', padding: 0, fontSize: '0.85rem' }}>About Us</button>
+                <a href="#" onClick={(e) => { e.preventDefault(); setShowPolicy('about'); }} style={{ color: '#cbd5e1', textDecoration: 'none', fontSize: '0.85rem' }}>About Us</a>
                 <a href="#features" style={{ color: '#cbd5e1', textDecoration: 'none', fontSize: '0.85rem' }}>Features</a>
                 <a href="#pricing" style={{ color: '#cbd5e1', textDecoration: 'none', fontSize: '0.85rem' }}>Pricing</a>
                 <a href="mailto:contact@advexcel.online" style={{ color: '#cbd5e1', textDecoration: 'none', fontSize: '0.85rem' }}>Contact Support</a>
