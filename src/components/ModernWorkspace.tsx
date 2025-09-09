@@ -75,7 +75,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
           console.log('Auto-generated pivot tables on upload:', pivots.length);
           
           // Generate automatic basic analytics immediately
-          generateBasicAnalytics(jsonData);
+          setTimeout(() => generateBasicAnalytics(jsonData), 500);
           
           // Automatically trigger comprehensive AI analysis
           setTimeout(() => performAutoAnalysis(jsonData), 1000);
@@ -187,99 +187,117 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
   const generateBasicAnalytics = (data: any[][]) => {
     if (!data || data.length < 2) return;
     
-    const analytics = performComprehensiveAnalytics(data);
     const headers = data[0];
     const rows = data.slice(1);
     
-    let basicAnalysis = `📊 **AUTOMATIC DATA ANALYTICS**\n\n`;
-    
-    // Dataset Overview
-    basicAnalysis += `**📋 DATASET OVERVIEW:**\n`;
-    basicAnalysis += `• Total Records: ${rows.length.toLocaleString()}\n`;
-    basicAnalysis += `• Total Columns: ${headers.length}\n`;
-    basicAnalysis += `• Data Quality: ${analytics.duplicates === 0 ? 'Clean (No duplicates)' : `${analytics.duplicates} duplicates found`}\n`;
-    basicAnalysis += `• Missing Values: ${analytics.missingValues.toLocaleString()}\n\n`;
-    
-    // Column Analysis
-    basicAnalysis += `**📊 COLUMN ANALYSIS:**\n`;
-    const numericColumns = [];
-    const textColumns = [];
-    
-    headers.forEach((header, index) => {
+    // Analyze actual data content
+    const columnAnalysis = headers.map((header, index) => {
       const values = rows.map(row => row[index]).filter(val => val !== null && val !== undefined && val !== '');
-      const numericValues = values.filter(val => !isNaN(parseFloat(String(val))));
+      const numericValues = values.filter(val => !isNaN(parseFloat(String(val)))).map(val => parseFloat(String(val)));
+      const uniqueValues = new Set(values.map(val => String(val).toLowerCase()));
       
-      if (numericValues.length > values.length * 0.7) {
-        numericColumns.push({ name: header, index, count: numericValues.length });
-      } else {
-        textColumns.push({ name: header, index, unique: new Set(values).size });
-      }
+      return {
+        name: String(header),
+        totalValues: values.length,
+        numericCount: numericValues.length,
+        uniqueCount: uniqueValues.size,
+        isNumeric: numericValues.length > values.length * 0.7,
+        sum: numericValues.length > 0 ? numericValues.reduce((a, b) => a + b, 0) : 0,
+        avg: numericValues.length > 0 ? numericValues.reduce((a, b) => a + b, 0) / numericValues.length : 0,
+        min: numericValues.length > 0 ? Math.min(...numericValues) : 0,
+        max: numericValues.length > 0 ? Math.max(...numericValues) : 0,
+        sampleValues: Array.from(uniqueValues).slice(0, 3)
+      };
     });
     
-    basicAnalysis += `• Numeric Columns: ${numericColumns.length} (${((numericColumns.length / headers.length) * 100).toFixed(1)}%)\n`;
-    basicAnalysis += `• Text Columns: ${textColumns.length} (${((textColumns.length / headers.length) * 100).toFixed(1)}%)\n\n`;
+    let analysis = `📊 **DATA ANALYSIS COMPLETE**\n\n`;
     
-    // Statistical Summary
-    if (analytics.top5.length > 0) {
-      basicAnalysis += `**📈 STATISTICAL SUMMARY:**\n`;
-      basicAnalysis += `• Highest Value: ${analytics.max.toFixed(2)}\n`;
-      basicAnalysis += `• Lowest Value: ${analytics.min.toFixed(2)}\n`;
-      basicAnalysis += `• Average Value: ${analytics.mean.toFixed(2)}\n`;
-      basicAnalysis += `• Data Range: ${analytics.range.toFixed(2)}\n`;
-      basicAnalysis += `• Standard Deviation: ${analytics.standardDeviation.toFixed(2)}\n\n`;
-    }
+    // Dataset summary with actual insights
+    analysis += `**📋 DATASET SUMMARY:**\n`;
+    analysis += `• ${rows.length.toLocaleString()} records across ${headers.length} columns\n`;
     
-    // Top Performers
-    if (analytics.top5.length > 0) {
-      basicAnalysis += `**🏆 TOP 5 PERFORMERS:**\n`;
-      analytics.top5.forEach((item, index) => {
-        basicAnalysis += `${index + 1}. ${item.country || `Record ${item.index}`}: ${item.value.toFixed(2)}\n`;
-      });
-      basicAnalysis += `\n`;
-    }
+    const numericCols = columnAnalysis.filter(col => col.isNumeric);
+    const textCols = columnAnalysis.filter(col => !col.isNumeric);
     
-    // Data Quality Assessment
-    const completeness = ((rows.length * headers.length - analytics.missingValues) / (rows.length * headers.length) * 100).toFixed(1);
-    basicAnalysis += `**🔍 DATA QUALITY ASSESSMENT:**\n`;
-    basicAnalysis += `• Data Completeness: ${completeness}%\n`;
-    basicAnalysis += `• Duplicate Records: ${analytics.duplicates}\n`;
-    basicAnalysis += `• Data Consistency: ${analytics.standardDeviation < analytics.mean ? 'Good' : 'Variable'}\n\n`;
+    if (numericCols.length > 0) {
+      analysis += `• ${numericCols.length} numeric columns: ${numericCols.map(col => col.name).join(', ')}\n`;
+    }
+    if (textCols.length > 0) {
+      analysis += `• ${textCols.length} text columns: ${textCols.map(col => col.name).join(', ')}\n`;
+    }
+    analysis += `\n`;
     
-    // Recommendations
-    basicAnalysis += `**💡 RECOMMENDATIONS:**\n`;
-    if (analytics.duplicates > 0) {
-      basicAnalysis += `• Remove ${analytics.duplicates} duplicate records\n`;
-    }
-    if (analytics.missingValues > 0) {
-      basicAnalysis += `• Address ${analytics.missingValues} missing values\n`;
-    }
-    if (numericColumns.length >= 2) {
-      basicAnalysis += `• Explore correlations between numeric columns\n`;
-    }
-    if (textColumns.length > 0) {
-      basicAnalysis += `• Consider categorical analysis for text columns\n`;
-    }
-    basicAnalysis += `• Use Quick Actions for detailed analysis\n`;
+    // Key findings from actual data
+    analysis += `**🔍 KEY FINDINGS:**\n`;
     
-    // Set the analytics data for display
-    if (analytics.top5.length > 0 && analytics.bottom5.length > 0) {
-      const topAvg = analytics.top5.reduce((sum, item) => sum + item.value, 0) / analytics.top5.length;
-      const bottomAvg = analytics.bottom5.reduce((sum, item) => sum + item.value, 0) / analytics.bottom5.length;
-      const ratio = (topAvg / bottomAvg).toFixed(2);
-      
-      setAnalyticsData({
-        top5: analytics.top5,
-        bottom5: analytics.bottom5,
-        comparison: {
-          topAvg: topAvg.toFixed(2),
-          bottomAvg: bottomAvg.toFixed(2),
-          ratio,
-          gap: topAvg > bottomAvg * 2 ? 'High inequality' : 'Moderate gap'
-        }
-      });
+    // Find the column with highest values
+    const highestValueCol = numericCols.reduce((prev, current) => 
+      (current.max > prev.max) ? current : prev, numericCols[0] || { max: 0, name: 'None' }
+    );
+    
+    if (highestValueCol && highestValueCol.max > 0) {
+      analysis += `• Highest value found: ${highestValueCol.max.toLocaleString()} in ${highestValueCol.name}\n`;
+      analysis += `• Average ${highestValueCol.name}: ${highestValueCol.avg.toFixed(2)}\n`;
     }
     
-    setAiResponse(basicAnalysis);
+    // Find most diverse column
+    const mostDiverseCol = columnAnalysis.reduce((prev, current) => 
+      (current.uniqueCount > prev.uniqueCount) ? current : prev
+    );
+    
+    if (mostDiverseCol.uniqueCount > 1) {
+      analysis += `• Most diverse data: ${mostDiverseCol.name} (${mostDiverseCol.uniqueCount} unique values)\n`;
+      if (mostDiverseCol.sampleValues.length > 0) {
+        analysis += `  Examples: ${mostDiverseCol.sampleValues.join(', ')}\n`;
+      }
+    }
+    
+    // Calculate totals for numeric columns
+    const totalSum = numericCols.reduce((sum, col) => sum + col.sum, 0);
+    if (totalSum > 0) {
+      analysis += `• Total sum across numeric columns: ${totalSum.toLocaleString()}\n`;
+    }
+    
+    analysis += `\n`;
+    
+    // Data quality insights
+    const missingCount = rows.reduce((count, row) => 
+      count + row.filter(cell => cell === null || cell === undefined || cell === '').length, 0
+    );
+    const totalCells = rows.length * headers.length;
+    const completeness = ((totalCells - missingCount) / totalCells * 100).toFixed(1);
+    
+    analysis += `**✅ DATA QUALITY:**\n`;
+    analysis += `• Data completeness: ${completeness}%\n`;
+    if (missingCount > 0) {
+      analysis += `• ${missingCount} empty cells found\n`;
+    }
+    
+    // Check for duplicates in first column (common identifier)
+    const firstColValues = rows.map(row => String(row[0] || '').toLowerCase());
+    const duplicates = firstColValues.length - new Set(firstColValues).size;
+    if (duplicates > 0) {
+      analysis += `• ${duplicates} potential duplicate records\n`;
+    }
+    
+    analysis += `\n`;
+    
+    // Actionable recommendations based on actual data
+    analysis += `**💡 NEXT STEPS:**\n`;
+    if (numericCols.length >= 2) {
+      analysis += `• Create charts to visualize ${numericCols[0].name} vs ${numericCols[1].name}\n`;
+    }
+    if (textCols.length > 0 && numericCols.length > 0) {
+      analysis += `• Analyze ${textCols[0].name} breakdown by ${numericCols[0].name}\n`;
+    }
+    if (duplicates > 0) {
+      analysis += `• Remove duplicate records for cleaner analysis\n`;
+    }
+    if (rows.length > 100) {
+      analysis += `• Use filters to focus on specific data segments\n`;
+    }
+    
+    setAiResponse(analysis);
   };
 
   const performAutoAnalysis = async (data: any[][]) => {
