@@ -63,36 +63,87 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
         const data = evt.target?.result;
         if (!data) throw new Error('No data read from file');
         
-        const workbook = XLSX.read(data, { type: 'binary' });
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
-        
-        setSpreadsheetData(jsonData);
-        
-        // Auto-analyze data structure
-        try {
-          const structure = DataDetectionService.analyzeData(jsonData);
-          setDataStructure(structure);
+        if (file.name.endsWith('.csv')) {
+          const text = data as string;
+          let parsedData = text.split('\n')
+            .map(row => row.split(',').map(cell => cell.trim()))
+            .filter(row => row.some(cell => cell.length > 0));
           
-          // Generate 5 sample pivot tables immediately
-          const pivots = generateAdvancedPivotTables(jsonData);
-          setPivotTables(pivots);
-          console.log('Auto-generated pivot tables on upload:', pivots.length);
+          if (parsedData.length > 1000) {
+            parsedData.splice(1000);
+          }
           
-          // Generate automatic basic analytics immediately
-          setTimeout(() => generateBasicAnalytics(jsonData), 500);
+          setSpreadsheetData(parsedData);
+        } else {
+          const workbook = XLSX.read(data, { type: 'binary' });
+          const sheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[sheetName];
+          let parsedData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
           
-          // Automatically trigger comprehensive AI analysis
-          setTimeout(() => performAutoAnalysis(jsonData), 1000);
-        } catch (err) {
-          console.error('Data analysis failed:', err);
+          // Auto-detect header row for sheets that don't start with headers
+          if (parsedData.length > 1) {
+            let headerRowIndex = 0;
+            let maxTextColumns = 0;
+            
+            // Check first 10 rows to find the row with most text (likely headers)
+            for (let i = 0; i < Math.min(10, parsedData.length); i++) {
+              const row = parsedData[i];
+              const textColumns = row.filter(cell => {
+                const str = String(cell || '').trim();
+                return str.length > 0 && isNaN(Number(str));
+              }).length;
+              
+              if (textColumns > maxTextColumns) {
+                maxTextColumns = textColumns;
+                headerRowIndex = i;
+              }
+            }
+            
+            // If headers found in a different row, reorganize data
+            if (headerRowIndex > 0) {
+              const headers = parsedData[headerRowIndex];
+              const dataRows = parsedData.slice(headerRowIndex + 1);
+              parsedData = [headers, ...dataRows];
+            }
+          }
+          
+          if (parsedData.length > 1000) {
+            parsedData = parsedData.slice(0, 1000);
+          }
+          
+          setSpreadsheetData(parsedData);
         }
+        
+        // Auto-analyze data structure after state is set
+        setTimeout(() => {
+          try {
+            const structure = DataDetectionService.analyzeData(parsedData);
+            setDataStructure(structure);
+            
+            // Generate 5 sample pivot tables immediately
+            const pivots = generateAdvancedPivotTables(parsedData);
+            setPivotTables(pivots);
+            console.log('Auto-generated pivot tables on upload:', pivots.length);
+            
+            // Generate automatic basic analytics immediately
+            generateBasicAnalytics(parsedData);
+            
+            // Automatically trigger comprehensive AI analysis
+            setTimeout(() => performAutoAnalysis(parsedData), 500);
+          } catch (err) {
+            console.error('Data analysis failed:', err);
+          }
+        }, 100);
       } catch (err) {
         console.error('Failed to process file:', err);
       }
     };
-    reader.readAsBinaryString(file);
+    
+    if (file.name.endsWith('.csv')) {
+      reader.readAsText(file);
+    } else {
+      reader.readAsBinaryString(file);
+    }
   };
 
   const handleDrag = (e: React.DragEvent) => {
