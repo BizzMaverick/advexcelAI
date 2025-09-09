@@ -369,12 +369,69 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     const fileNameLower = fileName.toLowerCase();
     const headersLower = headers.map(h => String(h).toLowerCase());
     
+    // Academic/Marks/Grades data
+    if (fileNameLower.includes('marks') || fileNameLower.includes('grades') || fileNameLower.includes('scores') || fileNameLower.includes('exam') || fileNameLower.includes('student') ||
+        headersLower.some(h => h.includes('marks') || h.includes('grade') || h.includes('score') || h.includes('student') || h.includes('subject') || h.includes('exam'))) {
+      return {
+        type: 'Academic',
+        title: 'Academic Performance Analysis',
+        recordType: 'students',
+        categoryType: 'subjects',
+        performanceMetric: 'Academic performance',
+        keyColumns: headers.filter((h, i) => headersLower[i].includes('student') || headersLower[i].includes('name') || headersLower[i].includes('subject')),
+        recommendations: [
+          'Identify top and bottom performers',
+          'Analyze subject-wise performance trends',
+          'Find students needing additional support',
+          'Compare class averages across subjects'
+        ]
+      };
+    }
+    
+    // Price/Pricing data
+    if (fileNameLower.includes('price') || fileNameLower.includes('pricing') || fileNameLower.includes('cost') || fileNameLower.includes('rate') ||
+        headersLower.some(h => h.includes('price') || h.includes('cost') || h.includes('rate') || h.includes('amount') || h.includes('value'))) {
+      return {
+        type: 'Pricing',
+        title: 'Price Analysis',
+        recordType: 'items',
+        categoryType: 'products/services',
+        performanceMetric: 'Price metrics',
+        keyColumns: headers.filter((h, i) => headersLower[i].includes('product') || headersLower[i].includes('item') || headersLower[i].includes('service')),
+        recommendations: [
+          'Compare price ranges across categories',
+          'Identify pricing outliers and anomalies',
+          'Analyze price distribution patterns',
+          'Find competitive pricing opportunities'
+        ]
+      };
+    }
+    
+    // Salary/Payroll data
+    if (fileNameLower.includes('salary') || fileNameLower.includes('payroll') || fileNameLower.includes('wage') || fileNameLower.includes('compensation') ||
+        headersLower.some(h => h.includes('salary') || h.includes('wage') || h.includes('pay') || h.includes('compensation') || h.includes('bonus'))) {
+      return {
+        type: 'Payroll',
+        title: 'Salary & Compensation Analysis',
+        recordType: 'employees',
+        categoryType: 'departments/positions',
+        performanceMetric: 'Compensation metrics',
+        keyColumns: headers.filter((h, i) => headersLower[i].includes('employee') || headersLower[i].includes('name') || headersLower[i].includes('department') || headersLower[i].includes('position')),
+        recommendations: [
+          'Analyze salary distribution by department',
+          'Identify compensation gaps and inequities',
+          'Compare pay scales across positions',
+          'Plan budget for salary adjustments'
+        ]
+      };
+    }
+    
     // Sales/Business data
-    if (fileNameLower.includes('sales') || fileNameLower.includes('revenue') || 
-        headersLower.some(h => h.includes('sales') || h.includes('revenue') || h.includes('amount'))) {
+    if (fileNameLower.includes('sales') || fileNameLower.includes('revenue') || fileNameLower.includes('business') ||
+        headersLower.some(h => h.includes('sales') || h.includes('revenue') || h.includes('profit'))) {
       return {
         type: 'Sales',
-        title: 'Sales Performance',
+        title: 'Sales Performance Analysis',
         recordType: 'transactions',
         categoryType: 'products/regions',
         performanceMetric: 'Sales performance',
@@ -390,7 +447,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     
     // Employee/HR data
     if (fileNameLower.includes('employee') || fileNameLower.includes('hr') || fileNameLower.includes('staff') ||
-        headersLower.some(h => h.includes('employee') || h.includes('salary') || h.includes('department'))) {
+        headersLower.some(h => h.includes('employee') || h.includes('department') || h.includes('position'))) {
       return {
         type: 'HR',
         title: 'Employee Analytics',
@@ -399,7 +456,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
         performanceMetric: 'Employee metrics',
         keyColumns: headers.filter((h, i) => headersLower[i].includes('name') || headersLower[i].includes('department') || headersLower[i].includes('position')),
         recommendations: [
-          'Analyze salary distribution across departments',
+          'Analyze employee distribution across departments',
           'Identify high-performing employees',
           'Review departmental headcount',
           'Plan workforce optimization'
@@ -409,7 +466,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     
     // Financial data
     if (fileNameLower.includes('financial') || fileNameLower.includes('budget') || fileNameLower.includes('expense') ||
-        headersLower.some(h => h.includes('cost') || h.includes('budget') || h.includes('expense'))) {
+        headersLower.some(h => h.includes('budget') || h.includes('expense') || h.includes('income'))) {
       return {
         type: 'Financial',
         title: 'Financial Analysis',
@@ -428,7 +485,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     
     // Inventory/Product data
     if (fileNameLower.includes('inventory') || fileNameLower.includes('product') || fileNameLower.includes('stock') ||
-        headersLower.some(h => h.includes('product') || h.includes('inventory') || h.includes('stock'))) {
+        headersLower.some(h => h.includes('product') || h.includes('inventory') || h.includes('stock') || h.includes('quantity'))) {
       return {
         type: 'Inventory',
         title: 'Inventory Management',
@@ -464,19 +521,51 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
       };
     }
     
-    // Default generic analysis
+    // Survey/Feedback data
+    if (fileNameLower.includes('survey') || fileNameLower.includes('feedback') || fileNameLower.includes('rating') ||
+        headersLower.some(h => h.includes('rating') || h.includes('feedback') || h.includes('satisfaction') || h.includes('response'))) {
+      return {
+        type: 'Survey',
+        title: 'Survey & Feedback Analysis',
+        recordType: 'responses',
+        categoryType: 'questions/categories',
+        performanceMetric: 'Satisfaction metrics',
+        keyColumns: headers.filter((h, i) => headersLower[i].includes('question') || headersLower[i].includes('category') || headersLower[i].includes('respondent')),
+        recommendations: [
+          'Analyze satisfaction trends',
+          'Identify areas for improvement',
+          'Compare ratings across categories',
+          'Track feedback patterns over time'
+        ]
+      };
+    }
+    
+    // Generic data analysis based on column types
+    const numericCols = headers.filter((h, i) => {
+      const values = rows.map(row => row[i]).filter(val => val !== null && val !== undefined && val !== '');
+      const numericValues = values.filter(val => !isNaN(parseFloat(String(val))));
+      return numericValues.length > values.length * 0.7;
+    });
+    
+    const textCols = headers.filter((h, i) => {
+      const values = rows.map(row => row[i]).filter(val => val !== null && val !== undefined && val !== '');
+      const numericValues = values.filter(val => !isNaN(parseFloat(String(val))));
+      return numericValues.length <= values.length * 0.7;
+    });
+    
+    // Default adaptive analysis
     return {
-      type: 'Business',
-      title: 'Data Analysis',
+      type: 'Data',
+      title: 'Universal Data Analysis',
       recordType: 'records',
       categoryType: 'categories',
-      performanceMetric: 'Performance metrics',
-      keyColumns: headers.slice(0, 3),
+      performanceMetric: 'Data metrics',
+      keyColumns: textCols.slice(0, 3),
       recommendations: [
-        'Explore data relationships and patterns',
-        'Identify key performance indicators',
-        'Look for trends and anomalies',
-        'Create targeted action plans'
+        `Analyze ${numericCols.length} numeric columns for trends and patterns`,
+        `Explore relationships between ${textCols.length} categorical variables`,
+        'Identify outliers and data quality issues',
+        'Create visualizations for key insights'
       ]
     };
   };
