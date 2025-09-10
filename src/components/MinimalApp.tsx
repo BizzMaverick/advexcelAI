@@ -2621,7 +2621,7 @@ We're committed to excellent support and continuous improvement based on your fe
               maxWidth: '600px',
               width: '90%',
               maxHeight: '70vh',
-              overflow: 'auto'
+              overflow: 'hidden'
             }}>
               <div style={{ position: 'relative', marginBottom: '16px', textAlign: 'center' }}>
                 <h3 style={{ margin: 0, color: '#232f3e' }}>{legalContent.title}</h3>
@@ -2641,20 +2641,19 @@ We're committed to excellent support and continuous improvement based on your fe
                   ×
                 </button>
               </div>
-              <div style={{ color: 'white', lineHeight: '1.6', margin: 0, whiteSpace: 'pre-line', fontSize: '14px' }}>{legalContent.content}</div>
+              <div style={{ color: 'white', lineHeight: '1.6', margin: 0, whiteSpace: 'pre-line', fontSize: '14px', maxHeight: 'calc(70vh - 120px)', overflowY: 'scroll', scrollbarWidth: 'none', msOverflowStyle: 'none' }} onWheel={(e) => { e.currentTarget.scrollTop += e.deltaY; }}>{legalContent.content}</div>
               <div style={{ marginTop: '20px', textAlign: 'right' }}>
                 <button
                   onClick={() => setShowLegalModal(false)}
                   style={{
-                    background: 'white',
-                    color: 'white',
+                    background: 'none',
                     border: 'none',
-                    padding: '8px 16px',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
+                    fontSize: '20px',
+                    cursor: 'pointer',
+                    color: '#666'
                   }}
                 >
-                  Close
+                  ×
                 </button>
               </div>
             </div>
