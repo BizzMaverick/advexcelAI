@@ -2615,7 +2615,7 @@ We're committed to excellent support and continuous improvement based on your fe
             zIndex: 2000
           }}>
             <div style={{
-              background: 'white',
+              background: 'transparent',
               borderRadius: '8px',
               padding: '24px',
               maxWidth: '600px',
