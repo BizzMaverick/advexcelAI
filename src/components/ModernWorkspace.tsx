@@ -48,6 +48,38 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
   const [feedbackText, setFeedbackText] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const data = new Uint8Array(e.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+        setSpreadsheetData(jsonData as any[][]);
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  };
+
+  const handleAiQuery = async () => {
+    if (!selectedFile || !prompt.trim() || !spreadsheetData.length) return;
+    
+    setAiLoading(true);
+    try {
+      const response = await bedrockService.analyzeData(spreadsheetData, prompt);
+      setAiResponse(response);
+    } catch (error) {
+      console.error('AI analysis failed:', error);
+      setAiResponse('Sorry, I encountered an error analyzing your data. Please try again.');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -188,6 +220,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
               ref={fileInputRef}
               type="file" 
               accept=".xlsx,.xls,.csv" 
+              onChange={handleFileUpload}
               style={{ 
                 width: '100%',
                 padding: '12px', 
@@ -229,6 +262,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
             </div>
             
             <button 
+              onClick={handleAiQuery}
               disabled={aiLoading || !selectedFile || !prompt.trim()}
               style={{ 
                 background: 'transparent',
@@ -285,22 +319,102 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
             flexDirection: 'column',
             overflow: 'hidden'
           }}>
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: '100%',
-              textAlign: 'center'
-            }}>
-              <div style={{ fontSize: '64px', marginBottom: '24px', opacity: 0.3 }}>📈</div>
-              <h3 style={{ margin: '0 0 12px 0', fontSize: '20px', fontWeight: '600' }}>
-                Ready for Analysis
-              </h3>
-              <p style={{ margin: 0, fontSize: '16px', opacity: 0.7, maxWidth: '300px' }}>
-                Upload your Excel or CSV file to get started with AI-powered data insights
-              </p>
-            </div>
+            {spreadsheetData.length > 0 ? (
+              <div style={{ width: '100%', height: '100%', overflow: 'auto' }}>
+                <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>
+                    {selectedFile?.name}
+                  </h3>
+                  <span style={{ fontSize: '14px', opacity: 0.7 }}>
+                    {spreadsheetData.length} rows × {spreadsheetData[0]?.length || 0} columns
+                  </span>
+                </div>
+                
+                <div style={{ 
+                  border: '1px solid rgba(255,255,255,0.2)', 
+                  borderRadius: '8px', 
+                  overflow: 'auto',
+                  maxHeight: '400px'
+                }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ background: 'rgba(255,255,255,0.1)' }}>
+                        {spreadsheetData[0]?.map((header, index) => (
+                          <th key={index} style={{
+                            padding: '12px 8px',
+                            textAlign: 'left',
+                            borderBottom: '1px solid rgba(255,255,255,0.2)',
+                            fontSize: '14px',
+                            fontWeight: '600',
+                            minWidth: '100px'
+                          }}>
+                            {header}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {spreadsheetData.slice(1, 21).map((row, rowIndex) => (
+                        <tr key={rowIndex} style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                          {row.map((cell, cellIndex) => (
+                            <td key={cellIndex} style={{
+                              padding: '8px',
+                              fontSize: '13px',
+                              borderRight: '1px solid rgba(255,255,255,0.1)'
+                            }}>
+                              {cell}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {spreadsheetData.length > 21 && (
+                    <div style={{ 
+                      padding: '12px', 
+                      textAlign: 'center', 
+                      fontSize: '14px', 
+                      opacity: 0.7,
+                      borderTop: '1px solid rgba(255,255,255,0.1)'
+                    }}>
+                      Showing first 20 rows of {spreadsheetData.length - 1} data rows
+                    </div>
+                  )}
+                </div>
+                
+                {aiResponse && (
+                  <div style={{
+                    marginTop: '20px',
+                    padding: '16px',
+                    background: 'rgba(120, 219, 255, 0.1)',
+                    border: '1px solid rgba(120, 219, 255, 0.3)',
+                    borderRadius: '8px'
+                  }}>
+                    <h4 style={{ margin: '0 0 12px 0', fontSize: '16px', fontWeight: '600' }}>AI Analysis:</h4>
+                    <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>
+                      {aiResponse}
+                    </p>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '100%',
+                textAlign: 'center'
+              }}>
+                <div style={{ fontSize: '64px', marginBottom: '24px', opacity: 0.3 }}>📈</div>
+                <h3 style={{ margin: '0 0 12px 0', fontSize: '20px', fontWeight: '600' }}>
+                  Ready for Analysis
+                </h3>
+                <p style={{ margin: 0, fontSize: '16px', opacity: 0.7, maxWidth: '300px' }}>
+                  Upload your Excel or CSV file to get started with AI-powered data insights
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </main>
