@@ -46,6 +46,12 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
   const [legalContent, setLegalContent] = useState({ title: '', content: '' });
   const [showFeedbackBox, setShowFeedbackBox] = useState(false);
   const [feedbackText, setFeedbackText] = useState('');
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
+  const [showAboutModal, setShowAboutModal] = useState(false);
+  const [showHelpModal, setShowHelpModal] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = async (file: File) => {
@@ -4585,6 +4591,39 @@ Technology Stack:
 • Razorpay for secure payment processing
 
 Contact Us:
+Have questions or feedback? We'd love to hear from you! Contact us at contact@advexcel.online`ithout requiring technical expertise.
+
+About AdvExcel AI:
+
+AdvExcel AI is an intelligent data analysis platform that transforms how you work with Excel and CSV files. Powered by Amazon Web Services and advanced AI, it brings enterprise-level analytics to your fingertips.
+
+Our platform uses natural language processing to let you ask questions in plain English, get insights, create charts, and analyze patterns without complex formulas or technical expertise.
+
+Built on AWS infrastructure for reliability, security, and scalability, AdvExcel AI processes your data securely and never permanently stores your sensitive information.
+
+Key Features:
+• AI-powered natural language processing for plain English queries
+• Advanced pivot tables and statistical analysis
+• Beautiful charts and data visualizations
+• Predictive insights and trend analysis
+• Data quality assessment and cleaning suggestions
+• Multi-sheet Excel workbook support
+• Secure cloud processing with AWS infrastructure
+
+Our Mission:
+
+To democratize advanced data analytics by making AI-powered insights accessible to everyone, regardless of technical background.
+
+We believe that powerful data analysis shouldn't require years of training or expensive software. AdvExcel AI empowers businesses and individuals to make data-driven decisions effortlessly.
+
+Technology Stack:
+• Amazon Web Services (AWS) for cloud infrastructure
+• AWS Bedrock for AI and machine learning capabilities
+• React and TypeScript for the user interface
+• AWS Cognito for secure user authentication
+• Razorpay for secure payment processing
+
+Contact Us:
 Have questions or feedback? We'd love to hear from you! Contact us at contact@advexcel.online` 
             });
             setShowLegalModal(true);
@@ -5064,3 +5103,610 @@ We're committed to excellent support and continuous improvement based on your fe
 
 
 
+      {/* Footer */}
+      <footer style={{
+        background: 'rgba(255, 255, 255, 0.02)',
+        borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+        padding: '40px 20px',
+        textAlign: 'center',
+        position: 'relative',
+        zIndex: 100
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '30px', flexWrap: 'wrap', marginBottom: '20px' }}>
+          <button
+            onClick={() => setShowPrivacyModal(true)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'rgba(255, 255, 255, 0.7)',
+              cursor: 'pointer',
+              fontSize: '14px',
+              textDecoration: 'none',
+              transition: 'color 0.3s ease'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#78dbff'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)'}
+          >
+            Privacy Policy
+          </button>
+          <button
+            onClick={() => setShowTermsModal(true)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'rgba(255, 255, 255, 0.7)',
+              cursor: 'pointer',
+              fontSize: '14px',
+              textDecoration: 'none',
+              transition: 'color 0.3s ease'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#78dbff'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)'}
+          >
+            Terms of Service
+          </button>
+          <button
+            onClick={() => setShowContactModal(true)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'rgba(255, 255, 255, 0.7)',
+              cursor: 'pointer',
+              fontSize: '14px',
+              textDecoration: 'none',
+              transition: 'color 0.3s ease'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#78dbff'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)'}
+          >
+            Contact
+          </button>
+          <button
+            onClick={() => setShowAboutModal(true)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'rgba(255, 255, 255, 0.7)',
+              cursor: 'pointer',
+              fontSize: '14px',
+              textDecoration: 'none',
+              transition: 'color 0.3s ease'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#78dbff'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)'}
+          >
+            About
+          </button>
+          <button
+            onClick={() => setShowHelpModal(true)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'rgba(255, 255, 255, 0.7)',
+              cursor: 'pointer',
+              fontSize: '14px',
+              textDecoration: 'none',
+              transition: 'color 0.3s ease'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#78dbff'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)'}
+          >
+            Help
+          </button>
+          <button
+            onClick={() => setShowFeedbackModal(true)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'rgba(255, 255, 255, 0.7)',
+              cursor: 'pointer',
+              fontSize: '14px',
+              textDecoration: 'none',
+              transition: 'color 0.3s ease'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#78dbff'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)'}
+          >
+            Feedback
+          </button>
+        </div>
+        <div style={{ fontSize: '14px', opacity: 0.7, marginBottom: '10px' }}>
+          © 2024 AdvExcel AI. All rights reserved.
+        </div>
+        <div style={{ fontSize: '12px', opacity: 0.5 }}>
+          Powered by AWS • Built with ❤️ by Yadunandan Katragadda
+        </div>
+      </footer>
+
+      {/* Privacy Policy Modal */}
+      {showPrivacyModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'rgba(0, 0, 0, 0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            borderRadius: '20px',
+            padding: '40px',
+            maxWidth: '800px',
+            maxHeight: '80vh',
+            overflow: 'auto',
+            color: 'white',
+            position: 'relative'
+          }}>
+            <button
+              onClick={() => setShowPrivacyModal(false)}
+              style={{
+                position: 'absolute',
+                top: '20px',
+                right: '20px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '50%',
+                width: '40px',
+                height: '40px',
+                color: 'white',
+                cursor: 'pointer',
+                fontSize: '18px'
+              }}
+            >
+              ×
+            </button>
+            <h2 style={{ margin: '0 0 24px 0', fontSize: '24px', fontWeight: '700' }}>Privacy Policy</h2>
+            <div style={{ fontSize: '14px', lineHeight: '1.6' }}>
+              <p><strong>Last updated:</strong> {new Date().toLocaleDateString()}</p>
+              
+              <h3>1. Information We Collect</h3>
+              <p>We collect information you provide directly to us, such as when you create an account, upload files, or contact us for support.</p>
+              
+              <h3>2. How We Use Your Information</h3>
+              <ul>
+                <li>To provide and maintain our service</li>
+                <li>To process and analyze your data as requested</li>
+                <li>To communicate with you about our service</li>
+                <li>To improve our AI algorithms and features</li>
+              </ul>
+              
+              <h3>3. Data Security</h3>
+              <p>We implement appropriate security measures to protect your personal information and uploaded data. All data processing occurs in secure AWS environments.</p>
+              
+              <h3>4. Data Retention</h3>
+              <p>We retain your data only as long as necessary to provide our services. You can delete your data at any time through your account settings.</p>
+              
+              <h3>5. Contact Us</h3>
+              <p>If you have any questions about this Privacy Policy, please contact us at privacy@advexcel.com.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Terms of Service Modal */}
+      {showTermsModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'rgba(0, 0, 0, 0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            borderRadius: '20px',
+            padding: '40px',
+            maxWidth: '800px',
+            maxHeight: '80vh',
+            overflow: 'auto',
+            color: 'white',
+            position: 'relative'
+          }}>
+            <button
+              onClick={() => setShowTermsModal(false)}
+              style={{
+                position: 'absolute',
+                top: '20px',
+                right: '20px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '50%',
+                width: '40px',
+                height: '40px',
+                color: 'white',
+                cursor: 'pointer',
+                fontSize: '18px'
+              }}
+            >
+              ×
+            </button>
+            <h2 style={{ margin: '0 0 24px 0', fontSize: '24px', fontWeight: '700' }}>Terms of Service</h2>
+            <div style={{ fontSize: '14px', lineHeight: '1.6' }}>
+              <p><strong>Last updated:</strong> {new Date().toLocaleDateString()}</p>
+              
+              <h3>1. Acceptance of Terms</h3>
+              <p>By accessing and using AdvExcel AI, you accept and agree to be bound by the terms and provision of this agreement.</p>
+              
+              <h3>2. Description of Service</h3>
+              <p>AdvExcel AI is a cloud-based data analytics platform that uses artificial intelligence to help users analyze and visualize their data.</p>
+              
+              <h3>3. User Accounts</h3>
+              <ul>
+                <li>You must provide accurate and complete information when creating an account</li>
+                <li>You are responsible for maintaining the security of your account</li>
+                <li>You must not share your account credentials with others</li>
+              </ul>
+              
+              <h3>4. Acceptable Use</h3>
+              <ul>
+                <li>Use the service only for lawful purposes</li>
+                <li>Do not upload malicious files or attempt to harm our systems</li>
+                <li>Do not violate any applicable laws or regulations</li>
+                <li>Respect intellectual property rights</li>
+              </ul>
+              
+              <h3>5. Contact Us</h3>
+              <p>For questions about these Terms of Service, contact us at legal@advexcel.com.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Contact Modal */}
+      {showContactModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'rgba(0, 0, 0, 0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            borderRadius: '20px',
+            padding: '40px',
+            maxWidth: '600px',
+            maxHeight: '80vh',
+            overflow: 'auto',
+            color: 'white',
+            position: 'relative'
+          }}>
+            <button
+              onClick={() => setShowContactModal(false)}
+              style={{
+                position: 'absolute',
+                top: '20px',
+                right: '20px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '50%',
+                width: '40px',
+                height: '40px',
+                color: 'white',
+                cursor: 'pointer',
+                fontSize: '18px'
+              }}
+            >
+              ×
+            </button>
+            <h2 style={{ margin: '0 0 24px 0', fontSize: '24px', fontWeight: '700' }}>Contact Information</h2>
+            <div style={{ fontSize: '14px', lineHeight: '1.6' }}>
+              <p>We'd love to hear from you! Get in touch with us through any of the following channels:</p>
+              
+              <h3>📧 Email Support</h3>
+              <ul>
+                <li>General Inquiries: info@advexcel.com</li>
+                <li>Technical Support: support@advexcel.com</li>
+                <li>Privacy Questions: privacy@advexcel.com</li>
+                <li>Legal Matters: legal@advexcel.com</li>
+              </ul>
+              
+              <h3>🌐 Online</h3>
+              <ul>
+                <li>Website: www.advexcel.com</li>
+                <li>Documentation: docs.advexcel.com</li>
+                <li>Status Page: status.advexcel.com</li>
+              </ul>
+              
+              <h3>⏰ Support Hours</h3>
+              <ul>
+                <li>Monday - Friday: 9:00 AM - 6:00 PM PST</li>
+                <li>Saturday: 10:00 AM - 4:00 PM PST</li>
+                <li>Sunday: Closed</li>
+              </ul>
+              
+              <p><strong>Response Time:</strong> We typically respond to all inquiries within 24 hours during business days.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* About Modal */}
+      {showAboutModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'rgba(0, 0, 0, 0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            borderRadius: '20px',
+            padding: '40px',
+            maxWidth: '700px',
+            maxHeight: '80vh',
+            overflow: 'auto',
+            color: 'white',
+            position: 'relative'
+          }}>
+            <button
+              onClick={() => setShowAboutModal(false)}
+              style={{
+                position: 'absolute',
+                top: '20px',
+                right: '20px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '50%',
+                width: '40px',
+                height: '40px',
+                color: 'white',
+                cursor: 'pointer',
+                fontSize: '18px'
+              }}
+            >
+              ×
+            </button>
+            <h2 style={{ margin: '0 0 24px 0', fontSize: '24px', fontWeight: '700' }}>About Us</h2>
+            <div style={{ fontSize: '14px', lineHeight: '1.6' }}>
+              <h3>About the Creator</h3>
+              <p>Yadunandan Katragadda is a full-stack developer and AI enthusiast passionate about creating intelligent solutions that simplify complex data analysis. With expertise in cloud technologies and machine learning, he built AdvExcel AI to democratize advanced data analytics for everyone.</p>
+              
+              <p>As an AWS Solutions Architect and AI/ML Engineer, Yadunandan combines deep technical knowledge with a user-centric approach to deliver powerful yet accessible tools for data professionals and business users alike.</p>
+              
+              <p>His vision is to make advanced data analytics as simple as having a conversation, enabling anyone to unlock insights from their data without requiring deep technical expertise.</p>
+              
+              <h3>Connect with Yadunandan</h3>
+              <ul>
+                <li>LinkedIn: linkedin.com/in/yadunandan-katragadda</li>
+                <li>GitHub: github.com/yadunandankatragadda</li>
+                <li>Email: yadunandan.katragadda@example.com</li>
+              </ul>
+              
+              <p><strong>AdvExcel AI represents the future of data analytics - intelligent, accessible, and powerful.</strong></p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Help Modal */}
+      {showHelpModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'rgba(0, 0, 0, 0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            borderRadius: '20px',
+            padding: '40px',
+            maxWidth: '800px',
+            maxHeight: '80vh',
+            overflow: 'auto',
+            color: 'white',
+            position: 'relative'
+          }}>
+            <button
+              onClick={() => setShowHelpModal(false)}
+              style={{
+                position: 'absolute',
+                top: '20px',
+                right: '20px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '50%',
+                width: '40px',
+                height: '40px',
+                color: 'white',
+                cursor: 'pointer',
+                fontSize: '18px'
+              }}
+            >
+              ×
+            </button>
+            <h2 style={{ margin: '0 0 24px 0', fontSize: '24px', fontWeight: '700' }}>Help & Documentation</h2>
+            <div style={{ fontSize: '14px', lineHeight: '1.6' }}>
+              <h3>🚀 Getting Started</h3>
+              <ol>
+                <li><strong>Upload Your Data</strong>
+                  <ul>
+                    <li>Supported formats: Excel (.xlsx, .xls), CSV (.csv)</li>
+                    <li>Maximum file size: 50MB</li>
+                    <li>Recommended: Clean, structured data with headers</li>
+                  </ul>
+                </li>
+                <li><strong>AI Analysis</strong>
+                  <ul>
+                    <li>Ask questions in natural language</li>
+                    <li>Example: "What are the top 5 performers?"</li>
+                    <li>Example: "Show me trends over time"</li>
+                  </ul>
+                </li>
+                <li><strong>Explore Features</strong>
+                  <ul>
+                    <li>Pivot Tables: Automatic generation based on your data</li>
+                    <li>Charts: Multiple visualization types</li>
+                    <li>Statistics: Correlation analysis, percentiles</li>
+                  </ul>
+                </li>
+              </ol>
+              
+              <h3>💡 Tips for Best Results</h3>
+              <ul>
+                <li>Use clear, descriptive column headers</li>
+                <li>Remove empty rows and columns</li>
+                <li>Ensure consistent data formats</li>
+                <li>Be specific in your questions to AI</li>
+              </ul>
+              
+              <p><strong>Need more help?</strong> Contact support@advexcel.com</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Feedback Modal */}
+      {showFeedbackModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'rgba(0, 0, 0, 0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            borderRadius: '20px',
+            padding: '40px',
+            maxWidth: '600px',
+            width: '100%',
+            color: 'white',
+            position: 'relative'
+          }}>
+            <button
+              onClick={() => setShowFeedbackModal(false)}
+              style={{
+                position: 'absolute',
+                top: '20px',
+                right: '20px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '50%',
+                width: '40px',
+                height: '40px',
+                color: 'white',
+                cursor: 'pointer',
+                fontSize: '18px'
+              }}
+            >
+              ×
+            </button>
+            <h2 style={{ margin: '0 0 24px 0', fontSize: '24px', fontWeight: '700' }}>💬 Send Feedback</h2>
+            <p style={{ margin: '0 0 20px 0', fontSize: '14px', opacity: 0.8 }}>
+              Help us improve AdvExcel AI! Share your thoughts, suggestions, or report issues.
+            </p>
+            <textarea
+              value={feedbackText}
+              onChange={(e) => setFeedbackText(e.target.value)}
+              placeholder="Your feedback is valuable to us. Please share your experience, suggestions for improvement, or any issues you've encountered..."
+              style={{
+                width: '100%',
+                height: '120px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '12px',
+                padding: '16px',
+                color: 'white',
+                fontSize: '14px',
+                resize: 'vertical',
+                marginBottom: '20px',
+                boxSizing: 'border-box'
+              }}
+            />
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setShowFeedbackModal(false)}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  borderRadius: '12px',
+                  padding: '12px 24px',
+                  color: 'white',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  if (feedbackText.trim()) {
+                    setAiResponse(`✅ **Feedback Submitted**\n\nThank you for your feedback! We appreciate your input and will use it to improve AdvExcel AI.\n\nYour message: "${feedbackText.substring(0, 100)}${feedbackText.length > 100 ? '...' : ''}"`);
+                    setFeedbackText('');
+                    setShowFeedbackModal(false);
+                  }
+                }}
+                disabled={!feedbackText.trim()}
+                style={{
+                  background: feedbackText.trim() ? 'linear-gradient(135deg, #78dbff 0%, #ff77c6 100%)' : 'rgba(255, 255, 255, 0.1)',
+                  border: 'none',
+                  borderRadius: '12px',
+                  padding: '12px 24px',
+                  color: 'white',
+                  cursor: feedbackText.trim() ? 'pointer' : 'not-allowed',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  opacity: feedbackText.trim() ? 1 : 0.5
+                }}
+              >
+                Send Feedback
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
