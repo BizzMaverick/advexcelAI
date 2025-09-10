@@ -4591,7 +4591,7 @@ Technology Stack:
 • Razorpay for secure payment processing
 
 Contact Us:
-Have questions or feedback? We'd love to hear from you! Contact us at contact@advexcel.online`ithout requiring technical expertise.
+Have questions or feedback? We'd love to hear from you! Contact us at contact@advexcel.online without requiring technical expertise.
 
 About AdvExcel AI:
 
