@@ -824,7 +824,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     setAiResponse('🧠 AI is analyzing your data for business insights...');
     
     try {
-      const result = await bedrockService.processExcelData(data, 'Provide detailed business analysis with specific insights, top performers, comparisons, and actionable recommendations', selectedFile?.name || 'data');
+      const result = await bedrockService.processExcelData(data, 'Provide comprehensive business analysis with detailed insights, performance metrics, trends, comparisons, and specific actionable recommendations for business improvement', selectedFile?.name || 'data');
       
       if (result.success && result.response) {
         // Generate comprehensive local analysis first
@@ -834,20 +834,77 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
         const headers = data[0];
         const context = detectDataContext(selectedFile?.name || '', headers, data.slice(1));
         
-        let enhancedResponse = `🤖 **AWS AI BUSINESS INTELLIGENCE**\n\n${result.response}`;
+        // Check if AWS response is too short or generic
+        const isShortResponse = result.response.length < 100 || result.response.includes('Top 10 entries');
         
-        // If response seems truncated, add continuation
-        if (result.response.length > 500 && !result.response.includes('recommendations')) {
-          enhancedResponse += `\n\n[Response continues with detailed insights...]`;
-        }
+        let enhancedResponse = '';
         
-        // Add detailed local business analysis
-        enhancedResponse += `\n\n📊 **DETAILED BUSINESS METRICS:**\n`;
-        
-        if (context.type === 'Restaurant') {
-          enhancedResponse += generateRestaurantMetrics(headers, data.slice(1));
+        if (isShortResponse) {
+          // Use structured data if available for better analysis
+          if (result.structured && result.structured.result) {
+            enhancedResponse = `🤖 **AWS AI DATA PROCESSING**\n\n`;
+            enhancedResponse += `✅ AWS has processed and filtered your data successfully.\n\n`;
+            
+            // Analyze the structured data
+            const structuredData = result.structured.result;
+            if (structuredData.length > 1) {
+              enhancedResponse += `📊 **PROCESSED DATA INSIGHTS:**\n`;
+              enhancedResponse += `• Filtered Records: ${structuredData.length - 1}\n`;
+              enhancedResponse += `• Data Columns: ${structuredData[0]?.length || 0}\n`;
+              enhancedResponse += `• Processing: ${result.structured.operation || 'analysis'}\n\n`;
+            }
+          } else {
+            enhancedResponse = `🤖 **AWS AI ANALYSIS**\n\n${result.response}\n\n`;
+          }
+          
+          // Add comprehensive local analysis since AWS response is limited
+          enhancedResponse += `🧠 **COMPREHENSIVE LOCAL ANALYSIS**\n\n`;
+          
+          switch (context.type) {
+            case 'Restaurant':
+              enhancedResponse += generateRestaurantAnalysis(headers, data.slice(1));
+              break;
+            case 'Ecommerce':
+              enhancedResponse += generateEcommerceAnalysis(headers, data.slice(1));
+              break;
+            case 'HR':
+              enhancedResponse += generateHRAnalysis(headers, data.slice(1));
+              break;
+            case 'Finance':
+              enhancedResponse += generateFinanceAnalysis(headers, data.slice(1));
+              break;
+            case 'Healthcare':
+              enhancedResponse += generateHealthcareAnalysis(headers, data.slice(1));
+              break;
+            case 'Education':
+              enhancedResponse += generateEducationAnalysis(headers, data.slice(1));
+              break;
+            case 'Manufacturing':
+              enhancedResponse += generateManufacturingAnalysis(headers, data.slice(1));
+              break;
+            case 'RealEstate':
+              enhancedResponse += generateRealEstateAnalysis(headers, data.slice(1));
+              break;
+            case 'Marketing':
+              enhancedResponse += generateMarketingAnalysis(headers, data.slice(1));
+              break;
+            case 'Logistics':
+              enhancedResponse += generateLogisticsAnalysis(headers, data.slice(1));
+              break;
+            default:
+              enhancedResponse += generateUniversalAnalysis(headers, data.slice(1), selectedFile?.name || 'data');
+          }
         } else {
-          enhancedResponse += generateUniversalMetrics(headers, data.slice(1), analytics);
+          // Use full AWS response when it's comprehensive
+          enhancedResponse = `🤖 **AWS AI COMPREHENSIVE ANALYSIS**\n\n${result.response}`;
+          
+          // Add quick metrics
+          enhancedResponse += `\n\n📊 **QUICK METRICS:**\n`;
+          if (context.type === 'Restaurant') {
+            enhancedResponse += generateRestaurantMetrics(headers, data.slice(1));
+          } else {
+            enhancedResponse += generateUniversalMetrics(headers, data.slice(1), analytics);
+          }
         }
         
         setAiResponse(enhancedResponse);
