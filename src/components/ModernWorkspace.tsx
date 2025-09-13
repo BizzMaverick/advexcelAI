@@ -269,10 +269,39 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     let analysis = `🧠 **${context.title.toUpperCase()}**\n\n`;
     
     // Business-specific analysis
-    if (context.type === 'Restaurant') {
-      analysis += generateRestaurantAnalysis(headers, rows);
-    } else {
-      analysis += generateUniversalAnalysis(headers, rows, fileName);
+    switch (context.type) {
+      case 'Restaurant':
+        analysis += generateRestaurantAnalysis(headers, rows);
+        break;
+      case 'Ecommerce':
+        analysis += generateEcommerceAnalysis(headers, rows);
+        break;
+      case 'HR':
+        analysis += generateHRAnalysis(headers, rows);
+        break;
+      case 'Finance':
+        analysis += generateFinanceAnalysis(headers, rows);
+        break;
+      case 'Healthcare':
+        analysis += generateHealthcareAnalysis(headers, rows);
+        break;
+      case 'Education':
+        analysis += generateEducationAnalysis(headers, rows);
+        break;
+      case 'Manufacturing':
+        analysis += generateManufacturingAnalysis(headers, rows);
+        break;
+      case 'RealEstate':
+        analysis += generateRealEstateAnalysis(headers, rows);
+        break;
+      case 'Marketing':
+        analysis += generateMarketingAnalysis(headers, rows);
+        break;
+      case 'Logistics':
+        analysis += generateLogisticsAnalysis(headers, rows);
+        break;
+      default:
+        analysis += generateUniversalAnalysis(headers, rows, fileName);
     }
     
     setAiResponse(analysis);
@@ -452,6 +481,210 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     return analysis;
   };
 
+  const generateEcommerceAnalysis = (headers: any[], rows: any[][]) => {
+    let analysis = `🛒 **E-COMMERCE SALES INTELLIGENCE**\n\n`;
+    
+    const productCol = headers.findIndex(h => String(h).toLowerCase().includes('product'));
+    const revenueCol = headers.findIndex(h => String(h).toLowerCase().includes('revenue') || String(h).toLowerCase().includes('total') || String(h).toLowerCase().includes('amount'));
+    
+    if (productCol >= 0 && revenueCol >= 0) {
+      const productSales = new Map();
+      rows.forEach(row => {
+        const product = String(row[productCol] || '').trim();
+        const revenue = parseFloat(row[revenueCol] || 0);
+        if (product && revenue > 0) {
+          productSales.set(product, (productSales.get(product) || 0) + revenue);
+        }
+      });
+      
+      const topProducts = Array.from(productSales.entries()).sort((a, b) => b[1] - a[1]).slice(0, 5);
+      analysis += `🏆 **TOP SELLING PRODUCTS:**\n`;
+      topProducts.forEach(([product, revenue], index) => {
+        analysis += `${index + 1}. ${product}: $${revenue.toLocaleString()}\n`;
+      });
+      analysis += `\n`;
+    }
+    
+    const totalRevenue = rows.reduce((sum, row) => sum + (parseFloat(row[revenueCol] || 0)), 0);
+    analysis += `💰 **BUSINESS METRICS:**\n`;
+    analysis += `• Total Revenue: $${totalRevenue.toLocaleString()}\n`;
+    analysis += `• Total Orders: ${rows.length.toLocaleString()}\n`;
+    analysis += `• Average Order Value: $${(totalRevenue / rows.length).toFixed(2)}\n\n`;
+    
+    return analysis;
+  };
+
+  const generateHRAnalysis = (headers: any[], rows: any[][]) => {
+    let analysis = `👥 **HUMAN RESOURCES ANALYTICS**\n\n`;
+    
+    const deptCol = headers.findIndex(h => String(h).toLowerCase().includes('department'));
+    const salaryCol = headers.findIndex(h => String(h).toLowerCase().includes('salary'));
+    
+    if (deptCol >= 0) {
+      const deptCount = new Map();
+      rows.forEach(row => {
+        const dept = String(row[deptCol] || '').trim();
+        if (dept) deptCount.set(dept, (deptCount.get(dept) || 0) + 1);
+      });
+      
+      analysis += `🏢 **DEPARTMENT BREAKDOWN:**\n`;
+      Array.from(deptCount.entries()).sort((a, b) => b[1] - a[1]).forEach(([dept, count]) => {
+        analysis += `• ${dept}: ${count} employees\n`;
+      });
+      analysis += `\n`;
+    }
+    
+    if (salaryCol >= 0) {
+      const salaries = rows.map(row => parseFloat(row[salaryCol] || 0)).filter(s => s > 0);
+      const avgSalary = salaries.reduce((sum, sal) => sum + sal, 0) / salaries.length;
+      analysis += `💰 **COMPENSATION ANALYSIS:**\n`;
+      analysis += `• Average Salary: $${avgSalary.toLocaleString()}\n`;
+      analysis += `• Highest Salary: $${Math.max(...salaries).toLocaleString()}\n\n`;
+    }
+    
+    return analysis;
+  };
+
+  const generateFinanceAnalysis = (headers: any[], rows: any[][]) => {
+    let analysis = `💳 **FINANCIAL ANALYTICS**\n\n`;
+    
+    const amountCol = headers.findIndex(h => String(h).toLowerCase().includes('amount') || String(h).toLowerCase().includes('balance'));
+    
+    if (amountCol >= 0) {
+      const amounts = rows.map(row => parseFloat(row[amountCol] || 0));
+      const totalAmount = amounts.reduce((sum, amt) => sum + amt, 0);
+      const positiveAmounts = amounts.filter(amt => amt > 0);
+      const negativeAmounts = amounts.filter(amt => amt < 0);
+      
+      analysis += `📊 **FINANCIAL SUMMARY:**\n`;
+      analysis += `• Total Amount: $${totalAmount.toLocaleString()}\n`;
+      analysis += `• Credits: $${positiveAmounts.reduce((sum, amt) => sum + amt, 0).toLocaleString()}\n`;
+      analysis += `• Debits: $${Math.abs(negativeAmounts.reduce((sum, amt) => sum + amt, 0)).toLocaleString()}\n\n`;
+    }
+    
+    return analysis;
+  };
+
+  const generateHealthcareAnalysis = (headers: any[], rows: any[][]) => {
+    let analysis = `🏥 **HEALTHCARE ANALYTICS**\n\n`;
+    
+    const diagnosisCol = headers.findIndex(h => String(h).toLowerCase().includes('diagnosis'));
+    const costCol = headers.findIndex(h => String(h).toLowerCase().includes('cost') || String(h).toLowerCase().includes('charge'));
+    
+    if (diagnosisCol >= 0) {
+      const diagnosisCount = new Map();
+      rows.forEach(row => {
+        const diagnosis = String(row[diagnosisCol] || '').trim();
+        if (diagnosis) diagnosisCount.set(diagnosis, (diagnosisCount.get(diagnosis) || 0) + 1);
+      });
+      
+      analysis += `🔬 **TOP DIAGNOSES:**\n`;
+      Array.from(diagnosisCount.entries()).sort((a, b) => b[1] - a[1]).slice(0, 5).forEach(([diagnosis, count]) => {
+        analysis += `• ${diagnosis}: ${count} cases\n`;
+      });
+      analysis += `\n`;
+    }
+    
+    return analysis;
+  };
+
+  const generateEducationAnalysis = (headers: any[], rows: any[][]) => {
+    let analysis = `🎓 **EDUCATION ANALYTICS**\n\n`;
+    
+    const gradeCol = headers.findIndex(h => String(h).toLowerCase().includes('grade') || String(h).toLowerCase().includes('score'));
+    const subjectCol = headers.findIndex(h => String(h).toLowerCase().includes('subject') || String(h).toLowerCase().includes('course'));
+    
+    if (gradeCol >= 0) {
+      const grades = rows.map(row => parseFloat(row[gradeCol] || 0)).filter(g => g > 0);
+      const avgGrade = grades.reduce((sum, grade) => sum + grade, 0) / grades.length;
+      analysis += `📊 **ACADEMIC PERFORMANCE:**\n`;
+      analysis += `• Average Grade: ${avgGrade.toFixed(2)}\n`;
+      analysis += `• Highest Grade: ${Math.max(...grades)}\n\n`;
+    }
+    
+    return analysis;
+  };
+
+  const generateManufacturingAnalysis = (headers: any[], rows: any[][]) => {
+    let analysis = `🏭 **MANUFACTURING ANALYTICS**\n\n`;
+    
+    const productionCol = headers.findIndex(h => String(h).toLowerCase().includes('production') || String(h).toLowerCase().includes('quantity'));
+    
+    if (productionCol >= 0) {
+      const production = rows.map(row => parseFloat(row[productionCol] || 0)).filter(p => p > 0);
+      const totalProduction = production.reduce((sum, prod) => sum + prod, 0);
+      analysis += `📈 **PRODUCTION METRICS:**\n`;
+      analysis += `• Total Production: ${totalProduction.toLocaleString()} units\n`;
+      analysis += `• Average Production: ${(totalProduction / production.length).toLocaleString()} units\n\n`;
+    }
+    
+    return analysis;
+  };
+
+  const generateRealEstateAnalysis = (headers: any[], rows: any[][]) => {
+    let analysis = `🏠 **REAL ESTATE ANALYTICS**\n\n`;
+    
+    const priceCol = headers.findIndex(h => String(h).toLowerCase().includes('price') || String(h).toLowerCase().includes('value'));
+    
+    if (priceCol >= 0) {
+      const prices = rows.map(row => parseFloat(row[priceCol] || 0)).filter(p => p > 0);
+      const avgPrice = prices.reduce((sum, price) => sum + price, 0) / prices.length;
+      analysis += `💰 **PROPERTY VALUES:**\n`;
+      analysis += `• Average Price: $${avgPrice.toLocaleString()}\n`;
+      analysis += `• Highest Price: $${Math.max(...prices).toLocaleString()}\n\n`;
+    }
+    
+    return analysis;
+  };
+
+  const generateMarketingAnalysis = (headers: any[], rows: any[][]) => {
+    let analysis = `📢 **MARKETING ANALYTICS**\n\n`;
+    
+    const campaignCol = headers.findIndex(h => String(h).toLowerCase().includes('campaign'));
+    const conversionCol = headers.findIndex(h => String(h).toLowerCase().includes('conversion') || String(h).toLowerCase().includes('click'));
+    
+    if (campaignCol >= 0) {
+      const campaignPerf = new Map();
+      rows.forEach(row => {
+        const campaign = String(row[campaignCol] || '').trim();
+        const conversion = parseFloat(row[conversionCol] || 0);
+        if (campaign) {
+          campaignPerf.set(campaign, (campaignPerf.get(campaign) || 0) + conversion);
+        }
+      });
+      
+      analysis += `🎯 **CAMPAIGN PERFORMANCE:**\n`;
+      Array.from(campaignPerf.entries()).sort((a, b) => b[1] - a[1]).slice(0, 5).forEach(([campaign, perf]) => {
+        analysis += `• ${campaign}: ${perf.toLocaleString()} conversions\n`;
+      });
+      analysis += `\n`;
+    }
+    
+    return analysis;
+  };
+
+  const generateLogisticsAnalysis = (headers: any[], rows: any[][]) => {
+    let analysis = `🚚 **LOGISTICS ANALYTICS**\n\n`;
+    
+    const statusCol = headers.findIndex(h => String(h).toLowerCase().includes('status'));
+    
+    if (statusCol >= 0) {
+      const statusCount = new Map();
+      rows.forEach(row => {
+        const status = String(row[statusCol] || '').trim();
+        if (status) statusCount.set(status, (statusCount.get(status) || 0) + 1);
+      });
+      
+      analysis += `📦 **DELIVERY STATUS:**\n`;
+      Array.from(statusCount.entries()).forEach(([status, count]) => {
+        analysis += `• ${status}: ${count} shipments\n`;
+      });
+      analysis += `\n`;
+    }
+    
+    return analysis;
+  };
+
   const detectDataContext = (fileName: string, headers: string[], rows: any[][]) => {
     const fileNameLower = fileName.toLowerCase();
     const headersLower = headers.map(h => String(h).toLowerCase());
@@ -464,15 +697,115 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
         title: 'Restaurant Analytics Dashboard',
         recordType: 'transactions',
         categoryType: 'menu items',
-        performanceMetric: 'Sales performance',
-        keyColumns: headers.filter((h, i) => headersLower[i].includes('item') || headersLower[i].includes('server') || headersLower[i].includes('table') || headersLower[i].includes('area')),
-        recommendations: [
-          'Analyze peak hours and sales trends',
-          'Identify top-performing menu items',
-          'Track server performance and efficiency',
-          'Monitor table turnover and capacity utilization',
-          'Generate GST compliance reports'
-        ]
+        performanceMetric: 'Sales performance'
+      };
+    }
+    
+    // E-commerce/Retail data
+    if (fileNameLower.includes('sales') || fileNameLower.includes('product') || fileNameLower.includes('customer') || fileNameLower.includes('ecommerce') ||
+        headersLower.some(h => h.includes('product') || h.includes('customer') || h.includes('purchase') || h.includes('cart') || h.includes('sku'))) {
+      return {
+        type: 'Ecommerce',
+        title: 'E-commerce Sales Analytics',
+        recordType: 'sales',
+        categoryType: 'products',
+        performanceMetric: 'Revenue performance'
+      };
+    }
+    
+    // HR/Employee data
+    if (fileNameLower.includes('employee') || fileNameLower.includes('hr') || fileNameLower.includes('payroll') || fileNameLower.includes('staff') ||
+        headersLower.some(h => h.includes('employee') || h.includes('salary') || h.includes('department') || h.includes('position') || h.includes('hire'))) {
+      return {
+        type: 'HR',
+        title: 'Human Resources Analytics',
+        recordType: 'employees',
+        categoryType: 'departments',
+        performanceMetric: 'Employee performance'
+      };
+    }
+    
+    // Finance/Banking data
+    if (fileNameLower.includes('finance') || fileNameLower.includes('bank') || fileNameLower.includes('transaction') || fileNameLower.includes('account') ||
+        headersLower.some(h => h.includes('account') || h.includes('balance') || h.includes('transaction') || h.includes('credit') || h.includes('debit'))) {
+      return {
+        type: 'Finance',
+        title: 'Financial Analytics Dashboard',
+        recordType: 'transactions',
+        categoryType: 'accounts',
+        performanceMetric: 'Financial performance'
+      };
+    }
+    
+    // Healthcare data
+    if (fileNameLower.includes('patient') || fileNameLower.includes('medical') || fileNameLower.includes('hospital') || fileNameLower.includes('clinic') ||
+        headersLower.some(h => h.includes('patient') || h.includes('diagnosis') || h.includes('treatment') || h.includes('doctor') || h.includes('medical'))) {
+      return {
+        type: 'Healthcare',
+        title: 'Healthcare Analytics Dashboard',
+        recordType: 'patients',
+        categoryType: 'treatments',
+        performanceMetric: 'Patient outcomes'
+      };
+    }
+    
+    // Education data
+    if (fileNameLower.includes('student') || fileNameLower.includes('school') || fileNameLower.includes('course') || fileNameLower.includes('grade') ||
+        headersLower.some(h => h.includes('student') || h.includes('grade') || h.includes('course') || h.includes('subject') || h.includes('score'))) {
+      return {
+        type: 'Education',
+        title: 'Education Analytics Dashboard',
+        recordType: 'students',
+        categoryType: 'courses',
+        performanceMetric: 'Academic performance'
+      };
+    }
+    
+    // Manufacturing data
+    if (fileNameLower.includes('production') || fileNameLower.includes('manufacturing') || fileNameLower.includes('inventory') || fileNameLower.includes('quality') ||
+        headersLower.some(h => h.includes('production') || h.includes('inventory') || h.includes('quality') || h.includes('defect') || h.includes('batch'))) {
+      return {
+        type: 'Manufacturing',
+        title: 'Manufacturing Analytics Dashboard',
+        recordType: 'production',
+        categoryType: 'products',
+        performanceMetric: 'Production efficiency'
+      };
+    }
+    
+    // Real Estate data
+    if (fileNameLower.includes('property') || fileNameLower.includes('real') || fileNameLower.includes('estate') || fileNameLower.includes('rent') ||
+        headersLower.some(h => h.includes('property') || h.includes('price') || h.includes('location') || h.includes('rent') || h.includes('sqft'))) {
+      return {
+        type: 'RealEstate',
+        title: 'Real Estate Analytics Dashboard',
+        recordType: 'properties',
+        categoryType: 'locations',
+        performanceMetric: 'Property values'
+      };
+    }
+    
+    // Marketing data
+    if (fileNameLower.includes('marketing') || fileNameLower.includes('campaign') || fileNameLower.includes('lead') || fileNameLower.includes('conversion') ||
+        headersLower.some(h => h.includes('campaign') || h.includes('lead') || h.includes('conversion') || h.includes('click') || h.includes('impression'))) {
+      return {
+        type: 'Marketing',
+        title: 'Marketing Analytics Dashboard',
+        recordType: 'campaigns',
+        categoryType: 'channels',
+        performanceMetric: 'Campaign performance'
+      };
+    }
+    
+    // Logistics/Supply Chain data
+    if (fileNameLower.includes('logistics') || fileNameLower.includes('shipping') || fileNameLower.includes('delivery') || fileNameLower.includes('supply') ||
+        headersLower.some(h => h.includes('shipping') || h.includes('delivery') || h.includes('warehouse') || h.includes('supplier') || h.includes('freight'))) {
+      return {
+        type: 'Logistics',
+        title: 'Logistics Analytics Dashboard',
+        recordType: 'shipments',
+        categoryType: 'routes',
+        performanceMetric: 'Delivery performance'
       };
     }
     
@@ -482,14 +815,7 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
       title: 'Universal Data Analysis',
       recordType: 'records',
       categoryType: 'categories',
-      performanceMetric: 'Data metrics',
-      keyColumns: headers.slice(0, 3),
-      recommendations: [
-        'Analyze numeric columns for trends and patterns',
-        'Explore relationships between categorical variables',
-        'Identify outliers and data quality issues',
-        'Create visualizations for key insights'
-      ]
+      performanceMetric: 'Data metrics'
     };
   };
 
