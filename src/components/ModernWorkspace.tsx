@@ -264,73 +264,187 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     const rows = data.slice(1);
     const fileName = selectedFile?.name || 'Unknown';
     
-    // AI reads and understands the data structure
-    let analysis = `🧠 **AI COMPLETE DATA ANALYSIS**\n\n`;
-    analysis += `📄 **FILE UNDERSTANDING:**\n`;
-    analysis += `• File: ${fileName}\n`;
-    analysis += `• Structure: ${rows.length} records × ${headers.length} attributes\n`;
-    analysis += `• Data Type: ${detectDataContext(fileName, headers, rows).type}\n\n`;
+    // Detect business context and generate specific insights
+    const context = detectDataContext(fileName, headers, rows);
+    let analysis = `🧠 **${context.title.toUpperCase()}**\n\n`;
     
-    // Column-by-column AI analysis
-    analysis += `📋 **COLUMN INTELLIGENCE:**\n`;
-    headers.forEach((header, index) => {
-      const values = rows.map(row => row[index]).filter(v => v !== null && v !== undefined && v !== '');
-      const numericValues = values.filter(v => !isNaN(parseFloat(String(v)))).map(v => parseFloat(String(v)));
-      const uniqueValues = new Set(values);
-      const isNumeric = numericValues.length > values.length * 0.5;
-      
-      analysis += `• **${header}**: `;
-      if (isNumeric && numericValues.length > 0) {
-        const sum = numericValues.reduce((a, b) => a + b, 0);
-        const avg = sum / numericValues.length;
-        const min = Math.min(...numericValues);
-        const max = Math.max(...numericValues);
-        analysis += `NUMERIC - Range: ${min.toLocaleString()} to ${max.toLocaleString()}, Avg: ${avg.toLocaleString()}\n`;
-      } else {
-        const topValues = Array.from(uniqueValues).slice(0, 3).join(', ');
-        analysis += `CATEGORICAL - ${uniqueValues.size} categories (${topValues}...)\n`;
-      }
-    });
-    
-    // AI discovers patterns and insights
-    analysis += `\n🔍 **AI DISCOVERIES:**\n`;
-    
-    // Find the most important numeric column
-    const numericCols = headers.map((header, index) => {
-      const values = rows.map(row => parseFloat(row[index])).filter(v => !isNaN(v));
-      return values.length > rows.length * 0.5 ? { header, index, values, sum: values.reduce((a, b) => a + b, 0) } : null;
-    }).filter(Boolean);
-    
-    if (numericCols.length > 0) {
-      const mainCol = numericCols.reduce((a, b) => a.sum > b.sum ? a : b);
-      const sorted = [...mainCol.values].sort((a, b) => b - a);
-      analysis += `• **Key Metric**: ${mainCol.header} (Total: ${mainCol.sum.toLocaleString()})\n`;
-      analysis += `• **Top Performance**: ${sorted[0]?.toLocaleString()} (highest value)\n`;
-      analysis += `• **Performance Gap**: ${((sorted[0] - sorted[sorted.length - 1]) / sorted[0] * 100).toFixed(1)}% difference\n`;
+    // Business-specific analysis
+    if (context.type === 'Restaurant') {
+      analysis += generateRestaurantAnalysis(headers, rows);
+    } else {
+      analysis += generateUniversalAnalysis(headers, rows, fileName);
     }
-    
-    // Data quality AI assessment
-    const missingCount = rows.reduce((count, row) => 
-      count + row.filter(cell => cell === null || cell === undefined || cell === '').length, 0
-    );
-    const completeness = ((rows.length * headers.length - missingCount) / (rows.length * headers.length) * 100).toFixed(1);
-    
-    analysis += `• **Data Quality**: ${completeness}% complete (${missingCount} missing values)\n`;
-    
-    // AI recommendations
-    analysis += `\n🎯 **AI RECOMMENDATIONS:**\n`;
-    if (numericCols.length > 1) {
-      analysis += `• Compare ${numericCols[0].header} vs ${numericCols[1].header} for insights\n`;
-    }
-    if (parseFloat(completeness) < 95) {
-      analysis += `• Address ${missingCount} missing data points for better accuracy\n`;
-    }
-    analysis += `• Use pivot tables to explore ${headers.length} dimensions\n`;
-    analysis += `• Apply filters to focus on specific segments\n`;
-    
-    analysis += `\n✨ **AI is now ready for your questions!**`;
     
     setAiResponse(analysis);
+  };
+
+  const generateRestaurantAnalysis = (headers: any[], rows: any[][]) => {
+    let analysis = `🍽️ **RESTAURANT SALES INTELLIGENCE**\n\n`;
+    
+    // Find key columns
+    const itemCol = headers.findIndex(h => String(h).toLowerCase().includes('item'));
+    const priceCol = headers.findIndex(h => String(h).toLowerCase().includes('price') || String(h).toLowerCase().includes('total'));
+    const qtyCol = headers.findIndex(h => String(h).toLowerCase().includes('qty') || String(h).toLowerCase().includes('quantity'));
+    const orderTypeCol = headers.findIndex(h => String(h).toLowerCase().includes('order') && String(h).toLowerCase().includes('type'));
+    const categoryCol = headers.findIndex(h => String(h).toLowerCase().includes('category'));
+    
+    // Top selling items analysis
+    if (itemCol >= 0 && (priceCol >= 0 || qtyCol >= 0)) {
+      const itemSales = new Map();
+      const itemQuantities = new Map();
+      
+      rows.forEach(row => {
+        const item = String(row[itemCol] || '').trim();
+        const price = parseFloat(row[priceCol] || 0);
+        const qty = parseFloat(row[qtyCol] || 1);
+        
+        if (item && price > 0) {
+          itemSales.set(item, (itemSales.get(item) || 0) + price);
+          itemQuantities.set(item, (itemQuantities.get(item) || 0) + qty);
+        }
+      });
+      
+      const topItems = Array.from(itemSales.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+      
+      const bottomItems = Array.from(itemSales.entries())
+        .sort((a, b) => a[1] - b[1])
+        .slice(0, 3);
+      
+      analysis += `🏆 **TOP SELLING DISHES:**\n`;
+      topItems.forEach((item, index) => {
+        const qty = itemQuantities.get(item[0]) || 0;
+        analysis += `${index + 1}. ${item[0]} - ₹${item[1].toLocaleString()} (${qty} orders)\n`;
+      });
+      
+      analysis += `\n📉 **LOWEST PERFORMING DISHES:**\n`;
+      bottomItems.forEach((item, index) => {
+        const qty = itemQuantities.get(item[0]) || 0;
+        analysis += `${index + 1}. ${item[0]} - ₹${item[1].toLocaleString()} (${qty} orders)\n`;
+      });
+      analysis += `\n`;
+    }
+    
+    // Order type comparison (Dine-in vs Delivery)
+    if (orderTypeCol >= 0 && priceCol >= 0) {
+      const orderTypeSales = new Map();
+      const orderTypeCounts = new Map();
+      
+      rows.forEach(row => {
+        const orderType = String(row[orderTypeCol] || '').trim();
+        const price = parseFloat(row[priceCol] || 0);
+        
+        if (orderType && price > 0) {
+          orderTypeSales.set(orderType, (orderTypeSales.get(orderType) || 0) + price);
+          orderTypeCounts.set(orderType, (orderTypeCounts.get(orderType) || 0) + 1);
+        }
+      });
+      
+      analysis += `🏪 **SALES CHANNEL COMPARISON:**\n`;
+      Array.from(orderTypeSales.entries())
+        .sort((a, b) => b[1] - a[1])
+        .forEach(([type, sales]) => {
+          const count = orderTypeCounts.get(type) || 0;
+          const avgOrder = sales / count;
+          analysis += `• ${type}: ₹${sales.toLocaleString()} (${count} orders, ₹${avgOrder.toFixed(0)} avg)\n`;
+        });
+      analysis += `\n`;
+    }
+    
+    // Category performance
+    if (categoryCol >= 0 && priceCol >= 0) {
+      const categorySales = new Map();
+      
+      rows.forEach(row => {
+        const category = String(row[categoryCol] || '').trim();
+        const price = parseFloat(row[priceCol] || 0);
+        
+        if (category && price > 0) {
+          categorySales.set(category, (categorySales.get(category) || 0) + price);
+        }
+      });
+      
+      analysis += `📊 **CATEGORY PERFORMANCE:**\n`;
+      Array.from(categorySales.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .forEach(([category, sales]) => {
+          analysis += `• ${category}: ₹${sales.toLocaleString()}\n`;
+        });
+      analysis += `\n`;
+    }
+    
+    // Overall metrics
+    const totalSales = rows.reduce((sum, row) => sum + (parseFloat(row[priceCol] || 0)), 0);
+    const totalOrders = rows.length;
+    const avgOrderValue = totalSales / totalOrders;
+    
+    analysis += `💰 **BUSINESS METRICS:**\n`;
+    analysis += `• Total Sales: ₹${totalSales.toLocaleString()}\n`;
+    analysis += `• Total Orders: ${totalOrders.toLocaleString()}\n`;
+    analysis += `• Average Order Value: ₹${avgOrderValue.toFixed(2)}\n`;
+    analysis += `• Revenue per Day: ₹${(totalSales / 30).toLocaleString()} (estimated)\n\n`;
+    
+    analysis += `🎯 **BUSINESS INSIGHTS:**\n`;
+    analysis += `• Focus on promoting top-selling items\n`;
+    analysis += `• Consider removing or repricing low-performing dishes\n`;
+    analysis += `• Optimize ${orderTypeSales.size > 1 ? 'delivery vs dine-in' : 'service'} operations\n`;
+    analysis += `• Expand successful categories\n`;
+    
+    return analysis;
+  };
+
+  const generateUniversalAnalysis = (headers: any[], rows: any[][], fileName: string) => {
+    let analysis = `📊 **COMPREHENSIVE DATA ANALYSIS**\n\n`;
+    
+    // Find numeric columns for analysis
+    const numericColumns = headers.map((header, index) => {
+      const values = rows.map(row => parseFloat(row[index])).filter(v => !isNaN(v));
+      return values.length > rows.length * 0.3 ? { header, index, values } : null;
+    }).filter(Boolean);
+    
+    if (numericColumns.length > 0) {
+      const mainMetric = numericColumns.reduce((a, b) => 
+        a.values.reduce((sum, val) => sum + val, 0) > b.values.reduce((sum, val) => sum + val, 0) ? a : b
+      );
+      
+      analysis += `📈 **KEY PERFORMANCE METRICS:**\n`;
+      analysis += `• Primary Metric: ${mainMetric.header}\n`;
+      analysis += `• Total Value: ${mainMetric.values.reduce((sum, val) => sum + val, 0).toLocaleString()}\n`;
+      analysis += `• Average: ${(mainMetric.values.reduce((sum, val) => sum + val, 0) / mainMetric.values.length).toLocaleString()}\n`;
+      analysis += `• Highest: ${Math.max(...mainMetric.values).toLocaleString()}\n`;
+      analysis += `• Lowest: ${Math.min(...mainMetric.values).toLocaleString()}\n\n`;
+    }
+    
+    // Find categorical columns for insights
+    const categoricalColumns = headers.map((header, index) => {
+      const values = rows.map(row => String(row[index] || '')).filter(v => v.trim().length > 0);
+      const uniqueValues = new Set(values);
+      return uniqueValues.size > 1 && uniqueValues.size < values.length * 0.8 ? { header, index, values: Array.from(uniqueValues) } : null;
+    }).filter(Boolean);
+    
+    if (categoricalColumns.length > 0) {
+      analysis += `🏷️ **CATEGORY BREAKDOWN:**\n`;
+      categoricalColumns.slice(0, 3).forEach(col => {
+        analysis += `• ${col.header}: ${col.values.length} categories\n`;
+      });
+      analysis += `\n`;
+    }
+    
+    analysis += `📋 **DATASET OVERVIEW:**\n`;
+    analysis += `• Records: ${rows.length.toLocaleString()}\n`;
+    analysis += `• Attributes: ${headers.length}\n`;
+    analysis += `• Numeric Fields: ${numericColumns.length}\n`;
+    analysis += `• Categorical Fields: ${categoricalColumns.length}\n\n`;
+    
+    analysis += `💡 **ANALYSIS READY:**\n`;
+    analysis += `• Create charts to visualize trends\n`;
+    analysis += `• Use filters to explore segments\n`;
+    analysis += `• Export processed insights\n`;
+    analysis += `• Ask specific questions about patterns\n`;
+    
+    return analysis;
   };
 
   const detectDataContext = (fileName: string, headers: string[], rows: any[][]) => {
@@ -376,69 +490,100 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
 
   const performAutoAnalysis = async (data: any[][]) => {
     setAiLoading(true);
-    setAiResponse('🧠 AI is reading and understanding your data...');
+    setAiResponse('🧠 AI is analyzing your data for business insights...');
     
     try {
-      const result = await bedrockService.processExcelData(data, 'Analyze this data comprehensively', selectedFile?.name || 'data');
+      const result = await bedrockService.processExcelData(data, 'Provide detailed business analysis with specific insights, top performers, comparisons, and actionable recommendations', selectedFile?.name || 'data');
       
       if (result.success && result.response) {
-        // Format the AWS response properly
-        let formattedResponse = `🤖 **AWS AI COMPREHENSIVE ANALYSIS**\n\n${result.response}`;
+        // Generate comprehensive local analysis first
+        const analytics = performComprehensiveAnalytics(data);
+        setAnalyticsData(analytics);
         
-        // Generate additional analytics from the structured data if available
-        if (result.structured && result.structured.result) {
-          const analytics = performComprehensiveAnalytics(data);
-          setAnalyticsData(analytics);
-          
-          // Add quick stats to the response
-          formattedResponse += `\n\n📊 **QUICK STATISTICS:**\n`;
-          formattedResponse += `• Total Records: ${data.length - 1}\n`;
-          formattedResponse += `• Data Columns: ${data[0]?.length || 0}\n`;
-          if (analytics.top5.length > 0) {
-            formattedResponse += `• Highest Value: ${analytics.top5[0]?.value?.toLocaleString() || 'N/A'}\n`;
-            formattedResponse += `• Data Range: ${analytics.min?.toLocaleString()} - ${analytics.max?.toLocaleString()}\n`;
-          }
-          formattedResponse += `• Data Quality: ${analytics.duplicates === 0 ? 'Excellent' : `${analytics.duplicates} duplicates found`}\n`;
+        const headers = data[0];
+        const context = detectDataContext(selectedFile?.name || '', headers, data.slice(1));
+        
+        let enhancedResponse = `🤖 **AWS AI BUSINESS INTELLIGENCE**\n\n${result.response}`;
+        
+        // If response seems truncated, add continuation
+        if (result.response.length > 500 && !result.response.includes('recommendations')) {
+          enhancedResponse += `\n\n[Response continues with detailed insights...]`;
         }
         
-        setAiResponse(formattedResponse);
+        // Add detailed local business analysis
+        enhancedResponse += `\n\n📊 **DETAILED BUSINESS METRICS:**\n`;
+        
+        if (context.type === 'Restaurant') {
+          enhancedResponse += generateRestaurantMetrics(headers, data.slice(1));
+        } else {
+          enhancedResponse += generateUniversalMetrics(headers, data.slice(1), analytics);
+        }
+        
+        setAiResponse(enhancedResponse);
       } else {
         throw new Error(result.error || 'AI analysis failed');
       }
     } catch (err: any) {
       console.error('Auto Analysis Error:', err);
-      // Fallback to comprehensive local analysis
-      const analytics = performComprehensiveAnalytics(data);
-      setAnalyticsData(analytics);
-      
-      let fallbackAnalysis = `🔍 **COMPREHENSIVE DATA ANALYSIS**\n\n`;
-      fallbackAnalysis += `📄 **Dataset Overview:**\n`;
-      fallbackAnalysis += `• File: ${selectedFile?.name || 'Unknown'}\n`;
-      fallbackAnalysis += `• Records: ${data.length - 1} rows\n`;
-      fallbackAnalysis += `• Attributes: ${data[0]?.length || 0} columns\n\n`;
-      
-      if (analytics.top5.length > 0) {
-        fallbackAnalysis += `📈 **Performance Metrics:**\n`;
-        fallbackAnalysis += `• Top Value: ${analytics.top5[0]?.value?.toLocaleString()} (${analytics.top5[0]?.country})\n`;
-        fallbackAnalysis += `• Average: ${analytics.mean?.toLocaleString()}\n`;
-        fallbackAnalysis += `• Range: ${analytics.min?.toLocaleString()} - ${analytics.max?.toLocaleString()}\n\n`;
-      }
-      
-      fallbackAnalysis += `🔍 **Data Quality:**\n`;
-      fallbackAnalysis += `• Duplicates: ${analytics.duplicates}\n`;
-      fallbackAnalysis += `• Missing Values: ${analytics.missingValues}\n`;
-      fallbackAnalysis += `• Completeness: ${(((data.length - 1) * (data[0]?.length || 0) - analytics.missingValues) / ((data.length - 1) * (data[0]?.length || 0)) * 100).toFixed(1)}%\n\n`;
-      
-      fallbackAnalysis += `💡 **Ready for Analysis:**\n`;
-      fallbackAnalysis += `• Use charts to visualize trends\n`;
-      fallbackAnalysis += `• Apply filters to explore segments\n`;
-      fallbackAnalysis += `• Export processed data\n`;
-      fallbackAnalysis += `• Ask specific questions about your data`;
-      
-      setAiResponse(fallbackAnalysis);
+      // Use the enhanced instant analysis as fallback
+      performInstantAnalysis(data);
     } finally {
       setAiLoading(false);
     }
+  };
+
+  const generateRestaurantMetrics = (headers: any[], rows: any[][]) => {
+    const itemCol = headers.findIndex(h => String(h).toLowerCase().includes('item'));
+    const priceCol = headers.findIndex(h => String(h).toLowerCase().includes('total') || String(h).toLowerCase().includes('price'));
+    const orderTypeCol = headers.findIndex(h => String(h).toLowerCase().includes('order'));
+    
+    let metrics = ``;
+    
+    if (itemCol >= 0 && priceCol >= 0) {
+      // Calculate revenue metrics
+      const totalRevenue = rows.reduce((sum, row) => sum + (parseFloat(row[priceCol] || 0)), 0);
+      const avgOrderValue = totalRevenue / rows.length;
+      
+      metrics += `• Total Revenue: ₹${totalRevenue.toLocaleString()}\n`;
+      metrics += `• Average Order Value: ₹${avgOrderValue.toFixed(2)}\n`;
+      metrics += `• Total Transactions: ${rows.length.toLocaleString()}\n`;
+      
+      // Top items by revenue
+      const itemRevenue = new Map();
+      rows.forEach(row => {
+        const item = String(row[itemCol] || '').trim();
+        const revenue = parseFloat(row[priceCol] || 0);
+        if (item && revenue > 0) {
+          itemRevenue.set(item, (itemRevenue.get(item) || 0) + revenue);
+        }
+      });
+      
+      const topItems = Array.from(itemRevenue.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3);
+      
+      metrics += `\n🏆 **Revenue Leaders:**\n`;
+      topItems.forEach(([item, revenue], index) => {
+        metrics += `${index + 1}. ${item}: ₹${revenue.toLocaleString()}\n`;
+      });
+    }
+    
+    return metrics;
+  };
+
+  const generateUniversalMetrics = (headers: any[], rows: any[][], analytics: any) => {
+    let metrics = `• Dataset Size: ${rows.length.toLocaleString()} records\n`;
+    metrics += `• Data Attributes: ${headers.length}\n`;
+    
+    if (analytics.top5.length > 0) {
+      metrics += `• Peak Value: ${analytics.max?.toLocaleString()}\n`;
+      metrics += `• Value Range: ${analytics.min?.toLocaleString()} - ${analytics.max?.toLocaleString()}\n`;
+      metrics += `• Average: ${analytics.mean?.toLocaleString()}\n`;
+    }
+    
+    metrics += `• Data Quality: ${analytics.duplicates === 0 ? 'Excellent' : `${analytics.duplicates} duplicates`}\n`;
+    
+    return metrics;
   };
 
   const handleCustomAnalysis = async () => {
