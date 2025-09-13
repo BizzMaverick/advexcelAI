@@ -389,7 +389,12 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
     analysis += `🎯 **BUSINESS INSIGHTS:**\n`;
     analysis += `• Focus on promoting top-selling items\n`;
     analysis += `• Consider removing or repricing low-performing dishes\n`;
-    analysis += `• Optimize ${orderTypeSales.size > 1 ? 'delivery vs dine-in' : 'service'} operations\n`;
+    if (orderTypeCol >= 0) {
+      const orderTypes = [...new Set(rows.map(row => String(row[orderTypeCol] || '').trim()).filter(Boolean))];
+      analysis += `• Optimize ${orderTypes.length > 1 ? 'delivery vs dine-in' : 'service'} operations\n`;
+    } else {
+      analysis += `• Optimize service operations\n`;
+    }
     analysis += `• Expand successful categories\n`;
     
     return analysis;
