@@ -139,8 +139,9 @@ export default function ModernWorkspace({ user, onLogout }: ModernWorkspaceProps
             console.log('Generating instant AI analysis for:', dataForAnalysis.length, 'rows');
             performInstantAnalysis(dataForAnalysis);
             
-            // Automatically trigger AWS AI analysis
-            setTimeout(() => performAutoAnalysis(dataForAnalysis), 1000);
+            // Generate analytics data for charts and metrics
+            const analytics = performComprehensiveAnalytics(dataForAnalysis);
+            setAnalyticsData(analytics);
           } catch (err) {
             console.error('Data analysis failed:', err);
             // Fallback: generate basic analytics with current data
